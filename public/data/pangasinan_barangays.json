@@ -1,0 +1,6918 @@
+ {
+  "Agno": [
+    {
+      "name": "Allabon",
+      "lat": 16.018179,
+      "lng": 119.793209
+    },
+    {
+      "name": "Aloleng",
+      "lat": 16.117253,
+      "lng": 119.778114
+    },
+    {
+      "name": "Bangan-oda",
+      "lat": 16.111471,
+      "lng": 119.827574
+    },
+    {
+      "name": "Baruan",
+      "lat": 16.016886,
+      "lng": 119.772049
+    },
+    {
+      "name": "Boboy",
+      "lat": 16.144654,
+      "lng": 119.787135
+    },
+    {
+      "name": "Cayungnan",
+      "lat": 16.139287,
+      "lng": 119.833184
+    },
+    {
+      "name": "Dangley",
+      "lat": 16.112091,
+      "lng": 119.794581
+    },
+    {
+      "name": "Gayusan",
+      "lat": 16.051914,
+      "lng": 119.775161
+    },
+    {
+      "name": "Macaboboni",
+      "lat": 16.182713,
+      "lng": 119.773817
+    },
+    {
+      "name": "Magsaysay",
+      "lat": 16.093657,
+      "lng": 119.799337
+    },
+    {
+      "name": "Namatucan",
+      "lat": 16.052521,
+      "lng": 119.810783
+    },
+    {
+      "name": "Patar",
+      "lat": 16.158818,
+      "lng": 119.809553
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 16.116046,
+      "lng": 119.802448
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 16.121062,
+      "lng": 119.795231
+    },
+    {
+      "name": "San Juan",
+      "lat": 16.088412,
+      "lng": 119.838835
+    },
+    {
+      "name": "Tupa",
+      "lat": 16.075229,
+      "lng": 119.778015
+    },
+    {
+      "name": "Viga",
+      "lat": 16.120801,
+      "lng": 119.858294
+    }
+  ],
+  "Aguilar": [
+    {
+      "name": "Bayaoas",
+      "lat": 15.800265,
+      "lng": 120.207899
+    },
+    {
+      "name": "Baybay",
+      "lat": 15.898904,
+      "lng": 120.236101
+    },
+    {
+      "name": "Bocacliw",
+      "lat": 15.828393,
+      "lng": 120.214063
+    },
+    {
+      "name": "Bocboc East",
+      "lat": 15.904912,
+      "lng": 120.259066
+    },
+    {
+      "name": "Bocboc West",
+      "lat": 15.885865,
+      "lng": 120.257417
+    },
+    {
+      "name": "Buer",
+      "lat": 15.813606,
+      "lng": 120.21187
+    },
+    {
+      "name": "Calsib",
+      "lat": 15.847948,
+      "lng": 120.27382
+    },
+    {
+      "name": "Laoag",
+      "lat": 15.855578,
+      "lng": 120.190643
+    },
+    {
+      "name": "Manlocboc",
+      "lat": 15.895323,
+      "lng": 120.215983
+    },
+    {
+      "name": "Ninoy",
+      "lat": 15.84007,
+      "lng": 120.209191
+    },
+    {
+      "name": "Panacol",
+      "lat": 15.868361,
+      "lng": 120.288297
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.889251,
+      "lng": 120.232718
+    },
+    {
+      "name": "Pogomboa",
+      "lat": 15.882119,
+      "lng": 120.242693
+    },
+    {
+      "name": "Pogonsili",
+      "lat": 15.790629,
+      "lng": 120.214588
+    },
+    {
+      "name": "San Jose",
+      "lat": 15.86654,
+      "lng": 120.27979
+    },
+    {
+      "name": "Tampac",
+      "lat": 15.875106,
+      "lng": 120.250871
+    }
+  ],
+  "Alaminos City": [
+    {
+      "name": "Alos",
+      "lat": 16.10145,
+      "lng": 119.965403
+    },
+    {
+      "name": "Amandiego",
+      "lat": 16.139247,
+      "lng": 119.967412
+    },
+    {
+      "name": "Amangbangan",
+      "lat": 16.166833,
+      "lng": 119.925719
+    },
+    {
+      "name": "Balangobong",
+      "lat": 16.120479,
+      "lng": 119.990261
+    },
+    {
+      "name": "Balayang",
+      "lat": 16.125403,
+      "lng": 119.94785
+    },
+    {
+      "name": "Baleyadaan",
+      "lat": 16.193417,
+      "lng": 119.988491
+    },
+    {
+      "name": "Bisocol",
+      "lat": 16.142355,
+      "lng": 119.955525
+    },
+    {
+      "name": "Bolaney",
+      "lat": 16.122941,
+      "lng": 119.969274
+    },
+    {
+      "name": "Bued",
+      "lat": 16.167844,
+      "lng": 120.00018
+    },
+    {
+      "name": "Cabatuan",
+      "lat": 16.119251,
+      "lng": 120.007478
+    },
+    {
+      "name": "Cayucay",
+      "lat": 16.18929,
+      "lng": 119.975965
+    },
+    {
+      "name": "Dulacac",
+      "lat": 16.135877,
+      "lng": 119.921762
+    },
+    {
+      "name": "Inerangan",
+      "lat": 16.185565,
+      "lng": 119.932312
+    },
+    {
+      "name": "Landoc",
+      "lat": 16.172402,
+      "lng": 119.937805
+    },
+    {
+      "name": "Linmansangan",
+      "lat": 16.070039,
+      "lng": 119.987887
+    },
+    {
+      "name": "Lucap",
+      "lat": 16.184952,
+      "lng": 119.998401
+    },
+    {
+      "name": "Maawi",
+      "lat": 16.107003,
+      "lng": 119.956648
+    },
+    {
+      "name": "Macatiw",
+      "lat": 16.088682,
+      "lng": 120.000211
+    },
+    {
+      "name": "Magsaysay",
+      "lat": 16.173492,
+      "lng": 119.985141
+    },
+    {
+      "name": "Mona",
+      "lat": 16.207045,
+      "lng": 119.968508
+    },
+    {
+      "name": "Palamis",
+      "lat": 16.143646,
+      "lng": 119.978354
+    },
+    {
+      "name": "Pandan",
+      "lat": 16.178478,
+      "lng": 120.035041
+    },
+    {
+      "name": "Pangapisan",
+      "lat": 16.226008,
+      "lng": 119.951748
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.158731,
+      "lng": 119.979734
+    },
+    {
+      "name": "Pocalpocal",
+      "lat": 16.145561,
+      "lng": 120.006435
+    },
+    {
+      "name": "Pogo",
+      "lat": 16.164604,
+      "lng": 119.960977
+    },
+    {
+      "name": "Polo",
+      "lat": 16.195858,
+      "lng": 119.949032
+    },
+    {
+      "name": "Quibuar",
+      "lat": 16.093181,
+      "lng": 119.975482
+    },
+    {
+      "name": "Sabangan",
+      "lat": 16.154827,
+      "lng": 120.02165
+    },
+    {
+      "name": "San Antonio (r. Magsaysay)",
+      "lat": 16.176575,
+      "lng": 119.945706
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.181095,
+      "lng": 119.961498
+    },
+    {
+      "name": "San Roque",
+      "lat": 16.157069,
+      "lng": 119.946074
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.133068,
+      "lng": 120.001629
+    },
+    {
+      "name": "Santa Maria",
+      "lat": 16.152087,
+      "lng": 119.92425
+    },
+    {
+      "name": "Tanaytay",
+      "lat": 16.146144,
+      "lng": 119.986831
+    },
+    {
+      "name": "Tangcarang",
+      "lat": 16.107563,
+      "lng": 119.982805
+    },
+    {
+      "name": "Tawintawin",
+      "lat": 16.175357,
+      "lng": 119.918819
+    },
+    {
+      "name": "Telbang",
+      "lat": 16.161044,
+      "lng": 120.052105
+    },
+    {
+      "name": "Victoria",
+      "lat": 16.162011,
+      "lng": 120.070108
+    }
+  ],
+  "Alcala": [
+    {
+      "name": "Anulid",
+      "lat": 15.83314,
+      "lng": 120.48671
+    },
+    {
+      "name": "Atainan",
+      "lat": 15.847788,
+      "lng": 120.47479
+    },
+    {
+      "name": "Bersamin",
+      "lat": 15.814348,
+      "lng": 120.549863
+    },
+    {
+      "name": "Canarvacanan",
+      "lat": 15.823766,
+      "lng": 120.531056
+    },
+    {
+      "name": "Caranglaan",
+      "lat": 15.840086,
+      "lng": 120.477036
+    },
+    {
+      "name": "Curareng",
+      "lat": 15.852713,
+      "lng": 120.483779
+    },
+    {
+      "name": "Gualsic",
+      "lat": 15.85343,
+      "lng": 120.499639
+    },
+    {
+      "name": "Kasikis",
+      "lat": 15.852042,
+      "lng": 120.544802
+    },
+    {
+      "name": "Laoac",
+      "lat": 15.831515,
+      "lng": 120.500038
+    },
+    {
+      "name": "Macayo",
+      "lat": 15.860151,
+      "lng": 120.514146
+    },
+    {
+      "name": "Pindangan Centro",
+      "lat": 15.853869,
+      "lng": 120.554757
+    },
+    {
+      "name": "Pindangan East",
+      "lat": 15.853709,
+      "lng": 120.559909
+    },
+    {
+      "name": "Pindangan West",
+      "lat": 15.853767,
+      "lng": 120.5513
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 15.831331,
+      "lng": 120.522792
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 15.832791,
+      "lng": 120.520232
+    },
+    {
+      "name": "San Juan",
+      "lat": 15.82939,
+      "lng": 120.517219
+    },
+    {
+      "name": "San Nicolas",
+      "lat": 15.851588,
+      "lng": 120.526133
+    },
+    {
+      "name": "San Pedro Apartado",
+      "lat": 15.832912,
+      "lng": 120.566775
+    },
+    {
+      "name": "San Pedro Ili",
+      "lat": 15.841145,
+      "lng": 120.539689
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.832938,
+      "lng": 120.51076
+    },
+    {
+      "name": "Vacante",
+      "lat": 15.819809,
+      "lng": 120.569706
+    }
+  ],
+  "Anda": [
+    {
+      "name": "Awag",
+      "lat": 16.320657,
+      "lng": 119.947443
+    },
+    {
+      "name": "Awile",
+      "lat": 16.270137,
+      "lng": 119.968242
+    },
+    {
+      "name": "Batiarao",
+      "lat": 16.238753,
+      "lng": 120.008716
+    },
+    {
+      "name": "Cabungan",
+      "lat": 16.328817,
+      "lng": 119.99093
+    },
+    {
+      "name": "Carot",
+      "lat": 16.34131,
+      "lng": 119.97962
+    },
+    {
+      "name": "Dolaoan",
+      "lat": 16.32468,
+      "lng": 119.969026
+    },
+    {
+      "name": "Imbo",
+      "lat": 16.313444,
+      "lng": 119.99754
+    },
+    {
+      "name": "Macaleeng",
+      "lat": 16.250789,
+      "lng": 120.007732
+    },
+    {
+      "name": "Macandocandong",
+      "lat": 16.253369,
+      "lng": 119.982135
+    },
+    {
+      "name": "Mal-ong",
+      "lat": 16.299371,
+      "lng": 119.932606
+    },
+    {
+      "name": "Namagbagan",
+      "lat": 16.29586,
+      "lng": 119.985387
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.298205,
+      "lng": 119.953581
+    },
+    {
+      "name": "Roxas",
+      "lat": 16.283905,
+      "lng": 119.961811
+    },
+    {
+      "name": "Sablig",
+      "lat": 16.270773,
+      "lng": 119.991632
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.308714,
+      "lng": 119.972474
+    },
+    {
+      "name": "Siapar",
+      "lat": 16.355431,
+      "lng": 119.95222
+    },
+    {
+      "name": "Tondol",
+      "lat": 16.302323,
+      "lng": 120.007116
+    },
+    {
+      "name": "Toritori",
+      "lat": 16.235062,
+      "lng": 119.995857
+    }
+  ],
+  "Asingan": [
+    {
+      "name": "Ariston Este",
+      "lat": 16.018244,
+      "lng": 120.700283
+    },
+    {
+      "name": "Ariston Weste",
+      "lat": 16.007049,
+      "lng": 120.703486
+    },
+    {
+      "name": "Bantog",
+      "lat": 15.998796,
+      "lng": 120.689413
+    },
+    {
+      "name": "Baro",
+      "lat": 15.99595,
+      "lng": 120.672525
+    },
+    {
+      "name": "Bobonan",
+      "lat": 16.040638,
+      "lng": 120.632359
+    },
+    {
+      "name": "Cabalitian",
+      "lat": 15.974983,
+      "lng": 120.657987
+    },
+    {
+      "name": "Calepaan",
+      "lat": 16.01268,
+      "lng": 120.619136
+    },
+    {
+      "name": "Carosucan Norte",
+      "lat": 15.96308,
+      "lng": 120.638839
+    },
+    {
+      "name": "Carosucan Sur",
+      "lat": 15.947135,
+      "lng": 120.62958
+    },
+    {
+      "name": "Coldit",
+      "lat": 16.033148,
+      "lng": 120.645616
+    },
+    {
+      "name": "Domanpot",
+      "lat": 15.993677,
+      "lng": 120.646201
+    },
+    {
+      "name": "Dupac",
+      "lat": 16.017741,
+      "lng": 120.676847
+    },
+    {
+      "name": "Macalong",
+      "lat": 16.012521,
+      "lng": 120.65493
+    },
+    {
+      "name": "Palaris",
+      "lat": 16.031781,
+      "lng": 120.624239
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 16.0076,
+      "lng": 120.674504
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 16.004002,
+      "lng": 120.667665
+    },
+    {
+      "name": "San Vicente Este",
+      "lat": 16.028027,
+      "lng": 120.672345
+    },
+    {
+      "name": "San Vicente Weste",
+      "lat": 16.02538,
+      "lng": 120.65744
+    },
+    {
+      "name": "Sanchez",
+      "lat": 15.986776,
+      "lng": 120.67398
+    },
+    {
+      "name": "Sobol",
+      "lat": 16.022074,
+      "lng": 120.635045
+    },
+    {
+      "name": "Toboy",
+      "lat": 16.004138,
+      "lng": 120.63243
+    }
+  ],
+  "Balungao": [
+    {
+      "name": "Angayan Norte",
+      "lat": 15.906961,
+      "lng": 120.698827
+    },
+    {
+      "name": "Angayan Sur",
+      "lat": 15.888052,
+      "lng": 120.698635
+    },
+    {
+      "name": "Capulaan",
+      "lat": 15.910812,
+      "lng": 120.667665
+    },
+    {
+      "name": "Esmeralda",
+      "lat": 15.871824,
+      "lng": 120.717003
+    },
+    {
+      "name": "Kita-kita",
+      "lat": 15.883992,
+      "lng": 120.666234
+    },
+    {
+      "name": "Mabini",
+      "lat": 15.855129,
+      "lng": 120.707908
+    },
+    {
+      "name": "Mauban",
+      "lat": 15.894075,
+      "lng": 120.711212
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.884381,
+      "lng": 120.673035
+    },
+    {
+      "name": "Pugaro",
+      "lat": 15.882335,
+      "lng": 120.679638
+    },
+    {
+      "name": "Rajal",
+      "lat": 15.912874,
+      "lng": 120.706498
+    },
+    {
+      "name": "San Andres",
+      "lat": 15.848833,
+      "lng": 120.687991
+    },
+    {
+      "name": "San Aurelio 1st",
+      "lat": 15.893714,
+      "lng": 120.684098
+    },
+    {
+      "name": "San Aurelio 2nd",
+      "lat": 15.882242,
+      "lng": 120.692178
+    },
+    {
+      "name": "San Aurelio 3rd",
+      "lat": 15.906044,
+      "lng": 120.69189
+    },
+    {
+      "name": "San Joaquin",
+      "lat": 15.932958,
+      "lng": 120.705265
+    },
+    {
+      "name": "San Julian",
+      "lat": 15.933336,
+      "lng": 120.680003
+    },
+    {
+      "name": "San Leon",
+      "lat": 15.900018,
+      "lng": 120.72021
+    },
+    {
+      "name": "San Marcelino",
+      "lat": 15.935045,
+      "lng": 120.669531
+    },
+    {
+      "name": "San Miguel",
+      "lat": 15.922435,
+      "lng": 120.667742
+    },
+    {
+      "name": "San Raymundo",
+      "lat": 15.920182,
+      "lng": 120.686946
+    }
+  ],
+  "Bani": [
+    {
+      "name": "Ambabaay",
+      "lat": 16.176102,
+      "lng": 119.877831
+    },
+    {
+      "name": "Aporao",
+      "lat": 16.229846,
+      "lng": 119.90188
+    },
+    {
+      "name": "Arwas",
+      "lat": 16.201382,
+      "lng": 119.854361
+    },
+    {
+      "name": "Ballag",
+      "lat": 16.142368,
+      "lng": 119.892408
+    },
+    {
+      "name": "Banog Norte",
+      "lat": 16.193119,
+      "lng": 119.895429
+    },
+    {
+      "name": "Banog Sur",
+      "lat": 16.165882,
+      "lng": 119.894009
+    },
+    {
+      "name": "Calabeng",
+      "lat": 16.226719,
+      "lng": 119.839068
+    },
+    {
+      "name": "Centro Toma",
+      "lat": 16.259554,
+      "lng": 119.787843
+    },
+    {
+      "name": "Colayo",
+      "lat": 16.274756,
+      "lng": 119.798327
+    },
+    {
+      "name": "Dacap Norte",
+      "lat": 16.247765,
+      "lng": 119.81659
+    },
+    {
+      "name": "Dacap Sur",
+      "lat": 16.232414,
+      "lng": 119.797176
+    },
+    {
+      "name": "Garrita",
+      "lat": 16.198185,
+      "lng": 119.909939
+    },
+    {
+      "name": "Luac",
+      "lat": 16.223703,
+      "lng": 119.881696
+    },
+    {
+      "name": "Macabit",
+      "lat": 16.253523,
+      "lng": 119.833201
+    },
+    {
+      "name": "Masidem",
+      "lat": 16.195945,
+      "lng": 119.880657
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.187863,
+      "lng": 119.858608
+    },
+    {
+      "name": "Quinaoayanan",
+      "lat": 16.16895,
+      "lng": 119.85001
+    },
+    {
+      "name": "Ranao",
+      "lat": 16.196809,
+      "lng": 119.822274
+    },
+    {
+      "name": "Ranom Iloco",
+      "lat": 16.156278,
+      "lng": 119.878354
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.21569,
+      "lng": 119.86178
+    },
+    {
+      "name": "San Miguel",
+      "lat": 16.217399,
+      "lng": 119.928442
+    },
+    {
+      "name": "San Simon",
+      "lat": 16.210362,
+      "lng": 119.788195
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.16715,
+      "lng": 119.907405
+    },
+    {
+      "name": "Tiep",
+      "lat": 16.239081,
+      "lng": 119.860757
+    },
+    {
+      "name": "Tipor",
+      "lat": 16.14555,
+      "lng": 119.862586
+    },
+    {
+      "name": "Tugui Grande",
+      "lat": 16.206455,
+      "lng": 119.87967
+    },
+    {
+      "name": "Tugui Norte",
+      "lat": 16.215862,
+      "lng": 119.875277
+    }
+  ],
+  "Basista": [
+    {
+      "name": "Anambongan",
+      "lat": 15.866972,
+      "lng": 120.387281
+    },
+    {
+      "name": "Bayoyong",
+      "lat": 15.862704,
+      "lng": 120.375808
+    },
+    {
+      "name": "Cabeldatan",
+      "lat": 15.882852,
+      "lng": 120.402186
+    },
+    {
+      "name": "Dumpay",
+      "lat": 15.881161,
+      "lng": 120.389627
+    },
+    {
+      "name": "Malimpec East",
+      "lat": 15.847851,
+      "lng": 120.407107
+    },
+    {
+      "name": "Mapolopolo",
+      "lat": 15.876958,
+      "lng": 120.373935
+    },
+    {
+      "name": "Nalneran",
+      "lat": 15.844361,
+      "lng": 120.416658
+    },
+    {
+      "name": "Navatat",
+      "lat": 15.852889,
+      "lng": 120.390286
+    },
+    {
+      "name": "Obong",
+      "lat": 15.85596,
+      "lng": 120.410312
+    },
+    {
+      "name": "Osmena sr.",
+      "lat": 15.845186,
+      "lng": 120.401007
+    },
+    {
+      "name": "Palma",
+      "lat": 15.867612,
+      "lng": 120.404374
+    },
+    {
+      "name": "Patacbo",
+      "lat": 15.854861,
+      "lng": 120.422777
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.8549,
+      "lng": 120.400193
+    }
+  ],
+  "Bautista": [
+    {
+      "name": "Artacho",
+      "lat": 15.808105,
+      "lng": 120.564958
+    },
+    {
+      "name": "Baluyot",
+      "lat": 15.796151,
+      "lng": 120.465374
+    },
+    {
+      "name": "Cabuaan",
+      "lat": 15.80753,
+      "lng": 120.469293
+    },
+    {
+      "name": "Cacandongan",
+      "lat": 15.822957,
+      "lng": 120.480944
+    },
+    {
+      "name": "Diaz",
+      "lat": 15.793845,
+      "lng": 120.507975
+    },
+    {
+      "name": "Ketegan",
+      "lat": 15.815844,
+      "lng": 120.486363
+    },
+    {
+      "name": "Nandacan",
+      "lat": 15.812651,
+      "lng": 120.479105
+    },
+    {
+      "name": "Nibaliw Norte",
+      "lat": 15.814585,
+      "lng": 120.461833
+    },
+    {
+      "name": "Nibaliw Sur",
+      "lat": 15.809276,
+      "lng": 120.461874
+    },
+    {
+      "name": "Palisoc",
+      "lat": 15.810504,
+      "lng": 120.49151
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 15.809452,
+      "lng": 120.478017
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 15.810769,
+      "lng": 120.467889
+    },
+    {
+      "name": "Pogo",
+      "lat": 15.812867,
+      "lng": 120.503966
+    },
+    {
+      "name": "Poponto",
+      "lat": 15.77938,
+      "lng": 120.540374
+    },
+    {
+      "name": "Primicias",
+      "lat": 15.787911,
+      "lng": 120.546576
+    },
+    {
+      "name": "Sinabaan",
+      "lat": 15.81612,
+      "lng": 120.466661
+    },
+    {
+      "name": "Vacante",
+      "lat": 15.795259,
+      "lng": 120.479421
+    },
+    {
+      "name": "Villanueva",
+      "lat": 15.797983,
+      "lng": 120.545124
+    }
+  ],
+  "Bayambang": [
+    {
+      "name": "Alinggan",
+      "lat": 15.836586,
+      "lng": 120.412012
+    },
+    {
+      "name": "Amamperez",
+      "lat": 15.833527,
+      "lng": 120.422933
+    },
+    {
+      "name": "Amancosiling Norte",
+      "lat": 15.783338,
+      "lng": 120.454778
+    },
+    {
+      "name": "Amancosiling Sur",
+      "lat": 15.774208,
+      "lng": 120.455366
+    },
+    {
+      "name": "Ambayat I",
+      "lat": 15.767137,
+      "lng": 120.412954
+    },
+    {
+      "name": "Ambayat II",
+      "lat": 15.76558,
+      "lng": 120.399074
+    },
+    {
+      "name": "Apalen",
+      "lat": 15.785022,
+      "lng": 120.424308
+    },
+    {
+      "name": "Asin",
+      "lat": 15.827137,
+      "lng": 120.44204
+    },
+    {
+      "name": "Ataynan",
+      "lat": 15.83002,
+      "lng": 120.473532
+    },
+    {
+      "name": "Bacnono",
+      "lat": 15.825223,
+      "lng": 120.464426
+    },
+    {
+      "name": "Balaybuaya",
+      "lat": 15.841953,
+      "lng": 120.39062
+    },
+    {
+      "name": "Banaban",
+      "lat": 15.840428,
+      "lng": 120.426393
+    },
+    {
+      "name": "Bani",
+      "lat": 15.822012,
+      "lng": 120.440975
+    },
+    {
+      "name": "Batangcawa",
+      "lat": 15.822274,
+      "lng": 120.383535
+    },
+    {
+      "name": "Beleng",
+      "lat": 15.830651,
+      "lng": 120.390314
+    },
+    {
+      "name": "Bical Norte",
+      "lat": 15.813816,
+      "lng": 120.435924
+    },
+    {
+      "name": "Bical Sur",
+      "lat": 15.804883,
+      "lng": 120.43729
+    },
+    {
+      "name": "Bongato East",
+      "lat": 15.82107,
+      "lng": 120.476597
+    },
+    {
+      "name": "Bongato West",
+      "lat": 15.817206,
+      "lng": 120.470956
+    },
+    {
+      "name": "Buayaen",
+      "lat": 15.784991,
+      "lng": 120.449587
+    },
+    {
+      "name": "Buenlag 1st",
+      "lat": 15.835386,
+      "lng": 120.461596
+    },
+    {
+      "name": "Buenlag 2nd",
+      "lat": 15.834383,
+      "lng": 120.468642
+    },
+    {
+      "name": "Cadre Site",
+      "lat": 15.804249,
+      "lng": 120.45441
+    },
+    {
+      "name": "Carungay",
+      "lat": 15.776396,
+      "lng": 120.413961
+    },
+    {
+      "name": "Caturay",
+      "lat": 15.789494,
+      "lng": 120.374005
+    },
+    {
+      "name": "Darawey (tangal)",
+      "lat": 15.768725,
+      "lng": 120.437958
+    },
+    {
+      "name": "Duera",
+      "lat": 15.840245,
+      "lng": 120.438458
+    },
+    {
+      "name": "Dusoc",
+      "lat": 15.779789,
+      "lng": 120.4393
+    },
+    {
+      "name": "Hermoza",
+      "lat": 15.781123,
+      "lng": 120.396272
+    },
+    {
+      "name": "Idong",
+      "lat": 15.794382,
+      "lng": 120.398231
+    },
+    {
+      "name": "Inanlorenzana",
+      "lat": 15.798163,
+      "lng": 120.405988
+    },
+    {
+      "name": "Inirangan",
+      "lat": 15.790757,
+      "lng": 120.415429
+    },
+    {
+      "name": "Iton",
+      "lat": 15.765643,
+      "lng": 120.46987
+    },
+    {
+      "name": "Langiran",
+      "lat": 15.833401,
+      "lng": 120.401005
+    },
+    {
+      "name": "Ligue",
+      "lat": 15.825001,
+      "lng": 120.427896
+    },
+    {
+      "name": "M. H. Del Pilar",
+      "lat": 15.80582,
+      "lng": 120.449638
+    },
+    {
+      "name": "Macayocayo",
+      "lat": 15.818666,
+      "lng": 120.395733
+    },
+    {
+      "name": "Magsaysay",
+      "lat": 15.809044,
+      "lng": 120.45607
+    },
+    {
+      "name": "Maigpa",
+      "lat": 15.807374,
+      "lng": 120.391576
+    },
+    {
+      "name": "Malimpec",
+      "lat": 15.841677,
+      "lng": 120.408104
+    },
+    {
+      "name": "Malioer",
+      "lat": 15.779819,
+      "lng": 120.382706
+    },
+    {
+      "name": "Managos",
+      "lat": 15.756506,
+      "lng": 120.4187
+    },
+    {
+      "name": "Manambong Norte",
+      "lat": 15.782894,
+      "lng": 120.46193
+    },
+    {
+      "name": "Manambong Parte",
+      "lat": 15.77206,
+      "lng": 120.492755
+    },
+    {
+      "name": "Manambong Sur",
+      "lat": 15.772695,
+      "lng": 120.469446
+    },
+    {
+      "name": "Mangayao",
+      "lat": 15.844482,
+      "lng": 120.466323
+    },
+    {
+      "name": "Nalsian Norte",
+      "lat": 15.845331,
+      "lng": 120.452572
+    },
+    {
+      "name": "Nalsian Sur",
+      "lat": 15.836281,
+      "lng": 120.454201
+    },
+    {
+      "name": "Pangdel",
+      "lat": 15.76899,
+      "lng": 120.425763
+    },
+    {
+      "name": "Pantol",
+      "lat": 15.765652,
+      "lng": 120.528044
+    },
+    {
+      "name": "Paragos",
+      "lat": 15.740452,
+      "lng": 120.466452
+    },
+    {
+      "name": "Poblacion Sur",
+      "lat": 15.804646,
+      "lng": 120.458034
+    },
+    {
+      "name": "Pugo",
+      "lat": 15.763029,
+      "lng": 120.453961
+    },
+    {
+      "name": "Reynado",
+      "lat": 15.786685,
+      "lng": 120.406801
+    },
+    {
+      "name": "San Gabriel 1st",
+      "lat": 15.765528,
+      "lng": 120.461066
+    },
+    {
+      "name": "San Gabriel 2nd",
+      "lat": 15.750021,
+      "lng": 120.486421
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.753526,
+      "lng": 120.448241
+    },
+    {
+      "name": "Sangcagulis",
+      "lat": 15.794474,
+      "lng": 120.43706
+    },
+    {
+      "name": "Sanlibo",
+      "lat": 15.798385,
+      "lng": 120.384581
+    },
+    {
+      "name": "Sapang",
+      "lat": 15.833301,
+      "lng": 120.443441
+    },
+    {
+      "name": "Tamaro",
+      "lat": 15.829261,
+      "lng": 120.454004
+    },
+    {
+      "name": "Tambac",
+      "lat": 15.823332,
+      "lng": 120.455144
+    },
+    {
+      "name": "Tampog",
+      "lat": 15.744575,
+      "lng": 120.45425
+    },
+    {
+      "name": "Tanolong",
+      "lat": 15.805898,
+      "lng": 120.415092
+    },
+    {
+      "name": "Tatarao",
+      "lat": 15.776997,
+      "lng": 120.425533
+    },
+    {
+      "name": "Telbang",
+      "lat": 15.797253,
+      "lng": 120.45342
+    },
+    {
+      "name": "Tococ East",
+      "lat": 15.822904,
+      "lng": 120.417436
+    },
+    {
+      "name": "Tococ West",
+      "lat": 15.822541,
+      "lng": 120.409035
+    },
+    {
+      "name": "Warding",
+      "lat": 15.760411,
+      "lng": 120.433138
+    },
+    {
+      "name": "Wawa",
+      "lat": 15.767105,
+      "lng": 120.448384
+    },
+    {
+      "name": "Zone I (POB.)",
+      "lat": 15.810317,
+      "lng": 120.451754
+    },
+    {
+      "name": "Zone II (POB.)",
+      "lat": 15.811584,
+      "lng": 120.45659
+    },
+    {
+      "name": "Zone III (POB.)",
+      "lat": 15.814005,
+      "lng": 120.454914
+    },
+    {
+      "name": "Zone IV (POB.)",
+      "lat": 15.815069,
+      "lng": 120.456614
+    },
+    {
+      "name": "Zone V (POB.)",
+      "lat": 15.81829,
+      "lng": 120.456804
+    },
+    {
+      "name": "Zone VI (POB.)",
+      "lat": 15.814618,
+      "lng": 120.450581
+    },
+    {
+      "name": "Zone VII (POB.)",
+      "lat": 15.818243,
+      "lng": 120.45187
+    }
+  ],
+  "Binalonan": [
+    {
+      "name": "Balangobong",
+      "lat": 16.021543,
+      "lng": 120.595711
+    },
+    {
+      "name": "Bued",
+      "lat": 16.0376,
+      "lng": 120.584161
+    },
+    {
+      "name": "Bugayong",
+      "lat": 16.083063,
+      "lng": 120.580469
+    },
+    {
+      "name": "Camangaan",
+      "lat": 16.088027,
+      "lng": 120.591161
+    },
+    {
+      "name": "Canarvacanan",
+      "lat": 16.05254,
+      "lng": 120.584443
+    },
+    {
+      "name": "Capas",
+      "lat": 16.056571,
+      "lng": 120.609789
+    },
+    {
+      "name": "Cili",
+      "lat": 16.069553,
+      "lng": 120.587507
+    },
+    {
+      "name": "Dumayat",
+      "lat": 16.062264,
+      "lng": 120.572109
+    },
+    {
+      "name": "Linmansangan",
+      "lat": 16.049597,
+      "lng": 120.571184
+    },
+    {
+      "name": "Mangcasuy",
+      "lat": 16.069996,
+      "lng": 120.610511
+    },
+    {
+      "name": "Moreno",
+      "lat": 16.078821,
+      "lng": 120.59958
+    },
+    {
+      "name": "Pasileng Norte",
+      "lat": 16.037309,
+      "lng": 120.603435
+    },
+    {
+      "name": "Pasileng Sur",
+      "lat": 16.030966,
+      "lng": 120.603877
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.04461,
+      "lng": 120.592246
+    },
+    {
+      "name": "San Felipe Central",
+      "lat": 16.05733,
+      "lng": 120.622382
+    },
+    {
+      "name": "San Felipe Sur",
+      "lat": 16.044355,
+      "lng": 120.607804
+    },
+    {
+      "name": "San Pablo",
+      "lat": 16.01821,
+      "lng": 120.608273
+    },
+    {
+      "name": "Santa Catalina",
+      "lat": 16.091254,
+      "lng": 120.611365
+    },
+    {
+      "name": "Santa Maria Norte",
+      "lat": 16.060854,
+      "lng": 120.588677
+    },
+    {
+      "name": "Santiago",
+      "lat": 16.036005,
+      "lng": 120.571268
+    },
+    {
+      "name": "Santo Niño",
+      "lat": 16.05405,
+      "lng": 120.593102
+    },
+    {
+      "name": "Sumabnit",
+      "lat": 16.024831,
+      "lng": 120.579731
+    },
+    {
+      "name": "Tabuyoc",
+      "lat": 16.013128,
+      "lng": 120.589818
+    },
+    {
+      "name": "Vacante",
+      "lat": 16.075025,
+      "lng": 120.570429
+    }
+  ],
+  "Binmaley": [
+    {
+      "name": "Amancoro",
+      "lat": 15.996872,
+      "lng": 120.277736
+    },
+    {
+      "name": "Balagan",
+      "lat": 15.975301,
+      "lng": 120.287311
+    },
+    {
+      "name": "Balogo",
+      "lat": 15.989741,
+      "lng": 120.285585
+    },
+    {
+      "name": "Basing",
+      "lat": 15.981598,
+      "lng": 120.269601
+    },
+    {
+      "name": "Baybay Lopez",
+      "lat": 16.036571,
+      "lng": 120.257175
+    },
+    {
+      "name": "Baybay Polong",
+      "lat": 16.029461,
+      "lng": 120.258671
+    },
+    {
+      "name": "Biec",
+      "lat": 16.020748,
+      "lng": 120.275703
+    },
+    {
+      "name": "Buenlag",
+      "lat": 16.047239,
+      "lng": 120.285301
+    },
+    {
+      "name": "Calit",
+      "lat": 16.005361,
+      "lng": 120.317661
+    },
+    {
+      "name": "Caloocan Dupo",
+      "lat": 16.045038,
+      "lng": 120.306806
+    },
+    {
+      "name": "Caloocan Norte",
+      "lat": 16.041799,
+      "lng": 120.288104
+    },
+    {
+      "name": "Caloocan Sur",
+      "lat": 16.036621,
+      "lng": 120.288277
+    },
+    {
+      "name": "Camaley",
+      "lat": 15.996922,
+      "lng": 120.298704
+    },
+    {
+      "name": "Canaoalan",
+      "lat": 16.030591,
+      "lng": 120.296832
+    },
+    {
+      "name": "Dulag",
+      "lat": 15.994449,
+      "lng": 120.265608
+    },
+    {
+      "name": "Gayaman",
+      "lat": 16.011819,
+      "lng": 120.308074
+    },
+    {
+      "name": "Linoc",
+      "lat": 16.020906,
+      "lng": 120.301683
+    },
+    {
+      "name": "Lomboy",
+      "lat": 16.01331,
+      "lng": 120.263081
+    },
+    {
+      "name": "Malindong",
+      "lat": 16.022456,
+      "lng": 120.258877
+    },
+    {
+      "name": "Manat",
+      "lat": 16.013703,
+      "lng": 120.282378
+    },
+    {
+      "name": "Nagpalangan",
+      "lat": 16.004481,
+      "lng": 120.270126
+    },
+    {
+      "name": "Naguilayan",
+      "lat": 16.007186,
+      "lng": 120.291791
+    },
+    {
+      "name": "Pallas",
+      "lat": 15.9748,
+      "lng": 120.304456
+    },
+    {
+      "name": "Papagueyan",
+      "lat": 15.978383,
+      "lng": 120.318934
+    },
+    {
+      "name": "Parayao",
+      "lat": 15.967636,
+      "lng": 120.310081
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.029011,
+      "lng": 120.269924
+    },
+    {
+      "name": "Pototan",
+      "lat": 15.961398,
+      "lng": 120.294984
+    },
+    {
+      "name": "Sabangan",
+      "lat": 16.056878,
+      "lng": 120.305771
+    },
+    {
+      "name": "Salapingao",
+      "lat": 16.051197,
+      "lng": 120.305884
+    },
+    {
+      "name": "San Isidro Norte",
+      "lat": 16.04018,
+      "lng": 120.267708
+    },
+    {
+      "name": "San Isidro Sur",
+      "lat": 16.033802,
+      "lng": 120.270555
+    },
+    {
+      "name": "Santa Rosa",
+      "lat": 16.001253,
+      "lng": 120.311258
+    },
+    {
+      "name": "Tombor",
+      "lat": 15.991474,
+      "lng": 120.315495
+    }
+  ],
+  "Bolinao": [
+    {
+      "name": "Arnedo",
+      "lat": 16.379348,
+      "lng": 119.878892
+    },
+    {
+      "name": "Balingasay",
+      "lat": 16.358033,
+      "lng": 119.865938
+    },
+    {
+      "name": "Binabalian",
+      "lat": 16.414096,
+      "lng": 119.92912
+    },
+    {
+      "name": "Cabuyao",
+      "lat": 16.34116,
+      "lng": 119.885886
+    },
+    {
+      "name": "Catuday",
+      "lat": 16.296142,
+      "lng": 119.812241
+    },
+    {
+      "name": "Catungi",
+      "lat": 16.274731,
+      "lng": 119.902051
+    },
+    {
+      "name": "Concordia (POB.)",
+      "lat": 16.386863,
+      "lng": 119.890678
+    },
+    {
+      "name": "Culang",
+      "lat": 16.310059,
+      "lng": 119.898296
+    },
+    {
+      "name": "Dewey",
+      "lat": 16.406703,
+      "lng": 119.962541
+    },
+    {
+      "name": "Estanza",
+      "lat": 16.347333,
+      "lng": 119.841986
+    },
+    {
+      "name": "Germinal (POB.)",
+      "lat": 16.381936,
+      "lng": 119.894018
+    },
+    {
+      "name": "Goyoden",
+      "lat": 16.40385,
+      "lng": 119.948021
+    },
+    {
+      "name": "Ilogmalino",
+      "lat": 16.33431,
+      "lng": 119.820184
+    },
+    {
+      "name": "Lambes (lames)",
+      "lat": 16.244973,
+      "lng": 119.900914
+    },
+    {
+      "name": "Liwa-liwa",
+      "lat": 16.361494,
+      "lng": 119.891333
+    },
+    {
+      "name": "Lucero",
+      "lat": 16.401344,
+      "lng": 119.917674
+    },
+    {
+      "name": "Luciente 1.0",
+      "lat": 16.380412,
+      "lng": 119.909037
+    },
+    {
+      "name": "Luciente 2.0",
+      "lat": 16.356541,
+      "lng": 119.915179
+    },
+    {
+      "name": "Luna",
+      "lat": 16.327902,
+      "lng": 119.906017
+    },
+    {
+      "name": "Patar",
+      "lat": 16.3242,
+      "lng": 119.794144
+    },
+    {
+      "name": "Pilar",
+      "lat": 16.376593,
+      "lng": 119.95601
+    },
+    {
+      "name": "Salud",
+      "lat": 16.389776,
+      "lng": 119.940207
+    },
+    {
+      "name": "Samang Norte",
+      "lat": 16.293241,
+      "lng": 119.864742
+    },
+    {
+      "name": "Samang Sur",
+      "lat": 16.269585,
+      "lng": 119.855152
+    },
+    {
+      "name": "Sampaloc",
+      "lat": 16.261924,
+      "lng": 119.871157
+    },
+    {
+      "name": "San Roque",
+      "lat": 16.276465,
+      "lng": 119.836879
+    },
+    {
+      "name": "Tara",
+      "lat": 16.29199,
+      "lng": 119.896684
+    },
+    {
+      "name": "Tupa",
+      "lat": 16.320714,
+      "lng": 119.857909
+    },
+    {
+      "name": "Victory",
+      "lat": 16.387242,
+      "lng": 119.957252
+    },
+    {
+      "name": "Zaragoza",
+      "lat": 16.255752,
+      "lng": 119.89449
+    }
+  ],
+  "Bugallon": [
+    {
+      "name": "Angarian",
+      "lat": 15.978162,
+      "lng": 120.243452
+    },
+    {
+      "name": "Asinan",
+      "lat": 15.987024,
+      "lng": 120.199417
+    },
+    {
+      "name": "Bacabac",
+      "lat": 15.969995,
+      "lng": 120.207551
+    },
+    {
+      "name": "Banaga",
+      "lat": 15.989194,
+      "lng": 120.225566
+    },
+    {
+      "name": "Bolaoen",
+      "lat": 15.933025,
+      "lng": 120.232455
+    },
+    {
+      "name": "Buenlag",
+      "lat": 15.97992,
+      "lng": 120.190123
+    },
+    {
+      "name": "Cabayaoasan",
+      "lat": 15.962393,
+      "lng": 120.236405
+    },
+    {
+      "name": "Cayanga",
+      "lat": 15.896459,
+      "lng": 120.167778
+    },
+    {
+      "name": "Gueset",
+      "lat": 15.96896,
+      "lng": 120.171992
+    },
+    {
+      "name": "Hacienda",
+      "lat": 15.91475,
+      "lng": 120.151513
+    },
+    {
+      "name": "Laguit Centro",
+      "lat": 15.950817,
+      "lng": 120.191571
+    },
+    {
+      "name": "Laguit Padilla",
+      "lat": 15.937977,
+      "lng": 120.143811
+    },
+    {
+      "name": "Magtaking",
+      "lat": 15.989267,
+      "lng": 120.184347
+    },
+    {
+      "name": "Pangascasan",
+      "lat": 15.931911,
+      "lng": 120.253207
+    },
+    {
+      "name": "Pantal",
+      "lat": 15.994429,
+      "lng": 120.20886
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.953898,
+      "lng": 120.210609
+    },
+    {
+      "name": "Polong",
+      "lat": 15.975882,
+      "lng": 120.199614
+    },
+    {
+      "name": "Portic",
+      "lat": 15.906758,
+      "lng": 120.16474
+    },
+    {
+      "name": "Salasa",
+      "lat": 15.975066,
+      "lng": 120.221693
+    },
+    {
+      "name": "Salomague Norte",
+      "lat": 15.894074,
+      "lng": 120.180855
+    },
+    {
+      "name": "Salomague Sur",
+      "lat": 15.872266,
+      "lng": 120.170333
+    },
+    {
+      "name": "Samat",
+      "lat": 15.98342,
+      "lng": 120.196211
+    },
+    {
+      "name": "San Francisco",
+      "lat": 15.965143,
+      "lng": 120.192114
+    },
+    {
+      "name": "Umanday",
+      "lat": 15.944575,
+      "lng": 120.22755
+    }
+  ],
+  "Burgos": [
+    {
+      "name": "Anapao (bur Anapac)",
+      "lat": 16.09554,
+      "lng": 119.872064
+    },
+    {
+      "name": "Cacayasen",
+      "lat": 16.063361,
+      "lng": 119.84339
+    },
+    {
+      "name": "Concordia",
+      "lat": 15.978721,
+      "lng": 119.808072
+    },
+    {
+      "name": "Don Matias",
+      "lat": 16.061009,
+      "lng": 119.88048
+    },
+    {
+      "name": "Ilio-ilio (iliw-iliw)",
+      "lat": 15.969274,
+      "lng": 119.766128
+    },
+    {
+      "name": "Papallasen",
+      "lat": 16.030359,
+      "lng": 119.862687
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.056022,
+      "lng": 119.865036
+    },
+    {
+      "name": "Pogoruac",
+      "lat": 15.989257,
+      "lng": 119.79375
+    },
+    {
+      "name": "San Miguel",
+      "lat": 16.033764,
+      "lng": 119.900717
+    },
+    {
+      "name": "San Pascual",
+      "lat": 16.032653,
+      "lng": 119.880466
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.078711,
+      "lng": 119.860073
+    },
+    {
+      "name": "Sapa Grande",
+      "lat": 16.005487,
+      "lng": 119.835342
+    },
+    {
+      "name": "Sapa Pequeña",
+      "lat": 16.036714,
+      "lng": 119.840712
+    },
+    {
+      "name": "Tambacan",
+      "lat": 16.067848,
+      "lng": 119.893285
+    }
+  ],
+  "Calasiao": [
+    {
+      "name": "Ambonao",
+      "lat": 16.02857,
+      "lng": 120.36903
+    },
+    {
+      "name": "Ambuetel",
+      "lat": 15.986761,
+      "lng": 120.333007
+    },
+    {
+      "name": "Banaoang",
+      "lat": 16.009965,
+      "lng": 120.330837
+    },
+    {
+      "name": "Bued",
+      "lat": 16.018118,
+      "lng": 120.381592
+    },
+    {
+      "name": "Buenlag",
+      "lat": 15.982514,
+      "lng": 120.376326
+    },
+    {
+      "name": "Cabilocaan",
+      "lat": 16.02451,
+      "lng": 120.378089
+    },
+    {
+      "name": "Dinalaoan",
+      "lat": 15.996094,
+      "lng": 120.339814
+    },
+    {
+      "name": "Doyong",
+      "lat": 15.970971,
+      "lng": 120.356864
+    },
+    {
+      "name": "Gabon",
+      "lat": 16.01221,
+      "lng": 120.364402
+    },
+    {
+      "name": "Lasip",
+      "lat": 16.002857,
+      "lng": 120.354044
+    },
+    {
+      "name": "Longos",
+      "lat": 15.987903,
+      "lng": 120.353114
+    },
+    {
+      "name": "Lumbang",
+      "lat": 15.989722,
+      "lng": 120.349754
+    },
+    {
+      "name": "Macabito",
+      "lat": 15.961583,
+      "lng": 120.390511
+    },
+    {
+      "name": "Malabago",
+      "lat": 15.980729,
+      "lng": 120.35666
+    },
+    {
+      "name": "Mancup",
+      "lat": 15.996295,
+      "lng": 120.367987
+    },
+    {
+      "name": "Nagsaing",
+      "lat": 15.976801,
+      "lng": 120.336801
+    },
+    {
+      "name": "Nalsian",
+      "lat": 16.015224,
+      "lng": 120.349512
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 16.009412,
+      "lng": 120.359505
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 16.008844,
+      "lng": 120.356436
+    },
+    {
+      "name": "Quesban",
+      "lat": 16.012449,
+      "lng": 120.376482
+    },
+    {
+      "name": "San Miguel",
+      "lat": 16.019939,
+      "lng": 120.358859
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.004174,
+      "lng": 120.337352
+    },
+    {
+      "name": "Songkoy",
+      "lat": 15.966205,
+      "lng": 120.373921
+    },
+    {
+      "name": "Talibaew",
+      "lat": 16.004916,
+      "lng": 120.370112
+    }
+  ],
+  "Dagupan City": [
+    {
+      "name": "Bacayao Norte",
+      "lat": 16.033119,
+      "lng": 120.343807
+    },
+    {
+      "name": "Bacayao Sur",
+      "lat": 16.024815,
+      "lng": 120.343499
+    },
+    {
+      "name": "Barangay I (t. Bugallon)",
+      "lat": 16.044301,
+      "lng": 120.336784
+    },
+    {
+      "name": "Barangay II (nueva)",
+      "lat": 16.042524,
+      "lng": 120.338693
+    },
+    {
+      "name": "Barangay IV (zamora)",
+      "lat": 16.041022,
+      "lng": 120.335024
+    },
+    {
+      "name": "Bolosan",
+      "lat": 16.047869,
+      "lng": 120.364672
+    },
+    {
+      "name": "Bonuan Binloc",
+      "lat": 16.100625,
+      "lng": 120.374763
+    },
+    {
+      "name": "Bonuan Boquig",
+      "lat": 16.074888,
+      "lng": 120.357001
+    },
+    {
+      "name": "Bonuan Gueset",
+      "lat": 16.073984,
+      "lng": 120.343072
+    },
+    {
+      "name": "Calmay",
+      "lat": 16.045785,
+      "lng": 120.322069
+    },
+    {
+      "name": "Carael",
+      "lat": 16.036589,
+      "lng": 120.315741
+    },
+    {
+      "name": "Caranglaan",
+      "lat": 16.031718,
+      "lng": 120.351718
+    },
+    {
+      "name": "Herrero",
+      "lat": 16.042432,
+      "lng": 120.342487
+    },
+    {
+      "name": "Lasip Chico",
+      "lat": 16.020802,
+      "lng": 120.340708
+    },
+    {
+      "name": "Lasip Grande",
+      "lat": 16.027771,
+      "lng": 120.343758
+    },
+    {
+      "name": "Lomboy",
+      "lat": 16.054067,
+      "lng": 120.321853
+    },
+    {
+      "name": "Lucao",
+      "lat": 16.020662,
+      "lng": 120.322384
+    },
+    {
+      "name": "Malued",
+      "lat": 16.025106,
+      "lng": 120.334661
+    },
+    {
+      "name": "Mamalingling",
+      "lat": 16.058753,
+      "lng": 120.359685
+    },
+    {
+      "name": "Mangin",
+      "lat": 16.039627,
+      "lng": 120.366829
+    },
+    {
+      "name": "Mayombo",
+      "lat": 16.041362,
+      "lng": 120.348813
+    },
+    {
+      "name": "Pantal",
+      "lat": 16.051685,
+      "lng": 120.338449
+    },
+    {
+      "name": "Poblacion Oeste",
+      "lat": 16.041865,
+      "lng": 120.329139
+    },
+    {
+      "name": "Pogo Chico",
+      "lat": 16.038109,
+      "lng": 120.337201
+    },
+    {
+      "name": "Pogo Grande",
+      "lat": 16.032393,
+      "lng": 120.337292
+    },
+    {
+      "name": "Pugaro Suit",
+      "lat": 16.062729,
+      "lng": 120.319808
+    },
+    {
+      "name": "Salapingao",
+      "lat": 16.058562,
+      "lng": 120.320314
+    },
+    {
+      "name": "Salisay",
+      "lat": 16.042536,
+      "lng": 120.375386
+    },
+    {
+      "name": "Tambac",
+      "lat": 16.0519,
+      "lng": 120.352788
+    },
+    {
+      "name": "Tapuac",
+      "lat": 16.034974,
+      "lng": 120.328034
+    },
+    {
+      "name": "Tebeng",
+      "lat": 16.03438,
+      "lng": 120.358006
+    }
+  ],
+  "Dasol": [
+    {
+      "name": "Alilao",
+      "lat": 15.969698,
+      "lng": 119.888463
+    },
+    {
+      "name": "Amalbalan",
+      "lat": 15.961976,
+      "lng": 119.878109
+    },
+    {
+      "name": "Bobonot",
+      "lat": 16.00632,
+      "lng": 119.871845
+    },
+    {
+      "name": "Eguia",
+      "lat": 15.914443,
+      "lng": 119.887899
+    },
+    {
+      "name": "Gais-guipe",
+      "lat": 15.971651,
+      "lng": 119.861431
+    },
+    {
+      "name": "Hermosa",
+      "lat": 15.945118,
+      "lng": 119.875786
+    },
+    {
+      "name": "Macalang",
+      "lat": 15.904207,
+      "lng": 119.948764
+    },
+    {
+      "name": "Magsaysay",
+      "lat": 15.989611,
+      "lng": 119.856709
+    },
+    {
+      "name": "Malacapas",
+      "lat": 15.97642,
+      "lng": 119.836849
+    },
+    {
+      "name": "Malimpin",
+      "lat": 15.988701,
+      "lng": 119.916151
+    },
+    {
+      "name": "Osmeña",
+      "lat": 15.931262,
+      "lng": 119.796541
+    },
+    {
+      "name": "Petal",
+      "lat": 15.930469,
+      "lng": 119.882708
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.99398,
+      "lng": 119.884277
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.979242,
+      "lng": 119.900428
+    },
+    {
+      "name": "Tambac",
+      "lat": 15.926926,
+      "lng": 119.942968
+    },
+    {
+      "name": "Tambobong",
+      "lat": 15.939,
+      "lng": 119.77391
+    },
+    {
+      "name": "Uli",
+      "lat": 15.955437,
+      "lng": 119.804048
+    },
+    {
+      "name": "Viga",
+      "lat": 15.948175,
+      "lng": 119.92055
+    }
+  ],
+  "Infanta": [
+    {
+      "name": "Babuyan",
+      "lat": 15.874162,
+      "lng": 120.077426
+    },
+    {
+      "name": "Bamban",
+      "lat": 15.848664,
+      "lng": 119.970644
+    },
+    {
+      "name": "Batang",
+      "lat": 15.865818,
+      "lng": 119.933033
+    },
+    {
+      "name": "Bayambang",
+      "lat": 15.87752,
+      "lng": 119.911412
+    },
+    {
+      "name": "Cato",
+      "lat": 15.843649,
+      "lng": 119.91695
+    },
+    {
+      "name": "Doliman",
+      "lat": 15.822066,
+      "lng": 119.983813
+    },
+    {
+      "name": "Fatima",
+      "lat": 15.830371,
+      "lng": 119.922053
+    },
+    {
+      "name": "Maya",
+      "lat": 15.815984,
+      "lng": 119.919666
+    },
+    {
+      "name": "Nangalisan",
+      "lat": 15.818164,
+      "lng": 119.945438
+    },
+    {
+      "name": "Nayom",
+      "lat": 15.815338,
+      "lng": 119.89734
+    },
+    {
+      "name": "Pita",
+      "lat": 15.895651,
+      "lng": 120.006015
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.82468,
+      "lng": 119.908688
+    },
+    {
+      "name": "Potol",
+      "lat": 15.81854,
+      "lng": 119.962839
+    }
+  ],
+  "Labrador": [
+    {
+      "name": "Bolo",
+      "lat": 15.967524,
+      "lng": 120.131792
+    },
+    {
+      "name": "Bongalon",
+      "lat": 15.981914,
+      "lng": 120.122435
+    },
+    {
+      "name": "Dulig",
+      "lat": 15.998812,
+      "lng": 120.173817
+    },
+    {
+      "name": "Laois",
+      "lat": 16.012591,
+      "lng": 120.109949
+    },
+    {
+      "name": "Magsaysay",
+      "lat": 16.005687,
+      "lng": 120.161861
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.002935,
+      "lng": 120.118313
+    },
+    {
+      "name": "San Gonzalo",
+      "lat": 15.993865,
+      "lng": 120.120165
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.003004,
+      "lng": 120.110675
+    },
+    {
+      "name": "Tobuan",
+      "lat": 16.040249,
+      "lng": 120.094167
+    },
+    {
+      "name": "Uyong",
+      "lat": 16.018801,
+      "lng": 120.091129
+    }
+  ],
+  "Laoac": [
+    {
+      "name": "Anis",
+      "lat": 16.027479,
+      "lng": 120.556741
+    },
+    {
+      "name": "Balligi",
+      "lat": 16.055556,
+      "lng": 120.55539
+    },
+    {
+      "name": "Banuar",
+      "lat": 16.043754,
+      "lng": 120.537376
+    },
+    {
+      "name": "Botique",
+      "lat": 16.068357,
+      "lng": 120.554455
+    },
+    {
+      "name": "Caaringayan",
+      "lat": 16.034402,
+      "lng": 120.549644
+    },
+    {
+      "name": "Cabilaoan West",
+      "lat": 16.016149,
+      "lng": 120.54158
+    },
+    {
+      "name": "Cabulalaan",
+      "lat": 16.063562,
+      "lng": 120.540958
+    },
+    {
+      "name": "Calaoagan",
+      "lat": 16.056237,
+      "lng": 120.535325
+    },
+    {
+      "name": "Calmay",
+      "lat": 16.029562,
+      "lng": 120.515667
+    },
+    {
+      "name": "Casampagaan",
+      "lat": 16.04243,
+      "lng": 120.55736
+    },
+    {
+      "name": "Casanestebanan",
+      "lat": 16.037634,
+      "lng": 120.525873
+    },
+    {
+      "name": "Casantiagoan",
+      "lat": 16.016579,
+      "lng": 120.568989
+    },
+    {
+      "name": "Domingo Alarcio (cabilaoan East)",
+      "lat": 16.013762,
+      "lng": 120.552854
+    },
+    {
+      "name": "Inmanduyan",
+      "lat": 16.044813,
+      "lng": 120.518219
+    },
+    {
+      "name": "Lebueg",
+      "lat": 16.021967,
+      "lng": 120.564238
+    },
+    {
+      "name": "Maraboc",
+      "lat": 16.06292,
+      "lng": 120.526031
+    },
+    {
+      "name": "Nanbagatan",
+      "lat": 16.030137,
+      "lng": 120.53457
+    },
+    {
+      "name": "Panaga",
+      "lat": 16.080246,
+      "lng": 120.55295
+    },
+    {
+      "name": "Poblacion (laoac)",
+      "lat": 16.052283,
+      "lng": 120.545514
+    },
+    {
+      "name": "Talogtog",
+      "lat": 16.051251,
+      "lng": 120.528823
+    },
+    {
+      "name": "Turko",
+      "lat": 16.073158,
+      "lng": 120.538287
+    },
+    {
+      "name": "Yatyat",
+      "lat": 16.004344,
+      "lng": 120.558584
+    }
+  ],
+  "Lingayen": [
+    {
+      "name": "Aliwekwek",
+      "lat": 15.969196,
+      "lng": 120.248366
+    },
+    {
+      "name": "Baay",
+      "lat": 16.012267,
+      "lng": 120.22208
+    },
+    {
+      "name": "Balangobong",
+      "lat": 16.018308,
+      "lng": 120.203456
+    },
+    {
+      "name": "Balococ",
+      "lat": 15.997194,
+      "lng": 120.22322
+    },
+    {
+      "name": "Bantayan",
+      "lat": 15.985252,
+      "lng": 120.213031
+    },
+    {
+      "name": "Basing",
+      "lat": 15.975167,
+      "lng": 120.258385
+    },
+    {
+      "name": "Capandanan",
+      "lat": 16.029744,
+      "lng": 120.199581
+    },
+    {
+      "name": "Domalandan Center",
+      "lat": 16.005676,
+      "lng": 120.194692
+    },
+    {
+      "name": "Domalandan East",
+      "lat": 16.00638,
+      "lng": 120.204686
+    },
+    {
+      "name": "Domalandan West",
+      "lat": 16.008329,
+      "lng": 120.182284
+    },
+    {
+      "name": "Dorongan",
+      "lat": 16.017689,
+      "lng": 120.213139
+    },
+    {
+      "name": "Dulag",
+      "lat": 15.990668,
+      "lng": 120.254779
+    },
+    {
+      "name": "Estanza",
+      "lat": 16.023007,
+      "lng": 120.171514
+    },
+    {
+      "name": "Lasip",
+      "lat": 15.944446,
+      "lng": 120.252208
+    },
+    {
+      "name": "Libsong East",
+      "lat": 16.033879,
+      "lng": 120.245879
+    },
+    {
+      "name": "Libsong West",
+      "lat": 16.031512,
+      "lng": 120.237086
+    },
+    {
+      "name": "Malawa",
+      "lat": 15.955835,
+      "lng": 120.271269
+    },
+    {
+      "name": "Malimpuec",
+      "lat": 16.030157,
+      "lng": 120.188156
+    },
+    {
+      "name": "Maniboc",
+      "lat": 16.03057,
+      "lng": 120.219647
+    },
+    {
+      "name": "Matalava",
+      "lat": 16.00881,
+      "lng": 120.248824
+    },
+    {
+      "name": "Naguelguel",
+      "lat": 16.000918,
+      "lng": 120.251423
+    },
+    {
+      "name": "Namolan",
+      "lat": 16.017056,
+      "lng": 120.244625
+    },
+    {
+      "name": "Pangapisan North",
+      "lat": 16.033255,
+      "lng": 120.20805
+    },
+    {
+      "name": "Pangapisan Sur",
+      "lat": 16.021436,
+      "lng": 120.219335
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.024512,
+      "lng": 120.230471
+    },
+    {
+      "name": "Quibaol",
+      "lat": 16.004153,
+      "lng": 120.227518
+    },
+    {
+      "name": "Rosario",
+      "lat": 15.942377,
+      "lng": 120.273101
+    },
+    {
+      "name": "Sabangan",
+      "lat": 16.029227,
+      "lng": 120.155888
+    },
+    {
+      "name": "Talogtog",
+      "lat": 15.996889,
+      "lng": 120.237365
+    },
+    {
+      "name": "Tonton",
+      "lat": 16.02463,
+      "lng": 120.24819
+    },
+    {
+      "name": "Tumbar",
+      "lat": 15.985453,
+      "lng": 120.238293
+    },
+    {
+      "name": "Wawa",
+      "lat": 15.955519,
+      "lng": 120.252234
+    }
+  ],
+  "Mabini": [
+    {
+      "name": "Bacnit",
+      "lat": 16.033989,
+      "lng": 119.932808
+    },
+    {
+      "name": "Barlo",
+      "lat": 15.985183,
+      "lng": 119.955998
+    },
+    {
+      "name": "Caabiangaan",
+      "lat": 16.102393,
+      "lng": 119.921212
+    },
+    {
+      "name": "Cabanaetan",
+      "lat": 16.119434,
+      "lng": 119.894165
+    },
+    {
+      "name": "Cabinuangan",
+      "lat": 16.077788,
+      "lng": 119.913551
+    },
+    {
+      "name": "Calzada",
+      "lat": 16.084769,
+      "lng": 119.931722
+    },
+    {
+      "name": "Caranglaan",
+      "lat": 16.091956,
+      "lng": 119.895501
+    },
+    {
+      "name": "De Guzman",
+      "lat": 16.04225,
+      "lng": 119.954308
+    },
+    {
+      "name": "Luna",
+      "lat": 16.108643,
+      "lng": 119.935344
+    },
+    {
+      "name": "Magalong",
+      "lat": 16.095853,
+      "lng": 119.912332
+    },
+    {
+      "name": "Nibaliw",
+      "lat": 16.056676,
+      "lng": 119.938121
+    },
+    {
+      "name": "Patar",
+      "lat": 16.060306,
+      "lng": 119.922191
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.069575,
+      "lng": 119.942082
+    },
+    {
+      "name": "San Pedro",
+      "lat": 16.012578,
+      "lng": 119.926544
+    },
+    {
+      "name": "Tagudin",
+      "lat": 16.075628,
+      "lng": 119.957312
+    },
+    {
+      "name": "Villacorta",
+      "lat": 15.979401,
+      "lng": 120.02233
+    }
+  ],
+  "Malasiqui": [
+    {
+      "name": "Abonagan",
+      "lat": 15.92857,
+      "lng": 120.43864
+    },
+    {
+      "name": "Agdao",
+      "lat": 15.924075,
+      "lng": 120.457385
+    },
+    {
+      "name": "Alacan",
+      "lat": 15.908438,
+      "lng": 120.405565
+    },
+    {
+      "name": "Aliaga",
+      "lat": 15.890367,
+      "lng": 120.451166
+    },
+    {
+      "name": "Amacalan",
+      "lat": 15.887274,
+      "lng": 120.438241
+    },
+    {
+      "name": "Anolid",
+      "lat": 15.899815,
+      "lng": 120.403307
+    },
+    {
+      "name": "Apaya",
+      "lat": 15.891254,
+      "lng": 120.41795
+    },
+    {
+      "name": "Asin Este",
+      "lat": 15.962494,
+      "lng": 120.466811
+    },
+    {
+      "name": "Asin Weste",
+      "lat": 15.957001,
+      "lng": 120.458941
+    },
+    {
+      "name": "Bacundao Este",
+      "lat": 15.918537,
+      "lng": 120.487273
+    },
+    {
+      "name": "Bacundao Weste",
+      "lat": 15.91969,
+      "lng": 120.474996
+    },
+    {
+      "name": "Bakitiw",
+      "lat": 15.879015,
+      "lng": 120.463745
+    },
+    {
+      "name": "Balite",
+      "lat": 15.944585,
+      "lng": 120.478957
+    },
+    {
+      "name": "Banawang",
+      "lat": 15.913279,
+      "lng": 120.425259
+    },
+    {
+      "name": "Barang",
+      "lat": 15.933331,
+      "lng": 120.418558
+    },
+    {
+      "name": "Bawer",
+      "lat": 15.894043,
+      "lng": 120.432049
+    },
+    {
+      "name": "Binalay",
+      "lat": 15.908358,
+      "lng": 120.435366
+    },
+    {
+      "name": "Bobon",
+      "lat": 15.924019,
+      "lng": 120.444634
+    },
+    {
+      "name": "Bolaoit",
+      "lat": 15.932042,
+      "lng": 120.429781
+    },
+    {
+      "name": "Bongar",
+      "lat": 15.88059,
+      "lng": 120.501875
+    },
+    {
+      "name": "Butao",
+      "lat": 15.905919,
+      "lng": 120.460687
+    },
+    {
+      "name": "Cabatling",
+      "lat": 15.919053,
+      "lng": 120.433349
+    },
+    {
+      "name": "Cabueldatan",
+      "lat": 15.893945,
+      "lng": 120.404956
+    },
+    {
+      "name": "Calbueg",
+      "lat": 15.94528,
+      "lng": 120.463783
+    },
+    {
+      "name": "Canan Norte",
+      "lat": 15.910047,
+      "lng": 120.472232
+    },
+    {
+      "name": "Canan Sur",
+      "lat": 15.901081,
+      "lng": 120.474204
+    },
+    {
+      "name": "Cawayan Bogtong",
+      "lat": 15.944739,
+      "lng": 120.399917
+    },
+    {
+      "name": "Don Pedro",
+      "lat": 15.881098,
+      "lng": 120.424037
+    },
+    {
+      "name": "Gatang",
+      "lat": 15.870812,
+      "lng": 120.479919
+    },
+    {
+      "name": "Goliman",
+      "lat": 15.855846,
+      "lng": 120.455775
+    },
+    {
+      "name": "Gomez",
+      "lat": 15.910693,
+      "lng": 120.417722
+    },
+    {
+      "name": "Guilig",
+      "lat": 15.913084,
+      "lng": 120.40021
+    },
+    {
+      "name": "Ican",
+      "lat": 15.94626,
+      "lng": 120.412627
+    },
+    {
+      "name": "Ingalagala",
+      "lat": 15.89952,
+      "lng": 120.438872
+    },
+    {
+      "name": "Lareg-lareg",
+      "lat": 15.908098,
+      "lng": 120.494892
+    },
+    {
+      "name": "Lasip",
+      "lat": 15.905879,
+      "lng": 120.449804
+    },
+    {
+      "name": "Lepa",
+      "lat": 15.879296,
+      "lng": 120.447027
+    },
+    {
+      "name": "Loqueb Este",
+      "lat": 15.949876,
+      "lng": 120.445007
+    },
+    {
+      "name": "Loqueb Norte",
+      "lat": 15.942568,
+      "lng": 120.428256
+    },
+    {
+      "name": "Loqueb Sur",
+      "lat": 15.939502,
+      "lng": 120.447269
+    },
+    {
+      "name": "Lunec",
+      "lat": 15.955785,
+      "lng": 120.488502
+    },
+    {
+      "name": "Mabulitec",
+      "lat": 15.887271,
+      "lng": 120.4091
+    },
+    {
+      "name": "Malimpec",
+      "lat": 15.894472,
+      "lng": 120.461885
+    },
+    {
+      "name": "Manggan-dampay",
+      "lat": 15.931644,
+      "lng": 120.494985
+    },
+    {
+      "name": "Nalsian Norte",
+      "lat": 15.858949,
+      "lng": 120.435506
+    },
+    {
+      "name": "Nalsian Sur",
+      "lat": 15.849835,
+      "lng": 120.439771
+    },
+    {
+      "name": "Nancapian",
+      "lat": 15.902314,
+      "lng": 120.509737
+    },
+    {
+      "name": "Nansangaan",
+      "lat": 15.918236,
+      "lng": 120.462383
+    },
+    {
+      "name": "Olea",
+      "lat": 15.860477,
+      "lng": 120.484368
+    },
+    {
+      "name": "Pacuan",
+      "lat": 15.857989,
+      "lng": 120.4679
+    },
+    {
+      "name": "Palapar Norte",
+      "lat": 15.887432,
+      "lng": 120.484968
+    },
+    {
+      "name": "Palapar Sur",
+      "lat": 15.886122,
+      "lng": 120.494611
+    },
+    {
+      "name": "Palong",
+      "lat": 15.870745,
+      "lng": 120.449043
+    },
+    {
+      "name": "Pamaranum",
+      "lat": 15.893065,
+      "lng": 120.4776
+    },
+    {
+      "name": "Pasima",
+      "lat": 15.932908,
+      "lng": 120.394521
+    },
+    {
+      "name": "Payar",
+      "lat": 15.902198,
+      "lng": 120.414646
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.921067,
+      "lng": 120.415484
+    },
+    {
+      "name": "Polong Norte",
+      "lat": 15.902734,
+      "lng": 120.422551
+    },
+    {
+      "name": "Polong Sur",
+      "lat": 15.893694,
+      "lng": 120.426801
+    },
+    {
+      "name": "Potiocan",
+      "lat": 15.953428,
+      "lng": 120.429358
+    },
+    {
+      "name": "San Julian",
+      "lat": 15.873543,
+      "lng": 120.436438
+    },
+    {
+      "name": "Tabo-sili",
+      "lat": 15.931292,
+      "lng": 120.453645
+    },
+    {
+      "name": "Talospatang",
+      "lat": 15.916791,
+      "lng": 120.448287
+    },
+    {
+      "name": "Taloy",
+      "lat": 15.92021,
+      "lng": 120.397351
+    },
+    {
+      "name": "Taloyan",
+      "lat": 15.930996,
+      "lng": 120.470332
+    },
+    {
+      "name": "Tambac",
+      "lat": 15.932112,
+      "lng": 120.408877
+    },
+    {
+      "name": "Tobor",
+      "lat": 15.882467,
+      "lng": 120.515313
+    },
+    {
+      "name": "Tolonguat",
+      "lat": 15.96272,
+      "lng": 120.450563
+    },
+    {
+      "name": "Tomling",
+      "lat": 15.862998,
+      "lng": 120.447168
+    },
+    {
+      "name": "Umando",
+      "lat": 15.866506,
+      "lng": 120.464129
+    },
+    {
+      "name": "Viado",
+      "lat": 15.901508,
+      "lng": 120.42929
+    },
+    {
+      "name": "Waig",
+      "lat": 15.86795,
+      "lng": 120.498455
+    },
+    {
+      "name": "Warey",
+      "lat": 15.869135,
+      "lng": 120.42674
+    }
+  ],
+  "Manaoag": [
+    {
+      "name": "Babasit",
+      "lat": 16.055213,
+      "lng": 120.472939
+    },
+    {
+      "name": "Baguinay",
+      "lat": 15.995814,
+      "lng": 120.523683
+    },
+    {
+      "name": "Baritao",
+      "lat": 16.037386,
+      "lng": 120.475053
+    },
+    {
+      "name": "Bisal",
+      "lat": 16.048649,
+      "lng": 120.46385
+    },
+    {
+      "name": "Bucao",
+      "lat": 16.043936,
+      "lng": 120.459306
+    },
+    {
+      "name": "Cabanbanan",
+      "lat": 16.017891,
+      "lng": 120.510606
+    },
+    {
+      "name": "Calaocan",
+      "lat": 16.047766,
+      "lng": 120.493701
+    },
+    {
+      "name": "Inamotan",
+      "lat": 15.998526,
+      "lng": 120.541649
+    },
+    {
+      "name": "Lelemaan",
+      "lat": 16.008535,
+      "lng": 120.529618
+    },
+    {
+      "name": "Licsi",
+      "lat": 16.036208,
+      "lng": 120.493318
+    },
+    {
+      "name": "Lipit Norte",
+      "lat": 16.073137,
+      "lng": 120.523242
+    },
+    {
+      "name": "Lipit Sur",
+      "lat": 16.067646,
+      "lng": 120.510788
+    },
+    {
+      "name": "Matolong",
+      "lat": 15.994104,
+      "lng": 120.497598
+    },
+    {
+      "name": "Mermer",
+      "lat": 16.018552,
+      "lng": 120.485137
+    },
+    {
+      "name": "Nalsian",
+      "lat": 16.031822,
+      "lng": 120.503466
+    },
+    {
+      "name": "Oraan East",
+      "lat": 16.005522,
+      "lng": 120.507592
+    },
+    {
+      "name": "Oraan West",
+      "lat": 16.014314,
+      "lng": 120.495675
+    },
+    {
+      "name": "Pantal",
+      "lat": 16.031778,
+      "lng": 120.48908
+    },
+    {
+      "name": "Pao",
+      "lat": 16.051467,
+      "lng": 120.510348
+    },
+    {
+      "name": "Parian",
+      "lat": 16.002381,
+      "lng": 120.488828
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.044763,
+      "lng": 120.486021
+    },
+    {
+      "name": "Pugaro",
+      "lat": 16.063691,
+      "lng": 120.490756
+    },
+    {
+      "name": "San Ramon",
+      "lat": 16.027302,
+      "lng": 120.475333
+    },
+    {
+      "name": "Santa Ines",
+      "lat": 16.021253,
+      "lng": 120.527946
+    },
+    {
+      "name": "Sapang",
+      "lat": 16.05257,
+      "lng": 120.502745
+    },
+    {
+      "name": "Tebuel",
+      "lat": 16.040163,
+      "lng": 120.500182
+    }
+  ],
+  "Mangaldan": [
+    {
+      "name": "Alitaya",
+      "lat": 16.033041,
+      "lng": 120.395659
+    },
+    {
+      "name": "Amansabina",
+      "lat": 16.039425,
+      "lng": 120.412531
+    },
+    {
+      "name": "Anolid",
+      "lat": 16.050116,
+      "lng": 120.380928
+    },
+    {
+      "name": "Banaoang",
+      "lat": 16.056933,
+      "lng": 120.40616
+    },
+    {
+      "name": "Bantayan",
+      "lat": 16.089607,
+      "lng": 120.388383
+    },
+    {
+      "name": "Bari",
+      "lat": 16.060834,
+      "lng": 120.400253
+    },
+    {
+      "name": "Bateng",
+      "lat": 16.088073,
+      "lng": 120.374575
+    },
+    {
+      "name": "Buenlag",
+      "lat": 16.047941,
+      "lng": 120.408873
+    },
+    {
+      "name": "David",
+      "lat": 16.039281,
+      "lng": 120.428231
+    },
+    {
+      "name": "Embarcadero",
+      "lat": 16.073178,
+      "lng": 120.419185
+    },
+    {
+      "name": "Gueguesangen",
+      "lat": 16.032597,
+      "lng": 120.420074
+    },
+    {
+      "name": "Guesang",
+      "lat": 16.045996,
+      "lng": 120.434736
+    },
+    {
+      "name": "Guiguilonen",
+      "lat": 16.071077,
+      "lng": 120.411156
+    },
+    {
+      "name": "Guilig",
+      "lat": 16.067153,
+      "lng": 120.395051
+    },
+    {
+      "name": "Inlambo",
+      "lat": 16.096516,
+      "lng": 120.413563
+    },
+    {
+      "name": "Lanas",
+      "lat": 16.077636,
+      "lng": 120.387933
+    },
+    {
+      "name": "Landas",
+      "lat": 16.051791,
+      "lng": 120.422693
+    },
+    {
+      "name": "Maasin",
+      "lat": 16.064788,
+      "lng": 120.375024
+    },
+    {
+      "name": "Macayug",
+      "lat": 16.085918,
+      "lng": 120.417247
+    },
+    {
+      "name": "Malabago",
+      "lat": 16.055526,
+      "lng": 120.391276
+    },
+    {
+      "name": "Navaluan",
+      "lat": 16.065738,
+      "lng": 120.416971
+    },
+    {
+      "name": "Nibaliw",
+      "lat": 16.076931,
+      "lng": 120.41085
+    },
+    {
+      "name": "Osiem",
+      "lat": 16.061687,
+      "lng": 120.423667
+    },
+    {
+      "name": "Palua",
+      "lat": 16.091865,
+      "lng": 120.402267
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.069392,
+      "lng": 120.404331
+    },
+    {
+      "name": "Pogo",
+      "lat": 16.09557,
+      "lng": 120.397811
+    },
+    {
+      "name": "Salaan",
+      "lat": 16.084866,
+      "lng": 120.404268
+    },
+    {
+      "name": "Salay",
+      "lat": 16.076621,
+      "lng": 120.395765
+    },
+    {
+      "name": "Talogtog",
+      "lat": 16.076133,
+      "lng": 120.373109
+    },
+    {
+      "name": "Tebag",
+      "lat": 16.079798,
+      "lng": 120.406739
+    }
+  ],
+  "Mangatarem": [
+    {
+      "name": "Andangin",
+      "lat": 15.724128,
+      "lng": 120.332542
+    },
+    {
+      "name": "Arellano Street (POB.)",
+      "lat": 15.788189,
+      "lng": 120.290851
+    },
+    {
+      "name": "Bantay",
+      "lat": 15.798068,
+      "lng": 120.253287
+    },
+    {
+      "name": "Bantocaling",
+      "lat": 15.775273,
+      "lng": 120.222742
+    },
+    {
+      "name": "Baracbac",
+      "lat": 15.720114,
+      "lng": 120.344381
+    },
+    {
+      "name": "Bogtong Bolo",
+      "lat": 15.746002,
+      "lng": 120.319437
+    },
+    {
+      "name": "Bogtong Bunao",
+      "lat": 15.750394,
+      "lng": 120.338546
+    },
+    {
+      "name": "Bogtong Centro",
+      "lat": 15.754212,
+      "lng": 120.328009
+    },
+    {
+      "name": "Bogtong Niog",
+      "lat": 15.758834,
+      "lng": 120.331811
+    },
+    {
+      "name": "Bogtong Silag",
+      "lat": 15.818685,
+      "lng": 120.292197
+    },
+    {
+      "name": "Buaya",
+      "lat": 15.769437,
+      "lng": 120.374458
+    },
+    {
+      "name": "Buenlag",
+      "lat": 15.803891,
+      "lng": 120.254714
+    },
+    {
+      "name": "Bueno",
+      "lat": 15.777083,
+      "lng": 120.308934
+    },
+    {
+      "name": "Bunagan",
+      "lat": 15.749781,
+      "lng": 120.224116
+    },
+    {
+      "name": "Bunlalacao",
+      "lat": 15.826637,
+      "lng": 120.287242
+    },
+    {
+      "name": "Burgos Street (POB.)",
+      "lat": 15.792231,
+      "lng": 120.295215
+    },
+    {
+      "name": "Cabaluyan 1st",
+      "lat": 15.705036,
+      "lng": 120.342544
+    },
+    {
+      "name": "Cabaluyan 2nd",
+      "lat": 15.670073,
+      "lng": 120.292559
+    },
+    {
+      "name": "Cabarabuan",
+      "lat": 15.71132,
+      "lng": 120.332953
+    },
+    {
+      "name": "Cabaruan",
+      "lat": 15.754635,
+      "lng": 120.313303
+    },
+    {
+      "name": "Cabayaoasan",
+      "lat": 15.76255,
+      "lng": 120.38527
+    },
+    {
+      "name": "Cabayugan",
+      "lat": 15.743341,
+      "lng": 120.348283
+    },
+    {
+      "name": "Cacaoiten",
+      "lat": 15.652725,
+      "lng": 120.29291
+    },
+    {
+      "name": "Calumboyan Norte",
+      "lat": 15.841686,
+      "lng": 120.282918
+    },
+    {
+      "name": "Calumboyan Sur",
+      "lat": 15.708356,
+      "lng": 120.246484
+    },
+    {
+      "name": "Calvo (POB.)",
+      "lat": 15.792564,
+      "lng": 120.292212
+    },
+    {
+      "name": "Casilagan",
+      "lat": 15.735028,
+      "lng": 120.324118
+    },
+    {
+      "name": "Catarataraan",
+      "lat": 15.723473,
+      "lng": 120.290333
+    },
+    {
+      "name": "Caturay Norte",
+      "lat": 15.785262,
+      "lng": 120.359208
+    },
+    {
+      "name": "Caturay Sur",
+      "lat": 15.774813,
+      "lng": 120.366046
+    },
+    {
+      "name": "Caviernesan",
+      "lat": 15.769359,
+      "lng": 120.285747
+    },
+    {
+      "name": "Dorongan Ketaket",
+      "lat": 15.801164,
+      "lng": 120.318531
+    },
+    {
+      "name": "Dorongan Linmansangan",
+      "lat": 15.850769,
+      "lng": 120.294587
+    },
+    {
+      "name": "Dorongan Punta",
+      "lat": 15.812669,
+      "lng": 120.317265
+    },
+    {
+      "name": "Dorongan Sawat",
+      "lat": 15.788687,
+      "lng": 120.332485
+    },
+    {
+      "name": "Dorongan Valerio",
+      "lat": 15.824516,
+      "lng": 120.310195
+    },
+    {
+      "name": "General Luna (POB.)",
+      "lat": 15.787795,
+      "lng": 120.291605
+    },
+    {
+      "name": "Historia",
+      "lat": 15.789751,
+      "lng": 120.313475
+    },
+    {
+      "name": "Lawak Langka",
+      "lat": 15.679407,
+      "lng": 120.276389
+    },
+    {
+      "name": "Linmansangan",
+      "lat": 15.834911,
+      "lng": 120.283619
+    },
+    {
+      "name": "Lopez (POB.)",
+      "lat": 15.78219,
+      "lng": 120.289672
+    },
+    {
+      "name": "Mabini (POB.)",
+      "lat": 15.786615,
+      "lng": 120.292459
+    },
+    {
+      "name": "Macarang",
+      "lat": 15.714472,
+      "lng": 120.352064
+    },
+    {
+      "name": "Malabobo",
+      "lat": 15.695278,
+      "lng": 120.271241
+    },
+    {
+      "name": "Malibong",
+      "lat": 15.74189,
+      "lng": 120.236195
+    },
+    {
+      "name": "Malunec",
+      "lat": 15.8111,
+      "lng": 120.268
+    },
+    {
+      "name": "Maravilla (POB.)",
+      "lat": 15.789618,
+      "lng": 120.289455
+    },
+    {
+      "name": "Maravilla-arellano Ext. (POB.)",
+      "lat": 15.784693,
+      "lng": 120.281693
+    },
+    {
+      "name": "Muelang",
+      "lat": 15.761274,
+      "lng": 120.221797
+    },
+    {
+      "name": "Naguilayan East",
+      "lat": 15.765348,
+      "lng": 120.302369
+    },
+    {
+      "name": "Naguilayan West",
+      "lat": 15.758421,
+      "lng": 120.289119
+    },
+    {
+      "name": "Nancasalan",
+      "lat": 15.742733,
+      "lng": 120.362334
+    },
+    {
+      "name": "Niog-cabison-bulaney",
+      "lat": 15.809085,
+      "lng": 120.300897
+    },
+    {
+      "name": "Olegario-caoile (POB.)",
+      "lat": 15.788514,
+      "lng": 120.297016
+    },
+    {
+      "name": "Olo Cacamposan",
+      "lat": 15.769384,
+      "lng": 120.326789
+    },
+    {
+      "name": "Olo Cafabrosan",
+      "lat": 15.766871,
+      "lng": 120.312877
+    },
+    {
+      "name": "Olo Cagarlitan",
+      "lat": 15.776771,
+      "lng": 120.32614
+    },
+    {
+      "name": "Osmeña (POB.)",
+      "lat": 15.782362,
+      "lng": 120.287552
+    },
+    {
+      "name": "Pacalat",
+      "lat": 15.728103,
+      "lng": 120.239893
+    },
+    {
+      "name": "Pampano",
+      "lat": 15.765524,
+      "lng": 120.353822
+    },
+    {
+      "name": "Parian",
+      "lat": 15.786189,
+      "lng": 120.269559
+    },
+    {
+      "name": "Paul",
+      "lat": 15.791825,
+      "lng": 120.309802
+    },
+    {
+      "name": "Peania Pedania (bedania)",
+      "lat": 15.757022,
+      "lng": 120.374684
+    },
+    {
+      "name": "Pogon-aniat",
+      "lat": 15.784674,
+      "lng": 120.318
+    },
+    {
+      "name": "Pogon-lomboy (POB.)",
+      "lat": 15.788832,
+      "lng": 120.301868
+    },
+    {
+      "name": "Ponglo-baleg",
+      "lat": 15.799314,
+      "lng": 120.26701
+    },
+    {
+      "name": "Ponglo-muelag",
+      "lat": 15.794211,
+      "lng": 120.275412
+    },
+    {
+      "name": "Quetegan (pogon-baleg)",
+      "lat": 15.824381,
+      "lng": 120.27351
+    },
+    {
+      "name": "Quezon (POB.)",
+      "lat": 15.787202,
+      "lng": 120.292025
+    },
+    {
+      "name": "Salavante",
+      "lat": 15.786523,
+      "lng": 120.347612
+    },
+    {
+      "name": "Sapang",
+      "lat": 15.732476,
+      "lng": 120.303219
+    },
+    {
+      "name": "Sonson Ongkit",
+      "lat": 15.774233,
+      "lng": 120.297975
+    },
+    {
+      "name": "Suaco",
+      "lat": 15.74845,
+      "lng": 120.306662
+    },
+    {
+      "name": "Tagac",
+      "lat": 15.7547,
+      "lng": 120.297157
+    },
+    {
+      "name": "Takipan",
+      "lat": 15.733658,
+      "lng": 120.34276
+    },
+    {
+      "name": "Talogtog",
+      "lat": 15.76154,
+      "lng": 120.323138
+    },
+    {
+      "name": "Tococ Barikir",
+      "lat": 15.742781,
+      "lng": 120.292511
+    },
+    {
+      "name": "Torre 1st",
+      "lat": 15.795999,
+      "lng": 120.295926
+    },
+    {
+      "name": "Torre 2nd",
+      "lat": 15.799516,
+      "lng": 120.306409
+    },
+    {
+      "name": "Torres Bugallon (POB.)",
+      "lat": 15.784639,
+      "lng": 120.293388
+    },
+    {
+      "name": "Umangan",
+      "lat": 15.800594,
+      "lng": 120.285484
+    },
+    {
+      "name": "Zamora (POB.)",
+      "lat": 15.791429,
+      "lng": 120.296384
+    }
+  ],
+  "Mapandan": [
+    {
+      "name": "Amanoaoac",
+      "lat": 16.014816,
+      "lng": 120.44822
+    },
+    {
+      "name": "Apaya",
+      "lat": 16.026944,
+      "lng": 120.444475
+    },
+    {
+      "name": "Aserda",
+      "lat": 16.023112,
+      "lng": 120.465669
+    },
+    {
+      "name": "Baloling",
+      "lat": 16.037864,
+      "lng": 120.455357
+    },
+    {
+      "name": "Coral",
+      "lat": 16.031153,
+      "lng": 120.451476
+    },
+    {
+      "name": "Golden",
+      "lat": 16.020178,
+      "lng": 120.439087
+    },
+    {
+      "name": "Jimenez",
+      "lat": 16.011192,
+      "lng": 120.459776
+    },
+    {
+      "name": "Lambayan",
+      "lat": 16.000212,
+      "lng": 120.469038
+    },
+    {
+      "name": "Luyan (luyan South)",
+      "lat": 16.012017,
+      "lng": 120.474912
+    },
+    {
+      "name": "Nilombot",
+      "lat": 16.026878,
+      "lng": 120.430087
+    },
+    {
+      "name": "Pias",
+      "lat": 16.035045,
+      "lng": 120.442706
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.025046,
+      "lng": 120.452809
+    },
+    {
+      "name": "Primicias",
+      "lat": 15.996778,
+      "lng": 120.47986
+    },
+    {
+      "name": "Santa Maria (luyan North)",
+      "lat": 16.030156,
+      "lng": 120.46579
+    },
+    {
+      "name": "Torres",
+      "lat": 16.013252,
+      "lng": 120.467428
+    }
+  ],
+  "Natividad": [
+    {
+      "name": "Barangobong",
+      "lat": 16.04697,
+      "lng": 120.778128
+    },
+    {
+      "name": "Batchelor East",
+      "lat": 16.067053,
+      "lng": 120.846449
+    },
+    {
+      "name": "Batchelor West",
+      "lat": 16.048925,
+      "lng": 120.808557
+    },
+    {
+      "name": "Burgos (san Narciso)",
+      "lat": 16.029054,
+      "lng": 120.779292
+    },
+    {
+      "name": "Cacandungan",
+      "lat": 16.053755,
+      "lng": 120.843458
+    },
+    {
+      "name": "Calapugan",
+      "lat": 16.028757,
+      "lng": 120.810509
+    },
+    {
+      "name": "Canarem",
+      "lat": 16.03658,
+      "lng": 120.773945
+    },
+    {
+      "name": "Luna",
+      "lat": 16.014719,
+      "lng": 120.7905
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 16.041059,
+      "lng": 120.798917
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 16.04156,
+      "lng": 120.791092
+    },
+    {
+      "name": "Rizal",
+      "lat": 16.039439,
+      "lng": 120.78262
+    },
+    {
+      "name": "Salud",
+      "lat": 16.069737,
+      "lng": 120.830665
+    },
+    {
+      "name": "San Eugenio",
+      "lat": 16.080407,
+      "lng": 120.83252
+    },
+    {
+      "name": "San Macario Norte",
+      "lat": 16.041747,
+      "lng": 120.858804
+    },
+    {
+      "name": "San Macario Sur",
+      "lat": 16.024195,
+      "lng": 120.85853
+    },
+    {
+      "name": "San Maximo",
+      "lat": 16.03175,
+      "lng": 120.79389
+    },
+    {
+      "name": "San Miguel",
+      "lat": 16.019227,
+      "lng": 120.800395
+    },
+    {
+      "name": "Silag",
+      "lat": 16.017235,
+      "lng": 120.78014
+    }
+  ],
+  "Pozorrubio": [
+    {
+      "name": "Alipangpang",
+      "lat": 16.108925,
+      "lng": 120.560466
+    },
+    {
+      "name": "Amagbagan",
+      "lat": 16.088245,
+      "lng": 120.538437
+    },
+    {
+      "name": "Balacag",
+      "lat": 16.130436,
+      "lng": 120.491435
+    },
+    {
+      "name": "Banding",
+      "lat": 16.101796,
+      "lng": 120.557388
+    },
+    {
+      "name": "Bantugan",
+      "lat": 16.091365,
+      "lng": 120.509104
+    },
+    {
+      "name": "Batakil",
+      "lat": 16.143193,
+      "lng": 120.523144
+    },
+    {
+      "name": "Bobonan",
+      "lat": 16.13256,
+      "lng": 120.526196
+    },
+    {
+      "name": "Buneg",
+      "lat": 16.118864,
+      "lng": 120.566275
+    },
+    {
+      "name": "Cablong",
+      "lat": 16.117964,
+      "lng": 120.542307
+    },
+    {
+      "name": "Casanfernandoan",
+      "lat": 16.114541,
+      "lng": 120.489351
+    },
+    {
+      "name": "Castaño",
+      "lat": 16.100982,
+      "lng": 120.504752
+    },
+    {
+      "name": "Dilan",
+      "lat": 16.081373,
+      "lng": 120.522897
+    },
+    {
+      "name": "Don Benito",
+      "lat": 16.13653,
+      "lng": 120.502805
+    },
+    {
+      "name": "Haway",
+      "lat": 16.101224,
+      "lng": 120.493221
+    },
+    {
+      "name": "Imbalbalatong",
+      "lat": 16.119958,
+      "lng": 120.554639
+    },
+    {
+      "name": "Inoman",
+      "lat": 16.142508,
+      "lng": 120.538609
+    },
+    {
+      "name": "Laoac",
+      "lat": 16.136127,
+      "lng": 120.512503
+    },
+    {
+      "name": "Maambal",
+      "lat": 16.085553,
+      "lng": 120.492189
+    },
+    {
+      "name": "Malasin",
+      "lat": 16.092621,
+      "lng": 120.522683
+    },
+    {
+      "name": "Malokiat",
+      "lat": 16.114653,
+      "lng": 120.502601
+    },
+    {
+      "name": "Manaol",
+      "lat": 16.115991,
+      "lng": 120.516207
+    },
+    {
+      "name": "Nama",
+      "lat": 16.13052,
+      "lng": 120.547777
+    },
+    {
+      "name": "Nantangalan",
+      "lat": 16.082762,
+      "lng": 120.506651
+    },
+    {
+      "name": "Palacpalac",
+      "lat": 16.124866,
+      "lng": 120.536177
+    },
+    {
+      "name": "Palguyod",
+      "lat": 16.122648,
+      "lng": 120.526085
+    },
+    {
+      "name": "Poblacion I",
+      "lat": 16.112024,
+      "lng": 120.536834
+    },
+    {
+      "name": "Poblacion II",
+      "lat": 16.107892,
+      "lng": 120.538526
+    },
+    {
+      "name": "Poblacion III",
+      "lat": 16.111737,
+      "lng": 120.546648
+    },
+    {
+      "name": "Poblacion IV",
+      "lat": 16.108106,
+      "lng": 120.546728
+    },
+    {
+      "name": "Rosario",
+      "lat": 16.09641,
+      "lng": 120.568574
+    },
+    {
+      "name": "Sugcong",
+      "lat": 16.146487,
+      "lng": 120.552406
+    },
+    {
+      "name": "Talogtog",
+      "lat": 16.101647,
+      "lng": 120.541784
+    },
+    {
+      "name": "Tulnac",
+      "lat": 16.102818,
+      "lng": 120.521862
+    },
+    {
+      "name": "Villegas",
+      "lat": 16.134878,
+      "lng": 120.561305
+    }
+  ],
+  "Rosales": [
+    {
+      "name": "Acop",
+      "lat": 15.87106,
+      "lng": 120.655956
+    },
+    {
+      "name": "Bakitbakit",
+      "lat": 15.896025,
+      "lng": 120.654931
+    },
+    {
+      "name": "Balingcanaway",
+      "lat": 15.886583,
+      "lng": 120.65776
+    },
+    {
+      "name": "Cabalaoangan Norte",
+      "lat": 15.882611,
+      "lng": 120.626752
+    },
+    {
+      "name": "Cabalaoangan Sur",
+      "lat": 15.874436,
+      "lng": 120.627437
+    },
+    {
+      "name": "Calanutan (don Felix Coloma)",
+      "lat": 15.859741,
+      "lng": 120.652002
+    },
+    {
+      "name": "Camangaan",
+      "lat": 15.842386,
+      "lng": 120.631614
+    },
+    {
+      "name": "Capitan Tomas",
+      "lat": 15.909221,
+      "lng": 120.655392
+    },
+    {
+      "name": "Carmay East",
+      "lat": 15.908489,
+      "lng": 120.642279
+    },
+    {
+      "name": "Carmay West",
+      "lat": 15.904988,
+      "lng": 120.627354
+    },
+    {
+      "name": "Carmen East",
+      "lat": 15.881913,
+      "lng": 120.604108
+    },
+    {
+      "name": "Carmen West",
+      "lat": 15.870855,
+      "lng": 120.598633
+    },
+    {
+      "name": "Casanicolasan",
+      "lat": 15.92385,
+      "lng": 120.65535
+    },
+    {
+      "name": "Coliling",
+      "lat": 15.857174,
+      "lng": 120.612031
+    },
+    {
+      "name": "Don Antonio Village",
+      "lat": 15.893224,
+      "lng": 120.629197
+    },
+    {
+      "name": "Guiling",
+      "lat": 15.84451,
+      "lng": 120.616564
+    },
+    {
+      "name": "Palakipak",
+      "lat": 15.865716,
+      "lng": 120.624106
+    },
+    {
+      "name": "Pangaoan",
+      "lat": 15.831521,
+      "lng": 120.638149
+    },
+    {
+      "name": "Rabago",
+      "lat": 15.855658,
+      "lng": 120.631103
+    },
+    {
+      "name": "Rizal",
+      "lat": 15.919031,
+      "lng": 120.634852
+    },
+    {
+      "name": "Salvacion",
+      "lat": 15.839846,
+      "lng": 120.670074
+    },
+    {
+      "name": "San Angel",
+      "lat": 15.850817,
+      "lng": 120.654082
+    },
+    {
+      "name": "San Antonio",
+      "lat": 15.843343,
+      "lng": 120.652383
+    },
+    {
+      "name": "San Bartolome",
+      "lat": 15.873004,
+      "lng": 120.613679
+    },
+    {
+      "name": "San Isidro",
+      "lat": 15.827049,
+      "lng": 120.62186
+    },
+    {
+      "name": "San Luis",
+      "lat": 15.832323,
+      "lng": 120.655294
+    },
+    {
+      "name": "San Pedro East",
+      "lat": 15.897976,
+      "lng": 120.648094
+    },
+    {
+      "name": "San Pedro West",
+      "lat": 15.895107,
+      "lng": 120.64288
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.839454,
+      "lng": 120.679931
+    },
+    {
+      "name": "Station District",
+      "lat": 15.878138,
+      "lng": 120.636634
+    },
+    {
+      "name": "Tomana East",
+      "lat": 15.896717,
+      "lng": 120.621297
+    },
+    {
+      "name": "Tomana West",
+      "lat": 15.888512,
+      "lng": 120.613897
+    },
+    {
+      "name": "Zone I (POB.)",
+      "lat": 15.888632,
+      "lng": 120.627887
+    },
+    {
+      "name": "Zone II (POB.)",
+      "lat": 15.892178,
+      "lng": 120.631249
+    },
+    {
+      "name": "Zone III (POB.)",
+      "lat": 15.894243,
+      "lng": 120.626803
+    },
+    {
+      "name": "Zone IV (POB.)",
+      "lat": 15.895166,
+      "lng": 120.637407
+    },
+    {
+      "name": "Zone V (POB.)",
+      "lat": 15.892335,
+      "lng": 120.635748
+    }
+  ],
+  "San Carlos City": [
+    {
+      "name": "Abanon",
+      "lat": 15.870006,
+      "lng": 120.325609
+    },
+    {
+      "name": "Agdao",
+      "lat": 15.899923,
+      "lng": 120.326958
+    },
+    {
+      "name": "Anando",
+      "lat": 15.866917,
+      "lng": 120.314319
+    },
+    {
+      "name": "Ano",
+      "lat": 15.950718,
+      "lng": 120.381942
+    },
+    {
+      "name": "Antipangol",
+      "lat": 15.930424,
+      "lng": 120.276526
+    },
+    {
+      "name": "Aponit",
+      "lat": 15.900038,
+      "lng": 120.285705
+    },
+    {
+      "name": "Bacnar",
+      "lat": 15.886299,
+      "lng": 120.343885
+    },
+    {
+      "name": "Balaya",
+      "lat": 15.92394,
+      "lng": 120.287747
+    },
+    {
+      "name": "Balayong",
+      "lat": 15.949142,
+      "lng": 120.342011
+    },
+    {
+      "name": "Baldog",
+      "lat": 15.914898,
+      "lng": 120.317782
+    },
+    {
+      "name": "Balite Sur",
+      "lat": 15.883822,
+      "lng": 120.358303
+    },
+    {
+      "name": "Balococ",
+      "lat": 15.912083,
+      "lng": 120.296672
+    },
+    {
+      "name": "Bani",
+      "lat": 15.901032,
+      "lng": 120.270504
+    },
+    {
+      "name": "Bega",
+      "lat": 15.930943,
+      "lng": 120.365693
+    },
+    {
+      "name": "Bocboc",
+      "lat": 15.893012,
+      "lng": 120.262809
+    },
+    {
+      "name": "Bogaoan",
+      "lat": 15.913944,
+      "lng": 120.273893
+    },
+    {
+      "name": "Bolingit",
+      "lat": 15.955308,
+      "lng": 120.349229
+    },
+    {
+      "name": "Bolosan",
+      "lat": 15.902308,
+      "lng": 120.344286
+    },
+    {
+      "name": "Bonifacio (POB.)",
+      "lat": 15.924878,
+      "lng": 120.34468
+    },
+    {
+      "name": "Buenglat",
+      "lat": 15.913495,
+      "lng": 120.306632
+    },
+    {
+      "name": "Bugallon-posadas Street (POB.)",
+      "lat": 15.927423,
+      "lng": 120.346371
+    },
+    {
+      "name": "Burgos Padlan (POB.)",
+      "lat": 15.926688,
+      "lng": 120.34462
+    },
+    {
+      "name": "Cacaritan",
+      "lat": 15.940787,
+      "lng": 120.336206
+    },
+    {
+      "name": "Caingal",
+      "lat": 15.909768,
+      "lng": 120.344676
+    },
+    {
+      "name": "Calobaoan",
+      "lat": 15.858121,
+      "lng": 120.342761
+    },
+    {
+      "name": "Calomboyan",
+      "lat": 15.946757,
+      "lng": 120.294604
+    },
+    {
+      "name": "Caoayan-kiling",
+      "lat": 15.854403,
+      "lng": 120.320085
+    },
+    {
+      "name": "Capataan",
+      "lat": 15.95081,
+      "lng": 120.311131
+    },
+    {
+      "name": "Cobol",
+      "lat": 15.903493,
+      "lng": 120.391592
+    },
+    {
+      "name": "Coliling",
+      "lat": 15.922155,
+      "lng": 120.378802
+    },
+    {
+      "name": "Cruz",
+      "lat": 15.962758,
+      "lng": 120.346234
+    },
+    {
+      "name": "Doyong",
+      "lat": 15.957603,
+      "lng": 120.357287
+    },
+    {
+      "name": "Gamata",
+      "lat": 15.925865,
+      "lng": 120.302302
+    },
+    {
+      "name": "Guelew",
+      "lat": 15.857888,
+      "lng": 120.303373
+    },
+    {
+      "name": "Ilang",
+      "lat": 15.920439,
+      "lng": 120.35397
+    },
+    {
+      "name": "Inerangan",
+      "lat": 15.960053,
+      "lng": 120.363134
+    },
+    {
+      "name": "Isla",
+      "lat": 15.893522,
+      "lng": 120.30116
+    },
+    {
+      "name": "Libas",
+      "lat": 15.876792,
+      "lng": 120.310128
+    },
+    {
+      "name": "Lilimasan",
+      "lat": 15.93595,
+      "lng": 120.379278
+    },
+    {
+      "name": "Longos",
+      "lat": 15.923524,
+      "lng": 120.356819
+    },
+    {
+      "name": "Lucban (POB.)",
+      "lat": 15.928509,
+      "lng": 120.342426
+    },
+    {
+      "name": "M. Soriano",
+      "lat": 15.921422,
+      "lng": 120.348838
+    },
+    {
+      "name": "Mabalbalino",
+      "lat": 15.918373,
+      "lng": 120.256486
+    },
+    {
+      "name": "Mabini (POB.)",
+      "lat": 15.927468,
+      "lng": 120.350933
+    },
+    {
+      "name": "Magtaking",
+      "lat": 15.912455,
+      "lng": 120.3653
+    },
+    {
+      "name": "Malacañang",
+      "lat": 15.882326,
+      "lng": 120.32935
+    },
+    {
+      "name": "Maliwara",
+      "lat": 15.897114,
+      "lng": 120.313658
+    },
+    {
+      "name": "Mamarlao",
+      "lat": 15.931606,
+      "lng": 120.334198
+    },
+    {
+      "name": "Manzon",
+      "lat": 15.945246,
+      "lng": 120.347526
+    },
+    {
+      "name": "Matagdem",
+      "lat": 15.949199,
+      "lng": 120.356449
+    },
+    {
+      "name": "Mestizo Norte",
+      "lat": 15.910081,
+      "lng": 120.335298
+    },
+    {
+      "name": "Naguilayan",
+      "lat": 15.961574,
+      "lng": 120.336461
+    },
+    {
+      "name": "Nilentap",
+      "lat": 15.952997,
+      "lng": 120.367442
+    },
+    {
+      "name": "Padilla-gomez",
+      "lat": 15.91691,
+      "lng": 120.347605
+    },
+    {
+      "name": "Pagal",
+      "lat": 15.949157,
+      "lng": 120.332478
+    },
+    {
+      "name": "Paitan-panoypoy",
+      "lat": 15.906412,
+      "lng": 120.355202
+    },
+    {
+      "name": "Palaming",
+      "lat": 15.944977,
+      "lng": 120.323041
+    },
+    {
+      "name": "Palaris (POB.)",
+      "lat": 15.922802,
+      "lng": 120.345119
+    },
+    {
+      "name": "Palospos",
+      "lat": 15.866311,
+      "lng": 120.359653
+    },
+    {
+      "name": "Pangalangan",
+      "lat": 15.957552,
+      "lng": 120.32151
+    },
+    {
+      "name": "Pangoloan",
+      "lat": 15.93234,
+      "lng": 120.312063
+    },
+    {
+      "name": "Pangpang",
+      "lat": 15.939584,
+      "lng": 120.306889
+    },
+    {
+      "name": "Parayao",
+      "lat": 15.963648,
+      "lng": 120.313228
+    },
+    {
+      "name": "Payapa",
+      "lat": 15.908395,
+      "lng": 120.378805
+    },
+    {
+      "name": "Payar",
+      "lat": 15.88845,
+      "lng": 120.311803
+    },
+    {
+      "name": "Perez Boulevard (POB.)",
+      "lat": 15.925269,
+      "lng": 120.351214
+    },
+    {
+      "name": "Pnr Station Site",
+      "lat": 15.933586,
+      "lng": 120.352052
+    },
+    {
+      "name": "Polo",
+      "lat": 15.893948,
+      "lng": 120.320269
+    },
+    {
+      "name": "Quezon Boulevard (POB.)",
+      "lat": 15.930487,
+      "lng": 120.35615
+    },
+    {
+      "name": "Quintong",
+      "lat": 15.960185,
+      "lng": 120.313837
+    },
+    {
+      "name": "Rizal (POB.)",
+      "lat": 15.936813,
+      "lng": 120.348051
+    },
+    {
+      "name": "Roxas Boulevard (POB.)",
+      "lat": 15.93344,
+      "lng": 120.34266
+    },
+    {
+      "name": "Salinap",
+      "lat": 15.891301,
+      "lng": 120.274886
+    },
+    {
+      "name": "San Juan",
+      "lat": 15.923442,
+      "lng": 120.326947
+    },
+    {
+      "name": "San Pedro-taloy",
+      "lat": 15.921164,
+      "lng": 120.338556
+    },
+    {
+      "name": "Sapinit",
+      "lat": 15.914756,
+      "lng": 120.376706
+    },
+    {
+      "name": "Supo",
+      "lat": 15.838901,
+      "lng": 120.301045
+    },
+    {
+      "name": "Talang",
+      "lat": 15.90481,
+      "lng": 120.306531
+    },
+    {
+      "name": "Tamayo",
+      "lat": 15.879574,
+      "lng": 120.290509
+    },
+    {
+      "name": "Tandang Sora",
+      "lat": 15.929957,
+      "lng": 120.350076
+    },
+    {
+      "name": "Tandoc",
+      "lat": 15.964038,
+      "lng": 120.329039
+    },
+    {
+      "name": "Tarece",
+      "lat": 15.941627,
+      "lng": 120.36389
+    },
+    {
+      "name": "Tarectec",
+      "lat": 15.899361,
+      "lng": 120.384434
+    },
+    {
+      "name": "Tayambani",
+      "lat": 15.899467,
+      "lng": 120.30803
+    },
+    {
+      "name": "Tebag",
+      "lat": 15.899829,
+      "lng": 120.33366
+    },
+    {
+      "name": "Turac",
+      "lat": 15.895489,
+      "lng": 120.371019
+    }
+  ],
+  "San Fabian": [
+    {
+      "name": "Alacan",
+      "lat": 16.171342,
+      "lng": 120.431969
+    },
+    {
+      "name": "Ambalangan-dalin",
+      "lat": 16.159885,
+      "lng": 120.467726
+    },
+    {
+      "name": "Angio",
+      "lat": 16.11548,
+      "lng": 120.423379
+    },
+    {
+      "name": "Anonang",
+      "lat": 16.107338,
+      "lng": 120.446951
+    },
+    {
+      "name": "Aramal",
+      "lat": 16.123885,
+      "lng": 120.436727
+    },
+    {
+      "name": "Bigbiga",
+      "lat": 16.193333,
+      "lng": 120.435931
+    },
+    {
+      "name": "Binday",
+      "lat": 16.124049,
+      "lng": 120.453427
+    },
+    {
+      "name": "Bolaoen",
+      "lat": 16.196207,
+      "lng": 120.458039
+    },
+    {
+      "name": "Bolasi",
+      "lat": 16.149177,
+      "lng": 120.42113
+    },
+    {
+      "name": "Cabaruan",
+      "lat": 16.103017,
+      "lng": 120.426058
+    },
+    {
+      "name": "Cayanga",
+      "lat": 16.115087,
+      "lng": 120.399989
+    },
+    {
+      "name": "Colisao",
+      "lat": 16.130881,
+      "lng": 120.462796
+    },
+    {
+      "name": "Gomot",
+      "lat": 16.194016,
+      "lng": 120.446721
+    },
+    {
+      "name": "Inmalog",
+      "lat": 16.163262,
+      "lng": 120.453074
+    },
+    {
+      "name": "Inmalog Norte",
+      "lat": 16.178409,
+      "lng": 120.448296
+    },
+    {
+      "name": "Lekep-butao",
+      "lat": 16.107461,
+      "lng": 120.409121
+    },
+    {
+      "name": "Lipit-tomeeng",
+      "lat": 16.149637,
+      "lng": 120.438833
+    },
+    {
+      "name": "Longos",
+      "lat": 16.105174,
+      "lng": 120.399005
+    },
+    {
+      "name": "Longos Proper",
+      "lat": 16.098004,
+      "lng": 120.387787
+    },
+    {
+      "name": "Longos-amangonan-parac-parac Fabrica",
+      "lat": 16.107072,
+      "lng": 120.389372
+    },
+    {
+      "name": "Mabilao",
+      "lat": 16.159076,
+      "lng": 120.42843
+    },
+    {
+      "name": "Nibaliw Central",
+      "lat": 16.123151,
+      "lng": 120.399596
+    },
+    {
+      "name": "Nibaliw East",
+      "lat": 16.127515,
+      "lng": 120.402809
+    },
+    {
+      "name": "Nibaliw Magliba",
+      "lat": 16.123145,
+      "lng": 120.392047
+    },
+    {
+      "name": "Nibaliw Narvarte (nibaliw West Compound)",
+      "lat": 16.115635,
+      "lng": 120.386922
+    },
+    {
+      "name": "Nibaliw Vidal (nibaliw West Proper)",
+      "lat": 16.128553,
+      "lng": 120.397912
+    },
+    {
+      "name": "Palapad",
+      "lat": 16.138055,
+      "lng": 120.448224
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.121041,
+      "lng": 120.405666
+    },
+    {
+      "name": "Rabon",
+      "lat": 16.198006,
+      "lng": 120.423423
+    },
+    {
+      "name": "Sagud-bahley",
+      "lat": 16.119261,
+      "lng": 120.396931
+    },
+    {
+      "name": "Sobol",
+      "lat": 16.13829,
+      "lng": 120.409873
+    },
+    {
+      "name": "Tempra-guilig",
+      "lat": 16.128308,
+      "lng": 120.411688
+    },
+    {
+      "name": "Tiblong",
+      "lat": 16.185508,
+      "lng": 120.42712
+    },
+    {
+      "name": "Tocok",
+      "lat": 16.13458,
+      "lng": 120.422875
+    }
+  ],
+  "San Jacinto": [
+    {
+      "name": "Awai",
+      "lat": 16.093138,
+      "lng": 120.480457
+    },
+    {
+      "name": "Bagong Pag-asa (poblacion East)",
+      "lat": 16.069646,
+      "lng": 120.434327
+    },
+    {
+      "name": "Bolo",
+      "lat": 16.117086,
+      "lng": 120.473342
+    },
+    {
+      "name": "Capaoay (POB.)",
+      "lat": 16.073767,
+      "lng": 120.440637
+    },
+    {
+      "name": "Casibong",
+      "lat": 16.062324,
+      "lng": 120.436161
+    },
+    {
+      "name": "Guibel",
+      "lat": 16.069861,
+      "lng": 120.449264
+    },
+    {
+      "name": "Imelda (decrito)",
+      "lat": 16.048599,
+      "lng": 120.449486
+    },
+    {
+      "name": "Labney",
+      "lat": 16.10147,
+      "lng": 120.465469
+    },
+    {
+      "name": "Lobong",
+      "lat": 16.081067,
+      "lng": 120.469797
+    },
+    {
+      "name": "Macayug",
+      "lat": 16.092838,
+      "lng": 120.432214
+    },
+    {
+      "name": "Magsaysay (capay)",
+      "lat": 16.072059,
+      "lng": 120.431943
+    },
+    {
+      "name": "San Guillermo (poblacion West)",
+      "lat": 16.072031,
+      "lng": 120.436343
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.084379,
+      "lng": 120.447795
+    },
+    {
+      "name": "San Juan",
+      "lat": 16.067817,
+      "lng": 120.468803
+    },
+    {
+      "name": "San Roque",
+      "lat": 16.05455,
+      "lng": 120.43835
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.079838,
+      "lng": 120.431716
+    },
+    {
+      "name": "Santa Cruz",
+      "lat": 16.133274,
+      "lng": 120.476141
+    },
+    {
+      "name": "Santa Maria",
+      "lat": 16.058081,
+      "lng": 120.454386
+    },
+    {
+      "name": "Santo Tomas",
+      "lat": 16.072892,
+      "lng": 120.427266
+    }
+  ],
+  "San Manuel": [
+    {
+      "name": "Cabacaraan",
+      "lat": 16.04315,
+      "lng": 120.678924
+    },
+    {
+      "name": "Cabaritan",
+      "lat": 16.048745,
+      "lng": 120.65283
+    },
+    {
+      "name": "Flores",
+      "lat": 16.061525,
+      "lng": 120.692219
+    },
+    {
+      "name": "Guiset Norte (POB.)",
+      "lat": 16.071815,
+      "lng": 120.670926
+    },
+    {
+      "name": "Guiset Sur (POB.)",
+      "lat": 16.056739,
+      "lng": 120.668532
+    },
+    {
+      "name": "Lapalo",
+      "lat": 16.09022,
+      "lng": 120.633056
+    },
+    {
+      "name": "Nagsaag",
+      "lat": 16.049222,
+      "lng": 120.641046
+    },
+    {
+      "name": "Narra",
+      "lat": 16.087424,
+      "lng": 120.696241
+    },
+    {
+      "name": "San Antonio-arzadon",
+      "lat": 16.038863,
+      "lng": 120.691007
+    },
+    {
+      "name": "San Bonifacio",
+      "lat": 16.088667,
+      "lng": 120.663533
+    },
+    {
+      "name": "San Juan",
+      "lat": 16.041466,
+      "lng": 120.666422
+    },
+    {
+      "name": "San Roque",
+      "lat": 16.147311,
+      "lng": 120.668279
+    },
+    {
+      "name": "San Vicente",
+      "lat": 16.047806,
+      "lng": 120.708699
+    },
+    {
+      "name": "Santo Domingo",
+      "lat": 16.066853,
+      "lng": 120.641437
+    }
+  ],
+  "San Nicolas": [
+    {
+      "name": "Bensican",
+      "lat": 16.118596,
+      "lng": 120.747559
+    },
+    {
+      "name": "Cabitnongan",
+      "lat": 16.077373,
+      "lng": 120.7702
+    },
+    {
+      "name": "Caboloan",
+      "lat": 16.074551,
+      "lng": 120.727054
+    },
+    {
+      "name": "Cacabugaoan",
+      "lat": 16.10496,
+      "lng": 120.831295
+    },
+    {
+      "name": "Calanutian",
+      "lat": 16.100003,
+      "lng": 120.730168
+    },
+    {
+      "name": "Calaocan",
+      "lat": 16.079681,
+      "lng": 120.777894
+    },
+    {
+      "name": "Camanggaan",
+      "lat": 16.081362,
+      "lng": 120.742457
+    },
+    {
+      "name": "Camindoroan",
+      "lat": 16.088852,
+      "lng": 120.721374
+    },
+    {
+      "name": "Casaratan",
+      "lat": 16.064955,
+      "lng": 120.755125
+    },
+    {
+      "name": "Dalumpinas",
+      "lat": 16.10625,
+      "lng": 120.761778
+    },
+    {
+      "name": "Fianza",
+      "lat": 16.147119,
+      "lng": 120.784005
+    },
+    {
+      "name": "Lungao",
+      "lat": 16.08502,
+      "lng": 120.755656
+    },
+    {
+      "name": "Malico",
+      "lat": 16.159969,
+      "lng": 120.823345
+    },
+    {
+      "name": "Malilion",
+      "lat": 16.094545,
+      "lng": 120.738098
+    },
+    {
+      "name": "Nagkaysa",
+      "lat": 16.064636,
+      "lng": 120.761204
+    },
+    {
+      "name": "Nining",
+      "lat": 16.057607,
+      "lng": 120.782673
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 16.072752,
+      "lng": 120.763877
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 16.071945,
+      "lng": 120.75867
+    },
+    {
+      "name": "Salingcob",
+      "lat": 16.093708,
+      "lng": 120.773673
+    },
+    {
+      "name": "Salpad",
+      "lat": 16.122853,
+      "lng": 120.737756
+    },
+    {
+      "name": "San Felipe East",
+      "lat": 16.153443,
+      "lng": 120.724796
+    },
+    {
+      "name": "San Felipe West",
+      "lat": 16.111258,
+      "lng": 120.704258
+    },
+    {
+      "name": "San Isidro (sta. Cruzan)",
+      "lat": 16.095826,
+      "lng": 120.747652
+    },
+    {
+      "name": "San Jose",
+      "lat": 16.052209,
+      "lng": 120.770607
+    },
+    {
+      "name": "San Rafael Centro",
+      "lat": 16.066027,
+      "lng": 120.738635
+    },
+    {
+      "name": "San Rafael East",
+      "lat": 16.071054,
+      "lng": 120.747635
+    },
+    {
+      "name": "San Rafael West",
+      "lat": 16.058165,
+      "lng": 120.727931
+    },
+    {
+      "name": "San Roque",
+      "lat": 16.050319,
+      "lng": 120.756957
+    },
+    {
+      "name": "Santa Maria East",
+      "lat": 16.095285,
+      "lng": 120.791347
+    },
+    {
+      "name": "Santa Maria West",
+      "lat": 16.085126,
+      "lng": 120.7833
+    },
+    {
+      "name": "Santo Tomas",
+      "lat": 16.080674,
+      "lng": 120.725958
+    },
+    {
+      "name": "Siblot",
+      "lat": 16.06414,
+      "lng": 120.772235
+    },
+    {
+      "name": "Sobol",
+      "lat": 16.051781,
+      "lng": 120.743162
+    }
+  ],
+  "San Quintin": [
+    {
+      "name": "Alac",
+      "lat": 15.990306,
+      "lng": 120.805273
+    },
+    {
+      "name": "Baligayan",
+      "lat": 15.951573,
+      "lng": 120.737553
+    },
+    {
+      "name": "Bantog",
+      "lat": 16.009535,
+      "lng": 120.850824
+    },
+    {
+      "name": "Bolintaguen",
+      "lat": 15.965439,
+      "lng": 120.778255
+    },
+    {
+      "name": "Cabalaoangan",
+      "lat": 15.977005,
+      "lng": 120.802146
+    },
+    {
+      "name": "Cabangaran",
+      "lat": 15.998928,
+      "lng": 120.864178
+    },
+    {
+      "name": "Calomboyan",
+      "lat": 15.975044,
+      "lng": 120.811726
+    },
+    {
+      "name": "Carayacan",
+      "lat": 15.956555,
+      "lng": 120.809984
+    },
+    {
+      "name": "Casantamarian",
+      "lat": 15.986599,
+      "lng": 120.824896
+    },
+    {
+      "name": "Gonzalo",
+      "lat": 15.976345,
+      "lng": 120.826767
+    },
+    {
+      "name": "Labuan",
+      "lat": 15.941533,
+      "lng": 120.730485
+    },
+    {
+      "name": "Lagasit",
+      "lat": 15.998157,
+      "lng": 120.790039
+    },
+    {
+      "name": "Lumayao",
+      "lat": 15.964864,
+      "lng": 120.762707
+    },
+    {
+      "name": "Mabini",
+      "lat": 15.986915,
+      "lng": 120.811873
+    },
+    {
+      "name": "Mantacdang",
+      "lat": 15.954526,
+      "lng": 120.754004
+    },
+    {
+      "name": "Nangapugan",
+      "lat": 15.98503,
+      "lng": 120.870003
+    },
+    {
+      "name": "Poblacion Zone I",
+      "lat": 15.982262,
+      "lng": 120.812866
+    },
+    {
+      "name": "Poblacion Zone II",
+      "lat": 15.984665,
+      "lng": 120.812937
+    },
+    {
+      "name": "Poblacion Zone III",
+      "lat": 15.983674,
+      "lng": 120.810657
+    },
+    {
+      "name": "San Pedro",
+      "lat": 15.962621,
+      "lng": 120.793573
+    },
+    {
+      "name": "Ungib",
+      "lat": 15.979802,
+      "lng": 120.785198
+    }
+  ],
+  "Santa Barbara": [
+    {
+      "name": "Alibago",
+      "lat": 16.005601,
+      "lng": 120.383811
+    },
+    {
+      "name": "Balingueo",
+      "lat": 15.961286,
+      "lng": 120.405546
+    },
+    {
+      "name": "Banaoang",
+      "lat": 15.989131,
+      "lng": 120.433354
+    },
+    {
+      "name": "Banzal",
+      "lat": 16.00641,
+      "lng": 120.437508
+    },
+    {
+      "name": "Botao",
+      "lat": 15.971101,
+      "lng": 120.458557
+    },
+    {
+      "name": "Cablong",
+      "lat": 15.967404,
+      "lng": 120.436129
+    },
+    {
+      "name": "Carusocan",
+      "lat": 15.977553,
+      "lng": 120.445533
+    },
+    {
+      "name": "Dalongue",
+      "lat": 16.00305,
+      "lng": 120.390713
+    },
+    {
+      "name": "Erfe",
+      "lat": 16.003917,
+      "lng": 120.451015
+    },
+    {
+      "name": "Gueguesangen",
+      "lat": 16.021851,
+      "lng": 120.413294
+    },
+    {
+      "name": "Leet",
+      "lat": 15.992983,
+      "lng": 120.462436
+    },
+    {
+      "name": "Malanay",
+      "lat": 16.011328,
+      "lng": 120.410194
+    },
+    {
+      "name": "Maningding",
+      "lat": 15.995013,
+      "lng": 120.416783
+    },
+    {
+      "name": "Maronong",
+      "lat": 15.983533,
+      "lng": 120.40956
+    },
+    {
+      "name": "Maticmatic",
+      "lat": 15.986062,
+      "lng": 120.450385
+    },
+    {
+      "name": "Minien East",
+      "lat": 15.973868,
+      "lng": 120.482947
+    },
+    {
+      "name": "Minien West",
+      "lat": 15.974717,
+      "lng": 120.472752
+    },
+    {
+      "name": "Nilombot",
+      "lat": 16.011471,
+      "lng": 120.425228
+    },
+    {
+      "name": "Patayac",
+      "lat": 15.966072,
+      "lng": 120.415817
+    },
+    {
+      "name": "Payas",
+      "lat": 15.977449,
+      "lng": 120.425242
+    },
+    {
+      "name": "Poblacion Norte",
+      "lat": 16.001899,
+      "lng": 120.400078
+    },
+    {
+      "name": "Poblacion Sur",
+      "lat": 15.996878,
+      "lng": 120.401576
+    },
+    {
+      "name": "Primicias (ventinilla West)",
+      "lat": 16.000296,
+      "lng": 120.425011
+    },
+    {
+      "name": "Sapang",
+      "lat": 15.990273,
+      "lng": 120.403296
+    },
+    {
+      "name": "Sonquil",
+      "lat": 15.987957,
+      "lng": 120.39134
+    },
+    {
+      "name": "Tebag East",
+      "lat": 15.981582,
+      "lng": 120.466859
+    },
+    {
+      "name": "Tebag West",
+      "lat": 15.982845,
+      "lng": 120.460156
+    },
+    {
+      "name": "Tuliao",
+      "lat": 16.016705,
+      "lng": 120.395994
+    },
+    {
+      "name": "Ventinilla (ventinilla East)",
+      "lat": 16.002633,
+      "lng": 120.410487
+    }
+  ],
+  "Santa Maria": [
+    {
+      "name": "Bal-loy",
+      "lat": 15.964795,
+      "lng": 120.71018
+    },
+    {
+      "name": "Bantog",
+      "lat": 15.965681,
+      "lng": 120.69648
+    },
+    {
+      "name": "Caboluan",
+      "lat": 15.957241,
+      "lng": 120.720265
+    },
+    {
+      "name": "Cal-litang",
+      "lat": 15.943559,
+      "lng": 120.657446
+    },
+    {
+      "name": "Capandanan",
+      "lat": 15.958299,
+      "lng": 120.696925
+    },
+    {
+      "name": "Cauplasan",
+      "lat": 15.961647,
+      "lng": 120.668526
+    },
+    {
+      "name": "Dalayap",
+      "lat": 15.953202,
+      "lng": 120.705763
+    },
+    {
+      "name": "Libsong",
+      "lat": 15.952556,
+      "lng": 120.72644
+    },
+    {
+      "name": "Namagbagan",
+      "lat": 15.949377,
+      "lng": 120.685348
+    },
+    {
+      "name": "Paitan",
+      "lat": 15.968011,
+      "lng": 120.677853
+    },
+    {
+      "name": "Pataquid",
+      "lat": 15.969278,
+      "lng": 120.739392
+    },
+    {
+      "name": "Pilar",
+      "lat": 15.949021,
+      "lng": 120.666653
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 15.978644,
+      "lng": 120.70098
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 15.981766,
+      "lng": 120.697981
+    },
+    {
+      "name": "Pugot",
+      "lat": 15.980705,
+      "lng": 120.725965
+    },
+    {
+      "name": "Samon",
+      "lat": 15.932332,
+      "lng": 120.651414
+    },
+    {
+      "name": "San Alejandro",
+      "lat": 15.973623,
+      "lng": 120.698375
+    },
+    {
+      "name": "San Mariano",
+      "lat": 15.975005,
+      "lng": 120.704709
+    },
+    {
+      "name": "San Pablo",
+      "lat": 15.943177,
+      "lng": 120.70479
+    },
+    {
+      "name": "San Patricio",
+      "lat": 15.983003,
+      "lng": 120.69266
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.987178,
+      "lng": 120.708069
+    },
+    {
+      "name": "Santa Cruz",
+      "lat": 15.947017,
+      "lng": 120.713136
+    },
+    {
+      "name": "Santa Rosa",
+      "lat": 15.975228,
+      "lng": 120.68694
+    }
+  ],
+  "Santo Tomas": [
+    {
+      "name": "La Luna",
+      "lat": 15.866652,
+      "lng": 120.581293
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 15.874542,
+      "lng": 120.586872
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 15.871456,
+      "lng": 120.584939
+    },
+    {
+      "name": "Salvacion",
+      "lat": 15.879561,
+      "lng": 120.593639
+    },
+    {
+      "name": "San Agustin",
+      "lat": 15.876295,
+      "lng": 120.590094
+    },
+    {
+      "name": "San Antonio",
+      "lat": 15.858154,
+      "lng": 120.56633
+    },
+    {
+      "name": "San Jose",
+      "lat": 15.858709,
+      "lng": 120.575756
+    },
+    {
+      "name": "San Marcos",
+      "lat": 15.869595,
+      "lng": 120.582708
+    },
+    {
+      "name": "Santo Domingo",
+      "lat": 15.862825,
+      "lng": 120.57846
+    },
+    {
+      "name": "Santo Niño",
+      "lat": 15.855346,
+      "lng": 120.574106
+    }
+  ],
+  "Sison": [
+    {
+      "name": "Agat",
+      "lat": 16.207322,
+      "lng": 120.514164
+    },
+    {
+      "name": "Alibeng",
+      "lat": 16.12313,
+      "lng": 120.615104
+    },
+    {
+      "name": "Amagbagan",
+      "lat": 16.172431,
+      "lng": 120.494668
+    },
+    {
+      "name": "Artacho",
+      "lat": 16.194613,
+      "lng": 120.513162
+    },
+    {
+      "name": "Asan Norte",
+      "lat": 16.183392,
+      "lng": 120.526995
+    },
+    {
+      "name": "Asan Sur",
+      "lat": 16.154903,
+      "lng": 120.515885
+    },
+    {
+      "name": "Bantay Insik",
+      "lat": 16.187979,
+      "lng": 120.472118
+    },
+    {
+      "name": "Bila",
+      "lat": 16.170631,
+      "lng": 120.528714
+    },
+    {
+      "name": "Binmeckeg",
+      "lat": 16.200632,
+      "lng": 120.48718
+    },
+    {
+      "name": "Bulaoen East",
+      "lat": 16.192823,
+      "lng": 120.478874
+    },
+    {
+      "name": "Bulaoen West",
+      "lat": 16.175089,
+      "lng": 120.472609
+    },
+    {
+      "name": "Cabaritan",
+      "lat": 16.186399,
+      "lng": 120.490242
+    },
+    {
+      "name": "Calunetan",
+      "lat": 16.145373,
+      "lng": 120.605771
+    },
+    {
+      "name": "Camangaan",
+      "lat": 16.155889,
+      "lng": 120.500144
+    },
+    {
+      "name": "Cauringan",
+      "lat": 16.188013,
+      "lng": 120.510731
+    },
+    {
+      "name": "Dungon",
+      "lat": 16.221765,
+      "lng": 120.523149
+    },
+    {
+      "name": "Esperanza",
+      "lat": 16.197232,
+      "lng": 120.500754
+    },
+    {
+      "name": "Inmalog",
+      "lat": 16.184731,
+      "lng": 120.572389
+    },
+    {
+      "name": "Killo",
+      "lat": 16.111129,
+      "lng": 120.584303
+    },
+    {
+      "name": "Labayug",
+      "lat": 16.161832,
+      "lng": 120.592307
+    },
+    {
+      "name": "Paldit",
+      "lat": 16.157994,
+      "lng": 120.534413
+    },
+    {
+      "name": "Pindangan",
+      "lat": 16.177087,
+      "lng": 120.481169
+    },
+    {
+      "name": "Pinmilapil",
+      "lat": 16.200199,
+      "lng": 120.469378
+    },
+    {
+      "name": "Poblacion Central",
+      "lat": 16.174992,
+      "lng": 120.512143
+    },
+    {
+      "name": "Poblacion Norte",
+      "lat": 16.179379,
+      "lng": 120.507881
+    },
+    {
+      "name": "Poblacion Sur",
+      "lat": 16.16709,
+      "lng": 120.512961
+    },
+    {
+      "name": "Sagunto",
+      "lat": 16.204308,
+      "lng": 120.537868
+    },
+    {
+      "name": "Tara-tara",
+      "lat": 16.15075,
+      "lng": 120.485124
+    }
+  ],
+  "Sual": [
+    {
+      "name": "Baquioen",
+      "lat": 16.088736,
+      "lng": 120.093615
+    },
+    {
+      "name": "Baybay Norte",
+      "lat": 16.151456,
+      "lng": 120.092179
+    },
+    {
+      "name": "Baybay Sur",
+      "lat": 16.137452,
+      "lng": 120.067812
+    },
+    {
+      "name": "Bolaoen",
+      "lat": 16.099534,
+      "lng": 120.034427
+    },
+    {
+      "name": "Cabalitian",
+      "lat": 16.114974,
+      "lng": 120.116639
+    },
+    {
+      "name": "Calumbuyan",
+      "lat": 16.051213,
+      "lng": 120.016763
+    },
+    {
+      "name": "Camagsingalan",
+      "lat": 16.06642,
+      "lng": 120.008313
+    },
+    {
+      "name": "Caoayan",
+      "lat": 16.075672,
+      "lng": 120.05731
+    },
+    {
+      "name": "Capantolan",
+      "lat": 16.102712,
+      "lng": 120.052264
+    },
+    {
+      "name": "Macaycayawan",
+      "lat": 16.094526,
+      "lng": 120.073166
+    },
+    {
+      "name": "Paitan East",
+      "lat": 16.087417,
+      "lng": 120.034074
+    },
+    {
+      "name": "Paitan West",
+      "lat": 16.09063,
+      "lng": 120.02022
+    },
+    {
+      "name": "Pangascasan",
+      "lat": 16.118724,
+      "lng": 120.078302
+    },
+    {
+      "name": "Poblacion",
+      "lat": 16.061556,
+      "lng": 120.087978
+    },
+    {
+      "name": "Santo Domingo",
+      "lat": 16.064821,
+      "lng": 120.033837
+    },
+    {
+      "name": "Seselangen",
+      "lat": 16.106807,
+      "lng": 120.008048
+    },
+    {
+      "name": "Sioasio East",
+      "lat": 16.02579,
+      "lng": 120.060657
+    },
+    {
+      "name": "Sioasio West",
+      "lat": 16.044683,
+      "lng": 120.051827
+    },
+    {
+      "name": "Victoria",
+      "lat": 16.124091,
+      "lng": 120.031931
+    }
+  ],
+  "Tayug": [
+    {
+      "name": "Agno",
+      "lat": 16.020478,
+      "lng": 120.72171
+    },
+    {
+      "name": "Amistad",
+      "lat": 16.0329,
+      "lng": 120.729096
+    },
+    {
+      "name": "Barangay A (POB.)",
+      "lat": 16.0286,
+      "lng": 120.748009
+    },
+    {
+      "name": "Barangay B (POB.)",
+      "lat": 16.024731,
+      "lng": 120.74757
+    },
+    {
+      "name": "Barangay C (POB.)",
+      "lat": 16.023797,
+      "lng": 120.738094
+    },
+    {
+      "name": "Barangay D (POB.)",
+      "lat": 16.023493,
+      "lng": 120.743145
+    },
+    {
+      "name": "Barangobong",
+      "lat": 16.00169,
+      "lng": 120.718924
+    },
+    {
+      "name": "C. Lichauco",
+      "lat": 15.981647,
+      "lng": 120.7645
+    },
+    {
+      "name": "Carriedo",
+      "lat": 16.03717,
+      "lng": 120.759068
+    },
+    {
+      "name": "Evangelista",
+      "lat": 16.001922,
+      "lng": 120.739691
+    },
+    {
+      "name": "Guzon",
+      "lat": 16.024057,
+      "lng": 120.711104
+    },
+    {
+      "name": "Lawak",
+      "lat": 15.99427,
+      "lng": 120.750556
+    },
+    {
+      "name": "Legaspi",
+      "lat": 16.04132,
+      "lng": 120.735847
+    },
+    {
+      "name": "Libertad",
+      "lat": 16.01664,
+      "lng": 120.758705
+    },
+    {
+      "name": "Magallanes",
+      "lat": 16.012986,
+      "lng": 120.736062
+    },
+    {
+      "name": "Panganiban",
+      "lat": 16.005652,
+      "lng": 120.771579
+    },
+    {
+      "name": "Saleng",
+      "lat": 15.991117,
+      "lng": 120.757973
+    },
+    {
+      "name": "Santo Domingo",
+      "lat": 15.992228,
+      "lng": 120.732118
+    },
+    {
+      "name": "Toketec",
+      "lat": 16.006872,
+      "lng": 120.757879
+    },
+    {
+      "name": "Trenchera",
+      "lat": 16.025356,
+      "lng": 120.758284
+    },
+    {
+      "name": "Zamora",
+      "lat": 15.9922,
+      "lng": 120.769551
+    }
+  ],
+  "Umingan": [
+    {
+      "name": "Abot Molina",
+      "lat": 15.905588,
+      "lng": 120.840505
+    },
+    {
+      "name": "Alo-o",
+      "lat": 15.907412,
+      "lng": 120.888421
+    },
+    {
+      "name": "Amaronan",
+      "lat": 15.954843,
+      "lng": 120.828495
+    },
+    {
+      "name": "Annam",
+      "lat": 15.963226,
+      "lng": 120.88657
+    },
+    {
+      "name": "Bantug",
+      "lat": 15.919938,
+      "lng": 120.851855
+    },
+    {
+      "name": "Baracbac",
+      "lat": 15.852277,
+      "lng": 120.850417
+    },
+    {
+      "name": "Barat",
+      "lat": 15.93625,
+      "lng": 120.818103
+    },
+    {
+      "name": "Buenavista",
+      "lat": 15.947028,
+      "lng": 120.790017
+    },
+    {
+      "name": "Cabalitian",
+      "lat": 15.93002,
+      "lng": 120.754562
+    },
+    {
+      "name": "Cabangaran",
+      "lat": 15.871655,
+      "lng": 120.862715
+    },
+    {
+      "name": "Cabaruan",
+      "lat": 15.902306,
+      "lng": 120.75106
+    },
+    {
+      "name": "Cabatuan",
+      "lat": 15.906718,
+      "lng": 120.85973
+    },
+    {
+      "name": "Cadiz",
+      "lat": 15.858463,
+      "lng": 120.741008
+    },
+    {
+      "name": "Calitlitan",
+      "lat": 15.974899,
+      "lng": 120.879941
+    },
+    {
+      "name": "Capas",
+      "lat": 15.91141,
+      "lng": 120.818545
+    },
+    {
+      "name": "Carayungan Sur",
+      "lat": 15.885231,
+      "lng": 120.849252
+    },
+    {
+      "name": "Carosalesan",
+      "lat": 15.892007,
+      "lng": 120.86623
+    },
+    {
+      "name": "Casilan",
+      "lat": 15.889497,
+      "lng": 120.765368
+    },
+    {
+      "name": "Caurdanetaan",
+      "lat": 15.932129,
+      "lng": 120.850313
+    },
+    {
+      "name": "Concepcion",
+      "lat": 15.864113,
+      "lng": 120.772301
+    },
+    {
+      "name": "Decreto",
+      "lat": 15.917448,
+      "lng": 120.720862
+    },
+    {
+      "name": "Del Rosario",
+      "lat": 15.926509,
+      "lng": 120.801106
+    },
+    {
+      "name": "Diaz",
+      "lat": 15.830915,
+      "lng": 120.818865
+    },
+    {
+      "name": "Diket",
+      "lat": 15.94815,
+      "lng": 120.890678
+    },
+    {
+      "name": "Don Justo Abalos (caroan)",
+      "lat": 15.937889,
+      "lng": 120.862477
+    },
+    {
+      "name": "Don Montano",
+      "lat": 15.931572,
+      "lng": 120.887621
+    },
+    {
+      "name": "Esperanza",
+      "lat": 15.934402,
+      "lng": 120.802731
+    },
+    {
+      "name": "Evangelista",
+      "lat": 15.96321,
+      "lng": 120.843702
+    },
+    {
+      "name": "Flores",
+      "lat": 15.929386,
+      "lng": 120.784386
+    },
+    {
+      "name": "Fulgosino",
+      "lat": 15.890135,
+      "lng": 120.813137
+    },
+    {
+      "name": "Gonzales",
+      "lat": 15.913632,
+      "lng": 120.768185
+    },
+    {
+      "name": "La Paz",
+      "lat": 15.917174,
+      "lng": 120.740153
+    },
+    {
+      "name": "Labuan",
+      "lat": 15.937478,
+      "lng": 120.739766
+    },
+    {
+      "name": "Lauren",
+      "lat": 15.944129,
+      "lng": 120.841614
+    },
+    {
+      "name": "Lubong",
+      "lat": 15.923586,
+      "lng": 120.812799
+    },
+    {
+      "name": "Luna Este",
+      "lat": 15.863713,
+      "lng": 120.804285
+    },
+    {
+      "name": "Luna Weste",
+      "lat": 15.866402,
+      "lng": 120.783796
+    },
+    {
+      "name": "Mantacdang",
+      "lat": 15.948698,
+      "lng": 120.771793
+    },
+    {
+      "name": "Maseil-seil",
+      "lat": 15.915852,
+      "lng": 120.886645
+    },
+    {
+      "name": "Nampalcan",
+      "lat": 15.906639,
+      "lng": 120.82887
+    },
+    {
+      "name": "Nancalabasaan",
+      "lat": 15.935829,
+      "lng": 120.836534
+    },
+    {
+      "name": "Pangangaan",
+      "lat": 15.878506,
+      "lng": 120.792954
+    },
+    {
+      "name": "Papallasen",
+      "lat": 15.925431,
+      "lng": 120.742731
+    },
+    {
+      "name": "Pemienta",
+      "lat": 15.925719,
+      "lng": 120.828006
+    },
+    {
+      "name": "Poblacion East",
+      "lat": 15.927079,
+      "lng": 120.843181
+    },
+    {
+      "name": "Poblacion West",
+      "lat": 15.926418,
+      "lng": 120.838081
+    },
+    {
+      "name": "Prado",
+      "lat": 15.894031,
+      "lng": 120.789505
+    },
+    {
+      "name": "Resurreccion",
+      "lat": 15.89066,
+      "lng": 120.730483
+    },
+    {
+      "name": "Ricos",
+      "lat": 15.872647,
+      "lng": 120.834097
+    },
+    {
+      "name": "San Andres",
+      "lat": 15.89845,
+      "lng": 120.740684
+    },
+    {
+      "name": "San Juan",
+      "lat": 15.844324,
+      "lng": 120.779788
+    },
+    {
+      "name": "San Leon",
+      "lat": 15.906043,
+      "lng": 120.726296
+    },
+    {
+      "name": "San Pablo",
+      "lat": 15.856572,
+      "lng": 120.753062
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.872429,
+      "lng": 120.757065
+    },
+    {
+      "name": "Santa Maria",
+      "lat": 15.913962,
+      "lng": 120.794894
+    },
+    {
+      "name": "Santa Rosa",
+      "lat": 15.875018,
+      "lng": 120.737589
+    },
+    {
+      "name": "Sinabaan",
+      "lat": 15.932547,
+      "lng": 120.768374
+    },
+    {
+      "name": "Tanggal Sawang",
+      "lat": 15.943223,
+      "lng": 120.758644
+    }
+  ],
+  "Urbiztondo": [
+    {
+      "name": "Angatel",
+      "lat": 15.807706,
+      "lng": 120.340993
+    },
+    {
+      "name": "Balangay",
+      "lat": 15.854817,
+      "lng": 120.361721
+    },
+    {
+      "name": "Batangcaoa",
+      "lat": 15.831521,
+      "lng": 120.372549
+    },
+    {
+      "name": "Baug",
+      "lat": 15.821093,
+      "lng": 120.369452
+    },
+    {
+      "name": "Bayaoas",
+      "lat": 15.83293,
+      "lng": 120.35536
+    },
+    {
+      "name": "Bituag",
+      "lat": 15.840497,
+      "lng": 120.380897
+    },
+    {
+      "name": "Camambugan",
+      "lat": 15.816904,
+      "lng": 120.355683
+    },
+    {
+      "name": "Dalangiring",
+      "lat": 15.837066,
+      "lng": 120.333752
+    },
+    {
+      "name": "Duplac",
+      "lat": 15.843456,
+      "lng": 120.364697
+    },
+    {
+      "name": "Galarin",
+      "lat": 15.794959,
+      "lng": 120.362511
+    },
+    {
+      "name": "Gueteb",
+      "lat": 15.847803,
+      "lng": 120.355196
+    },
+    {
+      "name": "Malaca",
+      "lat": 15.83804,
+      "lng": 120.374929
+    },
+    {
+      "name": "Malayo",
+      "lat": 15.823182,
+      "lng": 120.344437
+    },
+    {
+      "name": "Malibong",
+      "lat": 15.832095,
+      "lng": 120.318703
+    },
+    {
+      "name": "Pasibi East",
+      "lat": 15.852811,
+      "lng": 120.379361
+    },
+    {
+      "name": "Pasibi West",
+      "lat": 15.852138,
+      "lng": 120.369849
+    },
+    {
+      "name": "Pisuac",
+      "lat": 15.806558,
+      "lng": 120.365489
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.823073,
+      "lng": 120.331134
+    },
+    {
+      "name": "Real",
+      "lat": 15.81142,
+      "lng": 120.348028
+    },
+    {
+      "name": "Salavante",
+      "lat": 15.796052,
+      "lng": 120.348965
+    },
+    {
+      "name": "Sawat",
+      "lat": 15.802356,
+      "lng": 120.335902
+    }
+  ],
+  "Urdaneta City": [
+    {
+      "name": "Anonas",
+      "lat": 15.997722,
+      "lng": 120.575216
+    },
+    {
+      "name": "Bactad East",
+      "lat": 15.978382,
+      "lng": 120.62278
+    },
+    {
+      "name": "Bayaoas",
+      "lat": 15.977661,
+      "lng": 120.578735
+    },
+    {
+      "name": "Bolaoen",
+      "lat": 15.992848,
+      "lng": 120.606523
+    },
+    {
+      "name": "Cabaruan",
+      "lat": 15.945521,
+      "lng": 120.519963
+    },
+    {
+      "name": "Cabuloan",
+      "lat": 15.973413,
+      "lng": 120.598334
+    },
+    {
+      "name": "Camanang",
+      "lat": 15.960319,
+      "lng": 120.588497
+    },
+    {
+      "name": "Camantiles",
+      "lat": 15.991337,
+      "lng": 120.55459
+    },
+    {
+      "name": "Casantaan",
+      "lat": 15.985737,
+      "lng": 120.605384
+    },
+    {
+      "name": "Catablan",
+      "lat": 15.97296,
+      "lng": 120.496725
+    },
+    {
+      "name": "Cayambanan",
+      "lat": 15.998115,
+      "lng": 120.589055
+    },
+    {
+      "name": "Consolacion",
+      "lat": 15.948229,
+      "lng": 120.596896
+    },
+    {
+      "name": "Dilan Paurido",
+      "lat": 15.973985,
+      "lng": 120.586318
+    },
+    {
+      "name": "Dr. Pedro T. Orata (bactad Proper)",
+      "lat": 15.976808,
+      "lng": 120.610349
+    },
+    {
+      "name": "Labit Proper",
+      "lat": 15.956129,
+      "lng": 120.529461
+    },
+    {
+      "name": "Labit West",
+      "lat": 15.962173,
+      "lng": 120.514304
+    },
+    {
+      "name": "Mabanogbog",
+      "lat": 15.978238,
+      "lng": 120.552978
+    },
+    {
+      "name": "Macalong",
+      "lat": 15.955558,
+      "lng": 120.606797
+    },
+    {
+      "name": "Nancalobasaan",
+      "lat": 16.004096,
+      "lng": 120.60515
+    },
+    {
+      "name": "Nancamaliran East",
+      "lat": 15.968569,
+      "lng": 120.551422
+    },
+    {
+      "name": "Nancamaliran West",
+      "lat": 15.968411,
+      "lng": 120.539685
+    },
+    {
+      "name": "Nancayasan",
+      "lat": 15.948824,
+      "lng": 120.577639
+    },
+    {
+      "name": "Oltama",
+      "lat": 15.948306,
+      "lng": 120.502965
+    },
+    {
+      "name": "Palina East",
+      "lat": 15.94354,
+      "lng": 120.556004
+    },
+    {
+      "name": "Palina West",
+      "lat": 15.945926,
+      "lng": 120.543612
+    },
+    {
+      "name": "Pinmaludpod",
+      "lat": 15.979153,
+      "lng": 120.527501
+    },
+    {
+      "name": "Poblacion",
+      "lat": 15.974417,
+      "lng": 120.567607
+    },
+    {
+      "name": "San Jose",
+      "lat": 15.98363,
+      "lng": 120.507611
+    },
+    {
+      "name": "San Vicente",
+      "lat": 15.983565,
+      "lng": 120.569014
+    },
+    {
+      "name": "Santa Lucia",
+      "lat": 15.95855,
+      "lng": 120.552758
+    },
+    {
+      "name": "Santo Domingo",
+      "lat": 15.960322,
+      "lng": 120.56547
+    },
+    {
+      "name": "Sugcong",
+      "lat": 15.938123,
+      "lng": 120.530284
+    },
+    {
+      "name": "Tipuso",
+      "lat": 15.966832,
+      "lng": 120.61076
+    },
+    {
+      "name": "Tulong",
+      "lat": 16.009025,
+      "lng": 120.572582
+    }
+  ],
+  "Villasis": [
+    {
+      "name": "Amamperez",
+      "lat": 15.872501,
+      "lng": 120.533718
+    },
+    {
+      "name": "Bacag",
+      "lat": 15.927442,
+      "lng": 120.583778
+    },
+    {
+      "name": "Barangobong",
+      "lat": 15.883664,
+      "lng": 120.563311
+    },
+    {
+      "name": "Barraca",
+      "lat": 15.906806,
+      "lng": 120.570171
+    },
+    {
+      "name": "Capulaan",
+      "lat": 15.896453,
+      "lng": 120.536626
+    },
+    {
+      "name": "Caramutan",
+      "lat": 15.919797,
+      "lng": 120.611965
+    },
+    {
+      "name": "La Paz",
+      "lat": 15.92862,
+      "lng": 120.516308
+    },
+    {
+      "name": "Labit",
+      "lat": 15.930025,
+      "lng": 120.542102
+    },
+    {
+      "name": "Lipay",
+      "lat": 15.898408,
+      "lng": 120.605483
+    },
+    {
+      "name": "Lomboy",
+      "lat": 15.915784,
+      "lng": 120.596372
+    },
+    {
+      "name": "Piaz (plaza)",
+      "lat": 15.933408,
+      "lng": 120.621574
+    },
+    {
+      "name": "Puelay",
+      "lat": 15.890219,
+      "lng": 120.587033
+    },
+    {
+      "name": "San Blas",
+      "lat": 15.90696,
+      "lng": 120.601125
+    },
+    {
+      "name": "San Nicolas",
+      "lat": 15.911551,
+      "lng": 120.58613
+    },
+    {
+      "name": "Tombod",
+      "lat": 15.926033,
+      "lng": 120.561766
+    },
+    {
+      "name": "Unzad",
+      "lat": 15.914201,
+      "lng": 120.53941
+    },
+    {
+      "name": "Zone I (POB.)",
+      "lat": 15.901517,
+      "lng": 120.59104
+    },
+    {
+      "name": "Zone II (POB.)",
+      "lat": 15.895319,
+      "lng": 120.582336
+    },
+    {
+      "name": "Zone III (POB.)",
+      "lat": 15.898658,
+      "lng": 120.579072
+    },
+    {
+      "name": "Zone IV (POB.)",
+      "lat": 15.903542,
+      "lng": 120.583048
+    },
+    {
+      "name": "Zone V (POB.)",
+      "lat": 15.90562,
+      "lng": 120.589022
+    }
+  ]
+ }
