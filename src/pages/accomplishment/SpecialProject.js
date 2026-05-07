@@ -845,7 +845,6 @@ export default function SpecialProject() {
   };
 
   const [records, setRecords] = useState([]);
-  const [specialProjectCustomFields, setSpecialProjectCustomFields] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [editRecordId, setEditRecordId] = useState(null);
   const [viewRecordId, setViewRecordId] = useState(null);
@@ -910,7 +909,6 @@ export default function SpecialProject() {
     addressMeta: null,
     meansOfVerification: "",
     staffName: "",
-    customFields: {},
   });
 
   const [specialProjectOptions, setSpecialProjectOptions] = useState(DEFAULT_SPECIAL_PROJECT_OPTIONS);
@@ -1004,82 +1002,6 @@ export default function SpecialProject() {
     };
   }, []);
 
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fixedKeys = new Set([
-      "no",
-      "actions",
-      "quarter",
-      "specialProject",
-      "special_project",
-      "projectTitle",
-      "project_title",
-      "projectCost",
-      "project_cost",
-      "dateProjectApproved",
-      "date_project_approved",
-      "beneficiaryName",
-      "beneficiary_name",
-      "beneficiaries",
-      "address",
-      "venueAddress",
-      "venue_address",
-      "meansOfVerification",
-      "means_of_verification",
-      "staffName",
-      "staff_name",
-      "sntInterventions",
-      "snt_interventions"
-    ]);
-
-    async function loadSpecialProjectCustomFields() {
-      try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
-        const modules = Array.isArray(res.data) ? res.data : [];
-
-        const mod = modules.find(
-          (m) => String(m.moduleName || m.module_name || m.name || "").toLowerCase() === "special project"
-        );
-
-        const table =
-          (mod?.tables || []).find(
-            (t) => String(t.tableName || t.table_name || t.name || "").toLowerCase() === "main"
-          ) || (mod?.tables || [])[0];
-
-        const fields = Array.isArray(table?.fields || table?.formFields)
-          ? table.fields || table.formFields
-          : [];
-
-        const customFields = fields
-          .filter((f) => {
-            const key = String(f.fieldKey || f.field_key || f.key || "").trim();
-            const visible = f.isVisible ?? f.is_visible ?? true;
-            const showAdd = f.showAdd ?? f.show_add ?? true;
-            const showEdit = f.showEdit ?? f.show_edit ?? true;
-            const systemField = f.isSystemField ?? f.is_system_field ?? false;
-            return key && visible && !systemField && (showAdd || showEdit) && !fixedKeys.has(key);
-          })
-          .sort(
-            (a, b) =>
-              Number(a.sortOrder ?? a.sort_order ?? 999) -
-              Number(b.sortOrder ?? b.sort_order ?? 999)
-          );
-
-        if (!cancelled) setSpecialProjectCustomFields(customFields);
-      } catch (err) {
-        console.error("Failed to load Special Project custom fields:", err);
-        if (!cancelled) setSpecialProjectCustomFields([]);
-      }
-    }
-
-    loadSpecialProjectCustomFields();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
   const saveRecords = (next) => {
     setRecords(next);
     try {
@@ -1117,7 +1039,6 @@ export default function SpecialProject() {
       addressMeta: null,
       meansOfVerification: "",
       staffName: "",
-      customFields: {},
     });
   };
 
@@ -1430,118 +1351,11 @@ export default function SpecialProject() {
       addressMeta: r.addressMeta || null,
       meansOfVerification: r.meansOfVerification || "",
       staffName: r.staffName || "",
-      customFields: r.customFields || r.custom_fields || {},
     });
     setShowAdd(true);
   };
 
-
-
-  const cleanCustomLabel = (value) =>
-    String(value || "")
-      .replace(/^#+/, "")
-      .replace(/_/g, " ")
-      .trim()
-      .replace(/\b\w/g, (m) => m.toUpperCase());
-
-  const parseSpecialProjectCustomValues = (record = {}) => {
-    const raw = record?.customFields || record?.custom_fields || {};
-    if (typeof raw === "string") {
-      try {
-        return JSON.parse(raw || "{}");
-      } catch {
-        return {};
-      }
-    }
-    return raw || {};
-  };
-
-  const getSpecialProjectCustomPairs = (record = {}) => {
-    const values = parseSpecialProjectCustomValues(record);
-
-    return (specialProjectCustomFields || []).map((field) => {
-      const key = field.fieldKey || field.field_key || field.key;
-      const rawLabel = field.fieldLabel || field.field_label || field.label || key;
-      const value = values?.[key];
-
-      return {
-        key,
-        label: cleanCustomLabel(rawLabel),
-        value: value === null || value === undefined || value === "" ? "—" : String(value),
-      };
-    });
-  };
-
-  const renderSpecialProjectCustomViewFields = (record) => {
-    const pairs = getSpecialProjectCustomPairs(record);
-    if (!pairs.length) return null;
-
-    return pairs.map((item) => (
-      <div key={`custom-view-${item.key}`}>
-        <b>{item.label}:</b> {item.value}
-      </div>
-    ));
-  };
-
-  const renderSpecialProjectCustomViewRows = (record) => {
-    const pairs = getSpecialProjectCustomPairs(record);
-    if (!pairs.length) return null;
-
-    return pairs.map((item) => (
-      <tr key={`custom-row-${item.key}`}>
-        <td style={styles.viewTd}><b>{item.label}</b></td>
-        <td style={styles.viewTd}>{item.value}</td>
-      </tr>
-    ));
-  };
-  const renderSpecialProjectCustomInputs = () => {
-    if (!specialProjectCustomFields.length) return null;
-
-    return (
-      <>
-        {specialProjectCustomFields.map((field) => {
-          const key = field.fieldKey || field.field_key || field.key;
-          const label = field.fieldLabel || field.field_label || field.label || key;
-          const type = String(field.fieldType || field.field_type || field.type || "Text");
-          const required = Boolean(field.isRequired ?? field.is_required ?? field.required ?? false);
-
-          return (
-            <label key={key}>
-              <div style={styles.label}>{label}{required ? " *" : ""}</div>
-
-              {type.toLowerCase().includes("textarea") ? (
-                <textarea
-                  style={styles.textarea || styles.input}
-                  value={form.customFields?.[key] || ""}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      customFields: { ...(p.customFields || {}), [key]: e.target.value },
-                    }))
-                  }
-                  placeholder={`Enter ${label}`}
-                />
-              ) : (
-                <input
-                  style={styles.input}
-                  type={type.toLowerCase().includes("number") ? "number" : "text"}
-                  value={form.customFields?.[key] || ""}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      customFields: { ...(p.customFields || {}), [key]: e.target.value },
-                    }))
-                  }
-                  placeholder={`Enter ${label}`}
-                />
-              )}
-            </label>
-          );
-        })}
-      </>
-    );
-  };
-  const saveRecord = async () => {
+  const saveRecord = () => {
     if (!form.specialProject.trim()) return alert("Required: Special Project");
     if (!form.projectTitle.trim()) return alert("Required: Project Title");
     if (String(form.projectCost).trim() === "") return alert("Required: Project Cost");
@@ -1564,39 +1378,25 @@ export default function SpecialProject() {
       addressMeta: form.addressMeta || null,
       meansOfVerification: (form.meansOfVerification || "").trim(),
       staffName: (form.staffName || "").trim(),
-      custom_fields: form.customFields || {},
-      customFields: form.customFields || {},
       sntInterventions: Array.isArray(existing?.sntInterventions) ? existing.sntInterventions : [],
     };
 
-    try {
-      if (!editRecordId) {
-        await axios.post(`${API_BASE}/api/special-projects`, base);
-      } else {
-        await axios.put(`${API_BASE}/api/special-projects/${editRecordId}`, base);
-      }
-
-      await fetchRecords();
-
-      setShowAdd(false);
-      setEditRecordId(null);
-      resetForm();
-    } catch (err) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Failed to save Special Project record.");
+    if (!editRecordId) {
+      const item = { id: `${Date.now()}_${Math.random().toString(16).slice(2)}`, ...base };
+      saveRecords([...records, item]);
+    } else {
+      const next = records.map((r) => (r.id === editRecordId ? { ...r, ...base } : r));
+      saveRecords(next);
     }
+
+    setShowAdd(false);
+    setEditRecordId(null);
+    resetForm();
   };
 
-  const deleteRecord = async (id) => {
+  const deleteRecord = (id) => {
     if (!window.confirm("Delete this record?")) return;
-
-    try {
-      await axios.delete(`${API_BASE}/api/special-projects/${id}`);
-      await fetchRecords();
-    } catch (err) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Failed to delete Special Project record.");
-    }
+    saveRecords(records.filter((r) => r.id !== id));
   };
 
   const getFeatureName = (feature) => {
@@ -3432,11 +3232,8 @@ export default function SpecialProject() {
                     placeholder="Optional"
                   />
                 </div>
-
-                {renderSpecialProjectCustomInputs()}
               </div>
             </div>
-
 
             <div style={styles.modalFooter}>
               <button
@@ -3525,7 +3322,6 @@ export default function SpecialProject() {
                 <div><b>Project Cost:</b> PHP {formatCurrency(viewRecord.projectCost)}</div>
                 <div><b>Means of Verification:</b> {viewRecord.meansOfVerification || "—"}</div>
                 <div><b>Name of Staff:</b> {viewRecord.staffName || "—"}</div>
-                {renderSpecialProjectCustomViewFields(viewRecord)}
                 <div><b>Quarter:</b> {viewRecord.quarter ? `${viewRecord.quarter}Q` : "—"}</div>
               </div>
             ) : (
@@ -3576,7 +3372,6 @@ export default function SpecialProject() {
                       <td style={styles.viewTd}><b>Name of Staff</b></td>
                       <td style={styles.viewTd}>{viewRecord.staffName || "—"}</td>
                     </tr>
-                    {renderSpecialProjectCustomViewRows(viewRecord)}
                     <tr>
                       <td style={styles.viewTd}><b>Quarter</b></td>
                       <td style={styles.viewTd}>{viewRecord.quarter ? `${viewRecord.quarter}Q` : "—"}</td>
@@ -3835,4 +3630,5 @@ export default function SpecialProject() {
     </div>
   );
 }
+
 
