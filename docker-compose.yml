@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.3'
 
 services:
   backend:
@@ -7,13 +7,8 @@ services:
       dockerfile: Dockerfile.backend
     container_name: dost_backend
     restart: unless-stopped
-    environment:
-      API_PORT: 2100
-      DB_HOST: 192.168.0.41
-      DB_USER: sintauser
-      DB_PASSWORD: s!in++a2026
-      DB_NAME: sinta
-      DB_PORT: 3521
+    env_file:
+      - .env
     ports:
       - "2100:2100"
 
@@ -25,11 +20,9 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
+    env_file:
+      - .env
     ports:
       - "2101:2101"
     stdin_open: true
     tty: true
-
