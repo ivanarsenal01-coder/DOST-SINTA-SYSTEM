@@ -1,0 +1,255 @@
+:root {
+  --cest-blue: #0b4ea2;
+  --cest-blue-soft: #dbeafe;
+  --cest-blue-soft-2: #e0f2fe;
+  --cest-border: #94a3b8;
+  --cest-border-dark: #6b7280;
+  --cest-bg-soft: #f8fafc;
+  --cest-head-bg: #eef2f6;
+  --cest-text: #0f172a;
+  --cest-danger: #ef4444;
+}
+
+.cest-page {
+  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.cest-page *,
+.cest-page *::before,
+.cest-page *::after {
+  box-sizing: border-box;
+}
+
+.cest-page .cest-map-card,
+.cest-page .cest-table-wrap,
+.cest-page .cest-table-header-row {
+  width: 100%;
+}
+
+.cest-page .cest-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.cest-page .cest-table th,
+.cest-page .cest-table td {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Compact main table widths */
+.cest-page .cest-table th:nth-child(1),
+.cest-page .cest-table td:nth-child(1) {
+  min-width: 54px;
+  width: 54px;
+  text-align: center;
+}
+
+.cest-page .cest-table th:nth-child(2),
+.cest-page .cest-table td:nth-child(2) {
+  min-width: 110px;
+  text-align: center;
+}
+
+.cest-page .cest-table th:nth-child(3),
+.cest-page .cest-table td:nth-child(3) {
+  min-width: 180px;
+}
+
+.cest-page .cest-table th:nth-child(4),
+.cest-page .cest-table td:nth-child(4) {
+  min-width: 130px;
+  text-align: center;
+}
+
+.cest-page .cest-table th:nth-child(5),
+.cest-page .cest-table td:nth-child(5) {
+  min-width: 145px;
+  text-align: right;
+}
+
+.cest-page .cest-table th:nth-child(6),
+.cest-page .cest-table td:nth-child(6) {
+  min-width: 190px;
+}
+
+.cest-page .cest-table th:nth-child(7),
+.cest-page .cest-table td:nth-child(7) {
+  min-width: 220px;
+}
+
+.cest-page .cest-table th:nth-child(8),
+.cest-page .cest-table td:nth-child(8) {
+  min-width: 150px;
+}
+
+.cest-page .cest-table th:nth-child(9),
+.cest-page .cest-table td:nth-child(9) {
+  min-width: 100px;
+  text-align: center;
+}
+
+.cest-page .cest-table th:nth-child(10),
+.cest-page .cest-table td:nth-child(10) {
+  min-width: 240px;
+  vertical-align: top;
+}
+
+.cest-page .cest-table th:nth-child(11),
+.cest-page .cest-table td:nth-child(11) {
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Action rows */
+.cest-page .cest-actions,
+.cest-page .cest-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.cest-page .cest-actions {
+  justify-content: center;
+}
+
+.cest-page button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.cest-page button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.cest-page button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Compact buttons */
+.cest-page .cest-actions button,
+.cest-page .cest-inline-actions button,
+.cest-page td button,
+.cest-page .leaflet-popup-content button {
+  min-height: 26px;
+  height: 26px;
+  padding: 0 9px !important;
+  font-size: 11px !important;
+  border-radius: 8px !important;
+}
+
+.cest-page .cest-map-header select,
+.cest-page .cest-map-header button,
+.cest-page .cest-table-filter-bar select,
+.cest-page .cest-table-filter-bar button {
+  min-height: 34px;
+  height: 34px;
+}
+
+/* Intervention pills inside table */
+.cest-page td button[title] {
+  max-width: 100%;
+}
+
+.cest-page td button[title*="Edit selected"],
+.cest-page td button[title*="Delete selected"] {
+  min-width: 58px;
+}
+
+/* Modal polish */
+.cest-page .cest-modal-backdrop {
+  backdrop-filter: blur(2px);
+}
+
+.cest-page .cest-modal-backdrop > div,
+.cest-page .cest-modal-backdrop > div > div,
+.cest-page .photoViewerModal,
+.cest-page .pickModal,
+.cest-page .detailsModal,
+.cest-page .modal,
+.cest-page .addressFlowShell {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(11, 78, 162, 0.35) transparent;
+}
+
+.cest-page .cest-modal-backdrop ::-webkit-scrollbar,
+.cest-page .photoViewerModal::-webkit-scrollbar,
+.cest-page .pickModal::-webkit-scrollbar,
+.cest-page .detailsModal::-webkit-scrollbar,
+.cest-page .modal::-webkit-scrollbar,
+.cest-page .addressFlowShell::-webkit-scrollbar,
+.cest-page .tableWrap::-webkit-scrollbar,
+.cest-page .list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.cest-page .cest-modal-backdrop ::-webkit-scrollbar-thumb,
+.cest-page .photoViewerModal::-webkit-scrollbar-thumb,
+.cest-page .pickModal::-webkit-scrollbar-thumb,
+.cest-page .detailsModal::-webkit-scrollbar-thumb,
+.cest-page .modal::-webkit-scrollbar-thumb,
+.cest-page .addressFlowShell::-webkit-scrollbar-thumb,
+.cest-page .tableWrap::-webkit-scrollbar-thumb,
+.cest-page .list::-webkit-scrollbar-thumb {
+  background: rgba(11, 78, 162, 0.3);
+  border-radius: 999px;
+}
+
+/* Inputs */
+.cest-page input,
+.cest-page select,
+.cest-page textarea {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.cest-page input:focus,
+.cest-page select:focus,
+.cest-page textarea:focus {
+  border-color: var(--cest-blue) !important;
+  box-shadow: 0 0 0 3px rgba(11, 78, 162, 0.12);
+}
+
+/* Photo action buttons */
+.cest-page input[type="file"] + button,
+.cest-page .photoViewerModal button {
+  white-space: nowrap;
+}
+
+/* Table row hover */
+.cest-page .cest-table tbody tr:hover td {
+  background: #f8fbff;
+}
+
+/* Leaflet popup spacing */
+.cest-page .leaflet-popup-content {
+  margin: 12px 14px;
+}
+
+.cest-page .leaflet-control-layers {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+/* Address button look */
+.cest-page button[style*="justify-content: space-between"] {
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cest-page .cest-table-header-row {
+    align-items: stretch;
+  }
+
+  .cest-page .cest-table-filter-bar {
+    justify-content: flex-start !important;
+    margin-left: 0 !important;
+  }
+}

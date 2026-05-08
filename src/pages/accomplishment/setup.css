@@ -1,0 +1,144 @@
+.setup-page {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 14px 14px 40px;
+}
+.setup-page::-webkit-scrollbar {
+  width: 10px;
+}
+
+.setup-page::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.setup-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===== SETUP OTHER INDICATORS COMPACT THEME ===== */
+.setup-table th:nth-child(9),
+.setup-table td:nth-child(9) {
+  width: 215px;
+  min-width: 215px;
+  max-width: 215px;
+  vertical-align: top;
+  padding: 4px;
+  text-align: left;
+}
+
+/* fallback if layout/order changes */
+.setup-table th:nth-child(8).other-indicators-col,
+.setup-table td:nth-child(8).other-indicators-col {
+  width: 215px;
+  min-width: 215px;
+  max-width: 215px;
+}
+
+/* compact wrapper */
+.setup-page .other-indicators-box,
+.setup-page .indicator-card,
+.setup-page .nested-card {
+  display: inline-block;
+  width: 215px;
+  max-width: 215px;
+  background: #f8fafc;
+  border: 1px solid #94a3b8;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* inner table */
+.setup-page .other-indicators-box table,
+.setup-page .indicator-card table,
+.setup-page .nested-card table,
+.setup-page .other-indicators-table {
+  width: 215px !important;
+  min-width: 215px !important;
+  max-width: 215px !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+/* cells */
+.setup-page .other-indicators-box th,
+.setup-page .other-indicators-box td,
+.setup-page .indicator-card th,
+.setup-page .indicator-card td,
+.setup-page .nested-card th,
+.setup-page .nested-card td,
+.setup-page .other-indicators-table th,
+.setup-page .other-indicators-table td {
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  padding: 3px 5px !important;
+  border: 1px solid #94a3b8 !important;
+}
+
+/* label */
+.setup-page .other-indicators-box th:first-child,
+.setup-page .other-indicators-box td:first-child,
+.setup-page .other-indicators-table th:first-child,
+.setup-page .other-indicators-table td:first-child {
+  width: 145px !important;
+  text-align: left !important;
+  font-weight: 700 !important;
+}
+
+/* total */
+.setup-page .other-indicators-box th:last-child,
+.setup-page .other-indicators-box td:last-child,
+.setup-page .other-indicators-table th:last-child,
+.setup-page .other-indicators-table td:last-child {
+  width: 70px !important;
+  text-align: right !important;
+}
+
+/* buttons */
+.setup-page .other-indicators-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.setup-page .other-indicators-actions button {
+  height: 22px !important;
+  font-size: 10px !important;
+  padding: 0 8px !important;
+  border-radius: 999px !important;
+}
+
+/* report modal table */
+.setup-page .other-indicators-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.setup-page .other-indicators-modal-table th,
+.setup-page .other-indicators-modal-table td {
+  border: 1px solid #94a3b8 !important;
+  padding: 6px 8px !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+}
+
+.setup-page .other-indicators-modal-table th {
+  background: #eef2f6 !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+}
+
+.setup-page .other-indicators-modal-table td:first-child {
+  text-align: left !important;
+  font-weight: 700 !important;
+}
+
+.setup-page .other-indicators-modal-table input {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
