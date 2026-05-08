@@ -7,6 +7,13 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+# Build the production app
+RUN npm run build
 
-CMD ["npm", "start"]
+# Install serve to run the production build
+RUN npm install -g serve
+
+EXPOSE 2101
+
+# Serve the build folder on port 2101
+CMD ["serve", "-s", "build", "-l", "2101"]

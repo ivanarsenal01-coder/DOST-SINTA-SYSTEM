@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require("express");
 const mysql = require("mysql2");
 const { AsyncLocalStorage } = require("async_hooks");
@@ -8,11 +10,11 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "dostdb",
-  port: Number(process.env.DB_PORT || 3306),
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -20,7 +22,10 @@ const db = mysql.createPool({
 
 db.getConnection((err, conn) => {
   if (err) {
-    console.error("❌ Database connection failed:", err);
+    console.error("❌ Database connection failed:");
+    console.error("   Host:", process.env.DB_HOST);
+    console.error("   Port:", process.env.DB_PORT);
+    console.error("   Error:", err.message);
   } else {
     console.log("✅ Connected to MySQL");
     conn.release();
@@ -72,7 +77,7 @@ db.commit = (callback) => {
   });
 };
 
-db.rollback = (callback = () => {}) => {
+db.rollback = (callback = () => { }) => {
   const txConn = transactionStorage.getStore();
 
   if (!txConn) {
@@ -395,14 +400,14 @@ const syncCestTechnologyPromotionEntry = (
 
   const hasRequiredFields = Boolean(
     payload.activity_date &&
-      payload.technology_promoted &&
-      payload.technology_generator &&
-      payload.mode_of_promotion &&
-      payload.activity_title &&
-      payload.activity_venue_address &&
-      payload.customer_name &&
-      payload.customer_address &&
-      payload.staff_name
+    payload.technology_promoted &&
+    payload.technology_generator &&
+    payload.mode_of_promotion &&
+    payload.activity_title &&
+    payload.activity_venue_address &&
+    payload.customer_name &&
+    payload.customer_address &&
+    payload.staff_name
   );
 
   console.log("[CEST TECH PROMO] payload:", payload);
@@ -862,14 +867,14 @@ const syncProjectInterventionTechnologyPromotionEntry = (
 
     const hasRequiredFields = Boolean(
       payload.activity_date &&
-        payload.technology_promoted &&
-        payload.technology_generator &&
-        payload.mode_of_promotion &&
-        payload.activity_title &&
-        payload.activity_venue_address &&
-        payload.customer_name &&
-        payload.customer_address &&
-        payload.staff_name
+      payload.technology_promoted &&
+      payload.technology_generator &&
+      payload.mode_of_promotion &&
+      payload.activity_title &&
+      payload.activity_venue_address &&
+      payload.customer_name &&
+      payload.customer_address &&
+      payload.staff_name
     );
 
     if (!hasRequiredFields) {
@@ -1175,7 +1180,7 @@ const normalizeTechnologyTrainingEntry = (row) => ({
   totalMale: Number(row.total_male ?? row.participants_male ?? 0),
   totalParticipants: Number(
     row.total_participants ??
-      (Number(row.participants_female ?? 0) + Number(row.participants_male ?? 0))
+    (Number(row.participants_female ?? 0) + Number(row.participants_male ?? 0))
   ),
 
   firmsSucsHeisLgusCount: Number(row.firms_sucs_heis_lgus_count ?? 0),
@@ -1423,7 +1428,7 @@ const syncTechnologyTrainingEntryForIntervention = (
         province:
           String(
             pickTraining(body.province, notesObj.province, "PANGASINAN") ||
-              "PANGASINAN"
+            "PANGASINAN"
           ).trim() || "PANGASINAN",
         start_date: toNullIfEmpty(
           pickTraining(
@@ -1904,40 +1909,40 @@ const mapCestTechPromoPayload = (body = {}, type = "") => {
   const photosRaw = Array.isArray(body.promoPhotos)
     ? body.promoPhotos
     : Array.isArray(body.promo_photos)
-    ? body.promo_photos
-    : Array.isArray(body.photos)
-    ? body.photos
-    : Array.isArray(body.techPromoPhotos)
-    ? body.techPromoPhotos
-    : Array.isArray(body.tech_promo_photos)
-    ? body.tech_promo_photos
-    : Array.isArray(body.activityPhotos)
-    ? body.activityPhotos
-    : Array.isArray(body.activity_photos)
-    ? body.activity_photos
-    : Array.isArray(body.photoFiles)
-    ? body.photoFiles
-    : Array.isArray(body.photo_files)
-    ? body.photo_files
-    : Array.isArray(notesObj.promoPhotos)
-    ? notesObj.promoPhotos
-    : Array.isArray(notesObj.promo_photos)
-    ? notesObj.promo_photos
-    : Array.isArray(notesObj.photos)
-    ? notesObj.photos
-    : Array.isArray(notesObj.techPromoPhotos)
-    ? notesObj.techPromoPhotos
-    : Array.isArray(notesObj.tech_promo_photos)
-    ? notesObj.tech_promo_photos
-    : Array.isArray(notesObj.activityPhotos)
-    ? notesObj.activityPhotos
-    : Array.isArray(notesObj.activity_photos)
-    ? notesObj.activity_photos
-    : Array.isArray(notesObj.photoFiles)
-    ? notesObj.photoFiles
-    : Array.isArray(notesObj.photo_files)
-    ? notesObj.photo_files
-    : [];
+      ? body.promo_photos
+      : Array.isArray(body.photos)
+        ? body.photos
+        : Array.isArray(body.techPromoPhotos)
+          ? body.techPromoPhotos
+          : Array.isArray(body.tech_promo_photos)
+            ? body.tech_promo_photos
+            : Array.isArray(body.activityPhotos)
+              ? body.activityPhotos
+              : Array.isArray(body.activity_photos)
+                ? body.activity_photos
+                : Array.isArray(body.photoFiles)
+                  ? body.photoFiles
+                  : Array.isArray(body.photo_files)
+                    ? body.photo_files
+                    : Array.isArray(notesObj.promoPhotos)
+                      ? notesObj.promoPhotos
+                      : Array.isArray(notesObj.promo_photos)
+                        ? notesObj.promo_photos
+                        : Array.isArray(notesObj.photos)
+                          ? notesObj.photos
+                          : Array.isArray(notesObj.techPromoPhotos)
+                            ? notesObj.techPromoPhotos
+                            : Array.isArray(notesObj.tech_promo_photos)
+                              ? notesObj.tech_promo_photos
+                              : Array.isArray(notesObj.activityPhotos)
+                                ? notesObj.activityPhotos
+                                : Array.isArray(notesObj.activity_photos)
+                                  ? notesObj.activity_photos
+                                  : Array.isArray(notesObj.photoFiles)
+                                    ? notesObj.photoFiles
+                                    : Array.isArray(notesObj.photo_files)
+                                      ? notesObj.photo_files
+                                      : [];
 
   const photos = photosRaw
     .map((p) => {
@@ -1952,27 +1957,27 @@ const mapCestTechPromoPayload = (body = {}, type = "") => {
       return {
         name: String(
           p?.name ||
-            p?.original_name ||
-            p?.originalName ||
-            p?.file_name ||
-            "photo"
+          p?.original_name ||
+          p?.originalName ||
+          p?.file_name ||
+          "photo"
         ),
         type: String(
           p?.type ||
-            p?.mime_type ||
-            p?.mimeType ||
-            p?.content_type ||
-            "image/jpeg"
+          p?.mime_type ||
+          p?.mimeType ||
+          p?.content_type ||
+          "image/jpeg"
         ),
         dataUrl: String(
           p?.dataUrl ||
-            p?.data_url ||
-            p?.file_data ||
-            p?.src ||
-            p?.url ||
-            p?.photo_url ||
-            p?.photoUrl ||
-            ""
+          p?.data_url ||
+          p?.file_data ||
+          p?.src ||
+          p?.url ||
+          p?.photo_url ||
+          p?.photoUrl ||
+          ""
         ),
       };
     })
@@ -1981,156 +1986,156 @@ const mapCestTechPromoPayload = (body = {}, type = "") => {
   return {
     project_name: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoProject,
-            body.promo_project,
-            body.project,
-            body.project_name,
-            notesObj.promoProject,
-            notesObj.promo_project,
-            notesObj.project,
-            notesObj.project_name,
-            "CEST"
-          )
+        pickFirst(
+          body.promoProject,
+          body.promo_project,
+          body.project,
+          body.project_name,
+          notesObj.promoProject,
+          notesObj.promo_project,
+          notesObj.project,
+          notesObj.project_name,
+          "CEST"
         )
+      )
       : null,
 
     technology_promoted: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoTechnologyPromoted,
-            body.promo_technology_promoted,
-            body.technologyPromoted,
-            body.technology_promoted,
-            notesObj.promoTechnologyPromoted,
-            notesObj.promo_technology_promoted,
-            notesObj.technologyPromoted,
-            notesObj.technology_promoted,
-            null
-          )
+        pickFirst(
+          body.promoTechnologyPromoted,
+          body.promo_technology_promoted,
+          body.technologyPromoted,
+          body.technology_promoted,
+          notesObj.promoTechnologyPromoted,
+          notesObj.promo_technology_promoted,
+          notesObj.technologyPromoted,
+          notesObj.technology_promoted,
+          null
         )
+      )
       : null,
 
     technology_generator: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoTechnologyGenerator,
-            body.promo_technology_generator,
-            body.technologyGenerator,
-            body.technology_generator,
-            notesObj.promoTechnologyGenerator,
-            notesObj.promo_technology_generator,
-            notesObj.technologyGenerator,
-            notesObj.technology_generator,
-            null
-          )
+        pickFirst(
+          body.promoTechnologyGenerator,
+          body.promo_technology_generator,
+          body.technologyGenerator,
+          body.technology_generator,
+          notesObj.promoTechnologyGenerator,
+          notesObj.promo_technology_generator,
+          notesObj.technologyGenerator,
+          notesObj.technology_generator,
+          null
         )
+      )
       : null,
 
     mode_of_promotion: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoModeOfPromotion,
-            body.promo_mode_of_promotion,
-            body.modeOfPromotion,
-            body.mode_of_promotion,
-            notesObj.promoModeOfPromotion,
-            notesObj.promo_mode_of_promotion,
-            notesObj.modeOfPromotion,
-            notesObj.mode_of_promotion,
-            null
-          )
+        pickFirst(
+          body.promoModeOfPromotion,
+          body.promo_mode_of_promotion,
+          body.modeOfPromotion,
+          body.mode_of_promotion,
+          notesObj.promoModeOfPromotion,
+          notesObj.promo_mode_of_promotion,
+          notesObj.modeOfPromotion,
+          notesObj.mode_of_promotion,
+          null
         )
+      )
       : null,
 
     customer_name: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoCustomerName,
-            body.promo_customer_name,
-            body.customerName,
-            body.customer_name,
-            body.customerParticipantName,
-            body.customer_participant_name,
-            notesObj.promoCustomerName,
-            notesObj.promo_customer_name,
-            notesObj.customerName,
-            notesObj.customer_name,
-            notesObj.customerParticipantName,
-            notesObj.customer_participant_name,
-            null
-          )
+        pickFirst(
+          body.promoCustomerName,
+          body.promo_customer_name,
+          body.customerName,
+          body.customer_name,
+          body.customerParticipantName,
+          body.customer_participant_name,
+          notesObj.promoCustomerName,
+          notesObj.promo_customer_name,
+          notesObj.customerName,
+          notesObj.customer_name,
+          notesObj.customerParticipantName,
+          notesObj.customer_participant_name,
+          null
         )
+      )
       : null,
 
     customer_address: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoCustomerAddress,
-            body.promo_customer_address,
-            body.customerAddress,
-            body.customer_address,
-            body.customerParticipantAddress,
-            body.customer_participant_address,
-            notesObj.promoCustomerAddress,
-            notesObj.promo_customer_address,
-            notesObj.customerAddress,
-            notesObj.customer_address,
-            notesObj.customerParticipantAddress,
-            notesObj.customer_participant_address,
-            null
-          )
+        pickFirst(
+          body.promoCustomerAddress,
+          body.promo_customer_address,
+          body.customerAddress,
+          body.customer_address,
+          body.customerParticipantAddress,
+          body.customer_participant_address,
+          notesObj.promoCustomerAddress,
+          notesObj.promo_customer_address,
+          notesObj.customerAddress,
+          notesObj.customer_address,
+          notesObj.customerParticipantAddress,
+          notesObj.customer_participant_address,
+          null
         )
+      )
       : null,
 
     sex: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoSex,
-            body.promo_sex,
-            body.sex,
-            body.customerSex,
-            body.customer_sex,
-            notesObj.promoSex,
-            notesObj.promo_sex,
-            notesObj.sex,
-            notesObj.customerSex,
-            notesObj.customer_sex,
-            "N/A"
-          )
+        pickFirst(
+          body.promoSex,
+          body.promo_sex,
+          body.sex,
+          body.customerSex,
+          body.customer_sex,
+          notesObj.promoSex,
+          notesObj.promo_sex,
+          notesObj.sex,
+          notesObj.customerSex,
+          notesObj.customer_sex,
+          "N/A"
         )
+      )
       : null,
 
     staff_name: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoStaffName,
-            body.promo_staff_name,
-            body.staffName,
-            body.staff_name,
-            notesObj.promoStaffName,
-            notesObj.promo_staff_name,
-            notesObj.staffName,
-            notesObj.staff_name,
-            null
-          )
+        pickFirst(
+          body.promoStaffName,
+          body.promo_staff_name,
+          body.staffName,
+          body.staff_name,
+          notesObj.promoStaffName,
+          notesObj.promo_staff_name,
+          notesObj.staffName,
+          notesObj.staff_name,
+          null
         )
+      )
       : null,
 
     means_of_verification: isPromo
       ? toNullIfEmpty(
-          pickFirst(
-            body.promoMeansVerification,
-            body.promo_means_of_verification,
-            body.meansOfVerification,
-            body.means_of_verification,
-            notesObj.promoMeansVerification,
-            notesObj.promo_means_of_verification,
-            notesObj.meansOfVerification,
-            notesObj.means_of_verification,
-            null
-          )
+        pickFirst(
+          body.promoMeansVerification,
+          body.promo_means_of_verification,
+          body.meansOfVerification,
+          body.means_of_verification,
+          notesObj.promoMeansVerification,
+          notesObj.promo_means_of_verification,
+          notesObj.meansOfVerification,
+          notesObj.means_of_verification,
+          null
         )
+      )
       : null,
 
     venue_address_meta: isPromo && venueMeta ? JSON.stringify(venueMeta) : null,
@@ -2374,8 +2379,8 @@ const mapCestTechRolloutResponse = (row = {}) => ({
     row.intervention_techrollout_mode_of_transfer ?? row.techrollout_mode_of_transfer ?? "",
   techrolloutIsDostDevelopedFunded: Boolean(
     row.intervention_techrollout_is_dost_developed_funded ??
-      row.techrollout_is_dost_developed_funded ??
-      0
+    row.techrollout_is_dost_developed_funded ??
+    0
   ),
   techrolloutDateTransferred: formatDateOnly(
     row.intervention_techrollout_date_transferred ?? row.techrollout_date_transferred
@@ -2393,7 +2398,7 @@ const mapCestTechRolloutResponse = (row = {}) => ({
     row.intervention_techrollout_institution_address ?? row.techrollout_institution_address ?? "",
   techrolloutInstitutionAddressMeta: parseCestTechRolloutAddressMeta(
     row.intervention_techrollout_institution_address_meta ??
-      row.techrollout_institution_address_meta
+    row.techrollout_institution_address_meta
   ),
   techrolloutClassification:
     row.intervention_techrollout_classification ?? row.techrollout_classification ?? "",
@@ -2540,16 +2545,16 @@ const syncCestTechnologyRolloutToTable = ({
 
   const hasRequiredFields = Boolean(
     normalized.quarter &&
-      normalized.name_of_technology_transferred &&
-      normalized.technology_generator &&
-      normalized.mode_of_transfer &&
-      normalized.date_transferred &&
-      normalized.activity_title &&
-      normalized.activity_date &&
-      normalized.institution_name &&
-      normalized.institution_address &&
-      normalized.classification &&
-      normalized.representative_name
+    normalized.name_of_technology_transferred &&
+    normalized.technology_generator &&
+    normalized.mode_of_transfer &&
+    normalized.date_transferred &&
+    normalized.activity_title &&
+    normalized.activity_date &&
+    normalized.institution_name &&
+    normalized.institution_address &&
+    normalized.classification &&
+    normalized.representative_name
   );
 
   if (!hasRequiredFields) {
@@ -4609,7 +4614,7 @@ app.post("/cest/:id/interventions", (req, res) => {
         toNullIfEmpty(trainingEndDate),
         toNullIfEmpty(trainingProvince),
         techPromo.venue_address_meta ||
-          mapTacsAddressMeta(trainingVenueAddressMeta),
+        mapTacsAddressMeta(trainingVenueAddressMeta),
         toNumOrZero(noOfFirmsSucsHeisLgus),
         toNumOrZero(participantsFemale),
         toNumOrZero(participantsMale),
@@ -6994,8 +6999,8 @@ app.post("/api/technology-training/entries", (req, res) => {
       toNumOrZero(body.totalMale ?? body.participantsMale),
       toNumOrZero(
         body.totalParticipants ??
-          ((Number(body.totalFemale ?? body.participantsFemale ?? 0)) +
-           (Number(body.totalMale ?? body.participantsMale ?? 0)))
+        ((Number(body.totalFemale ?? body.participantsFemale ?? 0)) +
+          (Number(body.totalMale ?? body.participantsMale ?? 0)))
       ),
 
       toNumOrZero(body.firmsSucsHeisLgusCount),
@@ -7115,8 +7120,8 @@ app.put("/api/technology-training/entries/:id", (req, res) => {
       toNumOrZero(body.totalMale ?? body.participantsMale),
       toNumOrZero(
         body.totalParticipants ??
-          ((Number(body.totalFemale ?? body.participantsFemale ?? 0)) +
-           (Number(body.totalMale ?? body.participantsMale ?? 0)))
+        ((Number(body.totalFemale ?? body.participantsFemale ?? 0)) +
+          (Number(body.totalMale ?? body.participantsMale ?? 0)))
       ),
 
       toNumOrZero(body.firmsSucsHeisLgusCount),
@@ -7278,11 +7283,11 @@ const mapTechnologyRolloutPayload = (body = {}) => {
 
   const addressText = String(
     body.institutionAddress ||
-      body.institution_address ||
-      body.address ||
-      body.address_display_text ||
-      body.address_manual_text ||
-      ""
+    body.institution_address ||
+    body.address ||
+    body.address_display_text ||
+    body.address_manual_text ||
+    ""
   ).trim();
 
   return {
@@ -7292,21 +7297,21 @@ const mapTechnologyRolloutPayload = (body = {}) => {
     ).trim(),
     name_of_technology_transferred: String(
       body.nameOfTechnologyTransferred ||
-        body.name_of_technology_transferred ||
-        ""
+      body.name_of_technology_transferred ||
+      ""
     ).trim(),
     technology_generator: String(
       body.technologyGenerator ||
-        body.technology_generator ||
-        ""
+      body.technology_generator ||
+      ""
     ).trim(),
     mode_of_transfer: String(
       body.modeOfTransfer || body.mode_of_transfer || ""
     ).trim(),
     is_dost_developed_funded:
       body.isDostDevelopedFunded === true ||
-      body.is_dost_developed_funded === true ||
-      Number(body.is_dost_developed_funded) === 1
+        body.is_dost_developed_funded === true ||
+        Number(body.is_dost_developed_funded) === 1
         ? 1
         : 0,
     date_transferred: toNullIfEmpty(
@@ -9143,8 +9148,8 @@ app.put("/api/target-settings/:moduleName", (req, res) => {
   const rawRows = Array.isArray(req.body?.rows)
     ? req.body.rows
     : Array.isArray(req.body)
-    ? req.body
-    : [];
+      ? req.body
+      : [];
 
   if (!moduleName) {
     return res.status(400).json({ message: "moduleName is required" });
@@ -9279,13 +9284,13 @@ const normalizePhotoList = (rawPhotos = []) => {
 
       const dataUrl = String(
         item?.dataUrl ||
-          item?.photo_data ||
-          item?.file_data ||
-          item?.src ||
-          item?.url ||
-          item?.preview ||
-          item?.base64 ||
-          ""
+        item?.photo_data ||
+        item?.file_data ||
+        item?.src ||
+        item?.url ||
+        item?.preview ||
+        item?.base64 ||
+        ""
       ).trim();
 
       if (!dataUrl) return null;
@@ -9666,14 +9671,14 @@ const parsePackagingInterventionPayload = (body = {}) => {
   const products = Array.isArray(body.products)
     ? body.products
     : Array.isArray(bodyPackaging.products)
-    ? bodyPackaging.products
-    : Array.isArray(notesObj.products)
-    ? notesObj.products
-    : Array.isArray(notesPackaging.products)
-    ? notesPackaging.products
-    : mainProductName
-    ? [{ productName: mainProductName }]
-    : [];
+      ? bodyPackaging.products
+      : Array.isArray(notesObj.products)
+        ? notesObj.products
+        : Array.isArray(notesPackaging.products)
+          ? notesPackaging.products
+          : mainProductName
+            ? [{ productName: mainProductName }]
+            : [];
 
   const photos = normalizePhotoList(
     firstArrayLike(
@@ -10182,10 +10187,10 @@ const parseTacsInterventionPayload = (body = {}) => ({
   photos: Array.isArray(body.tacs_photos)
     ? body.tacs_photos
     : Array.isArray(body.tacsPhotos)
-    ? body.tacsPhotos
-    : Array.isArray(body.photos)
-    ? body.photos
-    : [],
+      ? body.tacsPhotos
+      : Array.isArray(body.photos)
+        ? body.photos
+        : [],
 });
 
 const syncTacsEntryForIntervention = (
@@ -10209,13 +10214,13 @@ const syncTacsEntryForIntervention = (
   const payload = parseTacsInterventionPayload(body || {});
   const hasMeaningfulData = Boolean(
     payload.type_of_consultancy ||
-      payload.date_of_engagement ||
-      payload.expert_institution ||
-      payload.customer_name ||
-      payload.customer_address_text ||
-      payload.means_of_verification ||
-      payload.advice_count !== null ||
-      (Array.isArray(payload.photos) && payload.photos.length)
+    payload.date_of_engagement ||
+    payload.expert_institution ||
+    payload.customer_name ||
+    payload.customer_address_text ||
+    payload.means_of_verification ||
+    payload.advice_count !== null ||
+    (Array.isArray(payload.photos) && payload.photos.length)
   );
 
   if (!hasMeaningfulData) {
@@ -10277,41 +10282,41 @@ const syncTacsEntryForIntervention = (
 
       const params = existingId
         ? [
-            projectId,
-            sourceInfo.source_module,
-            sourceInfo.source_table,
-            interventionId,
-            payload.type_of_consultancy,
-            payload.date_of_engagement,
-            payload.expert_institution,
-            payload.customer_name,
-            payload.sex,
-            payload.customer_address_text,
-            mapTacsAddressMeta(payload.customer_address_meta),
-            payload.advice_count,
-            payload.means_of_verification,
-            mapTacsAddressMeta(payload.photos),
-            sourceInfo.source_module,
-            sourceInfo.source_table,
-            interventionId,
-          ]
+          projectId,
+          sourceInfo.source_module,
+          sourceInfo.source_table,
+          interventionId,
+          payload.type_of_consultancy,
+          payload.date_of_engagement,
+          payload.expert_institution,
+          payload.customer_name,
+          payload.sex,
+          payload.customer_address_text,
+          mapTacsAddressMeta(payload.customer_address_meta),
+          payload.advice_count,
+          payload.means_of_verification,
+          mapTacsAddressMeta(payload.photos),
+          sourceInfo.source_module,
+          sourceInfo.source_table,
+          interventionId,
+        ]
         : [
-            recordId,
-            projectId,
-            sourceInfo.source_module,
-            sourceInfo.source_table,
-            interventionId,
-            payload.type_of_consultancy,
-            payload.date_of_engagement,
-            payload.expert_institution,
-            payload.customer_name,
-            payload.sex,
-            payload.customer_address_text,
-            mapTacsAddressMeta(payload.customer_address_meta),
-            payload.advice_count,
-            payload.means_of_verification,
-            mapTacsAddressMeta(payload.photos),
-          ];
+          recordId,
+          projectId,
+          sourceInfo.source_module,
+          sourceInfo.source_table,
+          interventionId,
+          payload.type_of_consultancy,
+          payload.date_of_engagement,
+          payload.expert_institution,
+          payload.customer_name,
+          payload.sex,
+          payload.customer_address_text,
+          mapTacsAddressMeta(payload.customer_address_meta),
+          payload.advice_count,
+          payload.means_of_verification,
+          mapTacsAddressMeta(payload.photos),
+        ];
 
       db.query(sql, params, (saveErr) => {
         if (saveErr) return callback(saveErr);
@@ -10409,10 +10414,10 @@ const mapPackagingLabelingPayload = (body = {}) => {
 
   const addressText = String(
     body.address ||
-      body.addressText ||
-      body.address_display_text ||
-      body.address_manual_text ||
-      ""
+    body.addressText ||
+    body.address_display_text ||
+    body.address_manual_text ||
+    ""
   ).trim();
 
   return {
@@ -10428,8 +10433,8 @@ const mapPackagingLabelingPayload = (body = {}) => {
     size_variant: String(body.sizeVariant || body.size_variant || "").trim(),
     packaging_materials_provided: String(
       body.packagingMaterialsProvided ||
-        body.packaging_materials_provided ||
-        ""
+      body.packaging_materials_provided ||
+      ""
     ).trim(),
     customer_name: String(body.customerName || body.customer_name || "").trim(),
     sex: toNullIfEmpty(body.sex),
@@ -12312,14 +12317,14 @@ const syncSscpTechnologyPromotionEntry = (
 
   const hasRequiredFields = Boolean(
     payload.activity_date &&
-      payload.technology_promoted &&
-      payload.technology_generator &&
-      payload.mode_of_promotion &&
-      payload.activity_title &&
-      payload.activity_venue_address &&
-      payload.customer_name &&
-      payload.customer_address &&
-      payload.staff_name
+    payload.technology_promoted &&
+    payload.technology_generator &&
+    payload.mode_of_promotion &&
+    payload.activity_title &&
+    payload.activity_venue_address &&
+    payload.customer_name &&
+    payload.customer_address &&
+    payload.staff_name
   );
 
   if (!hasRequiredFields) {
@@ -12510,16 +12515,16 @@ const syncSscpTechnologyRolloutToTable = ({
 
   const hasRequiredFields = Boolean(
     normalized.quarter &&
-      normalized.name_of_technology_transferred &&
-      normalized.technology_generator &&
-      normalized.mode_of_transfer &&
-      normalized.date_transferred &&
-      normalized.activity_title &&
-      normalized.activity_date &&
-      normalized.institution_name &&
-      normalized.institution_address &&
-      normalized.classification &&
-      normalized.representative_name
+    normalized.name_of_technology_transferred &&
+    normalized.technology_generator &&
+    normalized.mode_of_transfer &&
+    normalized.date_transferred &&
+    normalized.activity_title &&
+    normalized.activity_date &&
+    normalized.institution_name &&
+    normalized.institution_address &&
+    normalized.classification &&
+    normalized.representative_name
   );
 
   if (!hasRequiredFields) {
@@ -13930,7 +13935,7 @@ app.post("/sscp/:id/interventions", (req, res) => {
         toNullIfEmpty(trainingEndDate),
         toNullIfEmpty(trainingProvince),
         techPromo.venue_address_meta ||
-          mapTacsAddressMeta(trainingVenueAddressMeta),
+        mapTacsAddressMeta(trainingVenueAddressMeta),
         toNumOrZero(noOfFirmsSucsHeisLgus),
         toNumOrZero(participantsFemale),
         toNumOrZero(participantsMale),
@@ -15003,8 +15008,8 @@ const mapCalibrationPayload = (body = {}) => {
   );
   const totalCustomers =
     totalCustomersInput === null ||
-    totalCustomersInput === undefined ||
-    totalCustomersInput === ""
+      totalCustomersInput === undefined ||
+      totalCustomersInput === ""
       ? female + male
       : toNumOrZero(totalCustomersInput);
 
@@ -16094,13 +16099,13 @@ const buildStPromoPayload = (body = {}, forcedId = null) => {
     totalEngagements:
       entryMode === "ONLINE"
         ? toNumOrZero(
-            pickFirst(
-              body.totalEngagements,
-              toNumOrZero(body.reaction) +
-                toNumOrZero(body.comment) +
-                toNumOrZero(body.share)
-            )
+          pickFirst(
+            body.totalEngagements,
+            toNumOrZero(body.reaction) +
+            toNumOrZero(body.comment) +
+            toNumOrZero(body.share)
           )
+        )
         : 0,
     meansOfVerification: String(body.meansOfVerification || "").trim(),
     address: entryMode === "ONSITE" ? String(body.address || "").trim() : "",
@@ -16917,7 +16922,7 @@ app.get("/api/dashboard/projects", async (req, res) => {
     res.json(payload.filter((item) => item.municipality));
   } catch (err) {
     console.error("GET /api/dashboard/projects ERROR:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: err?.sqlMessage || err?.message || "Failed to load dashboard projects.",
     });
   }
@@ -17388,8 +17393,8 @@ app.post("/api/users", (req, res) => {
 
   const fullName = String(
     b.fullName ||
-      b.full_name ||
-      [firstName, middleName, lastName, suffix].filter(Boolean).join(" ")
+    b.full_name ||
+    [firstName, middleName, lastName, suffix].filter(Boolean).join(" ")
   )
     .replace(/\s+/g, " ")
     .trim();
@@ -17493,8 +17498,8 @@ app.put("/api/users/:id", (req, res) => {
 
   const fullName = String(
     b.fullName ||
-      b.full_name ||
-      [firstName, middleName, lastName, suffix].filter(Boolean).join(" ")
+    b.full_name ||
+    [firstName, middleName, lastName, suffix].filter(Boolean).join(" ")
   )
     .replace(/\s+/g, " ")
     .trim();
@@ -17848,9 +17853,9 @@ const buildSpecialProjectPayload = (body = {}) => {
 
   const finalAddress = String(
     body.address ||
-      meta.displayText ||
-      meta.manualText ||
-      [meta.barangay, meta.municipality, meta.province].filter(Boolean).join(", ")
+    meta.displayText ||
+    meta.manualText ||
+    [meta.barangay, meta.municipality, meta.province].filter(Boolean).join(", ")
   ).trim();
 
   return {
@@ -17871,8 +17876,8 @@ const buildSpecialProjectPayload = (body = {}) => {
     date_project_approved: toNullIfEmpty(body.dateProjectApproved),
     project_cost:
       body.projectCost !== "" &&
-      body.projectCost !== null &&
-      body.projectCost !== undefined
+        body.projectCost !== null &&
+        body.projectCost !== undefined
         ? Number(String(body.projectCost).replace(/,/g, ""))
         : 0,
 
@@ -18095,7 +18100,7 @@ app.delete("/api/special-projects/:id", (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.API_PORT || 2100;
 
 
 // ===========================
