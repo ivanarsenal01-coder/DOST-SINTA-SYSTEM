@@ -1,3 +1,3 @@
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:2100`;
+const API_BASE = `https://sinta.dost1.ph/api`;
 
 export default API_BASE;
