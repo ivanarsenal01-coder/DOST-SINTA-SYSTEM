@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import API_BASE from "../../api";
 
-const API = "http://localhost:5000";
+const API = API_BASE;
 
 const cloneRows = (rows) => rows.map((r) => ({ ...r }));
 

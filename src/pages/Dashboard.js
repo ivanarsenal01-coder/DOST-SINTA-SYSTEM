@@ -36,6 +36,7 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
+import API_BASE from "../api";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -93,7 +94,7 @@ const ALL_MUNICIPALITIES = PANGASINAN_DISTRICTS.flatMap((d) =>
 );
 
 const ENABLE_PROJECTS_API = true;
-const API_BASE_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_BASE_URL = (API_BASE || "http://localhost:5000").replace(/\/$/, "");
 const PROJECTS_API_URL = `${API_BASE_URL}/api/dashboard/projects`;
 
 function normalizeProgramKey(value = "") {
@@ -430,8 +431,8 @@ function ProgramTag({ label, kind = "neutral" }) {
     kind === "present"
       ? styles.programTagPresent
       : kind === "missing"
-      ? styles.programTagMissing
-      : styles.programTagNeutral;
+        ? styles.programTagMissing
+        : styles.programTagNeutral;
 
   return <span style={style}>{label}</span>;
 }
@@ -483,12 +484,12 @@ function AreaMap({
     fetch("/geo/pangasinan_outline.geojson")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => alive && data && setProvinceGeo(data))
-      .catch(() => {});
+      .catch(() => { });
 
     fetch("/geo/pangasinan_municipalities.geojson")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => alive && data && setMuniGeo(data))
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       alive = false;
@@ -761,8 +762,8 @@ export default function Dashboard() {
         const data = Array.isArray(response?.data)
           ? response.data
           : Array.isArray(response?.data?.rows)
-          ? response.data.rows
-          : [];
+            ? response.data.rows
+            : [];
         const normalized = normalizeProjects(data);
 
         if (!alive) return;
@@ -772,9 +773,9 @@ export default function Dashboard() {
         setProjects([]);
         setProjectsError(
           error?.response?.data?.message ||
-            error?.response?.data?.error ||
-            error?.message ||
-            "Failed to load projects."
+          error?.response?.data?.error ||
+          error?.message ||
+          "Failed to load projects."
         );
       } finally {
         if (alive) setProjectsLoading(false);
@@ -882,12 +883,12 @@ export default function Dashboard() {
               ? `Has ${PROGRAM_META[selectedProgram]?.label}`
               : "Complete"
             : status === "incomplete"
-            ? selectedProgram
-              ? `Missing ${PROGRAM_META[selectedProgram]?.label}`
-              : "Incomplete"
-            : selectedProgram
-            ? `No ${PROGRAM_META[selectedProgram]?.label}`
-            : "Without Projects",
+              ? selectedProgram
+                ? `Missing ${PROGRAM_META[selectedProgram]?.label}`
+                : "Incomplete"
+              : selectedProgram
+                ? `No ${PROGRAM_META[selectedProgram]?.label}`
+                : "Without Projects",
         projects: unitProjects,
         latestYear: latestProject ? getYearValue(latestProject.createdAt) : 0,
         latestQuarter: latestProject ? getQuarterNumeric(latestProject.createdAt) : 0,
@@ -1305,93 +1306,93 @@ export default function Dashboard() {
 
         {open
           ? createPortal(
-              <div style={styles.yearModalBackdrop} onMouseDown={closePicker}>
-                <div style={styles.yearModal} onMouseDown={(e) => e.stopPropagation()}>
-                  <div style={styles.yearModalHeader}>
-                    <div>
-                      <div>Select Year</div>
-                      <div style={styles.yearModalHeaderSub}>
-                        Scroll up/down or type any year
-                      </div>
+            <div style={styles.yearModalBackdrop} onMouseDown={closePicker}>
+              <div style={styles.yearModal} onMouseDown={(e) => e.stopPropagation()}>
+                <div style={styles.yearModalHeader}>
+                  <div>
+                    <div>Select Year</div>
+                    <div style={styles.yearModalHeaderSub}>
+                      Scroll up/down or type any year
                     </div>
-                    <button type="button" style={styles.yearModalClose} onClick={closePicker}>
-                      ✕
+                  </div>
+                  <button type="button" style={styles.yearModalClose} onClick={closePicker}>
+                    ✕
+                  </button>
+                </div>
+
+                <div style={styles.yearModalBody}>
+                  <div style={styles.yearModalInputRow}>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      style={styles.yearModalInput}
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") applyDraft();
+                        if (e.key === "Escape") closePicker();
+                      }}
+                      placeholder="Type year"
+                      autoFocus
+                    />
+
+                    <button type="button" style={styles.yearApplyBtn} onClick={applyDraft}>
+                      Apply
                     </button>
+
+                    {allowAll ? (
+                      <button
+                        type="button"
+                        style={styles.yearAllBtn}
+                        onClick={() => {
+                          onChange("all");
+                          closePicker();
+                        }}
+                      >
+                        {allLabel}
+                      </button>
+                    ) : null}
                   </div>
 
-                  <div style={styles.yearModalBody}>
-                    <div style={styles.yearModalInputRow}>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        style={styles.yearModalInput}
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") applyDraft();
-                          if (e.key === "Escape") closePicker();
-                        }}
-                        placeholder="Type year"
-                        autoFocus
-                      />
+                  <div
+                    key={activeYearValue}
+                    ref={listRef}
+                    style={styles.yearModalList}
+                    onScroll={handleScroll}
+                    onWheel={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                  >
+                    <div style={styles.yearModalListHint}>
+                      Scroll up/down to load more years
+                    </div>
 
-                      <button type="button" style={styles.yearApplyBtn} onClick={applyDraft}>
-                        Apply
-                      </button>
-
-                      {allowAll ? (
+                    {years.map((year) => {
+                      const active = String(year) === activeYearValue;
+                      return (
                         <button
                           type="button"
-                          style={styles.yearAllBtn}
+                          key={year}
+                          ref={active ? selectedRef : null}
+                          style={{
+                            ...styles.yearModalOption,
+                            ...(active ? styles.yearModalOptionActive : null),
+                          }}
                           onClick={() => {
-                            onChange("all");
+                            ensureYearInRange(year);
+                            onChange(String(year));
                             closePicker();
                           }}
                         >
-                          {allLabel}
+                          {year}
                         </button>
-                      ) : null}
-                    </div>
-
-                    <div
-                      key={activeYearValue}
-                      ref={listRef}
-                      style={styles.yearModalList}
-                      onScroll={handleScroll}
-                      onWheel={(e) => e.stopPropagation()}
-                      onTouchMove={(e) => e.stopPropagation()}
-                    >
-                      <div style={styles.yearModalListHint}>
-                        Scroll up/down to load more years
-                      </div>
-
-                      {years.map((year) => {
-                        const active = String(year) === activeYearValue;
-                        return (
-                          <button
-                            type="button"
-                            key={year}
-                            ref={active ? selectedRef : null}
-                            style={{
-                              ...styles.yearModalOption,
-                              ...(active ? styles.yearModalOptionActive : null),
-                            }}
-                            onClick={() => {
-                              ensureYearInRange(year);
-                              onChange(String(year));
-                              closePicker();
-                            }}
-                          >
-                            {year}
-                          </button>
-                        );
-                      })}
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>,
-              document.body
-            )
+              </div>
+            </div>,
+            document.body
+          )
           : null}
       </>
     );
@@ -1442,7 +1443,7 @@ export default function Dashboard() {
         <div style={styles.heroHeader}>
           <div>
             <div style={styles.heroTitle}>Provincial Projects Dashboard</div>
-            
+
           </div>
         </div>
 
@@ -1668,8 +1669,8 @@ export default function Dashboard() {
                                   row.status === "complete"
                                     ? "present"
                                     : row.status === "without"
-                                    ? "missing"
-                                    : "neutral"
+                                      ? "missing"
+                                      : "neutral"
                                 }
                               />
                               {row.latestYear ? <ProgramTag label={`Year ${row.latestYear}`} kind="neutral" /> : null}
@@ -1836,36 +1837,36 @@ export default function Dashboard() {
 
           <SectionCard
             title="Innovation Funding Support"
-          subtitle="SETUP, CEST, and SSCP summary computed from dashboard records."
-          right={
-            <div style={styles.filterState}>
-              <Table2 size={14} /> SETUP • CEST • SSCP
-            </div>
-          }
-        >
-          <div style={styles.innovationTableWrap}>
-            <table style={styles.innovationTable}>
-              <thead>
-                <tr>
-                  <th style={styles.innovationTh}>Program</th>
-                  <th style={styles.innovationThCenter}>Total Fund</th>
-                  <th style={styles.innovationThCenter}>No. of Projects</th>
-                  <th style={styles.innovationThCenter}>No. of Beneficiaries (Customer / Firms / LGUs)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {innovationFundingRows.map((row) => (
-                  <tr key={row.key}>
-                    <td style={styles.innovationTdLabel}>{row.pap}</td>
-                    <td style={styles.innovationTdCenter}>{row.totalFund}</td>
-                    <td style={styles.innovationTdCenter}>{row.projects}</td>
-                    <td style={styles.innovationTdCenter}>{row.beneficiaries}</td>
+            subtitle="SETUP, CEST, and SSCP summary computed from dashboard records."
+            right={
+              <div style={styles.filterState}>
+                <Table2 size={14} /> SETUP • CEST • SSCP
+              </div>
+            }
+          >
+            <div style={styles.innovationTableWrap}>
+              <table style={styles.innovationTable}>
+                <thead>
+                  <tr>
+                    <th style={styles.innovationTh}>Program</th>
+                    <th style={styles.innovationThCenter}>Total Fund</th>
+                    <th style={styles.innovationThCenter}>No. of Projects</th>
+                    <th style={styles.innovationThCenter}>No. of Beneficiaries (Customer / Firms / LGUs)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </SectionCard>
+                </thead>
+                <tbody>
+                  {innovationFundingRows.map((row) => (
+                    <tr key={row.key}>
+                      <td style={styles.innovationTdLabel}>{row.pap}</td>
+                      <td style={styles.innovationTdCenter}>{row.totalFund}</td>
+                      <td style={styles.innovationTdCenter}>{row.projects}</td>
+                      <td style={styles.innovationTdCenter}>{row.beneficiaries}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
         </div>
 
         <SectionCard
