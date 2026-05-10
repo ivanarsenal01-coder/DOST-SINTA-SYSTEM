@@ -6106,10 +6106,10 @@ const buildTacsWhere = (query = {}) => {
 // ===========================
 // TECHNOLOGY PROMOTION ROUTES
 // ===========================
-app.get("/api/technology-promotion/lookups", (req, res) => {
+app.get("/technology-promotion/lookups", (req, res) => {
   ensureTechnologyPromotionDefaults((err) => {
     if (err) {
-      console.error("GET /api/technology-promotion/lookups ERROR:", err);
+      console.error("GET /technology-promotion/lookups ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -6140,7 +6140,7 @@ app.get("/api/technology-promotion/lookups", (req, res) => {
   });
 });
 
-app.post("/api/technology-promotion/projects", (req, res) => {
+app.post("/technology-promotion/projects", (req, res) => {
   const name = String(req.body?.name || "").trim();
 
   if (!name) {
@@ -6152,7 +6152,7 @@ app.post("/api/technology-promotion/projects", (req, res) => {
     [name],
     (err) => {
       if (err) {
-        console.error("POST /api/technology-promotion/projects ERROR:", err);
+        console.error("POST /technology-promotion/projects ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6161,7 +6161,7 @@ app.post("/api/technology-promotion/projects", (req, res) => {
   );
 });
 
-app.post("/api/technology-promotion/modes", (req, res) => {
+app.post("/technology-promotion/modes", (req, res) => {
   const name = String(req.body?.name || "").trim();
 
   if (!name) {
@@ -6173,7 +6173,7 @@ app.post("/api/technology-promotion/modes", (req, res) => {
     [name],
     (err) => {
       if (err) {
-        console.error("POST /api/technology-promotion/modes ERROR:", err);
+        console.error("POST /technology-promotion/modes ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6426,7 +6426,7 @@ const attachTechnologyPromotionPhotos = (rows, callback) => {
   );
 };
 
-app.get("/api/technology-promotion/entries", (req, res) => {
+app.get("/technology-promotion/entries", (req, res) => {
   const hasServerPaging =
     req.query.page !== undefined ||
     req.query.limit !== undefined ||
@@ -6449,7 +6449,7 @@ app.get("/api/technology-promotion/entries", (req, res) => {
 
     db.query(sql, params, (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-promotion/entries ERROR:", err);
+        console.error("GET /technology-promotion/entries ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6478,7 +6478,7 @@ app.get("/api/technology-promotion/entries", (req, res) => {
 
   db.query(countSql, params, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/technology-promotion/entries count ERROR:", countErr);
+      console.error("GET /technology-promotion/entries count ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -6495,7 +6495,7 @@ app.get("/api/technology-promotion/entries", (req, res) => {
 
     db.query(dataSql, [...params, limit, offset], (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-promotion/entries data ERROR:", err);
+        console.error("GET /technology-promotion/entries data ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6517,7 +6517,7 @@ app.get("/api/technology-promotion/entries", (req, res) => {
   });
 });
 
-app.post("/api/technology-promotion/entries", (req, res) => {
+app.post("/technology-promotion/entries", (req, res) => {
   const body = req.body || {};
   const venue = body.activityVenueMeta || {};
   const photos = Array.isArray(body.photos) ? body.photos : [];
@@ -6609,7 +6609,7 @@ app.post("/api/technology-promotion/entries", (req, res) => {
   );
 });
 
-app.put("/api/technology-promotion/entries/:id", (req, res) => {
+app.put("/technology-promotion/entries/:id", (req, res) => {
   const entryId = Number(req.params.id);
   const body = req.body || {};
   const venue = body.activityVenueMeta || {};
@@ -6721,7 +6721,7 @@ app.put("/api/technology-promotion/entries/:id", (req, res) => {
   );
 });
 
-app.delete("/api/technology-promotion/entries/:id", (req, res) => {
+app.delete("/technology-promotion/entries/:id", (req, res) => {
   const entryId = Number(req.params.id);
 
   if (!Number.isFinite(entryId) || entryId <= 0) {
@@ -6733,7 +6733,7 @@ app.delete("/api/technology-promotion/entries/:id", (req, res) => {
     [entryId],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/technology-promotion/entries/:id ERROR:", err);
+        console.error("DELETE /technology-promotion/entries/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6746,7 +6746,7 @@ app.delete("/api/technology-promotion/entries/:id", (req, res) => {
   );
 });
 
-app.get("/api/technology-promotion/summary", (req, res) => {
+app.get("/technology-promotion/summary", (req, res) => {
   const project = String(req.query.project ?? "ALL");
   const year = Number(req.query.year || new Date().getFullYear());
 
@@ -6773,7 +6773,7 @@ app.get("/api/technology-promotion/summary", (req, res) => {
 
   db.query(sql, params, (err, rows) => {
     if (err) {
-      console.error("GET /api/technology-promotion/summary ERROR:", err);
+      console.error("GET /technology-promotion/summary ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -6822,12 +6822,12 @@ app.get("/api/technology-promotion/summary", (req, res) => {
 // ===========================
 // TECHNOLOGY TRAINING ROUTES
 // ===========================
-app.get("/api/technology-training/programs", (req, res) => {
+app.get("/technology-training/programs", (req, res) => {
   db.query(
     "SELECT * FROM technology_training_programs ORDER BY name ASC",
     (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-training/programs ERROR:", err);
+        console.error("GET /technology-training/programs ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6836,7 +6836,7 @@ app.get("/api/technology-training/programs", (req, res) => {
   );
 });
 
-app.post("/api/technology-training/programs", (req, res) => {
+app.post("/technology-training/programs", (req, res) => {
   const name = String(req.body?.name || "").trim();
 
   if (!name) {
@@ -6848,7 +6848,7 @@ app.post("/api/technology-training/programs", (req, res) => {
     [name],
     (err) => {
       if (err) {
-        console.error("POST /api/technology-training/programs ERROR:", err);
+        console.error("POST /technology-training/programs ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6857,7 +6857,7 @@ app.post("/api/technology-training/programs", (req, res) => {
   );
 });
 
-app.get("/api/technology-training/entries", (req, res) => {
+app.get("/technology-training/entries", (req, res) => {
   const page = Math.max(1, Number(req.query.page || 1));
   const limit = Math.max(1, Math.min(100, Number(req.query.limit || 10)));
   const offset = (page - 1) * limit;
@@ -6872,7 +6872,7 @@ app.get("/api/technology-training/entries", (req, res) => {
 
   db.query(countSql, params, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/technology-training/entries count ERROR:", countErr);
+      console.error("GET /technology-training/entries count ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -6892,7 +6892,7 @@ app.get("/api/technology-training/entries", (req, res) => {
 
     db.query(dataSql, [...params, limit, offset], (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-training/entries ERROR:", err);
+        console.error("GET /technology-training/entries ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -6907,7 +6907,7 @@ app.get("/api/technology-training/entries", (req, res) => {
   });
 });
 
-app.post("/api/technology-training/entries", (req, res) => {
+app.post("/technology-training/entries", (req, res) => {
   const body = req.body || {};
 
   const requiredChecks = [
@@ -7014,7 +7014,7 @@ app.post("/api/technology-training/entries", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/technology-training/entries ERROR:", err);
+        console.error("POST /technology-training/entries ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7026,7 +7026,7 @@ app.post("/api/technology-training/entries", (req, res) => {
   );
 });
 
-app.put("/api/technology-training/entries/:id", (req, res) => {
+app.put("/technology-training/entries/:id", (req, res) => {
   const entryId = Number(req.params.id);
   const body = req.body || {};
 
@@ -7136,7 +7136,7 @@ app.put("/api/technology-training/entries/:id", (req, res) => {
     ],
     (err) => {
       if (err) {
-        console.error("PUT /api/technology-training/entries/:id ERROR:", err);
+        console.error("PUT /technology-training/entries/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7145,7 +7145,7 @@ app.put("/api/technology-training/entries/:id", (req, res) => {
   );
 });
 
-app.delete("/api/technology-training/entries/:id", (req, res) => {
+app.delete("/technology-training/entries/:id", (req, res) => {
   const entryId = Number(req.params.id);
 
   db.query(
@@ -7153,7 +7153,7 @@ app.delete("/api/technology-training/entries/:id", (req, res) => {
     [entryId],
     (err) => {
       if (err) {
-        console.error("DELETE /api/technology-training/entries/:id ERROR:", err);
+        console.error("DELETE /technology-training/entries/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7162,7 +7162,7 @@ app.delete("/api/technology-training/entries/:id", (req, res) => {
   );
 });
 
-app.get("/api/technology-training/summary", (req, res) => {
+app.get("/technology-training/summary", (req, res) => {
   const year = Number(req.query.year || new Date().getFullYear());
 
   const sql = `
@@ -7178,7 +7178,7 @@ app.get("/api/technology-training/summary", (req, res) => {
 
   db.query(sql, [year], (err, rows) => {
     if (err) {
-      console.error("GET /api/technology-training/summary ERROR:", err);
+      console.error("GET /technology-training/summary ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -7364,7 +7364,7 @@ const normalizeTechnologyRolloutDistrictKey = (value = "") => {
   return raw.replace(/\s+/g, " ");
 };
 
-app.get("/api/technology-rollout", (req, res) => {
+app.get("/technology-rollout", (req, res) => {
   const hasServerPaging =
     req.query.page !== undefined ||
     req.query.limit !== undefined ||
@@ -7458,7 +7458,7 @@ app.get("/api/technology-rollout", (req, res) => {
 
     db.query(sql, params, (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-rollout ERROR:", err);
+        console.error("GET /technology-rollout ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7479,7 +7479,7 @@ app.get("/api/technology-rollout", (req, res) => {
 
   db.query(countSql, params, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/technology-rollout count ERROR:", countErr);
+      console.error("GET /technology-rollout count ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -7506,7 +7506,7 @@ app.get("/api/technology-rollout", (req, res) => {
 
     db.query(dataSql, [...params, limit, offset], (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-rollout data ERROR:", err);
+        console.error("GET /technology-rollout data ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7521,7 +7521,7 @@ app.get("/api/technology-rollout", (req, res) => {
   });
 });
 
-app.get("/api/technology-rollout/summary/:year", (req, res) => {
+app.get("/technology-rollout/summary/:year", (req, res) => {
   const year = Number(req.params.year || new Date().getFullYear());
 
   const sql = `
@@ -7539,7 +7539,7 @@ app.get("/api/technology-rollout/summary/:year", (req, res) => {
 
   db.query(sql, [year], (err, rows) => {
     if (err) {
-      console.error("GET /api/technology-rollout/summary/:year ERROR:", err);
+      console.error("GET /technology-rollout/summary/:year ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -7609,7 +7609,7 @@ app.get("/api/technology-rollout/summary/:year", (req, res) => {
     });
   });
 });
-app.get("/api/technology-rollout/:id", (req, res) => {
+app.get("/technology-rollout/:id", (req, res) => {
   const entryId = Number(req.params.id);
 
   db.query(
@@ -7617,7 +7617,7 @@ app.get("/api/technology-rollout/:id", (req, res) => {
     [entryId],
     (err, rows) => {
       if (err) {
-        console.error("GET /api/technology-rollout/:id ERROR:", err);
+        console.error("GET /technology-rollout/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7630,7 +7630,7 @@ app.get("/api/technology-rollout/:id", (req, res) => {
   );
 });
 
-app.post("/api/technology-rollout", (req, res) => {
+app.post("/technology-rollout", (req, res) => {
   const p = mapTechnologyRolloutPayload(req.body || {});
 
   const requiredChecks = [
@@ -7716,7 +7716,7 @@ app.post("/api/technology-rollout", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/technology-rollout ERROR:", err);
+        console.error("POST /technology-rollout ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7729,7 +7729,7 @@ app.post("/api/technology-rollout", (req, res) => {
   );
 });
 
-app.put("/api/technology-rollout/:id", (req, res) => {
+app.put("/technology-rollout/:id", (req, res) => {
   const entryId = Number(req.params.id);
   const p = mapTechnologyRolloutPayload(req.body || {});
 
@@ -7818,7 +7818,7 @@ app.put("/api/technology-rollout/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/technology-rollout/:id ERROR:", err);
+        console.error("PUT /technology-rollout/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7831,7 +7831,7 @@ app.put("/api/technology-rollout/:id", (req, res) => {
   );
 });
 
-app.delete("/api/technology-rollout/:id", (req, res) => {
+app.delete("/technology-rollout/:id", (req, res) => {
   const entryId = Number(req.params.id);
 
   db.query(
@@ -7839,7 +7839,7 @@ app.delete("/api/technology-rollout/:id", (req, res) => {
     [entryId],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/technology-rollout/:id ERROR:", err);
+        console.error("DELETE /technology-rollout/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -7863,7 +7863,7 @@ app.delete("/api/technology-rollout/:id", (req, res) => {
 // ===========================
 
 // GET all projects with interventions
-app.get("/api/projects", (req, res) => {
+app.get("/projects", (req, res) => {
   const page = Math.max(1, Number(req.query.page || 1));
   const limit = Math.max(1, Number(req.query.limit || 10));
   const offset = (page - 1) * limit;
@@ -7935,7 +7935,7 @@ app.get("/api/projects", (req, res) => {
 
   db.query(countSql, whereParams, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/projects COUNT ERROR:", countErr);
+      console.error("GET /projects COUNT ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -7944,7 +7944,7 @@ app.get("/api/projects", (req, res) => {
 
     db.query(idsSql, [...whereParams, limit, offset], (idsErr, idRows) => {
       if (idsErr) {
-        console.error("GET /api/projects IDS ERROR:", idsErr);
+        console.error("GET /projects IDS ERROR:", idsErr);
         return res.status(500).json({ message: idsErr.message });
       }
 
@@ -7996,7 +7996,7 @@ app.get("/api/projects", (req, res) => {
 
       db.query(sql, queryParams, (err, rows) => {
         if (err) {
-          console.error("GET /api/projects ERROR:", err);
+          console.error("GET /projects ERROR:", err);
           return res.status(500).json({ message: err.message });
         }
 
@@ -8100,7 +8100,7 @@ app.get("/api/projects", (req, res) => {
 });
 
 // GET single project
-app.get("/api/projects/:id", (req, res) => {
+app.get("/projects/:id", (req, res) => {
   const projectId = req.params.id;
 
   const sql = `
@@ -8138,7 +8138,7 @@ app.get("/api/projects/:id", (req, res) => {
 
   db.query(sql, [projectId], (err, rows) => {
     if (err) {
-      console.error("GET /api/projects/:id ERROR:", err);
+      console.error("GET /projects/:id ERROR:", err);
       return res.status(500).json(err);
     }
 
@@ -8240,7 +8240,7 @@ app.get("/api/projects/:id", (req, res) => {
 });
 
 // CREATE project
-app.post("/api/projects", (req, res) => {
+app.post("/projects", (req, res) => {
   const b = req.body || {};
   const addr = mapAddressMetaFromBody(b);
 
@@ -8305,7 +8305,7 @@ app.post("/api/projects", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/projects ERROR:", err);
+        console.error("POST /projects ERROR:", err);
         return res.status(500).json(err);
       }
       res.json({ message: "Project created", id: result.insertId });
@@ -8314,7 +8314,7 @@ app.post("/api/projects", (req, res) => {
 });
 
 // UPDATE project
-app.put("/api/projects/:id", (req, res) => {
+app.put("/projects/:id", (req, res) => {
   const b = req.body || {};
   const addr = mapAddressMetaFromBody(b);
 
@@ -8380,7 +8380,7 @@ app.put("/api/projects/:id", (req, res) => {
     ],
     (err) => {
       if (err) {
-        console.error("PUT /api/projects/:id ERROR:", err);
+        console.error("PUT /projects/:id ERROR:", err);
         return res.status(500).json(err);
       }
       res.json({ message: "Project updated" });
@@ -8389,7 +8389,7 @@ app.put("/api/projects/:id", (req, res) => {
 });
 
 // DELETE project
-app.delete("/api/projects/:id", (req, res) => {
+app.delete("/projects/:id", (req, res) => {
   const projectId = req.params.id;
 
   db.query(
@@ -8415,7 +8415,7 @@ app.delete("/api/projects/:id", (req, res) => {
 });
 
 // GET project interventions
-app.get("/api/projects/:id/interventions", (req, res) => {
+app.get("/projects/:id/interventions", (req, res) => {
   db.query(
     `
       SELECT
@@ -8429,7 +8429,7 @@ app.get("/api/projects/:id/interventions", (req, res) => {
     [req.params.id],
     (err, rows) => {
       if (err) {
-        console.error("GET /api/projects/:id/interventions ERROR:", err);
+        console.error("GET /projects/:id/interventions ERROR:", err);
         return res.status(500).json(err);
       }
 
@@ -8467,7 +8467,7 @@ app.get("/api/projects/:id/interventions", (req, res) => {
 });
 
 // CREATE project intervention
-app.post("/api/projects/:id/interventions", (req, res) => {
+app.post("/projects/:id/interventions", (req, res) => {
   const projectId = Number(req.params.id);
   const b = req.body || {};
 
@@ -8499,7 +8499,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
 
   db.beginTransaction((txErr) => {
     if (txErr) {
-      console.error("POST /api/projects/:id/interventions TX ERROR:", txErr);
+      console.error("POST /projects/:id/interventions TX ERROR:", txErr);
       return res.status(500).json({ message: txErr.message });
     }
 
@@ -8532,7 +8532,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
       (err, result) => {
         if (err) {
           return db.rollback(() => {
-            console.error("POST /api/projects/:id/interventions ERROR:", err);
+            console.error("POST /projects/:id/interventions ERROR:", err);
             res.status(500).json({ message: err.message });
           });
         }
@@ -8550,7 +8550,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
             if (packagingSyncErr) {
               return db.rollback(() => {
                 console.error(
-                  "POST /api/projects/:id/interventions packaging sync ERROR:",
+                  "POST /projects/:id/interventions packaging sync ERROR:",
                   packagingSyncErr
                 );
                 res.status(500).json({ message: packagingSyncErr.message });
@@ -8568,7 +8568,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
                 if (tacsSyncErr) {
                   return db.rollback(() => {
                     console.error(
-                      "POST /api/projects/:id/interventions TACS sync ERROR:",
+                      "POST /projects/:id/interventions TACS sync ERROR:",
                       tacsSyncErr
                     );
                     res.status(500).json({ message: tacsSyncErr.message });
@@ -8586,7 +8586,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
                     if (techPromoSyncErr) {
                       return db.rollback(() => {
                         console.error(
-                          "POST /api/projects/:id/interventions Technology Promotion sync ERROR:",
+                          "POST /projects/:id/interventions Technology Promotion sync ERROR:",
                           techPromoSyncErr
                         );
                         res.status(500).json({ message: techPromoSyncErr.message });
@@ -8604,7 +8604,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
                         if (techRolloutSyncErr) {
                           return db.rollback(() => {
                             console.error(
-                              "POST /api/projects/:id/interventions Tech Roll Out sync ERROR:",
+                              "POST /projects/:id/interventions Tech Roll Out sync ERROR:",
                               techRolloutSyncErr
                             );
                             res.status(500).json({ message: techRolloutSyncErr.message });
@@ -8622,7 +8622,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
                             if (techTrainingSyncErr) {
                               return db.rollback(() => {
                                 console.error(
-                                  "POST /api/projects/:id/interventions Technology Training sync ERROR:",
+                                  "POST /projects/:id/interventions Technology Training sync ERROR:",
                                   techTrainingSyncErr
                                 );
                                 res.status(500).json({ message: techTrainingSyncErr.message });
@@ -8633,7 +8633,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
                               if (commitErr) {
                                 return db.rollback(() => {
                                   console.error(
-                                    "POST /api/projects/:id/interventions COMMIT ERROR:",
+                                    "POST /projects/:id/interventions COMMIT ERROR:",
                                     commitErr
                                   );
                                   res.status(500).json({ message: commitErr.message });
@@ -8659,7 +8659,7 @@ app.post("/api/projects/:id/interventions", (req, res) => {
 
 // UPDATE project intervention
 // UPDATE project intervention
-app.put("/api/interventions/:id", (req, res) => {
+app.put("/interventions/:id", (req, res) => {
   const interventionId = Number(req.params.id);
   const b = req.body || {};
 
@@ -8689,7 +8689,7 @@ app.put("/api/interventions/:id", (req, res) => {
 
   db.beginTransaction((txErr) => {
     if (txErr) {
-      console.error("PUT /api/interventions/:id TX ERROR:", txErr);
+      console.error("PUT /interventions/:id TX ERROR:", txErr);
       return res.status(500).json({ message: txErr.message });
     }
 
@@ -8699,7 +8699,7 @@ app.put("/api/interventions/:id", (req, res) => {
       (findErr, rows) => {
         if (findErr) {
           return db.rollback(() => {
-            console.error("PUT /api/interventions/:id find ERROR:", findErr);
+            console.error("PUT /interventions/:id find ERROR:", findErr);
             res.status(500).json({ message: findErr.message });
           });
         }
@@ -8742,7 +8742,7 @@ app.put("/api/interventions/:id", (req, res) => {
           (err, result) => {
             if (err) {
               return db.rollback(() => {
-                console.error("PUT /api/interventions/:id ERROR:", err);
+                console.error("PUT /interventions/:id ERROR:", err);
                 res.status(500).json({ message: err.message });
               });
             }
@@ -8764,7 +8764,7 @@ app.put("/api/interventions/:id", (req, res) => {
                 if (packagingSyncErr) {
                   return db.rollback(() => {
                     console.error(
-                      "PUT /api/interventions/:id packaging sync ERROR:",
+                      "PUT /interventions/:id packaging sync ERROR:",
                       packagingSyncErr
                     );
                     res.status(500).json({ message: packagingSyncErr.message });
@@ -8782,7 +8782,7 @@ app.put("/api/interventions/:id", (req, res) => {
                     if (tacsSyncErr) {
                       return db.rollback(() => {
                         console.error(
-                          "PUT /api/interventions/:id TACS sync ERROR:",
+                          "PUT /interventions/:id TACS sync ERROR:",
                           tacsSyncErr
                         );
                         res.status(500).json({ message: tacsSyncErr.message });
@@ -8800,7 +8800,7 @@ app.put("/api/interventions/:id", (req, res) => {
                         if (techPromoSyncErr) {
                           return db.rollback(() => {
                             console.error(
-                              "PUT /api/interventions/:id Technology Promotion sync ERROR:",
+                              "PUT /interventions/:id Technology Promotion sync ERROR:",
                               techPromoSyncErr
                             );
                             res.status(500).json({ message: techPromoSyncErr.message });
@@ -8818,7 +8818,7 @@ app.put("/api/interventions/:id", (req, res) => {
                             if (techRolloutSyncErr) {
                               return db.rollback(() => {
                                 console.error(
-                                  "PUT /api/interventions/:id Tech Roll Out sync ERROR:",
+                                  "PUT /interventions/:id Tech Roll Out sync ERROR:",
                                   techRolloutSyncErr
                                 );
                                 res.status(500).json({ message: techRolloutSyncErr.message });
@@ -8836,7 +8836,7 @@ app.put("/api/interventions/:id", (req, res) => {
                                 if (techTrainingSyncErr) {
                                   return db.rollback(() => {
                                     console.error(
-                                      "PUT /api/interventions/:id Technology Training sync ERROR:",
+                                      "PUT /interventions/:id Technology Training sync ERROR:",
                                       techTrainingSyncErr
                                     );
                                     res.status(500).json({ message: techTrainingSyncErr.message });
@@ -8847,7 +8847,7 @@ app.put("/api/interventions/:id", (req, res) => {
                                   if (commitErr) {
                                     return db.rollback(() => {
                                       console.error(
-                                        "PUT /api/interventions/:id COMMIT ERROR:",
+                                        "PUT /interventions/:id COMMIT ERROR:",
                                         commitErr
                                       );
                                       res.status(500).json({ message: commitErr.message });
@@ -8875,12 +8875,12 @@ app.put("/api/interventions/:id", (req, res) => {
 
 // DELETE project intervention
 // DELETE project intervention
-app.delete("/api/interventions/:id", (req, res) => {
+app.delete("/interventions/:id", (req, res) => {
   const interventionId = Number(req.params.id);
 
   db.beginTransaction((txErr) => {
     if (txErr) {
-      console.error("DELETE /api/interventions/:id TX ERROR:", txErr);
+      console.error("DELETE /interventions/:id TX ERROR:", txErr);
       return res.status(500).json({ message: txErr.message });
     }
 
@@ -8890,7 +8890,7 @@ app.delete("/api/interventions/:id", (req, res) => {
       (findErr, rows) => {
         if (findErr) {
           return db.rollback(() => {
-            console.error("DELETE /api/interventions/:id find ERROR:", findErr);
+            console.error("DELETE /interventions/:id find ERROR:", findErr);
             res.status(500).json({ message: findErr.message });
           });
         }
@@ -8901,7 +8901,7 @@ app.delete("/api/interventions/:id", (req, res) => {
           if (deletePackagingErr) {
             return db.rollback(() => {
               console.error(
-                "DELETE /api/interventions/:id packaging delete ERROR:",
+                "DELETE /interventions/:id packaging delete ERROR:",
                 deletePackagingErr
               );
               res.status(500).json({ message: deletePackagingErr.message });
@@ -8912,7 +8912,7 @@ app.delete("/api/interventions/:id", (req, res) => {
             if (deleteTacsErr) {
               return db.rollback(() => {
                 console.error(
-                  "DELETE /api/interventions/:id TACS delete ERROR:",
+                  "DELETE /interventions/:id TACS delete ERROR:",
                   deleteTacsErr
                 );
                 res.status(500).json({ message: deleteTacsErr.message });
@@ -8925,7 +8925,7 @@ app.delete("/api/interventions/:id", (req, res) => {
                 if (deleteTechPromoErr) {
                   return db.rollback(() => {
                     console.error(
-                      "DELETE /api/interventions/:id Technology Promotion delete ERROR:",
+                      "DELETE /interventions/:id Technology Promotion delete ERROR:",
                       deleteTechPromoErr
                     );
                     res.status(500).json({ message: deleteTechPromoErr.message });
@@ -8938,7 +8938,7 @@ app.delete("/api/interventions/:id", (req, res) => {
                     if (deleteTechRolloutErr) {
                       return db.rollback(() => {
                         console.error(
-                          "DELETE /api/interventions/:id Tech Roll Out delete ERROR:",
+                          "DELETE /interventions/:id Tech Roll Out delete ERROR:",
                           deleteTechRolloutErr
                         );
                         res.status(500).json({ message: deleteTechRolloutErr.message });
@@ -8952,7 +8952,7 @@ app.delete("/api/interventions/:id", (req, res) => {
                         if (deleteTechTrainingErr) {
                           return db.rollback(() => {
                             console.error(
-                              "DELETE /api/interventions/:id Technology Training delete ERROR:",
+                              "DELETE /interventions/:id Technology Training delete ERROR:",
                               deleteTechTrainingErr
                             );
                             res.status(500).json({ message: deleteTechTrainingErr.message });
@@ -8965,7 +8965,7 @@ app.delete("/api/interventions/:id", (req, res) => {
                           (err, result) => {
                             if (err) {
                               return db.rollback(() => {
-                                console.error("DELETE /api/interventions/:id ERROR:", err);
+                                console.error("DELETE /interventions/:id ERROR:", err);
                                 res.status(500).json({ message: err.message });
                               });
                             }
@@ -8980,7 +8980,7 @@ app.delete("/api/interventions/:id", (req, res) => {
                               if (commitErr) {
                                 return db.rollback(() => {
                                   console.error(
-                                    "DELETE /api/interventions/:id COMMIT ERROR:",
+                                    "DELETE /interventions/:id COMMIT ERROR:",
                                     commitErr
                                   );
                                   res.status(500).json({ message: commitErr.message });
@@ -9006,13 +9006,13 @@ app.delete("/api/interventions/:id", (req, res) => {
 
 // GET other indicators
 // GET other indicators
-app.get("/api/projects/:id/other-indicators", (req, res) => {
+app.get("/projects/:id/other-indicators", (req, res) => {
   db.query(
     "SELECT * FROM project_other_indicators WHERE project_id=? LIMIT 1",
     [req.params.id],
     (err, rows) => {
       if (err) {
-        console.error("GET /api/projects/:id/other-indicators ERROR:", err);
+        console.error("GET /projects/:id/other-indicators ERROR:", err);
         return res.status(500).json(err);
       }
       res.json(rows[0] || null);
@@ -9021,7 +9021,7 @@ app.get("/api/projects/:id/other-indicators", (req, res) => {
 });
 
 // UPSERT other indicators
-app.put("/api/projects/:id/other-indicators", (req, res) => {
+app.put("/projects/:id/other-indicators", (req, res) => {
   const projectId = req.params.id;
   const b = req.body || {};
 
@@ -9085,7 +9085,7 @@ app.put("/api/projects/:id/other-indicators", (req, res) => {
 
   db.query(sql, vals, (err) => {
     if (err) {
-      console.error("PUT /api/projects/:id/other-indicators ERROR:", err);
+      console.error("PUT /projects/:id/other-indicators ERROR:", err);
       return res.status(500).json(err);
     }
     res.json({ message: "Other indicators saved" });
@@ -9093,13 +9093,13 @@ app.put("/api/projects/:id/other-indicators", (req, res) => {
 });
 
 // DELETE other indicators
-app.delete("/api/projects/:id/other-indicators", (req, res) => {
+app.delete("/projects/:id/other-indicators", (req, res) => {
   db.query(
     "DELETE FROM project_other_indicators WHERE project_id=?",
     [req.params.id],
     (err) => {
       if (err) {
-        console.error("DELETE /api/projects/:id/other-indicators ERROR:", err);
+        console.error("DELETE /projects/:id/other-indicators ERROR:", err);
         return res.status(500).json(err);
       }
       res.json({ message: "Other indicators deleted" });
@@ -9110,7 +9110,7 @@ app.delete("/api/projects/:id/other-indicators", (req, res) => {
 // ===========================
 // TARGET SETTINGS ROUTES
 // ===========================
-app.get("/api/target-settings/:moduleName", (req, res) => {
+app.get("/target-settings/:moduleName", (req, res) => {
   const moduleName = String(req.params.moduleName || "").trim().toLowerCase();
 
   if (!moduleName) {
@@ -9119,7 +9119,7 @@ app.get("/api/target-settings/:moduleName", (req, res) => {
 
   ensureTargetSettingsDefaults(moduleName, (seedErr) => {
     if (seedErr) {
-      console.error("SEED /api/target-settings/:moduleName ERROR:", seedErr);
+      console.error("SEED /target-settings/:moduleName ERROR:", seedErr);
       return res.status(500).json({ message: seedErr.message });
     }
 
@@ -9133,7 +9133,7 @@ app.get("/api/target-settings/:moduleName", (req, res) => {
       [moduleName],
       (err, rows) => {
         if (err) {
-          console.error("GET /api/target-settings/:moduleName ERROR:", err);
+          console.error("GET /target-settings/:moduleName ERROR:", err);
           return res.status(500).json({ message: err.message });
         }
 
@@ -9143,7 +9143,7 @@ app.get("/api/target-settings/:moduleName", (req, res) => {
   });
 });
 
-app.put("/api/target-settings/:moduleName", (req, res) => {
+app.put("/target-settings/:moduleName", (req, res) => {
   const moduleName = String(req.params.moduleName || "").trim().toLowerCase();
   const rawRows = Array.isArray(req.body?.rows)
     ? req.body.rows
@@ -10840,7 +10840,7 @@ const getPackagingLabelingRecords = (filters = {}, callback) => {
 // ===========================
 // PACKAGING AND LABELING ROUTES
 // ===========================
-app.get("/api/packaging-labeling", (req, res) => {
+app.get("/packaging-labeling", (req, res) => {
   const hasServerPaging =
     req.query.page !== undefined ||
     req.query.limit !== undefined ||
@@ -10860,7 +10860,7 @@ app.get("/api/packaging-labeling", (req, res) => {
       },
       (err, records) => {
         if (err) {
-          console.error("GET /api/packaging-labeling ERROR:", err);
+          console.error("GET /packaging-labeling ERROR:", err);
           return res.status(500).json({ message: err.message });
         }
 
@@ -10885,7 +10885,7 @@ app.get("/api/packaging-labeling", (req, res) => {
 
   db.query(countSql, params, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/packaging-labeling count ERROR:", countErr);
+      console.error("GET /packaging-labeling count ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -10912,7 +10912,7 @@ app.get("/api/packaging-labeling", (req, res) => {
 
     db.query(idsSql, [...params, limit, offset], (idsErr, idRows) => {
       if (idsErr) {
-        console.error("GET /api/packaging-labeling ids ERROR:", idsErr);
+        console.error("GET /packaging-labeling ids ERROR:", idsErr);
         return res.status(500).json({ message: idsErr.message });
       }
 
@@ -10932,7 +10932,7 @@ app.get("/api/packaging-labeling", (req, res) => {
 
       getPackagingLabelingRecordsByIds(ids, (dataErr, records) => {
         if (dataErr) {
-          console.error("GET /api/packaging-labeling data ERROR:", dataErr);
+          console.error("GET /packaging-labeling data ERROR:", dataErr);
           return res.status(500).json({ message: dataErr.message });
         }
 
@@ -10948,12 +10948,12 @@ app.get("/api/packaging-labeling", (req, res) => {
   });
 });
 
-app.get("/api/packaging-labeling/:id", (req, res) => {
+app.get("/packaging-labeling/:id", (req, res) => {
   const recordId = Number(req.params.id);
 
   getPackagingLabelingRecords({}, (err, records) => {
     if (err) {
-      console.error("GET /api/packaging-labeling/:id ERROR:", err);
+      console.error("GET /packaging-labeling/:id ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -10967,7 +10967,7 @@ app.get("/api/packaging-labeling/:id", (req, res) => {
   });
 });
 
-app.post("/api/packaging-labeling", (req, res) => {
+app.post("/packaging-labeling", (req, res) => {
   const p = mapPackagingLabelingPayload(req.body || {});
   const products = Array.isArray(req.body?.products) ? req.body.products : [];
   const photos = Array.isArray(req.body?.photos) ? req.body.photos : [];
@@ -11059,7 +11059,7 @@ app.post("/api/packaging-labeling", (req, res) => {
           if (err) {
             return conn.rollback(() => {
               conn.release();
-              console.error("POST /api/packaging-labeling ERROR:", err);
+              console.error("POST /packaging-labeling ERROR:", err);
               res.status(500).json({ message: err.message });
             });
           }
@@ -11111,7 +11111,7 @@ app.post("/api/packaging-labeling", (req, res) => {
   });
 });
 
-app.put("/api/packaging-labeling/:id", (req, res) => {
+app.put("/packaging-labeling/:id", (req, res) => {
   const recordId = Number(req.params.id);
   const p = mapPackagingLabelingPayload(req.body || {});
   const products = Array.isArray(req.body?.products) ? req.body.products : [];
@@ -11198,7 +11198,7 @@ app.put("/api/packaging-labeling/:id", (req, res) => {
       (err, result) => {
         if (err) {
           return db.rollback(() => {
-            console.error("PUT /api/packaging-labeling/:id ERROR:", err);
+            console.error("PUT /packaging-labeling/:id ERROR:", err);
             res.status(500).json({ message: err.message });
           });
         }
@@ -11271,7 +11271,7 @@ app.put("/api/packaging-labeling/:id", (req, res) => {
   });
 });
 
-app.delete("/api/packaging-labeling/:id", (req, res) => {
+app.delete("/packaging-labeling/:id", (req, res) => {
   const recordId = Number(req.params.id);
 
   db.beginTransaction((txErr) => {
@@ -11307,7 +11307,7 @@ app.delete("/api/packaging-labeling/:id", (req, res) => {
               (err, result) => {
                 if (err) {
                   return db.rollback(() => {
-                    console.error("DELETE /api/packaging-labeling/:id ERROR:", err);
+                    console.error("DELETE /packaging-labeling/:id ERROR:", err);
                     res.status(500).json({ message: err.message });
                   });
                 }
@@ -11339,7 +11339,7 @@ app.delete("/api/packaging-labeling/:id", (req, res) => {
   });
 });
 
-app.post("/api/packaging-labeling/:id/products", (req, res) => {
+app.post("/packaging-labeling/:id/products", (req, res) => {
   const recordId = Number(req.params.id);
   const productName = String(
     req.body?.productName || req.body?.product_name || ""
@@ -11358,7 +11358,7 @@ app.post("/api/packaging-labeling/:id/products", (req, res) => {
     [recordId, productName],
     (err, result) => {
       if (err) {
-        console.error("POST /api/packaging-labeling/:id/products ERROR:", err);
+        console.error("POST /packaging-labeling/:id/products ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -11371,7 +11371,7 @@ app.post("/api/packaging-labeling/:id/products", (req, res) => {
   );
 });
 
-app.put("/api/packaging-labeling/products/:productId", (req, res) => {
+app.put("/packaging-labeling/products/:productId", (req, res) => {
   const productId = Number(req.params.productId);
   const productName = String(
     req.body?.productName || req.body?.product_name || ""
@@ -11390,7 +11390,7 @@ app.put("/api/packaging-labeling/products/:productId", (req, res) => {
     [productName, productId],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/packaging-labeling/products/:productId ERROR:", err);
+        console.error("PUT /packaging-labeling/products/:productId ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -11406,7 +11406,7 @@ app.put("/api/packaging-labeling/products/:productId", (req, res) => {
   );
 });
 
-app.delete("/api/packaging-labeling/products/:productId", (req, res) => {
+app.delete("/packaging-labeling/products/:productId", (req, res) => {
   const productId = Number(req.params.productId);
 
   db.query(
@@ -11414,7 +11414,7 @@ app.delete("/api/packaging-labeling/products/:productId", (req, res) => {
     [productId],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/packaging-labeling/products/:productId ERROR:", err);
+        console.error("DELETE /packaging-labeling/products/:productId ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -11430,7 +11430,7 @@ app.delete("/api/packaging-labeling/products/:productId", (req, res) => {
   );
 });
 
-app.get("/api/packaging-labeling/summary/:year", (req, res) => {
+app.get("/packaging-labeling/summary/:year", (req, res) => {
   const year = Number(req.params.year || new Date().getFullYear());
 
   const sql = `
@@ -11447,7 +11447,7 @@ app.get("/api/packaging-labeling/summary/:year", (req, res) => {
 
   db.query(sql, [year], (err, rows) => {
     if (err) {
-      console.error("GET /api/packaging-labeling/summary/:year ERROR:", err);
+      console.error("GET /packaging-labeling/summary/:year ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -15389,7 +15389,7 @@ const CALIBRATION_SELECT_COLUMNS = `
 // ===========================
 // CALIBRATION SUMMARY ROUTE
 // ===========================
-app.get("/api/calibration/summary/:year", (req, res) => {
+app.get("/calibration/summary/:year", (req, res) => {
   const year = Number(req.params.year || new Date().getFullYear());
 
   db.query(
@@ -15409,7 +15409,7 @@ app.get("/api/calibration/summary/:year", (req, res) => {
     [year],
     (err, rows) => {
       if (err) {
-        console.error("GET /api/calibration/summary/:year ERROR:", err);
+        console.error("GET /calibration/summary/:year ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -15526,7 +15526,7 @@ const buildCalibrationTargetsFromTargetSettingsRows = (rows = []) => {
   return targets;
 };
 
-app.get("/api/calibration/targets/:year", (req, res) => {
+app.get("/calibration/targets/:year", (req, res) => {
   const year = Number(req.params.year || new Date().getFullYear());
 
   db.query(
@@ -15548,7 +15548,7 @@ app.get("/api/calibration/targets/:year", (req, res) => {
     `,
     (err, rows) => {
       if (err) {
-        console.error("GET /api/calibration/targets/:year ERROR:", err);
+        console.error("GET /calibration/targets/:year ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -15560,7 +15560,7 @@ app.get("/api/calibration/targets/:year", (req, res) => {
   );
 });
 
-app.put("/api/calibration/targets/:year", (req, res) => {
+app.put("/calibration/targets/:year", (req, res) => {
   const year = Number(req.params.year || new Date().getFullYear());
   const rawTargets = req.body?.targets || {};
 
@@ -15582,7 +15582,7 @@ app.put("/api/calibration/targets/:year", (req, res) => {
 
   db.beginTransaction((txErr) => {
     if (txErr) {
-      console.error("PUT /api/calibration/targets/:year transaction ERROR:", txErr);
+      console.error("PUT /calibration/targets/:year transaction ERROR:", txErr);
       return res.status(500).json({ message: txErr.message });
     }
 
@@ -15669,7 +15669,7 @@ app.put("/api/calibration/targets/:year", (req, res) => {
 // ===========================
 // CALIBRATION ENTRY ROUTES
 // ===========================
-app.get("/api/calibration", (req, res) => {
+app.get("/calibration", (req, res) => {
   const hasServerPaging =
     req.query.page !== undefined ||
     req.query.limit !== undefined ||
@@ -15682,7 +15682,7 @@ app.get("/api/calibration", (req, res) => {
 
   const { whereSql, params } = buildCalibrationWhere(req.query);
 
-  // Backward compatible: kapag plain /api/calibration lang, array pa rin ang return.
+  // Backward compatible: kapag plain /calibration lang, array pa rin ang return.
   if (!hasServerPaging) {
     const sql = `
       SELECT
@@ -15696,10 +15696,10 @@ app.get("/api/calibration", (req, res) => {
       if (err) {
         return sendCalibrationDbError(
           res,
-          "GET /api/calibration ERROR:",
+          "GET /calibration ERROR:",
           err,
           {
-            route: "GET /api/calibration",
+            route: "GET /calibration",
             filters: req.query,
           }
         );
@@ -15725,10 +15725,10 @@ app.get("/api/calibration", (req, res) => {
     if (countErr) {
       return sendCalibrationDbError(
         res,
-        "GET /api/calibration count ERROR:",
+        "GET /calibration count ERROR:",
         countErr,
         {
-          route: "GET /api/calibration",
+          route: "GET /calibration",
           filters: req.query,
         }
       );
@@ -15750,10 +15750,10 @@ app.get("/api/calibration", (req, res) => {
       if (err) {
         return sendCalibrationDbError(
           res,
-          "GET /api/calibration data ERROR:",
+          "GET /calibration data ERROR:",
           err,
           {
-            route: "GET /api/calibration",
+            route: "GET /calibration",
             filters: req.query,
           }
         );
@@ -15773,7 +15773,7 @@ app.get("/api/calibration", (req, res) => {
   });
 });
 
-app.get("/api/calibration/:id", (req, res) => {
+app.get("/calibration/:id", (req, res) => {
   db.query(
     `
       SELECT
@@ -15814,10 +15814,10 @@ app.get("/api/calibration/:id", (req, res) => {
       if (err) {
         return sendCalibrationDbError(
           res,
-          "GET /api/calibration/:id ERROR:",
+          "GET /calibration/:id ERROR:",
           err,
           {
-            route: "GET /api/calibration/:id",
+            route: "GET /calibration/:id",
             calibrationId: req.params.id,
           }
         );
@@ -15832,7 +15832,7 @@ app.get("/api/calibration/:id", (req, res) => {
   );
 });
 
-app.post("/api/calibration", (req, res) => {
+app.post("/calibration", (req, res) => {
   const payload = mapCalibrationPayload(req.body || {});
   const validationError = validateCalibrationPayload(payload);
 
@@ -15884,10 +15884,10 @@ app.post("/api/calibration", (req, res) => {
       if (err) {
         return sendCalibrationDbError(
           res,
-          "POST /api/calibration ERROR:",
+          "POST /calibration ERROR:",
           err,
           {
-            route: "POST /api/calibration",
+            route: "POST /calibration",
             payload: candidatePayload,
           }
         );
@@ -15904,7 +15904,7 @@ app.post("/api/calibration", (req, res) => {
   insertPayload(payload);
 });
 
-app.put("/api/calibration/:id", (req, res) => {
+app.put("/calibration/:id", (req, res) => {
   const payload = mapCalibrationPayload({ ...(req.body || {}), id: req.params.id });
   const validationError = validateCalibrationPayload(payload);
 
@@ -15976,10 +15976,10 @@ app.put("/api/calibration/:id", (req, res) => {
     if (err) {
       return sendCalibrationDbError(
         res,
-        "PUT /api/calibration/:id ERROR:",
+        "PUT /calibration/:id ERROR:",
         err,
         {
-          route: "PUT /api/calibration/:id",
+          route: "PUT /calibration/:id",
           calibrationId: req.params.id,
           payload,
         }
@@ -15997,7 +15997,7 @@ app.put("/api/calibration/:id", (req, res) => {
   });
 });
 
-app.delete("/api/calibration/:id", (req, res) => {
+app.delete("/calibration/:id", (req, res) => {
   db.query(
     "DELETE FROM calibration WHERE id = ?",
     [req.params.id],
@@ -16005,10 +16005,10 @@ app.delete("/api/calibration/:id", (req, res) => {
       if (err) {
         return sendCalibrationDbError(
           res,
-          "DELETE /api/calibration/:id ERROR:",
+          "DELETE /calibration/:id ERROR:",
           err,
           {
-            route: "DELETE /api/calibration/:id",
+            route: "DELETE /calibration/:id",
             calibrationId: req.params.id,
           }
         );
@@ -16214,7 +16214,7 @@ const fetchStPromoById = (id, callback) => {
 // ===========================
 // S&T PROMO ROUTES
 // ===========================
-app.get("/api/st-promo", (req, res) => {
+app.get("/st-promo", (req, res) => {
   const hasServerPaging =
     req.query.page !== undefined ||
     req.query.limit !== undefined ||
@@ -16236,7 +16236,7 @@ app.get("/api/st-promo", (req, res) => {
 
     db.query(sql, (err, rows) => {
       if (err) {
-        console.error("GET /api/st-promo ERROR:", err);
+        console.error("GET /st-promo ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -16259,7 +16259,7 @@ app.get("/api/st-promo", (req, res) => {
 
   db.query(countSql, params, (countErr, countRows) => {
     if (countErr) {
-      console.error("GET /api/st-promo count ERROR:", countErr);
+      console.error("GET /st-promo count ERROR:", countErr);
       return res.status(500).json({ message: countErr.message });
     }
 
@@ -16276,7 +16276,7 @@ app.get("/api/st-promo", (req, res) => {
 
     db.query(dataSql, [...params, limit, offset], (err, rows) => {
       if (err) {
-        console.error("GET /api/st-promo paged ERROR:", err);
+        console.error("GET /st-promo paged ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -16291,10 +16291,10 @@ app.get("/api/st-promo", (req, res) => {
   });
 });
 
-app.get("/api/st-promo/:id", (req, res) => {
+app.get("/st-promo/:id", (req, res) => {
   fetchStPromoById(req.params.id, (err, row) => {
     if (err) {
-      console.error("GET /api/st-promo/:id ERROR:", err);
+      console.error("GET /st-promo/:id ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -16306,7 +16306,7 @@ app.get("/api/st-promo/:id", (req, res) => {
   });
 });
 
-app.post("/api/st-promo", (req, res) => {
+app.post("/st-promo", (req, res) => {
   const payload = buildStPromoPayload(req.body || {});
   const validationError = validateStPromoPayload(payload);
 
@@ -16377,13 +16377,13 @@ app.post("/api/st-promo", (req, res) => {
     ],
     (err) => {
       if (err) {
-        console.error("POST /api/st-promo ERROR:", err);
+        console.error("POST /st-promo ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
       fetchStPromoById(payload.id, (fetchErr, row) => {
         if (fetchErr) {
-          console.error("POST /api/st-promo fetch ERROR:", fetchErr);
+          console.error("POST /st-promo fetch ERROR:", fetchErr);
           return res.status(500).json({ message: fetchErr.message });
         }
 
@@ -16393,7 +16393,7 @@ app.post("/api/st-promo", (req, res) => {
   );
 });
 
-app.put("/api/st-promo/:id", (req, res) => {
+app.put("/st-promo/:id", (req, res) => {
   const entryId = String(req.params.id || "").trim();
   const payload = buildStPromoPayload(req.body || {}, entryId);
   const validationError = validateStPromoPayload(payload);
@@ -16465,7 +16465,7 @@ app.put("/api/st-promo/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/st-promo/:id ERROR:", err);
+        console.error("PUT /st-promo/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -16475,7 +16475,7 @@ app.put("/api/st-promo/:id", (req, res) => {
 
       fetchStPromoById(entryId, (fetchErr, row) => {
         if (fetchErr) {
-          console.error("PUT /api/st-promo/:id fetch ERROR:", fetchErr);
+          console.error("PUT /st-promo/:id fetch ERROR:", fetchErr);
           return res.status(500).json({ message: fetchErr.message });
         }
 
@@ -16485,13 +16485,13 @@ app.put("/api/st-promo/:id", (req, res) => {
   );
 });
 
-app.delete("/api/st-promo/:id", (req, res) => {
+app.delete("/st-promo/:id", (req, res) => {
   db.query(
     "DELETE FROM st_promo WHERE id = ?",
     [req.params.id],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/st-promo/:id ERROR:", err);
+        console.error("DELETE /st-promo/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -16592,7 +16592,7 @@ const dashboardToProjectRecord = ({
   createdAt: formatDateOnly(createdAt) || formatDateOnly(new Date()) || "",
 });
 
-app.get("/api/dashboard/projects", async (req, res) => {
+app.get("/dashboard/projects", async (req, res) => {
   try {
     const [
       setupRows,
@@ -16921,7 +16921,7 @@ app.get("/api/dashboard/projects", async (req, res) => {
 
     res.json(payload.filter((item) => item.municipality));
   } catch (err) {
-    console.error("GET /api/dashboard/projects ERROR:", err);
+    console.error("GET /dashboard/projects ERROR:", err);
     res.status(500).json({
       message: err?.sqlMessage || err?.message || "Failed to load dashboard projects.",
     });
@@ -17256,7 +17256,7 @@ const getDefaultPermissionsForRole = (role = "staff") => {
 };
 
 // LOGIN
-app.post("/api/login", (req, res) => {
+app.post("/login", (req, res) => {
   const username = String(req.body?.username || "").trim();
   const password = String(req.body?.password || "").trim();
 
@@ -17279,7 +17279,7 @@ app.post("/api/login", (req, res) => {
     [username, password],
     (err, rows) => {
       if (err) {
-        console.error("POST /api/login ERROR:", err);
+        console.error("POST /login ERROR:", err);
         return res.status(500).json({
           success: false,
           message: err.message,
@@ -17300,12 +17300,12 @@ app.post("/api/login", (req, res) => {
         [userRow.id],
         (updateErr) => {
           if (updateErr) {
-            console.error("POST /api/login update last_login ERROR:", updateErr);
+            console.error("POST /login update last_login ERROR:", updateErr);
           }
 
           getFullUserById(userRow.id, (fullErr, user) => {
             if (fullErr) {
-              console.error("POST /api/login get full user ERROR:", fullErr);
+              console.error("POST /login get full user ERROR:", fullErr);
               return res.status(500).json({
                 success: false,
                 message: fullErr.message,
@@ -17324,7 +17324,7 @@ app.post("/api/login", (req, res) => {
 });
 
 // GET ALL USERS
-app.get("/api/users", (req, res) => {
+app.get("/users", (req, res) => {
   db.query(
     `
       SELECT *
@@ -17335,7 +17335,7 @@ app.get("/api/users", (req, res) => {
     `,
     (err, rows) => {
       if (err) {
-        console.error("GET /api/users ERROR:", err);
+        console.error("GET /users ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17366,10 +17366,10 @@ app.get("/api/users", (req, res) => {
 });
 
 // GET SINGLE USER
-app.get("/api/users/:id", (req, res) => {
+app.get("/users/:id", (req, res) => {
   getFullUserById(req.params.id, (err, user) => {
     if (err) {
-      console.error("GET /api/users/:id ERROR:", err);
+      console.error("GET /users/:id ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -17380,7 +17380,7 @@ app.get("/api/users/:id", (req, res) => {
 });
 
 // CREATE USER
-app.post("/api/users", (req, res) => {
+app.post("/users", (req, res) => {
   const b = req.body || {};
   const role = normalizeUserRole(b.role);
   const status = normalizeUserStatus(b.status);
@@ -17438,7 +17438,7 @@ app.post("/api/users", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/users INSERT ERROR:", err);
+        console.error("POST /users INSERT ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17452,19 +17452,19 @@ app.post("/api/users", (req, res) => {
 
       saveUserPermissions(userId, pages, (permErr) => {
         if (permErr) {
-          console.error("POST /api/users permissions ERROR:", permErr);
+          console.error("POST /users permissions ERROR:", permErr);
           return res.status(500).json({ message: permErr.message });
         }
 
         saveUserSpecialPermissions(userId, special, (specialErr) => {
           if (specialErr) {
-            console.error("POST /api/users special permissions ERROR:", specialErr);
+            console.error("POST /users special permissions ERROR:", specialErr);
             return res.status(500).json({ message: specialErr.message });
           }
 
           getFullUserById(userId, (getErr, user) => {
             if (getErr) {
-              console.error("POST /api/users get user ERROR:", getErr);
+              console.error("POST /users get user ERROR:", getErr);
               return res.status(500).json({ message: getErr.message });
             }
 
@@ -17479,7 +17479,7 @@ app.post("/api/users", (req, res) => {
 
 
 // UPDATE USER
-app.put("/api/users/:id", (req, res) => {
+app.put("/users/:id", (req, res) => {
   const userId = Number(req.params.id);
   const b = req.body || {};
 
@@ -17541,7 +17541,7 @@ app.put("/api/users/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/users/:id UPDATE ERROR:", err);
+        console.error("PUT /users/:id UPDATE ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17558,19 +17558,19 @@ app.put("/api/users/:id", (req, res) => {
 
       saveUserPermissions(userId, pages, (permErr) => {
         if (permErr) {
-          console.error("PUT /api/users/:id permissions ERROR:", permErr);
+          console.error("PUT /users/:id permissions ERROR:", permErr);
           return res.status(500).json({ message: permErr.message });
         }
 
         saveUserSpecialPermissions(userId, special, (specialErr) => {
           if (specialErr) {
-            console.error("PUT /api/users/:id special permissions ERROR:", specialErr);
+            console.error("PUT /users/:id special permissions ERROR:", specialErr);
             return res.status(500).json({ message: specialErr.message });
           }
 
           getFullUserById(userId, (getErr, user) => {
             if (getErr) {
-              console.error("PUT /api/users/:id get user ERROR:", getErr);
+              console.error("PUT /users/:id get user ERROR:", getErr);
               return res.status(500).json({ message: getErr.message });
             }
 
@@ -17586,7 +17586,7 @@ app.put("/api/users/:id", (req, res) => {
 
 // UPDATE USER PERMISSIONS ONLY
 // UPDATE USER PERMISSIONS
-app.put("/api/users/:id/permissions", (req, res) => {
+app.put("/users/:id/permissions", (req, res) => {
   const userId = Number(req.params.id);
   const b = req.body || {};
 
@@ -17599,19 +17599,19 @@ app.put("/api/users/:id/permissions", (req, res) => {
 
   saveUserPermissions(userId, pages, (permErr) => {
     if (permErr) {
-      console.error("PUT /api/users/:id/permissions pages ERROR:", permErr);
+      console.error("PUT /users/:id/permissions pages ERROR:", permErr);
       return res.status(500).json({ message: permErr.message });
     }
 
     saveUserSpecialPermissions(userId, special, (specialErr) => {
       if (specialErr) {
-        console.error("PUT /api/users/:id/permissions special ERROR:", specialErr);
+        console.error("PUT /users/:id/permissions special ERROR:", specialErr);
         return res.status(500).json({ message: specialErr.message });
       }
 
       getFullUserById(userId, (getErr, user) => {
         if (getErr) {
-          console.error("PUT /api/users/:id/permissions get user ERROR:", getErr);
+          console.error("PUT /users/:id/permissions get user ERROR:", getErr);
           return res.status(500).json({ message: getErr.message });
         }
 
@@ -17625,7 +17625,7 @@ app.put("/api/users/:id/permissions", (req, res) => {
 
 // RESET PASSWORD
 // RESET USER PASSWORD
-app.put("/api/users/:id/reset-password", (req, res) => {
+app.put("/users/:id/reset-password", (req, res) => {
   const userId = Number(req.params.id);
   const password = String(req.body?.password || "1234").trim() || "1234";
 
@@ -17638,7 +17638,7 @@ app.put("/api/users/:id/reset-password", (req, res) => {
     [password, userId],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/users/:id/reset-password ERROR:", err);
+        console.error("PUT /users/:id/reset-password ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17654,7 +17654,7 @@ app.put("/api/users/:id/reset-password", (req, res) => {
 
 
 // ACTIVATE USER
-app.put("/api/users/:id/activate", (req, res) => {
+app.put("/users/:id/activate", (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {
@@ -17666,7 +17666,7 @@ app.put("/api/users/:id/activate", (req, res) => {
     [userId],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/users/:id/activate ERROR:", err);
+        console.error("PUT /users/:id/activate ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17676,7 +17676,7 @@ app.put("/api/users/:id/activate", (req, res) => {
 
       getFullUserById(userId, (getErr, user) => {
         if (getErr) {
-          console.error("PUT /api/users/:id/activate get user ERROR:", getErr);
+          console.error("PUT /users/:id/activate get user ERROR:", getErr);
           return res.status(500).json({ message: getErr.message });
         }
 
@@ -17689,7 +17689,7 @@ app.put("/api/users/:id/activate", (req, res) => {
 
 
 // DEACTIVATE USER
-app.put("/api/users/:id/deactivate", (req, res) => {
+app.put("/users/:id/deactivate", (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {
@@ -17701,7 +17701,7 @@ app.put("/api/users/:id/deactivate", (req, res) => {
     [userId],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/users/:id/deactivate ERROR:", err);
+        console.error("PUT /users/:id/deactivate ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17711,7 +17711,7 @@ app.put("/api/users/:id/deactivate", (req, res) => {
 
       getFullUserById(userId, (getErr, user) => {
         if (getErr) {
-          console.error("PUT /api/users/:id/deactivate get user ERROR:", getErr);
+          console.error("PUT /users/:id/deactivate get user ERROR:", getErr);
           return res.status(500).json({ message: getErr.message });
         }
 
@@ -17724,7 +17724,7 @@ app.put("/api/users/:id/deactivate", (req, res) => {
 
 
 // DELETE USER
-app.delete("/api/users/:id", (req, res) => {
+app.delete("/users/:id", (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {
@@ -17750,7 +17750,7 @@ app.delete("/api/users/:id", (req, res) => {
   const deleteAccount = () => {
     db.query("DELETE FROM user_accounts WHERE id=?", [userId], (err, result) => {
       if (err) {
-        console.error("DELETE /api/users/:id account ERROR:", err);
+        console.error("DELETE /users/:id account ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -17764,25 +17764,25 @@ app.delete("/api/users/:id", (req, res) => {
 
   deleteSpecial((specialErr) => {
     if (specialErr) {
-      console.error("DELETE /api/users/:id special ERROR:", specialErr);
+      console.error("DELETE /users/:id special ERROR:", specialErr);
       return res.status(500).json({ message: specialErr.message });
     }
 
     deletePermissions((permErr) => {
       if (permErr) {
-        console.error("DELETE /api/users/:id permissions ERROR:", permErr);
+        console.error("DELETE /users/:id permissions ERROR:", permErr);
         return res.status(500).json({ message: permErr.message });
       }
 
       deleteAssignments((assignErr) => {
         if (assignErr) {
-          console.error("DELETE /api/users/:id assignments ERROR:", assignErr);
+          console.error("DELETE /users/:id assignments ERROR:", assignErr);
           return res.status(500).json({ message: assignErr.message });
         }
 
         deleteAuditLogs((auditErr) => {
           if (auditErr) {
-            console.error("DELETE /api/users/:id audit ERROR:", auditErr);
+            console.error("DELETE /users/:id audit ERROR:", auditErr);
             return res.status(500).json({ message: auditErr.message });
           }
 
@@ -17888,7 +17888,7 @@ const buildSpecialProjectPayload = (body = {}) => {
   };
 };
 
-app.get("/api/special-projects", (req, res) => {
+app.get("/special-projects", (req, res) => {
   const sql = `
     SELECT *
     FROM special_projects
@@ -17897,7 +17897,7 @@ app.get("/api/special-projects", (req, res) => {
 
   db.query(sql, (err, rows) => {
     if (err) {
-      console.error("GET /api/special-projects ERROR:", err);
+      console.error("GET /special-projects ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -17905,7 +17905,7 @@ app.get("/api/special-projects", (req, res) => {
   });
 });
 
-app.post("/api/special-projects", (req, res) => {
+app.post("/special-projects", (req, res) => {
   const payload = buildSpecialProjectPayload(req.body);
 
   if (
@@ -17968,7 +17968,7 @@ app.post("/api/special-projects", (req, res) => {
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error("POST /api/special-projects ERROR:", err);
+      console.error("POST /special-projects ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -17977,7 +17977,7 @@ app.post("/api/special-projects", (req, res) => {
       [result.insertId],
       (findErr, rows) => {
         if (findErr) {
-          console.error("POST /api/special-projects reload ERROR:", findErr);
+          console.error("POST /special-projects reload ERROR:", findErr);
           return res.status(500).json({ message: findErr.message });
         }
 
@@ -17987,7 +17987,7 @@ app.post("/api/special-projects", (req, res) => {
   });
 });
 
-app.put("/api/special-projects/:id", (req, res) => {
+app.put("/special-projects/:id", (req, res) => {
   const id = Number(req.params.id);
   const payload = buildSpecialProjectPayload(req.body);
 
@@ -18056,7 +18056,7 @@ app.put("/api/special-projects/:id", (req, res) => {
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error("PUT /api/special-projects/:id ERROR:", err);
+      console.error("PUT /special-projects/:id ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -18069,7 +18069,7 @@ app.put("/api/special-projects/:id", (req, res) => {
       [id],
       (findErr, rows) => {
         if (findErr) {
-          console.error("PUT /api/special-projects/:id reload ERROR:", findErr);
+          console.error("PUT /special-projects/:id reload ERROR:", findErr);
           return res.status(500).json({ message: findErr.message });
         }
 
@@ -18079,7 +18079,7 @@ app.put("/api/special-projects/:id", (req, res) => {
   });
 });
 
-app.delete("/api/special-projects/:id", (req, res) => {
+app.delete("/special-projects/:id", (req, res) => {
   const id = Number(req.params.id);
 
   if (!Number.isFinite(id) || id <= 0) {
@@ -18088,7 +18088,7 @@ app.delete("/api/special-projects/:id", (req, res) => {
 
   db.query("DELETE FROM special_projects WHERE id = ?", [id], (err, result) => {
     if (err) {
-      console.error("DELETE /api/special-projects/:id ERROR:", err);
+      console.error("DELETE /special-projects/:id ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -18284,7 +18284,7 @@ const insertDrrmChildRows = (table, parentColumn, parentId, valueColumn, values,
 };
 
 // ---------- Dropdowns ----------
-app.get("/api/drrm/dropdowns", (req, res) => {
+app.get("/drrm/dropdowns", (req, res) => {
   db.query(
     `
       SELECT category, option_name
@@ -18294,7 +18294,7 @@ app.get("/api/drrm/dropdowns", (req, res) => {
     `,
     [],
     (err, rows) => {
-      if (err) return sendDrrmError(res, "GET /api/drrm/dropdowns ERROR:", err);
+      if (err) return sendDrrmError(res, "GET /drrm/dropdowns ERROR:", err);
 
       const output = {
         sector: [],
@@ -18312,7 +18312,7 @@ app.get("/api/drrm/dropdowns", (req, res) => {
   );
 });
 
-app.post("/api/drrm/dropdowns", (req, res) => {
+app.post("/drrm/dropdowns", (req, res) => {
   const category = String(req.body?.category || "").trim();
   const optionName = String(req.body?.optionName || req.body?.option_name || "").trim();
 
@@ -18328,14 +18328,14 @@ app.post("/api/drrm/dropdowns", (req, res) => {
     `,
     [category, optionName],
     (err) => {
-      if (err) return sendDrrmError(res, "POST /api/drrm/dropdowns ERROR:", err);
+      if (err) return sendDrrmError(res, "POST /drrm/dropdowns ERROR:", err);
       res.json({ success: true, category, optionName });
     }
   );
 });
 
 // ---------- Activities ----------
-app.get("/api/drrm/activities", (req, res) => {
+app.get("/drrm/activities", (req, res) => {
   db.query(
     `
       SELECT
@@ -18348,13 +18348,13 @@ app.get("/api/drrm/activities", (req, res) => {
     `,
     [],
     (err, rows) => {
-      if (err) return sendDrrmError(res, "GET /api/drrm/activities ERROR:", err);
+      if (err) return sendDrrmError(res, "GET /drrm/activities ERROR:", err);
       res.json((rows || []).map(normalizeDrrmActivity));
     }
   );
 });
 
-app.post("/api/drrm/activities", (req, res) => {
+app.post("/drrm/activities", (req, res) => {
   const p = drrmActivityPayload(req.body || {});
   p.custom_fields = req.body?.custom_fields ?? req.body?.customFields ?? {};
   if (!p.title) return res.status(400).json({ message: "Title of Activity is required." });
@@ -18381,18 +18381,18 @@ app.post("/api/drrm/activities", (req, res) => {
       JSON.stringify(p.custom_fields || {}),
     ],
     (err, result) => {
-      if (err) return sendDrrmError(res, "POST /api/drrm/activities INSERT ERROR:", err);
+      if (err) return sendDrrmError(res, "POST /drrm/activities INSERT ERROR:", err);
 
       const id = result.insertId;
       insertDrrmChildRows("drrm_activity_sectors", "activity_id", id, "sector_name", p.sectors, (childErr) => {
-        if (childErr) return sendDrrmError(res, "POST /api/drrm/activities SECTORS ERROR:", childErr);
+        if (childErr) return sendDrrmError(res, "POST /drrm/activities SECTORS ERROR:", childErr);
         res.json({ success: true, id });
       });
     }
   );
 });
 
-app.put("/api/drrm/activities/:id", (req, res) => {
+app.put("/drrm/activities/:id", (req, res) => {
   const id = req.params.id;
   const p = drrmActivityPayload(req.body || {});
   p.custom_fields = req.body?.custom_fields ?? req.body?.customFields ?? {};
@@ -18421,13 +18421,13 @@ app.put("/api/drrm/activities/:id", (req, res) => {
       id,
     ],
     (err) => {
-      if (err) return sendDrrmError(res, "PUT /api/drrm/activities UPDATE ERROR:", err);
+      if (err) return sendDrrmError(res, "PUT /drrm/activities UPDATE ERROR:", err);
 
       db.query("DELETE FROM drrm_activity_sectors WHERE activity_id = ?", [id], (delErr) => {
-        if (delErr) return sendDrrmError(res, "PUT /api/drrm/activities DELETE SECTORS ERROR:", delErr);
+        if (delErr) return sendDrrmError(res, "PUT /drrm/activities DELETE SECTORS ERROR:", delErr);
 
         insertDrrmChildRows("drrm_activity_sectors", "activity_id", id, "sector_name", p.sectors, (childErr) => {
-          if (childErr) return sendDrrmError(res, "PUT /api/drrm/activities INSERT SECTORS ERROR:", childErr);
+          if (childErr) return sendDrrmError(res, "PUT /drrm/activities INSERT SECTORS ERROR:", childErr);
           res.json({ success: true, id });
         });
       });
@@ -18435,15 +18435,15 @@ app.put("/api/drrm/activities/:id", (req, res) => {
   );
 });
 
-app.delete("/api/drrm/activities/:id", (req, res) => {
+app.delete("/drrm/activities/:id", (req, res) => {
   db.query("DELETE FROM drrm_activities WHERE id = ?", [req.params.id], (err) => {
-    if (err) return sendDrrmError(res, "DELETE /api/drrm/activities/:id ERROR:", err);
+    if (err) return sendDrrmError(res, "DELETE /drrm/activities/:id ERROR:", err);
     res.json({ success: true });
   });
 });
 
 // ---------- IEC Materials ----------
-app.get("/api/drrm/iec-materials", (req, res) => {
+app.get("/drrm/iec-materials", (req, res) => {
   db.query(
     `
       SELECT
@@ -18458,13 +18458,13 @@ app.get("/api/drrm/iec-materials", (req, res) => {
     `,
     [],
     (err, rows) => {
-      if (err) return sendDrrmError(res, "GET /api/drrm/iec-materials ERROR:", err);
+      if (err) return sendDrrmError(res, "GET /drrm/iec-materials ERROR:", err);
       res.json((rows || []).map(normalizeDrrmIec));
     }
   );
 });
 
-app.post("/api/drrm/iec-materials", (req, res) => {
+app.post("/drrm/iec-materials", (req, res) => {
   const p = drrmIecPayload(req.body || {});
   p.custom_fields = req.body?.custom_fields ?? req.body?.customFields ?? {};
   if (!p.titles.length) return res.status(400).json({ message: "Title of IEC Material is required." });
@@ -18480,14 +18480,14 @@ app.post("/api/drrm/iec-materials", (req, res) => {
     `,
     [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.remarks, JSON.stringify(p.custom_fields || {})],
     (err, result) => {
-      if (err) return sendDrrmError(res, "POST /api/drrm/iec-materials INSERT ERROR:", err);
+      if (err) return sendDrrmError(res, "POST /drrm/iec-materials INSERT ERROR:", err);
 
       const id = result.insertId;
       insertDrrmChildRows("drrm_iec_titles", "iec_id", id, "title_name", p.titles, (titleErr) => {
-        if (titleErr) return sendDrrmError(res, "POST /api/drrm/iec-materials TITLES ERROR:", titleErr);
+        if (titleErr) return sendDrrmError(res, "POST /drrm/iec-materials TITLES ERROR:", titleErr);
 
         insertDrrmChildRows("drrm_iec_sources", "iec_id", id, "source_name", p.sources, (sourceErr) => {
-          if (sourceErr) return sendDrrmError(res, "POST /api/drrm/iec-materials SOURCES ERROR:", sourceErr);
+          if (sourceErr) return sendDrrmError(res, "POST /drrm/iec-materials SOURCES ERROR:", sourceErr);
           res.json({ success: true, id });
         });
       });
@@ -18495,7 +18495,7 @@ app.post("/api/drrm/iec-materials", (req, res) => {
   );
 });
 
-app.put("/api/drrm/iec-materials/:id", (req, res) => {
+app.put("/drrm/iec-materials/:id", (req, res) => {
   const id = req.params.id;
   const p = drrmIecPayload(req.body || {});
   p.custom_fields = req.body?.custom_fields ?? req.body?.customFields ?? {};
@@ -18511,19 +18511,19 @@ app.put("/api/drrm/iec-materials/:id", (req, res) => {
     `,
     [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.remarks, JSON.stringify(p.custom_fields || {}), id],
     (err) => {
-      if (err) return sendDrrmError(res, "PUT /api/drrm/iec-materials UPDATE ERROR:", err);
+      if (err) return sendDrrmError(res, "PUT /drrm/iec-materials UPDATE ERROR:", err);
 
       db.query("DELETE FROM drrm_iec_titles WHERE iec_id = ?", [id], (delTitleErr) => {
-        if (delTitleErr) return sendDrrmError(res, "PUT /api/drrm/iec-materials DELETE TITLES ERROR:", delTitleErr);
+        if (delTitleErr) return sendDrrmError(res, "PUT /drrm/iec-materials DELETE TITLES ERROR:", delTitleErr);
 
         db.query("DELETE FROM drrm_iec_sources WHERE iec_id = ?", [id], (delSourceErr) => {
-          if (delSourceErr) return sendDrrmError(res, "PUT /api/drrm/iec-materials DELETE SOURCES ERROR:", delSourceErr);
+          if (delSourceErr) return sendDrrmError(res, "PUT /drrm/iec-materials DELETE SOURCES ERROR:", delSourceErr);
 
           insertDrrmChildRows("drrm_iec_titles", "iec_id", id, "title_name", p.titles, (titleErr) => {
-            if (titleErr) return sendDrrmError(res, "PUT /api/drrm/iec-materials INSERT TITLES ERROR:", titleErr);
+            if (titleErr) return sendDrrmError(res, "PUT /drrm/iec-materials INSERT TITLES ERROR:", titleErr);
 
             insertDrrmChildRows("drrm_iec_sources", "iec_id", id, "source_name", p.sources, (sourceErr) => {
-              if (sourceErr) return sendDrrmError(res, "PUT /api/drrm/iec-materials INSERT SOURCES ERROR:", sourceErr);
+              if (sourceErr) return sendDrrmError(res, "PUT /drrm/iec-materials INSERT SOURCES ERROR:", sourceErr);
               res.json({ success: true, id });
             });
           });
@@ -18533,15 +18533,15 @@ app.put("/api/drrm/iec-materials/:id", (req, res) => {
   );
 });
 
-app.delete("/api/drrm/iec-materials/:id", (req, res) => {
+app.delete("/drrm/iec-materials/:id", (req, res) => {
   db.query("DELETE FROM drrm_iec_materials WHERE id = ?", [req.params.id], (err) => {
-    if (err) return sendDrrmError(res, "DELETE /api/drrm/iec-materials/:id ERROR:", err);
+    if (err) return sendDrrmError(res, "DELETE /drrm/iec-materials/:id ERROR:", err);
     res.json({ success: true });
   });
 });
 
 // ---------- Collaborations ----------
-app.get("/api/drrm/collaborations", (req, res) => {
+app.get("/drrm/collaborations", (req, res) => {
   db.query(
     `
       SELECT
@@ -18554,13 +18554,13 @@ app.get("/api/drrm/collaborations", (req, res) => {
     `,
     [],
     (err, rows) => {
-      if (err) return sendDrrmError(res, "GET /api/drrm/collaborations ERROR:", err);
+      if (err) return sendDrrmError(res, "GET /drrm/collaborations ERROR:", err);
       res.json((rows || []).map(normalizeDrrmCollab));
     }
   );
 });
 
-app.post("/api/drrm/collaborations", (req, res) => {
+app.post("/drrm/collaborations", (req, res) => {
   const p = drrmCollabPayload(req.body || {});
   if (!p.title) return res.status(400).json({ message: "Title of Activity is required." });
   if (!p.stakeholders.length) return res.status(400).json({ message: "Stakeholder is required." });
@@ -18575,7 +18575,7 @@ app.post("/api/drrm/collaborations", (req, res) => {
     `,
     [p.title, p.activity_date, p.means_of_verification, p.remarks],
     (err, result) => {
-      if (err) return sendDrrmError(res, "POST /api/drrm/collaborations INSERT ERROR:", err);
+      if (err) return sendDrrmError(res, "POST /drrm/collaborations INSERT ERROR:", err);
 
       const id = result.insertId;
       insertDrrmChildRows(
@@ -18585,7 +18585,7 @@ app.post("/api/drrm/collaborations", (req, res) => {
         "stakeholder_name",
         p.stakeholders,
         (childErr) => {
-          if (childErr) return sendDrrmError(res, "POST /api/drrm/collaborations STAKEHOLDERS ERROR:", childErr);
+          if (childErr) return sendDrrmError(res, "POST /drrm/collaborations STAKEHOLDERS ERROR:", childErr);
           res.json({ success: true, id });
         }
       );
@@ -18593,7 +18593,7 @@ app.post("/api/drrm/collaborations", (req, res) => {
   );
 });
 
-app.put("/api/drrm/collaborations/:id", (req, res) => {
+app.put("/drrm/collaborations/:id", (req, res) => {
   const id = req.params.id;
   const p = drrmCollabPayload(req.body || {});
   if (!p.title) return res.status(400).json({ message: "Title of Activity is required." });
@@ -18608,10 +18608,10 @@ app.put("/api/drrm/collaborations/:id", (req, res) => {
     `,
     [p.title, p.activity_date, p.means_of_verification, p.remarks, id],
     (err) => {
-      if (err) return sendDrrmError(res, "PUT /api/drrm/collaborations UPDATE ERROR:", err);
+      if (err) return sendDrrmError(res, "PUT /drrm/collaborations UPDATE ERROR:", err);
 
       db.query("DELETE FROM drrm_collaboration_stakeholders WHERE collaboration_id = ?", [id], (delErr) => {
-        if (delErr) return sendDrrmError(res, "PUT /api/drrm/collaborations DELETE STAKEHOLDERS ERROR:", delErr);
+        if (delErr) return sendDrrmError(res, "PUT /drrm/collaborations DELETE STAKEHOLDERS ERROR:", delErr);
 
         insertDrrmChildRows(
           "drrm_collaboration_stakeholders",
@@ -18620,7 +18620,7 @@ app.put("/api/drrm/collaborations/:id", (req, res) => {
           "stakeholder_name",
           p.stakeholders,
           (childErr) => {
-            if (childErr) return sendDrrmError(res, "PUT /api/drrm/collaborations INSERT STAKEHOLDERS ERROR:", childErr);
+            if (childErr) return sendDrrmError(res, "PUT /drrm/collaborations INSERT STAKEHOLDERS ERROR:", childErr);
             res.json({ success: true, id });
           }
         );
@@ -18629,15 +18629,15 @@ app.put("/api/drrm/collaborations/:id", (req, res) => {
   );
 });
 
-app.delete("/api/drrm/collaborations/:id", (req, res) => {
+app.delete("/drrm/collaborations/:id", (req, res) => {
   db.query("DELETE FROM drrm_collaborations WHERE id = ?", [req.params.id], (err) => {
-    if (err) return sendDrrmError(res, "DELETE /api/drrm/collaborations/:id ERROR:", err);
+    if (err) return sendDrrmError(res, "DELETE /drrm/collaborations/:id ERROR:", err);
     res.json({ success: true });
   });
 });
 
 // ---------- PSCP ----------
-app.get("/api/drrm/pscp/:year", (req, res) => {
+app.get("/drrm/pscp/:year", (req, res) => {
   const year = Number(req.params.year) || new Date().getFullYear();
 
   db.query(
@@ -18648,7 +18648,7 @@ app.get("/api/drrm/pscp/:year", (req, res) => {
     `,
     [year],
     (err, rows) => {
-      if (err) return sendDrrmError(res, "GET /api/drrm/pscp/:year ERROR:", err);
+      if (err) return sendDrrmError(res, "GET /drrm/pscp/:year ERROR:", err);
 
       const output = {
         crafted: { q1: "", q2: "", q3: "", q4: "" },
@@ -18671,7 +18671,7 @@ app.get("/api/drrm/pscp/:year", (req, res) => {
   );
 });
 
-app.put("/api/drrm/pscp/:year", (req, res) => {
+app.put("/drrm/pscp/:year", (req, res) => {
   const year = Number(req.params.year) || new Date().getFullYear();
   const crafted = req.body?.crafted || {};
   const implemented = req.body?.implemented || {};
@@ -18694,10 +18694,10 @@ app.put("/api/drrm/pscp/:year", (req, res) => {
   };
 
   upsertOne("crafted", crafted, (craftedErr) => {
-    if (craftedErr) return sendDrrmError(res, "PUT /api/drrm/pscp/:year CRAFTED ERROR:", craftedErr);
+    if (craftedErr) return sendDrrmError(res, "PUT /drrm/pscp/:year CRAFTED ERROR:", craftedErr);
 
     upsertOne("implemented", implemented, (implementedErr) => {
-      if (implementedErr) return sendDrrmError(res, "PUT /api/drrm/pscp/:year IMPLEMENTED ERROR:", implementedErr);
+      if (implementedErr) return sendDrrmError(res, "PUT /drrm/pscp/:year IMPLEMENTED ERROR:", implementedErr);
       res.json({ success: true, year });
     });
   });
@@ -18711,7 +18711,7 @@ app.put("/api/drrm/pscp/:year", (req, res) => {
 // ===========================
 
 // GET full table management config
-app.get("/api/table-management/config", (req, res) => {
+app.get("/table-management/config", (req, res) => {
   const sql = `
     SELECT
       m.id AS module_id,
@@ -18754,7 +18754,7 @@ app.get("/api/table-management/config", (req, res) => {
 
   db.query(sql, (err, rows) => {
     if (err) {
-      console.error("GET /api/table-management/config ERROR:", err);
+      console.error("GET /table-management/config ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -18818,7 +18818,7 @@ app.get("/api/table-management/config", (req, res) => {
 });
 
 // GET dropdowns with options
-app.get("/api/table-management/dropdowns", (req, res) => {
+app.get("/table-management/dropdowns", (req, res) => {
   const sql = `
     SELECT
       d.id AS dropdown_id,
@@ -18843,7 +18843,7 @@ app.get("/api/table-management/dropdowns", (req, res) => {
 
   db.query(sql, (err, rows) => {
     if (err) {
-      console.error("GET /api/table-management/dropdowns ERROR:", err);
+      console.error("GET /table-management/dropdowns ERROR:", err);
       return res.status(500).json({ message: err.message });
     }
 
@@ -18877,7 +18877,7 @@ app.get("/api/table-management/dropdowns", (req, res) => {
 });
 
 // CREATE field
-app.post("/api/table-management/fields", (req, res) => {
+app.post("/table-management/fields", (req, res) => {
   const b = req.body || {};
 
   const sql = `
@@ -18914,7 +18914,7 @@ app.post("/api/table-management/fields", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/table-management/fields ERROR:", err);
+        console.error("POST /table-management/fields ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -18924,7 +18924,7 @@ app.post("/api/table-management/fields", (req, res) => {
 });
 
 // UPDATE field
-app.put("/api/table-management/fields/:id", (req, res) => {
+app.put("/table-management/fields/:id", (req, res) => {
   const b = req.body || {};
 
   const sql = `
@@ -18955,7 +18955,7 @@ app.put("/api/table-management/fields/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/table-management/fields/:id ERROR:", err);
+        console.error("PUT /table-management/fields/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -18965,13 +18965,13 @@ app.put("/api/table-management/fields/:id", (req, res) => {
 });
 
 // DELETE field
-app.delete("/api/table-management/fields/:id", (req, res) => {
+app.delete("/table-management/fields/:id", (req, res) => {
   db.query(
     "DELETE FROM table_management_fields WHERE id = ? AND is_system_field = 0",
     [req.params.id],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/table-management/fields/:id ERROR:", err);
+        console.error("DELETE /table-management/fields/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -18981,7 +18981,7 @@ app.delete("/api/table-management/fields/:id", (req, res) => {
 });
 
 // CREATE dropdown
-app.post("/api/table-management/dropdowns", (req, res) => {
+app.post("/table-management/dropdowns", (req, res) => {
   const b = req.body || {};
 
   const sql = `
@@ -19000,7 +19000,7 @@ app.post("/api/table-management/dropdowns", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/table-management/dropdowns ERROR:", err);
+        console.error("POST /table-management/dropdowns ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19010,7 +19010,7 @@ app.post("/api/table-management/dropdowns", (req, res) => {
 });
 
 // UPDATE dropdown
-app.put("/api/table-management/dropdowns/:id", (req, res) => {
+app.put("/table-management/dropdowns/:id", (req, res) => {
   const b = req.body || {};
 
   db.query(
@@ -19027,7 +19027,7 @@ app.put("/api/table-management/dropdowns/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/table-management/dropdowns/:id ERROR:", err);
+        console.error("PUT /table-management/dropdowns/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19037,13 +19037,13 @@ app.put("/api/table-management/dropdowns/:id", (req, res) => {
 });
 
 // DELETE dropdown
-app.delete("/api/table-management/dropdowns/:id", (req, res) => {
+app.delete("/table-management/dropdowns/:id", (req, res) => {
   db.query(
     "DELETE FROM table_management_dropdowns WHERE id = ?",
     [req.params.id],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/table-management/dropdowns/:id ERROR:", err);
+        console.error("DELETE /table-management/dropdowns/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19053,7 +19053,7 @@ app.delete("/api/table-management/dropdowns/:id", (req, res) => {
 });
 
 // CREATE dropdown option
-app.post("/api/table-management/dropdown-options", (req, res) => {
+app.post("/table-management/dropdown-options", (req, res) => {
   const b = req.body || {};
 
   db.query(
@@ -19069,7 +19069,7 @@ app.post("/api/table-management/dropdown-options", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("POST /api/table-management/dropdown-options ERROR:", err);
+        console.error("POST /table-management/dropdown-options ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19079,13 +19079,13 @@ app.post("/api/table-management/dropdown-options", (req, res) => {
 });
 
 // DELETE dropdown option
-app.delete("/api/table-management/dropdown-options/:id", (req, res) => {
+app.delete("/table-management/dropdown-options/:id", (req, res) => {
   db.query(
     "DELETE FROM table_management_dropdown_options WHERE id = ?",
     [req.params.id],
     (err, result) => {
       if (err) {
-        console.error("DELETE /api/table-management/dropdown-options/:id ERROR:", err);
+        console.error("DELETE /table-management/dropdown-options/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19095,7 +19095,7 @@ app.delete("/api/table-management/dropdown-options/:id", (req, res) => {
 });
 
 // UPDATE table settings
-app.put("/api/table-management/settings/:id", (req, res) => {
+app.put("/table-management/settings/:id", (req, res) => {
   const b = req.body || {};
 
   db.query(
@@ -19120,7 +19120,7 @@ app.put("/api/table-management/settings/:id", (req, res) => {
     ],
     (err, result) => {
       if (err) {
-        console.error("PUT /api/table-management/settings/:id ERROR:", err);
+        console.error("PUT /table-management/settings/:id ERROR:", err);
         return res.status(500).json({ message: err.message });
       }
 
@@ -19131,7 +19131,7 @@ app.put("/api/table-management/settings/:id", (req, res) => {
 
 
 // SAVE selected table management field configuration
-app.post("/api/table-management/config/save", async (req, res) => {
+app.post("/table-management/config/save", async (req, res) => {
   const b = req.body || {};
   const fields = Array.isArray(b.fields) ? b.fields : [];
 
@@ -19190,7 +19190,7 @@ app.post("/api/table-management/config/save", async (req, res) => {
       saved: editableFields.length,
     });
   } catch (err) {
-    console.error("POST /api/table-management/config/save ERROR:", err);
+    console.error("POST /table-management/config/save ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 });
