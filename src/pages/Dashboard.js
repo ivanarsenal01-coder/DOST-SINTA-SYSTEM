@@ -95,7 +95,7 @@ const ALL_MUNICIPALITIES = PANGASINAN_DISTRICTS.flatMap((d) =>
 
 const ENABLE_PROJECTS_API = true;
 const API_BASE_URL = (API_BASE || "http://localhost:5000").replace(/\/$/, "");
-const PROJECTS_API_URL = `${API_BASE_URL}/api/dashboard/projects`;
+const PROJECTS_API_URL = `${API_BASE_URL}/dashboard/projects`;
 
 function normalizeProgramKey(value = "") {
   const raw = String(value || "").trim();
