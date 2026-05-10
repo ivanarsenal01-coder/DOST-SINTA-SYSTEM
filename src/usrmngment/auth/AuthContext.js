@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch(`${AUTH_API_BASE}/api/login`, {
+      const response = await fetch(`${AUTH_API_BASE}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ export function AuthProvider({ children }) {
 
     return Boolean(
       user?.permissions?.special?.[permissionKey] ||
-        user?.specialPermissions?.[permissionKey]
+      user?.specialPermissions?.[permissionKey]
     );
   };
 
@@ -151,7 +151,7 @@ export function AuthProvider({ children }) {
     if (!user?.id) return null;
 
     try {
-      const response = await fetch(`${AUTH_API_BASE}/api/users/${user.id}`);
+      const response = await fetch(`${AUTH_API_BASE}/users/${user.id}`);
       const payload = await response.json().catch(() => null);
 
       if (!response.ok || !payload) {

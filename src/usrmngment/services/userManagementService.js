@@ -379,7 +379,7 @@ export function seedAccounts() {
 }
 
 export async function getAccounts() {
-  const payload = await request("/api/users");
+  const payload = await request("/users");
   return Array.isArray(payload) ? payload.map(normalizeAccount) : [];
 }
 
@@ -389,7 +389,7 @@ export async function saveAccounts(accounts) {
 
 export async function getAccountById(id) {
   if (!id) return null;
-  const payload = await request(`/api/users/${id}`);
+  const payload = await request(`/users/${id}`);
   return payload ? normalizeAccount(payload) : null;
 }
 
@@ -407,7 +407,7 @@ export async function getAccountByUsername(username) {
 export async function createAccount(payload) {
   const body = normalizeAccountPayload(payload);
 
-  const result = await request("/api/users", {
+  const result = await request("/users", {
     method: "POST",
     body: JSON.stringify(body),
   });
@@ -418,7 +418,7 @@ export async function createAccount(payload) {
 export async function updateAccount(id, payload) {
   const body = normalizeAccountPayload(payload);
 
-  const result = await request(`/api/users/${id}`, {
+  const result = await request(`/users/${id}`, {
     method: "PUT",
     body: JSON.stringify(body),
   });
@@ -427,7 +427,7 @@ export async function updateAccount(id, payload) {
 }
 
 export async function updateUserPermissions(id, permissions) {
-  const result = await request(`/api/users/${id}/permissions`, {
+  const result = await request(`/users/${id}/permissions`, {
     method: "PUT",
     body: JSON.stringify({
       permissions: permissions.pages ? permissions.pages : permissions,
@@ -445,7 +445,7 @@ export async function updateUserPermissions(id, permissions) {
 }
 
 export async function deactivateAccount(id) {
-  const result = await request(`/api/users/${id}/deactivate`, {
+  const result = await request(`/users/${id}/deactivate`, {
     method: "PUT",
     body: JSON.stringify({}),
   });
@@ -454,7 +454,7 @@ export async function deactivateAccount(id) {
 }
 
 export async function activateAccount(id) {
-  const result = await request(`/api/users/${id}/activate`, {
+  const result = await request(`/users/${id}/activate`, {
     method: "PUT",
     body: JSON.stringify({}),
   });
@@ -463,7 +463,7 @@ export async function activateAccount(id) {
 }
 
 export async function resetPassword(id, newPassword = "1234") {
-  const result = await request(`/api/users/${id}/reset-password`, {
+  const result = await request(`/users/${id}/reset-password`, {
     method: "PUT",
     body: JSON.stringify({ password: newPassword }),
   });
@@ -472,7 +472,7 @@ export async function resetPassword(id, newPassword = "1234") {
 }
 
 export async function deleteAccount(id) {
-  const result = await request(`/api/users/${id}`, {
+  const result = await request(`/users/${id}`, {
     method: "DELETE",
   });
 
