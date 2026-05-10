@@ -5,18 +5,18 @@ import API_BASE from "../../api";
 const API = API_BASE;
 const CEST_API = `${API_BASE}/cest`;
 const SSCP_API = `${API_BASE}/sscp-summary`;
-const DRRM_API = `${API_BASE}/api/drrm`;
+const DRRM_API = `${API_BASE}/drrm`;
 
 // ✅ TECHNOLOGY PROMOTION
-const TECH_PROMO_API = `${API_BASE}/api/technology-promotion`;
+const TECH_PROMO_API = `${API_BASE}/technology-promotion`;
 
 // ✅ TECHNOLOGY ROLL OUT
-const TECH_ROLLOUT_API = `${API_BASE}/api/technology-rollout`;
+const TECH_ROLLOUT_API = `${API_BASE}/technology-rollout`;
 
 // ✅ PACKAGING AND LABELING
-const PACKAGING_LABELING_API = `${API_BASE}/api/packaging-labeling`;
-const CALIBRATION_API = `${API_BASE}/api/calibration`;
-const ST_PROMO_API = `${API_BASE}/api/st-promo`;
+const PACKAGING_LABELING_API = `${API_BASE}/packaging-labeling`;
+const CALIBRATION_API = `${API_BASE}/calibration`;
+const ST_PROMO_API = `${API_BASE}/st-promo`;
 
 export default function Setup() {
   // ✅ SETUP default fallback targets = 0
@@ -287,20 +287,20 @@ export default function Setup() {
       jobsGenerated: Number(p.jobsGenerated ?? 0),
       interventions: Array.isArray(p.interventions)
         ? p.interventions.map((it) => ({
-            id: Number(it.id),
-            type: it.type || "",
-            title: it.title || "",
-            date: it.date || "",
-            total: Number(it.total ?? 0),
-            technologiesPromotedTotal: Number(
-              it.technologiesPromotedTotal ?? it.technologies_promoted_total ?? 0
-            ),
-            promotionalActivitiesPressRelease: Number(
-              it.promotionalActivitiesPressRelease ??
-                it.promotional_activities_press_release ??
-                0
-            ),
-          }))
+          id: Number(it.id),
+          type: it.type || "",
+          title: it.title || "",
+          date: it.date || "",
+          total: Number(it.total ?? 0),
+          technologiesPromotedTotal: Number(
+            it.technologiesPromotedTotal ?? it.technologies_promoted_total ?? 0
+          ),
+          promotionalActivitiesPressRelease: Number(
+            it.promotionalActivitiesPressRelease ??
+            it.promotional_activities_press_release ??
+            0
+          ),
+        }))
         : [],
     }));
   };
@@ -315,20 +315,20 @@ export default function Setup() {
       const raw = rows?.[index] || {};
       const interventions = Array.isArray(base.interventions)
         ? base.interventions.map((it) => ({
-            ...it,
-            technologiesPromotedTotal: toNumber(
-              it?.technologiesPromotedTotal ??
-                it?.technologies_promoted_total ??
-                it?.technologyPromotedTotal ??
-                it?.technology_promoted_total ??
-                0
-            ),
-            promotionalActivitiesPressRelease: toNumber(
-              it?.promotionalActivitiesPressRelease ??
-                it?.promotional_activities_press_release ??
-                0
-            ),
-          }))
+          ...it,
+          technologiesPromotedTotal: toNumber(
+            it?.technologiesPromotedTotal ??
+            it?.technologies_promoted_total ??
+            it?.technologyPromotedTotal ??
+            it?.technology_promoted_total ??
+            0
+          ),
+          promotionalActivitiesPressRelease: toNumber(
+            it?.promotionalActivitiesPressRelease ??
+            it?.promotional_activities_press_release ??
+            0
+          ),
+        }))
         : [];
 
       return {
@@ -336,34 +336,34 @@ export default function Setup() {
         interventions,
         smartCitiesEstablished: toNumber(
           raw?.smartCitiesEstablished ??
-            raw?.smart_cities_established ??
-            raw?.noOfSmartCitiesEstablished ??
-            raw?.no_of_smart_cities_established ??
-            raw?.smartCityEstablished ??
-            raw?.smart_city_established ??
-            0
+          raw?.smart_cities_established ??
+          raw?.noOfSmartCitiesEstablished ??
+          raw?.no_of_smart_cities_established ??
+          raw?.smartCityEstablished ??
+          raw?.smart_city_established ??
+          0
         ),
         communitiesLgusAssisted: toNumber(
           raw?.communitiesLgusAssisted ??
-            raw?.communities_lgus_assisted ??
-            raw?.lguNumbersOfCommunities ??
-            raw?.lgu_numbers_of_communities ??
-            raw?.communitiesAssisted ??
-            raw?.communities_assisted ??
-            0
+          raw?.communities_lgus_assisted ??
+          raw?.lguNumbersOfCommunities ??
+          raw?.lgu_numbers_of_communities ??
+          raw?.communitiesAssisted ??
+          raw?.communities_assisted ??
+          0
         ),
         mouMoa: toNumber(
           raw?.mouMoa ??
-            raw?.mou_moa ??
-            raw?.mouMoaCount ??
-            raw?.mou_moa_count ??
-            raw?.moaMou ??
-            raw?.moa_mou ??
-            raw?.mouCount ??
-            raw?.mou_count ??
-            raw?.moaCount ??
-            raw?.moa_count ??
-            0
+          raw?.mou_moa ??
+          raw?.mouMoaCount ??
+          raw?.mou_moa_count ??
+          raw?.moaMou ??
+          raw?.moa_mou ??
+          raw?.mouCount ??
+          raw?.mou_count ??
+          raw?.moaCount ??
+          raw?.moa_count ??
+          0
         ),
       };
     });
@@ -389,20 +389,20 @@ export default function Setup() {
     stakeholders: Array.isArray(e?.stakeholders)
       ? e.stakeholders
       : Array.isArray(e?.partners)
-      ? e.partners
-      : e?.stakeholders
-      ? String(e.stakeholders).split(",").map((x) => x.trim()).filter(Boolean)
-      : e?.partners
-      ? String(e.partners).split(",").map((x) => x.trim()).filter(Boolean)
-      : e?.stakeholder
-      ? [e.stakeholder]
-      : e?.partner
-      ? [e.partner]
-      : e?.nameOfStakeholders
-      ? String(e.nameOfStakeholders).split(",").map((x) => x.trim()).filter(Boolean)
-      : e?.name_of_stakeholders
-      ? String(e.name_of_stakeholders).split(",").map((x) => x.trim()).filter(Boolean)
-      : [],
+        ? e.partners
+        : e?.stakeholders
+          ? String(e.stakeholders).split(",").map((x) => x.trim()).filter(Boolean)
+          : e?.partners
+            ? String(e.partners).split(",").map((x) => x.trim()).filter(Boolean)
+            : e?.stakeholder
+              ? [e.stakeholder]
+              : e?.partner
+                ? [e.partner]
+                : e?.nameOfStakeholders
+                  ? String(e.nameOfStakeholders).split(",").map((x) => x.trim()).filter(Boolean)
+                  : e?.name_of_stakeholders
+                    ? String(e.name_of_stakeholders).split(",").map((x) => x.trim()).filter(Boolean)
+                    : [],
   });
 
   // ==========================
@@ -557,24 +557,24 @@ export default function Setup() {
       "",
     participantsFemale: toNumber(
       e?.participantsFemale ??
-        e?.participants_female ??
-        e?.trainingParticipantsFemale ??
-        e?.training_participants_female ??
-        0
+      e?.participants_female ??
+      e?.trainingParticipantsFemale ??
+      e?.training_participants_female ??
+      0
     ),
     participantsMale: toNumber(
       e?.participantsMale ??
-        e?.participants_male ??
-        e?.trainingParticipantsMale ??
-        e?.training_participants_male ??
-        0
+      e?.participants_male ??
+      e?.trainingParticipantsMale ??
+      e?.training_participants_male ??
+      0
     ),
     totalParticipants: toNumber(
       e?.totalParticipants ??
-        e?.total_participants ??
-        e?.participantsTotal ??
-        e?.participants_total ??
-        0
+      e?.total_participants ??
+      e?.participantsTotal ??
+      e?.participants_total ??
+      0
     ),
   });
 
@@ -677,10 +677,10 @@ export default function Setup() {
       const rows = Array.isArray(raw)
         ? raw
         : Array.isArray(raw?.value)
-        ? raw.value
-        : Array.isArray(raw?.data)
-        ? raw.data
-        : [];
+          ? raw.value
+          : Array.isArray(raw?.data)
+            ? raw.data
+            : [];
 
       setSscpProjects(normalizeSscpProjects(rows));
     } catch (e) {
@@ -826,7 +826,7 @@ export default function Setup() {
 
     init();
 
-    return () => {};
+    return () => { };
   }, [selectedYear]);
 
   const fetchProjects = async (year = selectedYear) => {
@@ -851,8 +851,8 @@ export default function Setup() {
       const rows = Array.isArray(raw)
         ? raw
         : Array.isArray(raw?.data)
-        ? raw.data
-        : [];
+          ? raw.data
+          : [];
 
       const normalized = rows.map((p) => {
         const dateApproved =
@@ -881,17 +881,17 @@ export default function Setup() {
 
           interventions: Array.isArray(p.interventions)
             ? p.interventions.map((it) => ({
-                id: Number(it.id),
-                type: it.type ?? "",
-                title: it.title ?? "",
-                date: it.date ?? "",
-                venue: it.venue ?? "",
-                noOfFirms: Number(it.noOfFirms ?? it.no_of_firms ?? 0),
-                male: Number(it.male ?? 0),
-                female: Number(it.female ?? 0),
-                total: Number(it.total ?? 0),
-                notes: it.notes ?? "",
-              }))
+              id: Number(it.id),
+              type: it.type ?? "",
+              title: it.title ?? "",
+              date: it.date ?? "",
+              venue: it.venue ?? "",
+              noOfFirms: Number(it.noOfFirms ?? it.no_of_firms ?? 0),
+              male: Number(it.male ?? 0),
+              female: Number(it.female ?? 0),
+              total: Number(it.total ?? 0),
+              notes: it.notes ?? "",
+            }))
             : [],
         };
       });
@@ -2228,7 +2228,7 @@ export default function Setup() {
                 <th style={{ ...styles.th, ...styles.blue }}>4Q</th>
               </tr>
             </thead>
-                        <tbody>
+            <tbody>
               <CestLikeKpiRow label="No. of smart cities established" targetSet={SSCP_TARGETS} defaultSet={DEFAULT_SSCP_TARGETS} targetKey="smartCitiesEstablished" accomObj={sscpAccom.smartCitiesEstablished} />
               <CestLikeKpiRow label="No. of communities / LGUs assisted" targetSet={SSCP_TARGETS} defaultSet={DEFAULT_SSCP_TARGETS} targetKey="communitiesLgusAssisted" accomObj={sscpAccom.communitiesLgusAssisted} />
               <CestLikeKpiRow label="No. of technologies promoted" targetSet={SSCP_TARGETS} defaultSet={DEFAULT_SSCP_TARGETS} targetKey="technologiesPromoted" accomObj={sscpAccom.technologiesPromoted} />

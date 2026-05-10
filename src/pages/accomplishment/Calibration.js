@@ -48,27 +48,27 @@ L.Icon.Default.mergeOptions({
    Pangasinan core data
    ========================= */
 const PANGASINAN_LGUS = [
-  "Alaminos City","Dagupan City","San Carlos City","Urdaneta City","Agno","Aguilar","Alcala","Anda",
-  "Asingan","Balungao","Bani","Basista","Bautista","Bayambang","Binalonan","Binmaley","Bolinao",
-  "Bugallon","Burgos","Calasiao","Dasol","Infanta","Labrador","Laoac","Lingayen","Mabini","Malasiqui",
-  "Manaoag","Mangaldan","Mangatarem","Mapandan","Natividad","Pozorrubio","Rosales","San Fabian",
-  "San Jacinto","San Manuel","San Nicolas","San Quintin","Santa Barbara","Santa Maria","Santo Tomas",
-  "Sison","Sual","Tayug","Umingan","Urbiztondo","Villasis",
+  "Alaminos City", "Dagupan City", "San Carlos City", "Urdaneta City", "Agno", "Aguilar", "Alcala", "Anda",
+  "Asingan", "Balungao", "Bani", "Basista", "Bautista", "Bayambang", "Binalonan", "Binmaley", "Bolinao",
+  "Bugallon", "Burgos", "Calasiao", "Dasol", "Infanta", "Labrador", "Laoac", "Lingayen", "Mabini", "Malasiqui",
+  "Manaoag", "Mangaldan", "Mangatarem", "Mapandan", "Natividad", "Pozorrubio", "Rosales", "San Fabian",
+  "San Jacinto", "San Manuel", "San Nicolas", "San Quintin", "Santa Barbara", "Santa Maria", "Santo Tomas",
+  "Sison", "Sual", "Tayug", "Umingan", "Urbiztondo", "Villasis",
 ].sort((a, b) => a.localeCompare(b));
 
 const PANGASINAN_DISTRICTS = [
-  { id: "District 1", municipalities: ["Agno","Alaminos City","Anda","Bani","Bolinao","Burgos","Dasol","Infanta","Mabini","Sual"] },
-  { id: "District 2", municipalities: ["Aguilar","Basista","Binmaley","Bugallon","Labrador","Lingayen","Mangatarem","Urbiztondo"] },
-  { id: "District 3", municipalities: ["Bayambang","Calasiao","Malasiqui","Mapandan","San Carlos City","Santa Barbara"] },
-  { id: "District 4", municipalities: ["Dagupan City","Manaoag","Mangaldan","San Fabian","San Jacinto"] },
-  { id: "District 5", municipalities: ["Alcala","Bautista","Binalonan","Laoac","Pozorrubio","Santo Tomas","Sison","Urdaneta City","Villasis"] },
-  { id: "District 6", municipalities: ["Asingan","Balungao","Natividad","Rosales","San Manuel","San Nicolas","San Quintin","Santa Maria","Tayug","Umingan"] },
+  { id: "District 1", municipalities: ["Agno", "Alaminos City", "Anda", "Bani", "Bolinao", "Burgos", "Dasol", "Infanta", "Mabini", "Sual"] },
+  { id: "District 2", municipalities: ["Aguilar", "Basista", "Binmaley", "Bugallon", "Labrador", "Lingayen", "Mangatarem", "Urbiztondo"] },
+  { id: "District 3", municipalities: ["Bayambang", "Calasiao", "Malasiqui", "Mapandan", "San Carlos City", "Santa Barbara"] },
+  { id: "District 4", municipalities: ["Dagupan City", "Manaoag", "Mangaldan", "San Fabian", "San Jacinto"] },
+  { id: "District 5", municipalities: ["Alcala", "Bautista", "Binalonan", "Laoac", "Pozorrubio", "Santo Tomas", "Sison", "Urdaneta City", "Villasis"] },
+  { id: "District 6", municipalities: ["Asingan", "Balungao", "Natividad", "Rosales", "San Manuel", "San Nicolas", "San Quintin", "Santa Maria", "Tayug", "Umingan"] },
 ];
 
 /* =========================
    Helpers
    ========================= */
-const CALIBRATION_API_URL = `${API_BASE}/api/calibration`;
+const CALIBRATION_API_URL = `${API_BASE}/calibration`;
 const BARANGAY_LOCAL_URL = "/data/pangasinan_barangays.json";
 const MC_RANGE_OPTIONS = ["<100 Kg", ">=100 Kg"];
 const DEFAULT_CENTER = [15.8949, 120.2863];
@@ -114,8 +114,8 @@ const EMPTY_FORM = {
 };
 
 const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 function normalizeKey(s) {
@@ -165,9 +165,9 @@ function deriveMunicipalityFromEntry(entry) {
     entry?.addressMeta?.municipality ||
     detectMunicipalityFromAddressText(
       entry?.addressMeta?.displayText ||
-        entry?.addressMeta?.manualText ||
-        entry?.address ||
-        ""
+      entry?.addressMeta?.manualText ||
+      entry?.address ||
+      ""
     ) ||
     ""
   );
@@ -188,13 +188,13 @@ function sanitizeEntry(raw = {}) {
     custom_fields: raw?.custom_fields || raw?.customFields || {},
     mcBreakdown: Array.isArray(raw?.mcBreakdown)
       ? raw.mcBreakdown.map((row) => ({
-          id: row?.id || uid(),
-          range: row?.range || "",
-          noOfSample: row?.noOfSample ?? "",
-          cost: row?.cost ?? "",
-          feesCollected: row?.feesCollected ?? "",
-          autoFilled: Boolean(row?.autoFilled),
-        }))
+        id: row?.id || uid(),
+        range: row?.range || "",
+        noOfSample: row?.noOfSample ?? "",
+        cost: row?.cost ?? "",
+        feesCollected: row?.feesCollected ?? "",
+        autoFilled: Boolean(row?.autoFilled),
+      }))
       : [],
   };
 }
@@ -243,7 +243,7 @@ function FitAndLockToPangasinan({ bounds, borderMode, selectedMuni, selectedDist
         const layer = L.geoJSON(geo);
         const b = layer.getBounds();
         if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-      } catch {}
+      } catch { }
     };
 
     if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -263,7 +263,7 @@ function FitAndLockToPangasinan({ bounds, borderMode, selectedMuni, selectedDist
 
 function detectMunicipalityName(feature) {
   const props = feature?.properties || {};
-  const keys = ["name","NAME","NAME_3","NAME_2","ADM3_EN","ADM3EN","ADM3","MUNICIPALI","MUNICIPALITY","CITY","city","municipality"];
+  const keys = ["name", "NAME", "NAME_3", "NAME_2", "ADM3_EN", "ADM3EN", "ADM3", "MUNICIPALI", "MUNICIPALITY", "CITY", "city", "municipality"];
   for (const k of keys) if (props[k]) return String(props[k]).trim();
   return "";
 }
@@ -512,10 +512,10 @@ function AddressFlowModal({
     mode === "manual"
       ? "Manual Input"
       : step === 1
-      ? "Pangasinan > Select Municipality/City"
-      : step === 2
-      ? `Pangasinan > ${municipality} > Select Barangay`
-      : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+        ? "Pangasinan > Select Municipality/City"
+        : step === 2
+          ? `Pangasinan > ${municipality} > Select Barangay`
+          : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
   const back = () => {
     if (mode === "manual") return onClose();
@@ -775,7 +775,7 @@ export default function Calibration() {
 
     async function loadCalibrationCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find(
@@ -1067,8 +1067,8 @@ export default function Calibration() {
       mcBreakdown:
         entry.typeOfSample === "Weighing Scale"
           ? (Array.isArray(entry.mcBreakdown) && entry.mcBreakdown.length
-              ? entry.mcBreakdown.map((r) => ({ ...r, id: r.id || uid(), autoFilled: Boolean(r.autoFilled) }))
-              : [makeMCBreakdownRow()])
+            ? entry.mcBreakdown.map((r) => ({ ...r, id: r.id || uid(), autoFilled: Boolean(r.autoFilled) }))
+            : [makeMCBreakdownRow()])
           : [makeMCBreakdownRow()],
       date: entry.date || new Date().toISOString().slice(0, 10),
     });
@@ -1180,9 +1180,9 @@ export default function Calibration() {
       const totalFees =
         prev.category === "PAYING"
           ? updatedRows.reduce(
-              (sum, r) => sum + toNumber(r.noOfSample) * toNumber(r.cost),
-              0
-            )
+            (sum, r) => sum + toNumber(r.noOfSample) * toNumber(r.cost),
+            0
+          )
           : 0;
 
       return {
@@ -3034,102 +3034,102 @@ export default function Calibration() {
                       <input type="number" style={{ ...styles.input, background: "#f8fafc" }} value={form.feesCollected} readOnly />
                     </div>
 
-                  <div style={styles.breakdownBox}>
-                    <div style={styles.breakdownHead}>MC Range Breakdown<span style={styles.req}>*</span></div>
-                    <div style={{ fontSize: 12, marginBottom: 8, opacity: 0.8 }}>
-                      Tip: when you add a new row, the system auto-fills the next row with the remaining sample count. You can still edit it.
-                    </div>
-                    {toNumber(form.noOfSample) <= 0 ? (
-                      <div style={{ fontSize: 12, marginBottom: 8, color: "#b45309", fontWeight: 800 }}>
-                        Please enter a value in the main No. of Sample field first before editing the breakdown sample fields.
+                    <div style={styles.breakdownBox}>
+                      <div style={styles.breakdownHead}>MC Range Breakdown<span style={styles.req}>*</span></div>
+                      <div style={{ fontSize: 12, marginBottom: 8, opacity: 0.8 }}>
+                        Tip: when you add a new row, the system auto-fills the next row with the remaining sample count. You can still edit it.
                       </div>
-                    ) : null}
-
-                    {(form.mcBreakdown || []).map((row, index) => (
-                      <div key={row.id} style={styles.breakdownRow}>
-                        <div style={styles.field}>
-                          <div style={styles.label}>Range<span style={styles.req}>*</span></div>
-                          <select
-                            style={styles.input}
-                            value={row.range}
-                            onChange={(e) => updateMCBreakdownRow(row.id, "range", e.target.value)}
-                          >
-                            <option value="">Select range</option>
-                            {MC_RANGE_OPTIONS.map((r) => (
-                              <option key={r} value={r}>{r}</option>
-                            ))}
-                          </select>
+                      {toNumber(form.noOfSample) <= 0 ? (
+                        <div style={{ fontSize: 12, marginBottom: 8, color: "#b45309", fontWeight: 800 }}>
+                          Please enter a value in the main No. of Sample field first before editing the breakdown sample fields.
                         </div>
+                      ) : null}
 
-                        <div style={styles.field}>
-                          <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
-                          <input
-                            type="number"
-                            min="1"
-                            style={{
-                              ...styles.input,
-                              background: toNumber(form.noOfSample) > 0 ? "#fff" : "#f1f5f9",
-                              cursor: toNumber(form.noOfSample) > 0 ? "text" : "not-allowed",
-                            }}
-                            value={row.noOfSample}
-                            onChange={(e) => updateMCBreakdownRow(row.id, "noOfSample", e.target.value)}
-                            disabled={toNumber(form.noOfSample) <= 0}
-                            placeholder={toNumber(form.noOfSample) > 0 ? "" : "Enter main No. of Sample first"}
-                          />
-                        </div>
-
-                        <div style={styles.field}>
-                          <div style={styles.label}>
-                            Cost{form.category === "PAYING" ? <span style={styles.req}>*</span> : null}
+                      {(form.mcBreakdown || []).map((row, index) => (
+                        <div key={row.id} style={styles.breakdownRow}>
+                          <div style={styles.field}>
+                            <div style={styles.label}>Range<span style={styles.req}>*</span></div>
+                            <select
+                              style={styles.input}
+                              value={row.range}
+                              onChange={(e) => updateMCBreakdownRow(row.id, "range", e.target.value)}
+                            >
+                              <option value="">Select range</option>
+                              {MC_RANGE_OPTIONS.map((r) => (
+                                <option key={r} value={r}>{r}</option>
+                              ))}
+                            </select>
                           </div>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            style={styles.input}
-                            value={row.cost}
-                            onChange={(e) => updateMCBreakdownRow(row.id, "cost", e.target.value)}
-                          />
-                        </div>
 
-                        <div style={styles.field}>
-                          <div style={styles.label}>Fees Collected</div>
-                          <input
-                            type="number"
-                            style={{ ...styles.input, background: "#f8fafc" }}
-                            value={row.feesCollected}
-                            readOnly
-                          />
-                        </div>
+                          <div style={styles.field}>
+                            <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
+                            <input
+                              type="number"
+                              min="1"
+                              style={{
+                                ...styles.input,
+                                background: toNumber(form.noOfSample) > 0 ? "#fff" : "#f1f5f9",
+                                cursor: toNumber(form.noOfSample) > 0 ? "text" : "not-allowed",
+                              }}
+                              value={row.noOfSample}
+                              onChange={(e) => updateMCBreakdownRow(row.id, "noOfSample", e.target.value)}
+                              disabled={toNumber(form.noOfSample) <= 0}
+                              placeholder={toNumber(form.noOfSample) > 0 ? "" : "Enter main No. of Sample first"}
+                            />
+                          </div>
 
-                        <div style={{ alignSelf: "end" }}>
-                          <button
-                            type="button"
-                            style={index === 0 && (form.mcBreakdown || []).length === 1 ? { ...styles.dangerTiny, opacity: 0.45, cursor: "not-allowed" } : styles.dangerTiny}
-                            disabled={index === 0 && (form.mcBreakdown || []).length === 1}
-                            onClick={() => removeMCBreakdownRow(row.id)}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                          <div style={styles.field}>
+                            <div style={styles.label}>
+                              Cost{form.category === "PAYING" ? <span style={styles.req}>*</span> : null}
+                            </div>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              style={styles.input}
+                              value={row.cost}
+                              onChange={(e) => updateMCBreakdownRow(row.id, "cost", e.target.value)}
+                            />
+                          </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                      <button type="button" style={styles.pillBtn} onClick={addMCBreakdownRow}>
-                        + Add MC Range Breakdown
-                      </button>
+                          <div style={styles.field}>
+                            <div style={styles.label}>Fees Collected</div>
+                            <input
+                              type="number"
+                              style={{ ...styles.input, background: "#f8fafc" }}
+                              value={row.feesCollected}
+                              readOnly
+                            />
+                          </div>
 
-                      <div style={styles.breakdownTotals}>
-                        <div>Main No. of Sample: {toNumber(form.noOfSample)}</div>
-                        <div>Breakdown Total: {(form.mcBreakdown || []).reduce((sum, r) => sum + toNumber(r.noOfSample), 0)}</div>
-                        <div>
-                          Remaining: {Math.max(0, toNumber(form.noOfSample) - (form.mcBreakdown || []).reduce((sum, r) => sum + toNumber(r.noOfSample), 0))}
+                          <div style={{ alignSelf: "end" }}>
+                            <button
+                              type="button"
+                              style={index === 0 && (form.mcBreakdown || []).length === 1 ? { ...styles.dangerTiny, opacity: 0.45, cursor: "not-allowed" } : styles.dangerTiny}
+                              disabled={index === 0 && (form.mcBreakdown || []).length === 1}
+                              onClick={() => removeMCBreakdownRow(row.id)}
+                            >
+                              Remove
+                            </button>
+                          </div>
                         </div>
-                        <div>Total Fees: {money(form.feesCollected)}</div>
+                      ))}
+
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                        <button type="button" style={styles.pillBtn} onClick={addMCBreakdownRow}>
+                          + Add MC Range Breakdown
+                        </button>
+
+                        <div style={styles.breakdownTotals}>
+                          <div>Main No. of Sample: {toNumber(form.noOfSample)}</div>
+                          <div>Breakdown Total: {(form.mcBreakdown || []).reduce((sum, r) => sum + toNumber(r.noOfSample), 0)}</div>
+                          <div>
+                            Remaining: {Math.max(0, toNumber(form.noOfSample) - (form.mcBreakdown || []).reduce((sum, r) => sum + toNumber(r.noOfSample), 0))}
+                          </div>
+                          <div>Total Fees: {money(form.feesCollected)}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
                   </>
                 ) : (
                   <>
@@ -3376,5 +3376,5 @@ export default function Calibration() {
       )}
     </div>
   );
-} 
+}
 

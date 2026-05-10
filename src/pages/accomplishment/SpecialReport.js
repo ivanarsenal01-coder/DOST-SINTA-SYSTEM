@@ -736,8 +736,8 @@ export default function SpecialProject() {
       layoutKey === "FORM"
         ? formLayout
         : layoutKey === "TABLE"
-        ? tableLayout
-        : compactLayout;
+          ? tableLayout
+          : compactLayout;
 
     return `
       <div class="sheet">
@@ -838,10 +838,10 @@ export default function SpecialProject() {
         setTimeout(() => {
           try {
             win.print();
-          } catch {}
+          } catch { }
         }, 250);
       };
-    } catch {}
+    } catch { }
   };
 
   const [records, setRecords] = useState([]);
@@ -924,7 +924,7 @@ export default function SpecialProject() {
 
   const fetchRecords = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/special-projects`);
+      const res = await axios.get(`${API_BASE}/special-projects`);
       setRecords(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -957,7 +957,7 @@ export default function SpecialProject() {
     setSpecialProjectOptions(cleaned);
     try {
       localStorage.setItem(SPECIAL_PROJECT_OPTIONS_KEY, JSON.stringify(cleaned));
-    } catch {}
+    } catch { }
   };
 
   const handleSpecialProjectChange = (value) => {
@@ -1036,7 +1036,7 @@ export default function SpecialProject() {
 
     async function loadSpecialProjectCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find(
@@ -1084,7 +1084,7 @@ export default function SpecialProject() {
     setRecords(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -1571,9 +1571,9 @@ export default function SpecialProject() {
 
     try {
       if (!editRecordId) {
-        await axios.post(`${API_BASE}/api/special-projects`, base);
+        await axios.post(`${API_BASE}/special-projects`, base);
       } else {
-        await axios.put(`${API_BASE}/api/special-projects/${editRecordId}`, base);
+        await axios.put(`${API_BASE}/special-projects/${editRecordId}`, base);
       }
 
       await fetchRecords();
@@ -1591,7 +1591,7 @@ export default function SpecialProject() {
     if (!window.confirm("Delete this record?")) return;
 
     try {
-      await axios.delete(`${API_BASE}/api/special-projects/${id}`);
+      await axios.delete(`${API_BASE}/special-projects/${id}`);
       await fetchRecords();
     } catch (err) {
       console.error(err);
@@ -1742,7 +1742,7 @@ export default function SpecialProject() {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -1956,10 +1956,10 @@ export default function SpecialProject() {
       mode === "manual"
         ? "Manual Input"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -2010,29 +2010,29 @@ export default function SpecialProject() {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              venue: venue.trim(),
-              manualText: manualText.trim(),
-              addressText,
-              displayText,
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            venue: venue.trim(),
+            manualText: manualText.trim(),
+            addressText,
+            displayText,
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              venue: venue.trim(),
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              addressText,
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            venue: venue.trim(),
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            addressText,
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -2940,7 +2940,7 @@ export default function SpecialProject() {
       <div style={styles.titleBar}>
         <div>SPECIAL PROJECT</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
-          
+
         </div>
       </div>
 
@@ -3515,7 +3515,7 @@ export default function SpecialProject() {
                 <div>
                   <b>Coordinates:</b>{" "}
                   {Number.isFinite(viewRecord?.addressMeta?.lat) &&
-                  Number.isFinite(viewRecord?.addressMeta?.lng)
+                    Number.isFinite(viewRecord?.addressMeta?.lng)
                     ? `${viewRecord.addressMeta.lat}, ${viewRecord.addressMeta.lng}`
                     : "—"}
                 </div>
@@ -3602,7 +3602,7 @@ export default function SpecialProject() {
             >
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {Number.isFinite(viewRecord?.addressMeta?.lat) &&
-                Number.isFinite(viewRecord?.addressMeta?.lng) ? (
+                  Number.isFinite(viewRecord?.addressMeta?.lng) ? (
                   <>
                     <button
                       type="button"

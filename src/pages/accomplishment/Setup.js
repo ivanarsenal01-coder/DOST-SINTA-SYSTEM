@@ -45,7 +45,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const API = `${API_BASE}/api`;
+const API = `${API_BASE}`;
 
 function escapeHtml(value = "") {
   return String(value ?? "")
@@ -124,13 +124,13 @@ function normalizeCalibrationData(raw = {}) {
   next.address = next.address || next.addressMeta?.displayText || "";
   next.mcBreakdown = Array.isArray(raw?.mcBreakdown) && raw.mcBreakdown.length
     ? raw.mcBreakdown.map((row) => ({
-        id: row?.id || makeCalibrationBreakdownRow().id,
-        range: row?.range || "",
-        noOfSample: row?.noOfSample ?? "",
-        cost: row?.cost ?? "",
-        feesCollected: row?.feesCollected ?? "",
-        autoFilled: Boolean(row?.autoFilled),
-      }))
+      id: row?.id || makeCalibrationBreakdownRow().id,
+      range: row?.range || "",
+      noOfSample: row?.noOfSample ?? "",
+      cost: row?.cost ?? "",
+      feesCollected: row?.feesCollected ?? "",
+      autoFilled: Boolean(row?.autoFilled),
+    }))
     : [makeCalibrationBreakdownRow()];
   return next;
 }
@@ -373,7 +373,7 @@ function FitAndLockToPangasinan({
         const layer = L.geoJSON(geo);
         const b = layer.getBounds();
         if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-      } catch {}
+      } catch { }
     };
 
     if (
@@ -569,10 +569,10 @@ function AddressFlowModal({
     mode === "manual"
       ? "Manual Venue/Address"
       : step === 1
-      ? "Pangasinan > Select Municipality/City"
-      : step === 2
-      ? `Pangasinan > ${municipality} > Select Barangay`
-      : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+        ? "Pangasinan > Select Municipality/City"
+        : step === 2
+          ? `Pangasinan > ${municipality} > Select Barangay`
+          : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
   const back = () => {
     if (mode === "manual") return onClose();
@@ -611,29 +611,29 @@ function AddressFlowModal({
     const meta =
       mode === "manual"
         ? {
-            mode: "manual",
-            venueName: venueName.trim(),
-            manualText: manualText.trim(),
-            addressOnlyText: manualText.trim(),
-            displayText,
-            province: "",
-            municipality: "",
-            barangay: "",
-            lat: coords?.lat || null,
-            lng: coords?.lng || null,
-          }
+          mode: "manual",
+          venueName: venueName.trim(),
+          manualText: manualText.trim(),
+          addressOnlyText: manualText.trim(),
+          displayText,
+          province: "",
+          municipality: "",
+          barangay: "",
+          lat: coords?.lat || null,
+          lng: coords?.lng || null,
+        }
         : {
-            mode: "hierarchical",
-            venueName: venueName.trim(),
-            province,
-            municipality,
-            barangay,
-            manualText: "",
-            addressOnlyText: baseAddressText,
-            displayText,
-            lat: coords?.lat || null,
-            lng: coords?.lng || null,
-          };
+          mode: "hierarchical",
+          venueName: venueName.trim(),
+          province,
+          municipality,
+          barangay,
+          manualText: "",
+          addressOnlyText: baseAddressText,
+          displayText,
+          lat: coords?.lat || null,
+          lng: coords?.lng || null,
+        };
 
     onSave(meta);
     onClose();
@@ -938,25 +938,25 @@ function ViewProjectModal({
   const projectCustomFields =
     typeof rawCustomFields === "string"
       ? (() => {
-          try {
-            return JSON.parse(rawCustomFields || "{}");
-          } catch {
-            return {};
-          }
-        })()
+        try {
+          return JSON.parse(rawCustomFields || "{}");
+        } catch {
+          return {};
+        }
+      })()
       : rawCustomFields || {};
 
   const displayCustomFields =
     setupCustomFields.length > 0
       ? setupCustomFields
       : Object.keys(projectCustomFields || {}).map((key) => ({
-          key,
-          fieldKey: key,
-          field_label: key,
-          fieldLabel: key,
-        }));
+        key,
+        fieldKey: key,
+        field_label: key,
+        fieldLabel: key,
+      }));
 
-const oi = getOI(project.id);
+  const oi = getOI(project.id);
   const totalJobs = sumOI(oi.jobsGenerated || blankQuarterObj());
   const totalInc = sumOI(oi.jobsIncreasePct || blankQuarterObj());
   const totalProd = sumOI(oi.productivityPct || blankQuarterObj());
@@ -993,30 +993,30 @@ const oi = getOI(project.id);
               </div>
 
               <div style={styles.field}>
-  <div style={styles.label}>Cooperator Name</div>
-  <div style={{ fontWeight: 900 }}>
-    {project.cooperatorName || "—"}
-  </div>
-</div>
+                <div style={styles.label}>Cooperator Name</div>
+                <div style={{ fontWeight: 900 }}>
+                  {project.cooperatorName || "—"}
+                </div>
+              </div>
 
-<div style={styles.field}>
-  <div style={styles.label}>Age</div>
-  <div style={{ fontWeight: 900 }}>{project.age ?? "—"}</div>
-</div>
+              <div style={styles.field}>
+                <div style={styles.label}>Age</div>
+                <div style={{ fontWeight: 900 }}>{project.age ?? "—"}</div>
+              </div>
 
-<div style={styles.field}>
-  <div style={styles.label}>Sex</div>
-  <div style={{ fontWeight: 900 }}>{project.sex || "—"}</div>
-</div>
-<div style={styles.field}>
-  <div style={styles.label}>SPIN Number</div>
-  <div style={{ fontWeight: 900 }}>{project.spinNumber || "—"}</div>
-</div>
+              <div style={styles.field}>
+                <div style={styles.label}>Sex</div>
+                <div style={{ fontWeight: 900 }}>{project.sex || "—"}</div>
+              </div>
+              <div style={styles.field}>
+                <div style={styles.label}>SPIN Number</div>
+                <div style={{ fontWeight: 900 }}>{project.spinNumber || "—"}</div>
+              </div>
 
-<div style={styles.field}>
-  <div style={styles.label}>Sector</div>
-  <div style={{ fontWeight: 900 }}>{project.sector || "—"}</div>
-</div>
+              <div style={styles.field}>
+                <div style={styles.label}>Sector</div>
+                <div style={{ fontWeight: 900 }}>{project.sector || "—"}</div>
+              </div>
               <div style={styles.field}>
                 <div style={styles.label}>District</div>
                 <div style={{ fontWeight: 900 }}>{project.district || "—"}</div>
@@ -1043,30 +1043,30 @@ const oi = getOI(project.id);
               </div>
 
               <div style={styles.field}>
-  <div style={styles.label}>Date Approved</div>
-  <div
-    style={{
-      display: "flex",
-      gap: 8,
-      flexWrap: "wrap",
-      alignItems: "center",
-    }}
-  >
-    <input
-      style={{ ...styles.input, maxWidth: 220 }}
-      type="date"
-      value={dateApprovedInput || ""}
-      onChange={(e) => setDateApprovedInput(e.target.value)}
-    />
-    <button
-      type="button"
-      style={styles.tinyBtn}
-      onClick={() => onSaveDateApproved(project.id, dateApprovedInput || "")}
-    >
-      Save Date
-    </button>
-  </div>
-</div>
+                <div style={styles.label}>Date Approved</div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                  }}
+                >
+                  <input
+                    style={{ ...styles.input, maxWidth: 220 }}
+                    type="date"
+                    value={dateApprovedInput || ""}
+                    onChange={(e) => setDateApprovedInput(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    style={styles.tinyBtn}
+                    onClick={() => onSaveDateApproved(project.id, dateApprovedInput || "")}
+                  >
+                    Save Date
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -1158,8 +1158,8 @@ const oi = getOI(project.id);
                           }}
                         >
                           {value === null ||
-                          value === undefined ||
-                          value === ""
+                            value === undefined ||
+                            value === ""
                             ? "—"
                             : String(value)}
                         </div>
@@ -1207,48 +1207,48 @@ const oi = getOI(project.id);
             </div>
 
             {Array.isArray(project.interventions) &&
-project.interventions.length > 0 ? (
-  <div
-    style={{
-      border: "1px solid #e2e8f0",
-      borderRadius: 10,
-      overflow: "hidden",
-    }}
-  >
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr>
-          <th style={styles.rptTh}>#</th>
-          <th style={styles.rptTh}>Type</th>
-          <th style={styles.rptTh}>Title / Label</th>
-          <th style={styles.rptTh}>Date</th>
-          <th style={styles.rptTh}>Venue</th>
-          <th style={styles.rptTh}>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {project.interventions.map((it, idx) => (
-          <tr key={it.id}>
-            <td style={styles.rptTd}>{idx + 1}</td>
-            <td style={styles.rptTd}>{it.type || "—"}</td>
-            <td style={styles.rptTd}>{getInterventionLabel(it)}</td>
-            <td style={styles.rptTd}>{it.date || "—"}</td>
-            <td style={styles.rptTd}>{it.venue || "—"}</td>
-            <td style={styles.rptTd}>
-              <button
-                type="button"
-                style={styles.tinyBtn}
-                onClick={() => onViewIntervention(project.id, it.id)}
+              project.interventions.length > 0 ? (
+              <div
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 10,
+                  overflow: "hidden",
+                }}
               >
-                View
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={styles.rptTh}>#</th>
+                      <th style={styles.rptTh}>Type</th>
+                      <th style={styles.rptTh}>Title / Label</th>
+                      <th style={styles.rptTh}>Date</th>
+                      <th style={styles.rptTh}>Venue</th>
+                      <th style={styles.rptTh}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {project.interventions.map((it, idx) => (
+                      <tr key={it.id}>
+                        <td style={styles.rptTd}>{idx + 1}</td>
+                        <td style={styles.rptTd}>{it.type || "—"}</td>
+                        <td style={styles.rptTd}>{getInterventionLabel(it)}</td>
+                        <td style={styles.rptTd}>{it.date || "—"}</td>
+                        <td style={styles.rptTd}>{it.venue || "—"}</td>
+                        <td style={styles.rptTd}>
+                          <button
+                            type="button"
+                            style={styles.tinyBtn}
+                            onClick={() => onViewIntervention(project.id, it.id)}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
               <div style={{ fontSize: 12, opacity: 0.7 }}>
                 No interventions yet.
               </div>
@@ -1403,7 +1403,7 @@ function AddEditProjectModal({
                   setForm((p) => ({ ...p, sex: e.target.value }))
                 }
               >
-                
+
                 <option value="M">M</option>
                 <option value="F">F</option>
               </select>
@@ -1483,7 +1483,7 @@ function AddEditProjectModal({
                   setForm((p) => ({ ...p, status: e.target.value }))
                 }
               >
-                
+
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -1501,7 +1501,7 @@ function AddEditProjectModal({
                   setForm((p) => ({ ...p, type: e.target.value }))
                 }
               >
-                
+
                 {TYPE_OPTIONS.map((t) => (
                   <option key={t} value={t}>
                     {t}
@@ -1602,90 +1602,90 @@ function AddEditProjectModal({
                       ].includes(key);
                     })
                     .map((field) => {
-                    const key = field.fieldKey || field.field_key;
-                    const label = field.fieldLabel || field.field_label || key;
-                    const type = String(field.fieldType || field.field_type || "Text").toLowerCase();
-                    const value = form.customFields?.[key] ?? "";
+                      const key = field.fieldKey || field.field_key;
+                      const label = field.fieldLabel || field.field_label || key;
+                      const type = String(field.fieldType || field.field_type || "Text").toLowerCase();
+                      const value = form.customFields?.[key] ?? "";
 
-                    const updateCustomField = (newValue) => {
-                      setForm((prev) => ({
-                        ...prev,
-                        customFields: {
-                          ...(prev.customFields || {}),
-                          [key]: newValue,
-                        },
-                      }));
-                    };
+                      const updateCustomField = (newValue) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          customFields: {
+                            ...(prev.customFields || {}),
+                            [key]: newValue,
+                          },
+                        }));
+                      };
 
-                    if (type.includes("textarea")) {
-                      return (
-                        <div style={styles.field} key={key}>
-                          <div style={styles.label}>{label}</div>
-                          <textarea
-                            style={styles.textarea}
-                            value={value}
-                            onChange={(e) => updateCustomField(e.target.value)}
-                          />
-                        </div>
-                      );
-                    }
+                      if (type.includes("textarea")) {
+                        return (
+                          <div style={styles.field} key={key}>
+                            <div style={styles.label}>{label}</div>
+                            <textarea
+                              style={styles.textarea}
+                              value={value}
+                              onChange={(e) => updateCustomField(e.target.value)}
+                            />
+                          </div>
+                        );
+                      }
 
-                    if (type.includes("date")) {
+                      if (type.includes("date")) {
+                        return (
+                          <div style={styles.field} key={key}>
+                            <div style={styles.label}>{label}</div>
+                            <input
+                              type="date"
+                              style={styles.input}
+                              value={value}
+                              onChange={(e) => updateCustomField(e.target.value)}
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (type.includes("number") || type.includes("currency")) {
+                        return (
+                          <div style={styles.field} key={key}>
+                            <div style={styles.label}>{label}</div>
+                            <input
+                              type="number"
+                              style={styles.input}
+                              value={value}
+                              onChange={(e) => updateCustomField(e.target.value)}
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (type.includes("yes/no")) {
+                        return (
+                          <div style={styles.field} key={key}>
+                            <div style={styles.label}>{label}</div>
+                            <select
+                              style={styles.input}
+                              value={value}
+                              onChange={(e) => updateCustomField(e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+                        );
+                      }
+
                       return (
                         <div style={styles.field} key={key}>
                           <div style={styles.label}>{label}</div>
                           <input
-                            type="date"
                             style={styles.input}
                             value={value}
                             onChange={(e) => updateCustomField(e.target.value)}
                           />
                         </div>
                       );
-                    }
-
-                    if (type.includes("number") || type.includes("currency")) {
-                      return (
-                        <div style={styles.field} key={key}>
-                          <div style={styles.label}>{label}</div>
-                          <input
-                            type="number"
-                            style={styles.input}
-                            value={value}
-                            onChange={(e) => updateCustomField(e.target.value)}
-                          />
-                        </div>
-                      );
-                    }
-
-                    if (type.includes("yes/no")) {
-                      return (
-                        <div style={styles.field} key={key}>
-                          <div style={styles.label}>{label}</div>
-                          <select
-                            style={styles.input}
-                            value={value}
-                            onChange={(e) => updateCustomField(e.target.value)}
-                          >
-                            <option value="">-- Select --</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div style={styles.field} key={key}>
-                        <div style={styles.label}>{label}</div>
-                        <input
-                          style={styles.input}
-                          value={value}
-                          onChange={(e) => updateCustomField(e.target.value)}
-                        />
-                      </div>
-                    );
-                  })}
+                    })}
                 </div>
               </div>
             )}
@@ -1809,26 +1809,26 @@ export default function Setup() {
   const STATUS_OPTIONS = ["Ongoing", "Terminated", "Graduated"];
   const TYPE_OPTIONS = ["Phase 1 (New)", "Phase 2", "Phase 3"];
   const SECTOR_OPTIONS = [
-  "Food Processing",
-  "Crop and animal production, hunting, and related service activities",
-  "Forestry and Logging",
-  "Fishing and Aquaculture",
-  "Furniture Manufacturing",
-  "Fabricated Metal Products Manufacturing",
-  "Machinery and Equipment, NEC (Not Elsewhere Classified) Manufacturing",
-  "Information and Communication",
-  "Basic Pharmaceutical Products and Pharmaceutical Preparations Manufacturing",
-  "Beverage Manufacturing",
-  "Textile Manufacturing",
-  "Wood and Products of Wood and Cork Manufacturing",
-  "Paper and Paper Products Manufacturing",
-  "Rubber and Plastic Products Manufacturing",
-  "Non-metallic Mineral Products Manufacturing",
-  "Other Transport Equipment Manufacturing",
-  "Weaving Apparel Manufacturing",
-  "Leather and Related Products Manufacturing",
-  "Chemicals and Chemical Products Manufacturing",
-];
+    "Food Processing",
+    "Crop and animal production, hunting, and related service activities",
+    "Forestry and Logging",
+    "Fishing and Aquaculture",
+    "Furniture Manufacturing",
+    "Fabricated Metal Products Manufacturing",
+    "Machinery and Equipment, NEC (Not Elsewhere Classified) Manufacturing",
+    "Information and Communication",
+    "Basic Pharmaceutical Products and Pharmaceutical Preparations Manufacturing",
+    "Beverage Manufacturing",
+    "Textile Manufacturing",
+    "Wood and Products of Wood and Cork Manufacturing",
+    "Paper and Paper Products Manufacturing",
+    "Rubber and Plastic Products Manufacturing",
+    "Non-metallic Mineral Products Manufacturing",
+    "Other Transport Equipment Manufacturing",
+    "Weaving Apparel Manufacturing",
+    "Leather and Related Products Manufacturing",
+    "Chemicals and Chemical Products Manufacturing",
+  ];
   const DEFAULT_TACS_CONSULTANCY_OPTIONS = [
     "Plant layout",
     "Simple TACS",
@@ -1867,25 +1867,25 @@ export default function Setup() {
   const [setupCustomFields, setSetupCustomFields] = useState([]);
 
   const [form, setForm] = useState({
-  projectTitle: "",
-  firmName: "",
-  cooperatorName: "",
-  age: "",
-  sex: "",
-  spinNumber: "",
-  sector: "",
-  district: "",
-  address: "",
-  funded: "N",
-  amount: "",
-  status: "",
-  type: "",
-  dateApproved: "",
-  nameOfStaff: "",
-  remarks: "",
-  addressMeta: null,
-  customFields: {},
-});
+    projectTitle: "",
+    firmName: "",
+    cooperatorName: "",
+    age: "",
+    sex: "",
+    spinNumber: "",
+    sector: "",
+    district: "",
+    address: "",
+    funded: "N",
+    amount: "",
+    status: "",
+    type: "",
+    dateApproved: "",
+    nameOfStaff: "",
+    remarks: "",
+    addressMeta: null,
+    customFields: {},
+  });
 
   const [pickForId, setPickForId] = useState(null);
   const [selectedInterventionByProject, setSelectedInterventionByProject] =
@@ -2184,7 +2184,7 @@ export default function Setup() {
     setAddressMetaByProject(nextMap);
     try {
       localStorage.setItem(ADDRESS_META_STORAGE_KEY, JSON.stringify(nextMap));
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -2295,8 +2295,8 @@ export default function Setup() {
       const rows = Array.isArray(raw)
         ? raw
         : Array.isArray(raw?.data)
-        ? raw.data
-        : [];
+          ? raw.data
+          : [];
 
       setServerTotalPages(Array.isArray(raw) ? 1 : Number(raw?.totalPages || 1));
       setServerTotalRows(
@@ -2343,38 +2343,38 @@ export default function Setup() {
 
           interventions: Array.isArray(p.interventions)
             ? p.interventions.map((it) => ({
-                id: Number(it.id),
-                type: it.type ?? "",
-                title: it.title ?? "",
-                date: it.date ?? "",
-                venue: it.venue ?? "",
-                noOfFirms: it.noOfFirms ?? it.no_of_firms ?? "",
-                male: it.male ?? "",
-                female: it.female ?? "",
-                total: it.total ?? "",
-                notes: it.notes ?? "",
+              id: Number(it.id),
+              type: it.type ?? "",
+              title: it.title ?? "",
+              date: it.date ?? "",
+              venue: it.venue ?? "",
+              noOfFirms: it.noOfFirms ?? it.no_of_firms ?? "",
+              male: it.male ?? "",
+              female: it.female ?? "",
+              total: it.total ?? "",
+              notes: it.notes ?? "",
 
-                tacsConsultancyType:
-                  it.tacsConsultancyType ?? it.tacs_consultancy_type ?? "",
-                tacsDateEngagement:
-                  it.tacsDateEngagement ?? it.tacs_date_engagement ?? "",
-                tacsExpertInstitution:
-                  it.tacsExpertInstitution ?? it.tacs_expert_institution ?? "",
-                tacsCustomerName:
-                  it.tacsCustomerName ?? it.tacs_customer_name ?? "",
-                tacsCustomerSex:
-                  it.tacsCustomerSex ?? it.tacs_customer_sex ?? "",
-                tacsCustomerAddress:
-                  it.tacsCustomerAddress ?? it.tacs_customer_address ?? "",
-                tacsCustomerAddressMeta:
-                  it.tacsCustomerAddressMeta ?? it.tacs_customer_address_meta ?? null,
-                tacsMeansVerification:
-                  it.tacsMeansVerification ?? it.tacs_means_verification ?? "",
-                tacsNoOfAdvice:
-                  it.tacsNoOfAdvice ?? it.tacs_no_of_advice ?? "",
-                tacsRemarks:
-                  it.tacsRemarks ?? it.tacs_remarks ?? "",
-              }))
+              tacsConsultancyType:
+                it.tacsConsultancyType ?? it.tacs_consultancy_type ?? "",
+              tacsDateEngagement:
+                it.tacsDateEngagement ?? it.tacs_date_engagement ?? "",
+              tacsExpertInstitution:
+                it.tacsExpertInstitution ?? it.tacs_expert_institution ?? "",
+              tacsCustomerName:
+                it.tacsCustomerName ?? it.tacs_customer_name ?? "",
+              tacsCustomerSex:
+                it.tacsCustomerSex ?? it.tacs_customer_sex ?? "",
+              tacsCustomerAddress:
+                it.tacsCustomerAddress ?? it.tacs_customer_address ?? "",
+              tacsCustomerAddressMeta:
+                it.tacsCustomerAddressMeta ?? it.tacs_customer_address_meta ?? null,
+              tacsMeansVerification:
+                it.tacsMeansVerification ?? it.tacs_means_verification ?? "",
+              tacsNoOfAdvice:
+                it.tacsNoOfAdvice ?? it.tacs_no_of_advice ?? "",
+              tacsRemarks:
+                it.tacsRemarks ?? it.tacs_remarks ?? "",
+            }))
             : [],
         };
       });
@@ -2608,7 +2608,7 @@ export default function Setup() {
         p.district ||
         getDistrictFromMunicipality(
           p.addressMeta?.municipality ||
-            detectMunicipalityFromAddressText(p.address)
+          detectMunicipalityFromAddressText(p.address)
         ) ||
         "",
       address: p.address || "",
@@ -2655,7 +2655,7 @@ export default function Setup() {
         form.district ||
         getDistrictFromMunicipality(
           form.addressMeta?.municipality ||
-            detectMunicipalityFromAddressText(form.address)
+          detectMunicipalityFromAddressText(form.address)
         )
       ).trim(),
       address: form.address.trim(),
@@ -2701,47 +2701,47 @@ export default function Setup() {
   };
 
   const saveProjectDateApproved = async (projectId, dateApproved) => {
-  const p = projects.find((x) => x.id === projectId);
-  if (!p) return;
+    const p = projects.find((x) => x.id === projectId);
+    if (!p) return;
 
-  const qComputed =
-    getQuarterFromDate(dateApproved) ?? Number(p.quarter) ?? 1;
+    const qComputed =
+      getQuarterFromDate(dateApproved) ?? Number(p.quarter) ?? 1;
 
-  const payload = {
-    project_title: p.projectTitle || "",
-    quarter: qComputed,
-    firm_name: p.firmName || "",
-    cooperator_name: p.cooperatorName || "",
-    age: p.age === "" || p.age === null || p.age === undefined ? null : Number(p.age),
-    sex: (p.sex || "").trim(),
-    spin_number: (p.spinNumber || "").trim(),
-    sector: (p.sector || "").trim(),
-    district: (p.district || "").trim(),
-    address: p.address || "",
-    funded: String(p.funded || "N").toUpperCase(),
-    amount: Number(p.amount || 0),
-    name_of_staff: p.nameOfStaff || "",
-    nameOfStaff: p.nameOfStaff || "",
-    remarks: p.remarks || "",
-    stpms_status: p.status || "",
-    phase: p.type || "",
-    date_approved: dateApproved || null,
-    moa_signed: p.moaSigned || null,
-    addressMeta: p.addressMeta || null,
+    const payload = {
+      project_title: p.projectTitle || "",
+      quarter: qComputed,
+      firm_name: p.firmName || "",
+      cooperator_name: p.cooperatorName || "",
+      age: p.age === "" || p.age === null || p.age === undefined ? null : Number(p.age),
+      sex: (p.sex || "").trim(),
+      spin_number: (p.spinNumber || "").trim(),
+      sector: (p.sector || "").trim(),
+      district: (p.district || "").trim(),
+      address: p.address || "",
+      funded: String(p.funded || "N").toUpperCase(),
+      amount: Number(p.amount || 0),
+      name_of_staff: p.nameOfStaff || "",
+      nameOfStaff: p.nameOfStaff || "",
+      remarks: p.remarks || "",
+      stpms_status: p.status || "",
+      phase: p.type || "",
+      date_approved: dateApproved || null,
+      moa_signed: p.moaSigned || null,
+      addressMeta: p.addressMeta || null,
+    };
+
+    try {
+      await axios.put(`${API}/projects/${projectId}`, payload);
+      await fetchProjects();
+      setViewProjectId(projectId);
+      alert("Date Approved saved successfully.");
+    } catch (e) {
+      console.error("Save Date Approved error:", e?.response?.data || e.message || e);
+      alert("Failed to save Date Approved.");
+    }
   };
 
-  try {
-    await axios.put(`${API}/projects/${projectId}`, payload);
-    await fetchProjects();
-    setViewProjectId(projectId);
-    alert("Date Approved saved successfully.");
-  } catch (e) {
-    console.error("Save Date Approved error:", e?.response?.data || e.message || e);
-    alert("Failed to save Date Approved.");
-  }
-};
-
-const deleteProject = async (id) => {
+  const deleteProject = async (id) => {
     if (!window.confirm("Delete this project?")) return;
     try {
       await axios.delete(`${API}/projects/${id}`);
@@ -2768,38 +2768,38 @@ const deleteProject = async (id) => {
   };
 
   const addCustomTacsConsultancyType = async () => {
-  const name = String(newTacsType || "").trim();
-  if (!name) return alert("Required: Consultancy type");
+    const name = String(newTacsType || "").trim();
+    if (!name) return alert("Required: Consultancy type");
 
-  const exists = tacsConsultancyOptions.some(
-    (x) => String(x).toLowerCase() === name.toLowerCase()
-  );
-  if (exists) {
-    setDetailForm((p) => ({
-      ...p,
-      consultancyType: name,
-    }));
-    setNewTacsType("");
-    setShowAddTacsTypeModal(false);
-    return;
-  }
+    const exists = tacsConsultancyOptions.some(
+      (x) => String(x).toLowerCase() === name.toLowerCase()
+    );
+    if (exists) {
+      setDetailForm((p) => ({
+        ...p,
+        consultancyType: name,
+      }));
+      setNewTacsType("");
+      setShowAddTacsTypeModal(false);
+      return;
+    }
 
-  try {
-    await axios.post(`${API}/tacs-consultancy-types`, { name });
-    await fetchCustomTacsConsultancyOptions();
+    try {
+      await axios.post(`${API}/tacs-consultancy-types`, { name });
+      await fetchCustomTacsConsultancyOptions();
 
-    setDetailForm((p) => ({
-      ...p,
-      consultancyType: name,
-    }));
+      setDetailForm((p) => ({
+        ...p,
+        consultancyType: name,
+      }));
 
-    setNewTacsType("");
-    setShowAddTacsTypeModal(false);
-  } catch (e) {
-    console.error(e);
-    alert("Failed to add consultancy type.");
-  }
-};
+      setNewTacsType("");
+      setShowAddTacsTypeModal(false);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to add consultancy type.");
+    }
+  };
 
   const deleteCustomTacsConsultancyType = async (name) => {
     const cleanName = String(name || "").trim();
@@ -2823,7 +2823,7 @@ const deleteProject = async (id) => {
         ...prev,
         consultancyType:
           String(prev.consultancyType || "").toLowerCase() ===
-          cleanName.toLowerCase()
+            cleanName.toLowerCase()
             ? ""
             : prev.consultancyType,
       }));
@@ -2929,7 +2929,7 @@ const deleteProject = async (id) => {
           if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
           if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
         }
-      } catch {}
+      } catch { }
     }
 
     let tacsConsultancyType = "";
@@ -2957,41 +2957,41 @@ const deleteProject = async (id) => {
     let packagingAddressMeta = null;
     let packagingMeansVerification = "";
     let packagingRemarks = entry.notes || "";
-  let calibrationData = getDefaultCalibrationData();
+    let calibrationData = getDefaultCalibrationData();
 
-  if (isCalibration) {
-    try {
-      const obj = JSON.parse(entry?.notes || "{}");
-      calibrationData = normalizeCalibrationData(obj?.calibration || obj || {});
-    } catch {
-      calibrationData = getDefaultCalibrationData();
+    if (isCalibration) {
+      try {
+        const obj = JSON.parse(entry?.notes || "{}");
+        calibrationData = normalizeCalibrationData(obj?.calibration || obj || {});
+      } catch {
+        calibrationData = getDefaultCalibrationData();
+      }
     }
-  }
 
     if (isTacs) {
-  tacsConsultancyType =
-    entry.tacsConsultancyType || entry.title || "";
-  tacsDateEngagement =
-    entry.tacsDateEngagement || entry.date || "";
-  tacsExpertInstitution =
-    entry.tacsExpertInstitution || "";
-  tacsCustomerName =
-    entry.tacsCustomerName || "";
-  tacsCustomerSex =
-    entry.tacsCustomerSex || "";
-  tacsCustomerAddress =
-    entry.tacsCustomerAddress || entry.venue || "";
-  tacsCustomerAddressMeta =
-    entry.tacsCustomerAddressMeta || null;
-  tacsMeansVerification =
-    entry.tacsMeansVerification || "";
-  tacsNoOfAdvice =
-    entry.tacsNoOfAdvice === null || entry.tacsNoOfAdvice === undefined
-      ? ""
-      : String(entry.tacsNoOfAdvice);
-  tacsRemarks =
-    entry.tacsRemarks || "";
-}
+      tacsConsultancyType =
+        entry.tacsConsultancyType || entry.title || "";
+      tacsDateEngagement =
+        entry.tacsDateEngagement || entry.date || "";
+      tacsExpertInstitution =
+        entry.tacsExpertInstitution || "";
+      tacsCustomerName =
+        entry.tacsCustomerName || "";
+      tacsCustomerSex =
+        entry.tacsCustomerSex || "";
+      tacsCustomerAddress =
+        entry.tacsCustomerAddress || entry.venue || "";
+      tacsCustomerAddressMeta =
+        entry.tacsCustomerAddressMeta || null;
+      tacsMeansVerification =
+        entry.tacsMeansVerification || "";
+      tacsNoOfAdvice =
+        entry.tacsNoOfAdvice === null || entry.tacsNoOfAdvice === undefined
+          ? ""
+          : String(entry.tacsNoOfAdvice);
+      tacsRemarks =
+        entry.tacsRemarks || "";
+    }
 
     if (isPackaging) {
       try {
@@ -3006,7 +3006,7 @@ const deleteProject = async (id) => {
           packagingSizeVariantMaterial = obj.sizeVariantMaterial || "";
           packagingMaterialsProvided =
             obj.packagingMaterialsProvided === null ||
-            obj.packagingMaterialsProvided === undefined
+              obj.packagingMaterialsProvided === undefined
               ? ""
               : String(obj.packagingMaterialsProvided);
           packagingCustomerName = obj.customerName || "";
@@ -3057,7 +3057,7 @@ const deleteProject = async (id) => {
             typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
           trainingFirmsSucsHeisLgusCount =
             obj.firmsSucsHeisLgusCount === null ||
-            obj.firmsSucsHeisLgusCount === undefined
+              obj.firmsSucsHeisLgusCount === undefined
               ? ""
               : String(obj.firmsSucsHeisLgusCount);
           trainingSeniorFemale =
@@ -3159,12 +3159,12 @@ const deleteProject = async (id) => {
       notes: isTech
         ? parsedFreeText ?? ""
         : isTraining
-        ? trainingRemarks
-        : isTacs
-        ? tacsRemarks
-        : isPackaging
-        ? packagingRemarks
-        : entry.notes || "",
+          ? trainingRemarks
+          : isTacs
+            ? tacsRemarks
+            : isPackaging
+              ? packagingRemarks
+              : entry.notes || "",
       techRows: isTech
         ? Array.isArray(parsedRows) && parsedRows.length
           ? parsedRows
@@ -3200,266 +3200,266 @@ const deleteProject = async (id) => {
     });
   };
   const openInterventionDetails_View = (projectId, entryId) => {
-  const p = projects.find((x) => x.id === projectId);
-  const entry = p?.interventions?.find((x) => x.id === entryId);
-  if (!p || !entry) return;
+    const p = projects.find((x) => x.id === projectId);
+    const entry = p?.interventions?.find((x) => x.id === entryId);
+    if (!p || !entry) return;
 
-  const type = entry.type || "";
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
-  const isCalibration = type === "Calibration";
+    const type = entry.type || "";
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
+    const isCalibration = type === "Calibration";
 
-  let parsedRows = null;
-  let parsedFreeText = null;
+    let parsedRows = null;
+    let parsedFreeText = null;
 
-  if (isTech) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
-        if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
-      }
-    } catch {}
-  }
-
-  let trainingPPU = "";
-  let trainingRemarks = entry.notes || "";
-  let trainingVenueMeta = null;
-
-  let packagingQuarter = "";
-  let packagingProvince = "Pangasinan";
-  let packagingDateCompleted = "";
-  let packagingServiceType = entry.title || "Label Design";
-  let packagingProductName = "";
-  let packagingSizeVariantMaterial = "";
-  let packagingMaterialsProvided = "";
-  let packagingCustomerName = "";
-  let packagingCustomerSex = "";
-  let packagingFirmName = "";
-  let packagingAddress = entry.venue || "";
-  let packagingAddressMeta = null;
-  let packagingMeansVerification = "";
-  let packagingRemarks = entry.notes || "";
-  let calibrationData = getDefaultCalibrationData();
-
-  if (isCalibration) {
-    try {
-      const obj = JSON.parse(entry?.notes || "{}");
-      calibrationData = normalizeCalibrationData(obj?.calibration || obj || {});
-    } catch {
-      calibrationData = getDefaultCalibrationData();
+    if (isTech) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
+          if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
+        }
+      } catch { }
     }
-  }
 
-  let trainingFirmsSucsHeisLgusCount = "";
-  let trainingSeniorFemale = "";
-  let trainingSeniorMale = "";
-  let trainingIpFemale = "";
-  let trainingIpMale = "";
-  let trainingFourPsFemale = "";
-  let trainingFourPsMale = "";
-  let trainingPwdFemale = "";
-  let trainingPwdMale = "";
-  let trainingFirmsAssociationsList = "";
-  let trainingTrainorAffiliation = "";
-  let trainingCostDost = "";
-  let trainingCostPartnerAgency = "";
-  let trainingTotalCost = "";
-  let trainingEndDate = "";
-  let trainingProvince = "Pangasinan";
+    let trainingPPU = "";
+    let trainingRemarks = entry.notes || "";
+    let trainingVenueMeta = null;
 
-  if (isTraining) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        trainingVenueMeta = obj.venueMeta || null;
-        trainingPPU =
-          typeof obj.projectProgramUnit === "string"
-            ? obj.projectProgramUnit
-            : "";
-        trainingRemarks =
-          typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
-        trainingFirmsSucsHeisLgusCount =
-          obj.firmsSucsHeisLgusCount === null ||
-          obj.firmsSucsHeisLgusCount === undefined
-            ? ""
-            : String(obj.firmsSucsHeisLgusCount);
-        trainingSeniorFemale =
-          obj.seniorFemale === null || obj.seniorFemale === undefined
-            ? ""
-            : String(obj.seniorFemale);
-        trainingSeniorMale =
-          obj.seniorMale === null || obj.seniorMale === undefined
-            ? ""
-            : String(obj.seniorMale);
-        trainingIpFemale =
-          obj.ipFemale === null || obj.ipFemale === undefined
-            ? ""
-            : String(obj.ipFemale);
-        trainingIpMale =
-          obj.ipMale === null || obj.ipMale === undefined
-            ? ""
-            : String(obj.ipMale);
-        trainingFourPsFemale =
-          obj.fourPsFemale === null || obj.fourPsFemale === undefined
-            ? ""
-            : String(obj.fourPsFemale);
-        trainingFourPsMale =
-          obj.fourPsMale === null || obj.fourPsMale === undefined
-            ? ""
-            : String(obj.fourPsMale);
-        trainingPwdFemale =
-          obj.pwdFemale === null || obj.pwdFemale === undefined
-            ? ""
-            : String(obj.pwdFemale);
-        trainingPwdMale =
-          obj.pwdMale === null || obj.pwdMale === undefined
-            ? ""
-            : String(obj.pwdMale);
-        trainingFirmsAssociationsList =
-          typeof obj.firmsAssociationsList === "string"
-            ? obj.firmsAssociationsList
-            : "";
-        trainingTrainorAffiliation =
-          typeof obj.trainorAffiliation === "string"
-            ? obj.trainorAffiliation
-            : "";
-        trainingCostDost =
-          obj.costDost === null || obj.costDost === undefined
-            ? ""
-            : String(obj.costDost);
-        trainingCostPartnerAgency =
-          obj.costPartnerAgency === null || obj.costPartnerAgency === undefined
-            ? ""
-            : String(obj.costPartnerAgency);
-        trainingTotalCost =
-          obj.totalCost === null || obj.totalCost === undefined
-            ? ""
-            : String(obj.totalCost);
-        trainingEndDate =
-          typeof obj.endDate === "string" ? obj.endDate : "";
-        trainingProvince =
-          typeof obj.province === "string" && obj.province.trim()
-            ? obj.province
-            : "Pangasinan";
+    let packagingQuarter = "";
+    let packagingProvince = "Pangasinan";
+    let packagingDateCompleted = "";
+    let packagingServiceType = entry.title || "Label Design";
+    let packagingProductName = "";
+    let packagingSizeVariantMaterial = "";
+    let packagingMaterialsProvided = "";
+    let packagingCustomerName = "";
+    let packagingCustomerSex = "";
+    let packagingFirmName = "";
+    let packagingAddress = entry.venue || "";
+    let packagingAddressMeta = null;
+    let packagingMeansVerification = "";
+    let packagingRemarks = entry.notes || "";
+    let calibrationData = getDefaultCalibrationData();
+
+    if (isCalibration) {
+      try {
+        const obj = JSON.parse(entry?.notes || "{}");
+        calibrationData = normalizeCalibrationData(obj?.calibration || obj || {});
+      } catch {
+        calibrationData = getDefaultCalibrationData();
       }
-    } catch {
-      trainingVenueMeta = null;
-      trainingPPU = "";
-      trainingRemarks = entry.notes || "";
-      trainingEndDate = "";
-      trainingProvince = "Pangasinan";
     }
-  }
 
-  if (isPackaging) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        packagingQuarter = obj.quarter || "";
-        packagingProvince = obj.province || "Pangasinan";
-        packagingDateCompleted = obj.dateCompleted || entry.date || "";
-        packagingServiceType = obj.serviceType || entry.title || "Label Design";
-        packagingProductName = obj.productName || "";
-        packagingSizeVariantMaterial = obj.sizeVariantMaterial || "";
-        packagingMaterialsProvided =
-          obj.packagingMaterialsProvided === null ||
-          obj.packagingMaterialsProvided === undefined
-            ? ""
-            : String(obj.packagingMaterialsProvided);
-        packagingCustomerName = obj.customerName || "";
-        packagingCustomerSex = obj.customerSex || "";
-        packagingFirmName = obj.firmName || "";
-        packagingAddress = obj.address || entry.venue || "";
-        packagingAddressMeta = obj.addressMeta || null;
-        packagingMeansVerification = obj.meansVerification || "";
-        packagingRemarks = obj.remarks || "";
+    let trainingFirmsSucsHeisLgusCount = "";
+    let trainingSeniorFemale = "";
+    let trainingSeniorMale = "";
+    let trainingIpFemale = "";
+    let trainingIpMale = "";
+    let trainingFourPsFemale = "";
+    let trainingFourPsMale = "";
+    let trainingPwdFemale = "";
+    let trainingPwdMale = "";
+    let trainingFirmsAssociationsList = "";
+    let trainingTrainorAffiliation = "";
+    let trainingCostDost = "";
+    let trainingCostPartnerAgency = "";
+    let trainingTotalCost = "";
+    let trainingEndDate = "";
+    let trainingProvince = "Pangasinan";
+
+    if (isTraining) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          trainingVenueMeta = obj.venueMeta || null;
+          trainingPPU =
+            typeof obj.projectProgramUnit === "string"
+              ? obj.projectProgramUnit
+              : "";
+          trainingRemarks =
+            typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
+          trainingFirmsSucsHeisLgusCount =
+            obj.firmsSucsHeisLgusCount === null ||
+              obj.firmsSucsHeisLgusCount === undefined
+              ? ""
+              : String(obj.firmsSucsHeisLgusCount);
+          trainingSeniorFemale =
+            obj.seniorFemale === null || obj.seniorFemale === undefined
+              ? ""
+              : String(obj.seniorFemale);
+          trainingSeniorMale =
+            obj.seniorMale === null || obj.seniorMale === undefined
+              ? ""
+              : String(obj.seniorMale);
+          trainingIpFemale =
+            obj.ipFemale === null || obj.ipFemale === undefined
+              ? ""
+              : String(obj.ipFemale);
+          trainingIpMale =
+            obj.ipMale === null || obj.ipMale === undefined
+              ? ""
+              : String(obj.ipMale);
+          trainingFourPsFemale =
+            obj.fourPsFemale === null || obj.fourPsFemale === undefined
+              ? ""
+              : String(obj.fourPsFemale);
+          trainingFourPsMale =
+            obj.fourPsMale === null || obj.fourPsMale === undefined
+              ? ""
+              : String(obj.fourPsMale);
+          trainingPwdFemale =
+            obj.pwdFemale === null || obj.pwdFemale === undefined
+              ? ""
+              : String(obj.pwdFemale);
+          trainingPwdMale =
+            obj.pwdMale === null || obj.pwdMale === undefined
+              ? ""
+              : String(obj.pwdMale);
+          trainingFirmsAssociationsList =
+            typeof obj.firmsAssociationsList === "string"
+              ? obj.firmsAssociationsList
+              : "";
+          trainingTrainorAffiliation =
+            typeof obj.trainorAffiliation === "string"
+              ? obj.trainorAffiliation
+              : "";
+          trainingCostDost =
+            obj.costDost === null || obj.costDost === undefined
+              ? ""
+              : String(obj.costDost);
+          trainingCostPartnerAgency =
+            obj.costPartnerAgency === null || obj.costPartnerAgency === undefined
+              ? ""
+              : String(obj.costPartnerAgency);
+          trainingTotalCost =
+            obj.totalCost === null || obj.totalCost === undefined
+              ? ""
+              : String(obj.totalCost);
+          trainingEndDate =
+            typeof obj.endDate === "string" ? obj.endDate : "";
+          trainingProvince =
+            typeof obj.province === "string" && obj.province.trim()
+              ? obj.province
+              : "Pangasinan";
+        }
+      } catch {
+        trainingVenueMeta = null;
+        trainingPPU = "";
+        trainingRemarks = entry.notes || "";
+        trainingEndDate = "";
+        trainingProvince = "Pangasinan";
       }
-    } catch {
-      packagingDateCompleted = entry.date || "";
-      packagingServiceType = entry.title || "Label Design";
-      packagingAddress = entry.venue || "";
-      packagingRemarks = entry.notes || "";
     }
-  }
 
-  setViewInterventionFor({ projectId, entryId });
+    if (isPackaging) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          packagingQuarter = obj.quarter || "";
+          packagingProvince = obj.province || "Pangasinan";
+          packagingDateCompleted = obj.dateCompleted || entry.date || "";
+          packagingServiceType = obj.serviceType || entry.title || "Label Design";
+          packagingProductName = obj.productName || "";
+          packagingSizeVariantMaterial = obj.sizeVariantMaterial || "";
+          packagingMaterialsProvided =
+            obj.packagingMaterialsProvided === null ||
+              obj.packagingMaterialsProvided === undefined
+              ? ""
+              : String(obj.packagingMaterialsProvided);
+          packagingCustomerName = obj.customerName || "";
+          packagingCustomerSex = obj.customerSex || "";
+          packagingFirmName = obj.firmName || "";
+          packagingAddress = obj.address || entry.venue || "";
+          packagingAddressMeta = obj.addressMeta || null;
+          packagingMeansVerification = obj.meansVerification || "";
+          packagingRemarks = obj.remarks || "";
+        }
+      } catch {
+        packagingDateCompleted = entry.date || "";
+        packagingServiceType = entry.title || "Label Design";
+        packagingAddress = entry.venue || "";
+        packagingRemarks = entry.notes || "";
+      }
+    }
 
-  setDetailForm({
-    type,
-    title: entry.title || (isTraining ? "" : type),
-    date: entry.date || "",
-    venue: entry.venue || "",
-    venueMeta: isTraining ? trainingVenueMeta : null,
-    noOfFirms: entry.noOfFirms ?? "",
-    firmsSucsHeisLgusCount: isTraining ? trainingFirmsSucsHeisLgusCount : "",
-    male: entry.male ?? "",
-    female: entry.female ?? "",
-    total: entry.total ?? "",
-    seniorFemale: isTraining ? trainingSeniorFemale : "",
-    seniorMale: isTraining ? trainingSeniorMale : "",
-    ipFemale: isTraining ? trainingIpFemale : "",
-    ipMale: isTraining ? trainingIpMale : "",
-    fourPsFemale: isTraining ? trainingFourPsFemale : "",
-    fourPsMale: isTraining ? trainingFourPsMale : "",
-    pwdFemale: isTraining ? trainingPwdFemale : "",
-    pwdMale: isTraining ? trainingPwdMale : "",
-    firmsAssociationsList: isTraining ? trainingFirmsAssociationsList : "",
-    trainorAffiliation: isTraining ? trainingTrainorAffiliation : "",
-    projectProgramUnit: trainingPPU,
-    costDost: isTraining ? trainingCostDost : "",
-    costPartnerAgency: isTraining ? trainingCostPartnerAgency : "",
-    totalCost: isTraining ? trainingTotalCost : "",
-    notesEndDate: isTraining ? trainingEndDate : "",
-    notesProvince: isTraining ? trainingProvince : "Pangasinan",
-    notes: isTech
-      ? parsedFreeText ?? ""
-      : isTraining
-      ? trainingRemarks
-      : isTacs
-      ? entry.tacsRemarks || ""
-      : isPackaging
-      ? packagingRemarks
-      : entry.notes || "",
-    techRows: isTech
-      ? Array.isArray(parsedRows) && parsedRows.length
-        ? parsedRows
-        : makeDefaultTechRows()
-      : [],
+    setViewInterventionFor({ projectId, entryId });
 
-    consultancyType: isTacs ? entry.tacsConsultancyType || "" : "",
-    dateEngagement: isTacs ? entry.tacsDateEngagement || "" : "",
-    expertInstitution: isTacs ? entry.tacsExpertInstitution || "" : "",
-    customerName: isTacs ? entry.tacsCustomerName || "" : "",
-    customerSex: isTacs ? entry.tacsCustomerSex || "" : "",
-    customerAddress: isTacs ? entry.tacsCustomerAddress || "" : "",
-    customerAddressMeta: isTacs ? entry.tacsCustomerAddressMeta || null : null,
-    meansVerification: isTacs ? entry.tacsMeansVerification || "" : "",
-    noOfAdvice:
-      isTacs && entry.tacsNoOfAdvice !== null && entry.tacsNoOfAdvice !== undefined
-        ? String(entry.tacsNoOfAdvice)
-        : "",
+    setDetailForm({
+      type,
+      title: entry.title || (isTraining ? "" : type),
+      date: entry.date || "",
+      venue: entry.venue || "",
+      venueMeta: isTraining ? trainingVenueMeta : null,
+      noOfFirms: entry.noOfFirms ?? "",
+      firmsSucsHeisLgusCount: isTraining ? trainingFirmsSucsHeisLgusCount : "",
+      male: entry.male ?? "",
+      female: entry.female ?? "",
+      total: entry.total ?? "",
+      seniorFemale: isTraining ? trainingSeniorFemale : "",
+      seniorMale: isTraining ? trainingSeniorMale : "",
+      ipFemale: isTraining ? trainingIpFemale : "",
+      ipMale: isTraining ? trainingIpMale : "",
+      fourPsFemale: isTraining ? trainingFourPsFemale : "",
+      fourPsMale: isTraining ? trainingFourPsMale : "",
+      pwdFemale: isTraining ? trainingPwdFemale : "",
+      pwdMale: isTraining ? trainingPwdMale : "",
+      firmsAssociationsList: isTraining ? trainingFirmsAssociationsList : "",
+      trainorAffiliation: isTraining ? trainingTrainorAffiliation : "",
+      projectProgramUnit: trainingPPU,
+      costDost: isTraining ? trainingCostDost : "",
+      costPartnerAgency: isTraining ? trainingCostPartnerAgency : "",
+      totalCost: isTraining ? trainingTotalCost : "",
+      notesEndDate: isTraining ? trainingEndDate : "",
+      notesProvince: isTraining ? trainingProvince : "Pangasinan",
+      notes: isTech
+        ? parsedFreeText ?? ""
+        : isTraining
+          ? trainingRemarks
+          : isTacs
+            ? entry.tacsRemarks || ""
+            : isPackaging
+              ? packagingRemarks
+              : entry.notes || "",
+      techRows: isTech
+        ? Array.isArray(parsedRows) && parsedRows.length
+          ? parsedRows
+          : makeDefaultTechRows()
+        : [],
 
-    packagingQuarter: isPackaging ? packagingQuarter : "",
-    packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
-    packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
-    packagingServiceType: isPackaging ? packagingServiceType : "Label Design",
-    packagingProductName: isPackaging ? packagingProductName : "",
-    packagingSizeVariantMaterial: isPackaging ? packagingSizeVariantMaterial : "",
-    packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
-    packagingCustomerName: isPackaging ? packagingCustomerName : "",
-    packagingCustomerSex: isPackaging ? packagingCustomerSex : "",
-    packagingFirmName: isPackaging ? packagingFirmName : "",
-    packagingAddress: isPackaging ? packagingAddress : "",
-    packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
-    packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
-    packagingRemarks: isPackaging ? packagingRemarks : "",
+      consultancyType: isTacs ? entry.tacsConsultancyType || "" : "",
+      dateEngagement: isTacs ? entry.tacsDateEngagement || "" : "",
+      expertInstitution: isTacs ? entry.tacsExpertInstitution || "" : "",
+      customerName: isTacs ? entry.tacsCustomerName || "" : "",
+      customerSex: isTacs ? entry.tacsCustomerSex || "" : "",
+      customerAddress: isTacs ? entry.tacsCustomerAddress || "" : "",
+      customerAddressMeta: isTacs ? entry.tacsCustomerAddressMeta || null : null,
+      meansVerification: isTacs ? entry.tacsMeansVerification || "" : "",
+      noOfAdvice:
+        isTacs && entry.tacsNoOfAdvice !== null && entry.tacsNoOfAdvice !== undefined
+          ? String(entry.tacsNoOfAdvice)
+          : "",
 
-    calibrationData: isCalibration ? calibrationData : getDefaultCalibrationData(),
-  });
-};
+      packagingQuarter: isPackaging ? packagingQuarter : "",
+      packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
+      packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
+      packagingServiceType: isPackaging ? packagingServiceType : "Label Design",
+      packagingProductName: isPackaging ? packagingProductName : "",
+      packagingSizeVariantMaterial: isPackaging ? packagingSizeVariantMaterial : "",
+      packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
+      packagingCustomerName: isPackaging ? packagingCustomerName : "",
+      packagingCustomerSex: isPackaging ? packagingCustomerSex : "",
+      packagingFirmName: isPackaging ? packagingFirmName : "",
+      packagingAddress: isPackaging ? packagingAddress : "",
+      packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
+      packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
+      packagingRemarks: isPackaging ? packagingRemarks : "",
+
+      calibrationData: isCalibration ? calibrationData : getDefaultCalibrationData(),
+    });
+  };
 
   const deleteIntervention = async (projectId, entryId) => {
     if (!window.confirm("Delete this intervention entry?")) return;
@@ -3495,8 +3495,8 @@ const deleteProject = async (id) => {
       freeText: typeof obj.freeText === "string" ? obj.freeText : "",
       techRolloutEntryIds: Array.isArray(obj.techRolloutEntryIds)
         ? obj.techRolloutEntryIds
-            .map((x) => Number(x))
-            .filter((x) => Number.isFinite(x) && x > 0)
+          .map((x) => Number(x))
+          .filter((x) => Number.isFinite(x) && x > 0)
         : [],
     };
   };
@@ -3724,12 +3724,12 @@ const deleteProject = async (id) => {
 
     let notesToSave = isTech
       ? JSON.stringify({
-          techRollOutRows: cleanTechRows(detailForm.techRows),
-          freeText: (detailForm.notes || "").trim(),
-          techRolloutEntryIds: [],
-        })
+        techRollOutRows: cleanTechRows(detailForm.techRows),
+        freeText: (detailForm.notes || "").trim(),
+        techRolloutEntryIds: [],
+      })
       : isTraining
-      ? JSON.stringify({
+        ? JSON.stringify({
           venueMeta: detailForm.venueMeta || null,
           firmsSucsHeisLgusCount:
             detailForm.firmsSucsHeisLgusCount === ""
@@ -3794,161 +3794,161 @@ const deleteProject = async (id) => {
               : null,
           remarks: (detailForm.notes || "").trim(),
         })
-      : isTacs
-      ? JSON.stringify({
-          consultancyType: (detailForm.consultancyType || "").trim(),
-          dateEngagement: detailForm.dateEngagement || "",
-          expertInstitution: (detailForm.expertInstitution || "").trim(),
-          customerName: (detailForm.customerName || "").trim(),
-          customerSex: (detailForm.customerSex || "").trim(),
-          customerAddress: (detailForm.customerAddress || "").trim(),
-          customerAddressMeta: detailForm.customerAddressMeta || null,
-          meansVerification: (detailForm.meansVerification || "").trim(),
-          noOfAdvice:
-            detailForm.noOfAdvice === ""
-              ? null
-              : Number(detailForm.noOfAdvice),
-          remarks: (detailForm.notes || "").trim(),
-        })
-      : isPackaging
-      ? JSON.stringify({
-          quarter: (detailForm.packagingQuarter || "").trim(),
-          province: (detailForm.packagingProvince || "Pangasinan").trim(),
-          dateCompleted: detailForm.packagingDateCompleted || "",
-          serviceType: (detailForm.packagingServiceType || "Label Design").trim(),
-          productName: (detailForm.packagingProductName || "").trim(),
-          sizeVariantMaterial: (detailForm.packagingSizeVariantMaterial || "").trim(),
-          packagingMaterialsProvided:
-            detailForm.packagingMaterialsProvided === ""
-              ? null
-              : Number(detailForm.packagingMaterialsProvided),
-          customerName: (detailForm.packagingCustomerName || "").trim(),
-          customerSex: (detailForm.packagingCustomerSex || "").trim(),
-          firmName: (detailForm.packagingFirmName || "").trim(),
-          address: (detailForm.packagingAddress || "").trim(),
-          addressMeta: detailForm.packagingAddressMeta || null,
-          meansVerification: (detailForm.packagingMeansVerification || "").trim(),
-          remarks: (detailForm.notes || "").trim(),
-        })
-      : isCalibration
-      ? (() => {
-          const calibration = normalizeCalibrationData(detailForm.calibrationData || {});
-          const cleanRows = calibration.typeOfSample === "Weighing Scale"
-            ? (calibration.mcBreakdown || [])
-                .filter((r) => r.range && calibrationToNumber(r.noOfSample) > 0)
-                .map((r) => ({
-                  id: r.id || makeCalibrationBreakdownRow().id,
-                  range: r.range,
-                  noOfSample: calibrationToNumber(r.noOfSample),
-                  cost: calibrationToNumber(r.cost),
-                  feesCollected:
-                    calibration.category === "PAYING"
-                      ? calibrationToNumber(r.noOfSample) * calibrationToNumber(r.cost)
-                      : 0,
-                  autoFilled: Boolean(r.autoFilled),
-                }))
-            : [];
-          const totals = computeCalibrationBreakdownTotals(cleanRows, calibration.category);
-          return JSON.stringify({
-            calibration: {
-              ...calibration,
-              noOfSample: calibrationToNumber(calibration.noOfSample),
-              cost: calibrationToNumber(calibration.cost),
-              feesCollected:
-                calibration.typeOfSample === "Weighing Scale"
-                  ? (calibration.category === "PAYING" ? totals.totalFees : 0)
-                  : (calibration.category === "PAYING" ? calibrationToNumber(calibration.feesCollected) : 0),
-              female: calibrationToNumber(calibration.female),
-              male: calibrationToNumber(calibration.male),
-              totalCustomers: calibrationToNumber(calibration.female) + calibrationToNumber(calibration.male),
-              noOfFirms: calibrationToNumber(calibration.noOfFirms),
-              noOfNewFirms: calibrationToNumber(calibration.noOfNewFirms),
-              pwd: calibrationToNumber(calibration.pwd),
-              ip: calibrationToNumber(calibration.ip),
-              sc: calibrationToNumber(calibration.sc),
-              fourPs: calibrationToNumber(calibration.fourPs),
-              mcBreakdown: cleanRows,
-            },
-          });
-        })()
-      : (detailForm.notes || "").trim();
+        : isTacs
+          ? JSON.stringify({
+            consultancyType: (detailForm.consultancyType || "").trim(),
+            dateEngagement: detailForm.dateEngagement || "",
+            expertInstitution: (detailForm.expertInstitution || "").trim(),
+            customerName: (detailForm.customerName || "").trim(),
+            customerSex: (detailForm.customerSex || "").trim(),
+            customerAddress: (detailForm.customerAddress || "").trim(),
+            customerAddressMeta: detailForm.customerAddressMeta || null,
+            meansVerification: (detailForm.meansVerification || "").trim(),
+            noOfAdvice:
+              detailForm.noOfAdvice === ""
+                ? null
+                : Number(detailForm.noOfAdvice),
+            remarks: (detailForm.notes || "").trim(),
+          })
+          : isPackaging
+            ? JSON.stringify({
+              quarter: (detailForm.packagingQuarter || "").trim(),
+              province: (detailForm.packagingProvince || "Pangasinan").trim(),
+              dateCompleted: detailForm.packagingDateCompleted || "",
+              serviceType: (detailForm.packagingServiceType || "Label Design").trim(),
+              productName: (detailForm.packagingProductName || "").trim(),
+              sizeVariantMaterial: (detailForm.packagingSizeVariantMaterial || "").trim(),
+              packagingMaterialsProvided:
+                detailForm.packagingMaterialsProvided === ""
+                  ? null
+                  : Number(detailForm.packagingMaterialsProvided),
+              customerName: (detailForm.packagingCustomerName || "").trim(),
+              customerSex: (detailForm.packagingCustomerSex || "").trim(),
+              firmName: (detailForm.packagingFirmName || "").trim(),
+              address: (detailForm.packagingAddress || "").trim(),
+              addressMeta: detailForm.packagingAddressMeta || null,
+              meansVerification: (detailForm.packagingMeansVerification || "").trim(),
+              remarks: (detailForm.notes || "").trim(),
+            })
+            : isCalibration
+              ? (() => {
+                const calibration = normalizeCalibrationData(detailForm.calibrationData || {});
+                const cleanRows = calibration.typeOfSample === "Weighing Scale"
+                  ? (calibration.mcBreakdown || [])
+                    .filter((r) => r.range && calibrationToNumber(r.noOfSample) > 0)
+                    .map((r) => ({
+                      id: r.id || makeCalibrationBreakdownRow().id,
+                      range: r.range,
+                      noOfSample: calibrationToNumber(r.noOfSample),
+                      cost: calibrationToNumber(r.cost),
+                      feesCollected:
+                        calibration.category === "PAYING"
+                          ? calibrationToNumber(r.noOfSample) * calibrationToNumber(r.cost)
+                          : 0,
+                      autoFilled: Boolean(r.autoFilled),
+                    }))
+                  : [];
+                const totals = computeCalibrationBreakdownTotals(cleanRows, calibration.category);
+                return JSON.stringify({
+                  calibration: {
+                    ...calibration,
+                    noOfSample: calibrationToNumber(calibration.noOfSample),
+                    cost: calibrationToNumber(calibration.cost),
+                    feesCollected:
+                      calibration.typeOfSample === "Weighing Scale"
+                        ? (calibration.category === "PAYING" ? totals.totalFees : 0)
+                        : (calibration.category === "PAYING" ? calibrationToNumber(calibration.feesCollected) : 0),
+                    female: calibrationToNumber(calibration.female),
+                    male: calibrationToNumber(calibration.male),
+                    totalCustomers: calibrationToNumber(calibration.female) + calibrationToNumber(calibration.male),
+                    noOfFirms: calibrationToNumber(calibration.noOfFirms),
+                    noOfNewFirms: calibrationToNumber(calibration.noOfNewFirms),
+                    pwd: calibrationToNumber(calibration.pwd),
+                    ip: calibrationToNumber(calibration.ip),
+                    sc: calibrationToNumber(calibration.sc),
+                    fourPs: calibrationToNumber(calibration.fourPs),
+                    mcBreakdown: cleanRows,
+                  },
+                });
+              })()
+              : (detailForm.notes || "").trim();
 
     const payload = {
-  type,
-  title: isTraining
-    ? (detailForm.title || "").trim()
-    : isTacs
-    ? (detailForm.consultancyType || "").trim()
-    : isPackaging
-    ? (detailForm.packagingServiceType || "").trim()
-    : isCalibration
-    ? ((detailForm.calibrationData?.typeOfSample || "Calibration").trim())
-    : type,
-  date: isTraining
-    ? detailForm.date || null
-    : isTacs
-    ? detailForm.dateEngagement || null
-    : isPackaging
-    ? detailForm.packagingDateCompleted || null
-    : isCalibration
-    ? detailForm.calibrationData?.date || null
-    : null,
-  venue: isTraining
-    ? detailForm.venue || ""
-    : isTacs
-    ? (detailForm.customerAddress || "").trim()
-    : isPackaging
-    ? (detailForm.packagingAddress || "").trim()
-    : isCalibration
-    ? (detailForm.calibrationData?.address || "").trim()
-    : "",
-  noOfFirms: isTraining
-    ? detailForm.noOfFirms === ""
-      ? null
-      : Number(detailForm.noOfFirms)
-    : isCalibration
-    ? calibrationToNumber(detailForm.calibrationData?.noOfFirms)
-    : null,
-  male: isTraining ? getTrainingMaleTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.male) : null,
-  female: isTraining ? getTrainingFemaleTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.female) : null,
-  total: isTraining ? getTrainingGrandTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.female) + calibrationToNumber(detailForm.calibrationData?.male) : null,
-  notes: isTacs ? "" : notesToSave,
+      type,
+      title: isTraining
+        ? (detailForm.title || "").trim()
+        : isTacs
+          ? (detailForm.consultancyType || "").trim()
+          : isPackaging
+            ? (detailForm.packagingServiceType || "").trim()
+            : isCalibration
+              ? ((detailForm.calibrationData?.typeOfSample || "Calibration").trim())
+              : type,
+      date: isTraining
+        ? detailForm.date || null
+        : isTacs
+          ? detailForm.dateEngagement || null
+          : isPackaging
+            ? detailForm.packagingDateCompleted || null
+            : isCalibration
+              ? detailForm.calibrationData?.date || null
+              : null,
+      venue: isTraining
+        ? detailForm.venue || ""
+        : isTacs
+          ? (detailForm.customerAddress || "").trim()
+          : isPackaging
+            ? (detailForm.packagingAddress || "").trim()
+            : isCalibration
+              ? (detailForm.calibrationData?.address || "").trim()
+              : "",
+      noOfFirms: isTraining
+        ? detailForm.noOfFirms === ""
+          ? null
+          : Number(detailForm.noOfFirms)
+        : isCalibration
+          ? calibrationToNumber(detailForm.calibrationData?.noOfFirms)
+          : null,
+      male: isTraining ? getTrainingMaleTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.male) : null,
+      female: isTraining ? getTrainingFemaleTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.female) : null,
+      total: isTraining ? getTrainingGrandTotal(detailForm) : isCalibration ? calibrationToNumber(detailForm.calibrationData?.female) + calibrationToNumber(detailForm.calibrationData?.male) : null,
+      notes: isTacs ? "" : notesToSave,
 
-  tacs_consultancy_type: isTacs
-    ? (detailForm.consultancyType || "").trim()
-    : null,
-  tacs_date_engagement: isTacs
-    ? detailForm.dateEngagement || null
-    : null,
-  tacs_expert_institution: isTacs
-    ? (detailForm.expertInstitution || "").trim()
-    : null,
-  tacs_customer_name: isTacs
-    ? (detailForm.customerName || "").trim()
-    : null,
-  tacs_customer_sex: isTacs
-    ? (detailForm.customerSex || "").trim()
-    : null,
-  tacs_customer_address: isTacs
-    ? (detailForm.customerAddress || "").trim()
-    : null,
-  tacs_customer_address_meta: isTacs
-    ? detailForm.customerAddressMeta || null
-    : null,
-  tacs_means_verification: isTacs
-    ? (detailForm.meansVerification || "").trim()
-    : null,
-  tacs_no_of_advice: isTacs
-    ? detailForm.noOfAdvice === ""
-      ? null
-      : Number(detailForm.noOfAdvice)
-    : null,
-  tacs_remarks: isTacs
-    ? (detailForm.notes || "").trim()
-    : null,
+      tacs_consultancy_type: isTacs
+        ? (detailForm.consultancyType || "").trim()
+        : null,
+      tacs_date_engagement: isTacs
+        ? detailForm.dateEngagement || null
+        : null,
+      tacs_expert_institution: isTacs
+        ? (detailForm.expertInstitution || "").trim()
+        : null,
+      tacs_customer_name: isTacs
+        ? (detailForm.customerName || "").trim()
+        : null,
+      tacs_customer_sex: isTacs
+        ? (detailForm.customerSex || "").trim()
+        : null,
+      tacs_customer_address: isTacs
+        ? (detailForm.customerAddress || "").trim()
+        : null,
+      tacs_customer_address_meta: isTacs
+        ? detailForm.customerAddressMeta || null
+        : null,
+      tacs_means_verification: isTacs
+        ? (detailForm.meansVerification || "").trim()
+        : null,
+      tacs_no_of_advice: isTacs
+        ? detailForm.noOfAdvice === ""
+          ? null
+          : Number(detailForm.noOfAdvice)
+        : null,
+      tacs_remarks: isTacs
+        ? (detailForm.notes || "").trim()
+        : null,
 
-  techRolloutRows: isTech ? cleanTechRows(detailForm.techRows) : undefined,
-};
+      techRolloutRows: isTech ? cleanTechRows(detailForm.techRows) : undefined,
+    };
 
     try {
       if (isTech) {
@@ -3994,9 +3994,9 @@ const deleteProject = async (id) => {
 
       alert(
         e?.response?.data?.message ||
-          e?.response?.data?.error ||
-          e?.message ||
-          "Failed to save intervention."
+        e?.response?.data?.error ||
+        e?.message ||
+        "Failed to save intervention."
       );
     }
   };
@@ -4464,49 +4464,49 @@ const deleteProject = async (id) => {
     );
 
   const getInterventionLabel = (it) => {
-  const type = it?.type || "";
+    const type = it?.type || "";
 
-  if (type === "Tech Roll Out") {
-    try {
-      const obj = JSON.parse(it?.notes || "");
-      const rows = Array.isArray(obj?.techRollOutRows)
-        ? obj.techRollOutRows
-        : [];
+    if (type === "Tech Roll Out") {
+      try {
+        const obj = JSON.parse(it?.notes || "");
+        const rows = Array.isArray(obj?.techRollOutRows)
+          ? obj.techRollOutRows
+          : [];
 
-      const firstTech = rows
-        .map((r) => String(r?.knowledgeTech || "").trim())
-        .find((x) => x);
+        const firstTech = rows
+          .map((r) => String(r?.knowledgeTech || "").trim())
+          .find((x) => x);
 
-      if (firstTech) return firstTech;
-    } catch {}
-    return "Tech Roll Out";
-  }
-
-  if (type === "Training") {
-    return (it?.title || "Training").trim();
-  }
-
-  if (type === "TNA Report") {
-    return (it?.notes || "").trim() || "TNA Report";
-  }
-
-  if (type === "Calibration") {
-    try {
-      const obj = JSON.parse(it?.notes || "{}");
-      const calibration = obj?.calibration || obj || {};
-      return (
-        calibration?.typeOfSample ||
-        calibration?.testType ||
-        it?.title ||
-        "Calibration"
-      );
-    } catch {
-      return it?.title || "Calibration";
+        if (firstTech) return firstTech;
+      } catch { }
+      return "Tech Roll Out";
     }
-  }
 
-  return (it?.title || type || "—").trim();
-};
+    if (type === "Training") {
+      return (it?.title || "Training").trim();
+    }
+
+    if (type === "TNA Report") {
+      return (it?.notes || "").trim() || "TNA Report";
+    }
+
+    if (type === "Calibration") {
+      try {
+        const obj = JSON.parse(it?.notes || "{}");
+        const calibration = obj?.calibration || obj || {};
+        return (
+          calibration?.typeOfSample ||
+          calibration?.testType ||
+          it?.title ||
+          "Calibration"
+        );
+      } catch {
+        return it?.title || "Calibration";
+      }
+    }
+
+    return (it?.title || type || "—").trim();
+  };
 
 
   const buildProjectExportRows = (rows = []) => {
@@ -4814,11 +4814,11 @@ const deleteProject = async (id) => {
   };
 
   const styles = {
-  page: {
-  padding: 14,
-  position: "relative",
-  fontFamily,
-},
+    page: {
+      padding: 14,
+      position: "relative",
+      fontFamily,
+    },
 
     titleBar: {
       background: "#2f6fd6",
@@ -5580,7 +5580,7 @@ const deleteProject = async (id) => {
         <div
           style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}
         >
-         
+
         </div>
       </div>
 
@@ -5753,69 +5753,69 @@ const deleteProject = async (id) => {
                 return Number.isFinite(lat) && Number.isFinite(lng);
               })
               .map((p) => (
-              <Marker
-                key={p.id}
-                position={[Number(p.addressMeta.lat), Number(p.addressMeta.lng)]}
-                pane="pinPane"
-              >
-                <Popup>
-                  <div style={{ minWidth: 240, fontFamily }}>
-                    <div style={{ fontWeight: 900, marginBottom: 6 }}>
-                      {p.projectTitle}
-                    </div>
-                    <div style={{ fontSize: 12, marginBottom: 6 }}>
-                      <b>Firm:</b> {p.firmName || "—"}
-                      <br />
-                      <b>Cooperator:</b> {p.cooperatorName || "—"}
-                      <br />
-                      <b>District:</b> {p.district || "—"}
-                      <br />
-                      <b>Municipality:</b> {getProjectMunicipality(p) || "—"}
-                    </div>
+                <Marker
+                  key={p.id}
+                  position={[Number(p.addressMeta.lat), Number(p.addressMeta.lng)]}
+                  pane="pinPane"
+                >
+                  <Popup>
+                    <div style={{ minWidth: 240, fontFamily }}>
+                      <div style={{ fontWeight: 900, marginBottom: 6 }}>
+                        {p.projectTitle}
+                      </div>
+                      <div style={{ fontSize: 12, marginBottom: 6 }}>
+                        <b>Firm:</b> {p.firmName || "—"}
+                        <br />
+                        <b>Cooperator:</b> {p.cooperatorName || "—"}
+                        <br />
+                        <b>District:</b> {p.district || "—"}
+                        <br />
+                        <b>Municipality:</b> {getProjectMunicipality(p) || "—"}
+                      </div>
 
-                    <div style={{ fontSize: 12, marginBottom: 8 }}>
-                      <b>Venue/Address:</b> {p.address || "—"}
-                      <br />
-                      <span style={{ ...styles.mono, fontSize: 12 }}>
-                        {Number(p.addressMeta.lat).toFixed(6)},{" "}
-                        {Number(p.addressMeta.lng).toFixed(6)}
-                      </span>
-                    </div>
+                      <div style={{ fontSize: 12, marginBottom: 8 }}>
+                        <b>Venue/Address:</b> {p.address || "—"}
+                        <br />
+                        <span style={{ ...styles.mono, fontSize: 12 }}>
+                          {Number(p.addressMeta.lat).toFixed(6)},{" "}
+                          {Number(p.addressMeta.lng).toFixed(6)}
+                        </span>
+                      </div>
 
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() =>
-                          openGoogleMap(p.addressMeta.lat, p.addressMeta.lng)
-                        }
-                      >
-                        Map
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() =>
-                          openGoogleDirections(
-                            p.addressMeta.lat,
-                            p.addressMeta.lng
-                          )
-                        }
-                      >
-                        Directions
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => setAddressViewForProjectId(p.id)}
-                      >
-                        View
-                      </button>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() =>
+                            openGoogleMap(p.addressMeta.lat, p.addressMeta.lng)
+                          }
+                        >
+                          Map
+                        </button>
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() =>
+                            openGoogleDirections(
+                              p.addressMeta.lat,
+                              p.addressMeta.lng
+                            )
+                          }
+                        >
+                          Directions
+                        </button>
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => setAddressViewForProjectId(p.id)}
+                        >
+                          View
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
+                  </Popup>
+                </Marker>
+              ))}
           </MapContainer>
         </div>
       </div>
@@ -5829,107 +5829,107 @@ const deleteProject = async (id) => {
         </div>
 
         <div style={styles.tableFilterBar}>
-        <input
-          type="text"
-          style={styles.tableSearchInput}
-          value={tableFilterFirmName}
-          onChange={(e) => setTableFilterFirmName(e.target.value)}
-          placeholder="Search firm from database..."
-        />
+          <input
+            type="text"
+            style={styles.tableSearchInput}
+            value={tableFilterFirmName}
+            onChange={(e) => setTableFilterFirmName(e.target.value)}
+            placeholder="Search firm from database..."
+          />
 
-        <select
-          style={styles.tableFilterSelect}
-          value={tableFilterYear}
-          onChange={(e) => setTableFilterYear(e.target.value)}
-        >
-          <option value="ALL">All Years</option>
-          {tableYearOptions.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+          <select
+            style={styles.tableFilterSelect}
+            value={tableFilterYear}
+            onChange={(e) => setTableFilterYear(e.target.value)}
+          >
+            <option value="ALL">All Years</option>
+            {tableYearOptions.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
 
-        <select
-          style={styles.tableFilterSelect}
-          value={tableFilterDistrict}
-          onChange={(e) => setTableFilterDistrict(e.target.value)}
-        >
-          <option value="ALL">All Districts</option>
-          {tableDistrictOptions.map((district) => (
-            <option key={district} value={district}>
-              {district}
-            </option>
-          ))}
-        </select>
+          <select
+            style={styles.tableFilterSelect}
+            value={tableFilterDistrict}
+            onChange={(e) => setTableFilterDistrict(e.target.value)}
+          >
+            <option value="ALL">All Districts</option>
+            {tableDistrictOptions.map((district) => (
+              <option key={district} value={district}>
+                {district}
+              </option>
+            ))}
+          </select>
 
-        <select
-          style={styles.tableFilterSelect}
-          value={tableFilterMonth}
-          onChange={(e) => setTableFilterMonth(e.target.value)}
-        >
-          <option value="ALL">All Months</option>
-          {[
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ].map((label, index) => (
-            <option key={label} value={String(index + 1)}>
-              {label}
-            </option>
-          ))}
-        </select>
+          <select
+            style={styles.tableFilterSelect}
+            value={tableFilterMonth}
+            onChange={(e) => setTableFilterMonth(e.target.value)}
+          >
+            <option value="ALL">All Months</option>
+            {[
+              "January",
+              "February",
+              "March",
+              "April",
+              "May",
+              "June",
+              "July",
+              "August",
+              "September",
+              "October",
+              "November",
+              "December",
+            ].map((label, index) => (
+              <option key={label} value={String(index + 1)}>
+                {label}
+              </option>
+            ))}
+          </select>
 
-        <select
-          style={styles.tableFilterSelect}
-          value={tableFilterMunicipality}
-          onChange={(e) => setTableFilterMunicipality(e.target.value)}
-        >
-          <option value="ALL">All Municipalities</option>
-          {tableMunicipalityOptions.map((municipality) => (
-            <option key={municipality} value={municipality}>
-              {municipality}
-            </option>
-          ))}
-        </select>
+          <select
+            style={styles.tableFilterSelect}
+            value={tableFilterMunicipality}
+            onChange={(e) => setTableFilterMunicipality(e.target.value)}
+          >
+            <option value="ALL">All Municipalities</option>
+            {tableMunicipalityOptions.map((municipality) => (
+              <option key={municipality} value={municipality}>
+                {municipality}
+              </option>
+            ))}
+          </select>
 
-        <select
-          style={styles.tableFilterSelect}
-          value={tableFilterStatus}
-          onChange={(e) => setTableFilterStatus(e.target.value)}
-        >
-          <option value="ALL">Overall</option>
-          {tableStatusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+          <select
+            style={styles.tableFilterSelect}
+            value={tableFilterStatus}
+            onChange={(e) => setTableFilterStatus(e.target.value)}
+          >
+            <option value="ALL">Overall</option>
+            {tableStatusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
 
-        <button type="button" style={styles.tableClearBtn} onClick={clearTableFilters}>
-          Clear Filters
-        </button>
+          <button type="button" style={styles.tableClearBtn} onClick={clearTableFilters}>
+            Clear Filters
+          </button>
 
-        <button type="button" style={styles.addBtn} onClick={openSETUPExportPopupBulk}>
-          Export
-        </button>
+          <button type="button" style={styles.addBtn} onClick={openSETUPExportPopupBulk}>
+            Export
+          </button>
 
-        <button type="button" style={styles.tablePrintBtn} onClick={openSETUPPrintPopupBulk}>
-          Print
-        </button>
+          <button type="button" style={styles.tablePrintBtn} onClick={openSETUPPrintPopupBulk}>
+            Print
+          </button>
 
-        <button type="button" style={styles.addBtn} onClick={openAddProject}>
-          + Add Project
-        </button>
+          <button type="button" style={styles.addBtn} onClick={openAddProject}>
+            + Add Project
+          </button>
         </div>
       </div>
 
@@ -6049,7 +6049,7 @@ const deleteProject = async (id) => {
                     <td style={styles.td}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {Array.isArray(p.interventions) &&
-                        p.interventions.length > 0 ? (
+                          p.interventions.length > 0 ? (
                           <div style={{ display: "grid", gap: 6 }}>
                             {p.interventions.map((it, i) => {
                               const isSelected = selectedId === it.id;
@@ -6335,7 +6335,7 @@ const deleteProject = async (id) => {
                 Math.max(
                   1,
                   Math.floor((prev - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW -
-                    (PAGE_NUMBER_WINDOW - 1)
+                  (PAGE_NUMBER_WINDOW - 1)
                 )
               )
             }
@@ -6373,8 +6373,8 @@ const deleteProject = async (id) => {
             onClick={() =>
               setCurrentPage(
                 Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
-                  PAGE_NUMBER_WINDOW +
-                  1
+                PAGE_NUMBER_WINDOW +
+                1
               )
             }
             disabled={false}
@@ -6395,22 +6395,22 @@ const deleteProject = async (id) => {
       )}
 
       {viewProjectId && (
-  <ViewProjectModal
-    project={viewProject}
-    onClose={() => setViewProjectId(null)}
-    styles={styles}
-    getOI={getOI}
-    sumOI={sumOI}
-    blankQuarterObj={blankQuarterObj}
-    money={money}
-    getInterventionLabel={getInterventionLabel}
-    openGoogleMap={openGoogleMap}
-    openGoogleDirections={openGoogleDirections}
-    onViewIntervention={openInterventionDetails_View}
-    onSaveDateApproved={saveProjectDateApproved}
-    setupCustomFields={setupCustomFields}
-  />
-)}
+        <ViewProjectModal
+          project={viewProject}
+          onClose={() => setViewProjectId(null)}
+          styles={styles}
+          getOI={getOI}
+          sumOI={sumOI}
+          blankQuarterObj={blankQuarterObj}
+          money={money}
+          getInterventionLabel={getInterventionLabel}
+          openGoogleMap={openGoogleMap}
+          openGoogleDirections={openGoogleDirections}
+          onViewIntervention={openInterventionDetails_View}
+          onSaveDateApproved={saveProjectDateApproved}
+          setupCustomFields={setupCustomFields}
+        />
+      )}
 
 
 
@@ -6484,42 +6484,42 @@ const deleteProject = async (id) => {
         setAddressFlowTarget={setAddressFlowTarget}
       />
 
-     {addressFlowOpen && (
-  <AddressFlowModal
-    open={addressFlowOpen}
-    onClose={() => {
-      setAddressFlowOpen(false);
-      setAddressFlowTarget("project");
-    }}
-    onSave={(meta) => {
-      if (
-        addressFlowTarget === "training" ||
-        addressFlowTarget === "tacs" ||
-        addressFlowTarget === "packaging" ||
-        addressFlowTarget === "calibration"
-      ) {
-        applyAddressMetaToDetailForm(meta, addressFlowTarget);
-      } else {
-        applyAddressMetaToForm(meta);
-      }
-    }}
-    initialMeta={
-      addressFlowTarget === "training"
-        ? detailForm.venueMeta
-        : addressFlowTarget === "tacs"
-        ? detailForm.customerAddressMeta
-        : addressFlowTarget === "packaging"
-        ? detailForm.packagingAddressMeta
-        : addressFlowTarget === "calibration"
-        ? detailForm.calibrationData?.addressMeta
-        : form.addressMeta
-    }
-    styles={styles}
-    fetchBarangaysForMunicipality_Local={
-      fetchBarangaysForMunicipality_Local
-    }
-  />
-)}
+      {addressFlowOpen && (
+        <AddressFlowModal
+          open={addressFlowOpen}
+          onClose={() => {
+            setAddressFlowOpen(false);
+            setAddressFlowTarget("project");
+          }}
+          onSave={(meta) => {
+            if (
+              addressFlowTarget === "training" ||
+              addressFlowTarget === "tacs" ||
+              addressFlowTarget === "packaging" ||
+              addressFlowTarget === "calibration"
+            ) {
+              applyAddressMetaToDetailForm(meta, addressFlowTarget);
+            } else {
+              applyAddressMetaToForm(meta);
+            }
+          }}
+          initialMeta={
+            addressFlowTarget === "training"
+              ? detailForm.venueMeta
+              : addressFlowTarget === "tacs"
+                ? detailForm.customerAddressMeta
+                : addressFlowTarget === "packaging"
+                  ? detailForm.packagingAddressMeta
+                  : addressFlowTarget === "calibration"
+                    ? detailForm.calibrationData?.addressMeta
+                    : form.addressMeta
+          }
+          styles={styles}
+          fetchBarangaysForMunicipality_Local={
+            fetchBarangaysForMunicipality_Local
+          }
+        />
+      )}
 
       <ReportModal
         open={Boolean(reportForProjectId)}
@@ -6572,7 +6572,7 @@ const deleteProject = async (id) => {
         </div>
       )}
 
-            {(detailFor || viewInterventionFor) && (
+      {(detailFor || viewInterventionFor) && (
         <div
           style={styles.modalBackdrop}
           onClick={() => {
@@ -6586,8 +6586,8 @@ const deleteProject = async (id) => {
                 {viewInterventionFor
                   ? "View"
                   : detailFor?.mode === "edit"
-                  ? "Edit"
-                  : "Add"}{" "}
+                    ? "Edit"
+                    : "Add"}{" "}
                 {detailForm.type} Details
                 {detailProject ? (
                   <span style={{ opacity: 0.9, fontWeight: 800 }}>
@@ -7064,9 +7064,9 @@ const deleteProject = async (id) => {
                               costDost === "" && p.costPartnerAgency === ""
                                 ? ""
                                 : String(
-                                    Number(costDost || 0) +
-                                      Number(p.costPartnerAgency || 0)
-                                  );
+                                  Number(costDost || 0) +
+                                  Number(p.costPartnerAgency || 0)
+                                );
                             return { ...p, costDost, totalCost };
                           })
                         }
@@ -7090,9 +7090,9 @@ const deleteProject = async (id) => {
                               p.costDost === "" && costPartnerAgency === ""
                                 ? ""
                                 : String(
-                                    Number(p.costDost || 0) +
-                                      Number(costPartnerAgency || 0)
-                                  );
+                                  Number(p.costDost || 0) +
+                                  Number(costPartnerAgency || 0)
+                                );
                             return { ...p, costPartnerAgency, totalCost };
                           })
                         }
@@ -7215,7 +7215,7 @@ const deleteProject = async (id) => {
                               }
                               disabled={Boolean(viewInterventionFor)}
                             >
-                              
+
                               <option value="Commercialization">
                                 Commercialization
                               </option>
@@ -7327,7 +7327,7 @@ const deleteProject = async (id) => {
                               }
                               disabled={Boolean(viewInterventionFor)}
                             >
-                              
+
                               <option value="Individual">Individual</option>
                               <option value="MSME/Firm">MSME/Firm</option>
                               <option value="Academe">Academe</option>
@@ -7348,7 +7348,7 @@ const deleteProject = async (id) => {
                               }
                               disabled={Boolean(viewInterventionFor)}
                             >
-                              
+
                               <option value="M">M</option>
                               <option value="F">F</option>
                             </select>
@@ -7483,7 +7483,7 @@ const deleteProject = async (id) => {
                         }
                         disabled={Boolean(viewInterventionFor)}
                       >
-                        
+
                         <option value="M">M</option>
                         <option value="F">F</option>
                       </select>
@@ -7616,7 +7616,7 @@ const deleteProject = async (id) => {
                         }
                         disabled={Boolean(viewInterventionFor)}
                       >
-                        
+
                         <option value="1">1st Quarter</option>
                         <option value="2">2nd Quarter</option>
                         <option value="3">3rd Quarter</option>
@@ -7758,7 +7758,7 @@ const deleteProject = async (id) => {
                         }
                         disabled={Boolean(viewInterventionFor)}
                       >
-                        
+
                         <option value="M">M</option>
                         <option value="F">F</option>
                       </select>
@@ -8036,8 +8036,8 @@ const deleteProject = async (id) => {
                                 ? breakdownTotals.totalFees
                                 : 0
                               : calibration.category === "PAYING"
-                              ? calibration.feesCollected
-                              : 0
+                                ? calibration.feesCollected
+                                : 0
                           }
                           readOnly
                         />

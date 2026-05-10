@@ -32,7 +32,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const TECH_PROMOTION_API = `${API_BASE}/api/technology-promotion`;
+const TECH_PROMOTION_API = `${API_BASE}/technology-promotion`;
 
 async function apiFetch(path, options = {}) {
   try {
@@ -685,7 +685,7 @@ export default function TechnologyPromotion() {
 
     async function loadTechPromoCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find((m) => {
@@ -728,13 +728,13 @@ export default function TechnologyPromotion() {
         const finalCustomFields = customFields.length
           ? customFields
           : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
+            {
+              fieldKey: "funding",
+              fieldLabel: "Funding",
+              fieldType: "Text",
+              sortOrder: 999,
+            },
+          ];
 
         if (!cancelled) setTechPromoCustomFields(finalCustomFields);
       } catch (err) {
@@ -998,8 +998,8 @@ export default function TechnologyPromotion() {
   };
   const confirmPrint = () => {
     const rows = buildPromoRows(printModal.scope, printModal.entryId);
-    const tableHtml = `<table><thead><tr>${promoColumns.map((c)=>`<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r)=>`<tr>${promoColumns.map((c)=>`<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${promoColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>`;
-    const cardsHtml = rows.length ? rows.map((r)=>`<div class="card">${promoColumns.map((c)=>`<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`;
+    const tableHtml = `<table><thead><tr>${promoColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${promoColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${promoColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>`;
+    const cardsHtml = rows.length ? rows.map((r) => `<div class="card">${promoColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`;
     const body = printModal.layout === "TABLE" ? tableHtml : cardsHtml;
     const win = window.open("", "_blank", "width=1200,height=900"); if (!win) return alert("Popup blocked. Please allow popups for printing.");
     win.document.write(`<!doctype html><html><head><title>Technology Promotion Print</title><style>@page{size:${printModal.preset || "a4"} ${printModal.orientation || "landscape"};margin:10mm;}body{font-family:Arial;padding:12px;color:#0f172a}h1{font-size:18px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #94a3b8;padding:6px;font-size:10px;vertical-align:top}th{background:#e2e8f0}.card{border:1px solid #94a3b8;border-radius:8px;padding:10px;margin-bottom:10px;display:grid;gap:4px;font-size:12px}</style></head><body><h1>Technology Promotion Print</h1>${body}<script>setTimeout(()=>window.print(),250)</script></body></html>`); win.document.close(); win.focus();
@@ -2079,10 +2079,10 @@ export default function TechnologyPromotion() {
       mode === "manual"
         ? "Manual Input"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -2114,7 +2114,7 @@ export default function TechnologyPromotion() {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${nextCoords.lat}&lon=${nextCoords.lng}`);
         const data = await res.json();
         if (data?.display_name) setManualText(data.display_name);
-      } catch {}
+      } catch { }
     };
 
     const useMyLocation = () => {
@@ -2137,27 +2137,27 @@ export default function TechnologyPromotion() {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              venueName: venueName.trim(),
-              manualText: manualText.trim(),
-              displayText,
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            venueName: venueName.trim(),
+            manualText: manualText.trim(),
+            displayText,
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              venueName: venueName.trim(),
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            venueName: venueName.trim(),
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -2796,7 +2796,7 @@ export default function TechnologyPromotion() {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (
@@ -3904,7 +3904,7 @@ export default function TechnologyPromotion() {
                   </button>
 
                   {Number.isFinite(entryForm.activityVenueMeta?.lat) &&
-                  Number.isFinite(entryForm.activityVenueMeta?.lng) ? (
+                    Number.isFinite(entryForm.activityVenueMeta?.lng) ? (
                     <div style={{ fontSize: 12, opacity: 0.85 }}>
                       <b>Coordinates:</b> {entryForm.activityVenueMeta.lat},{" "}
                       {entryForm.activityVenueMeta.lng}
@@ -4057,7 +4057,7 @@ export default function TechnologyPromotion() {
                   />
 
                   {Array.isArray(entryForm.photos) &&
-                  entryForm.photos.length > 0 ? (
+                    entryForm.photos.length > 0 ? (
                     <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
                       {entryForm.photos.map((p, idx) => (
                         <div
@@ -4394,7 +4394,7 @@ export default function TechnologyPromotion() {
                 </div>
 
                 {Number.isFinite(viewEntry?.activityVenueMeta?.lat) &&
-                Number.isFinite(viewEntry?.activityVenueMeta?.lng) ? (
+                  Number.isFinite(viewEntry?.activityVenueMeta?.lng) ? (
                   <div
                     style={{
                       marginTop: 10,
@@ -4687,4 +4687,4 @@ export default function TechnologyPromotion() {
     </div>
   );
 }
-    
+

@@ -178,7 +178,7 @@ const PANGASINAN_DISTRICTS = [
   },
 ];
 
-const API_BASE_URL = `${API_BASE}/api/technology-rollout`;
+const API_BASE_URL = `${API_BASE}/technology-rollout`;
 
 const parseTechRolloutCustomFields = (value) => {
   if (!value) return {};
@@ -301,14 +301,14 @@ const mapDbRowToUi = (row) => ({
       row.address_lat !== null && row.address_lat !== undefined
         ? Number(row.address_lat)
         : Number.isFinite(Number(row?.institutionAddressMeta?.lat))
-        ? Number(row.institutionAddressMeta.lat)
-        : null,
+          ? Number(row.institutionAddressMeta.lat)
+          : null,
     lng:
       row.address_lng !== null && row.address_lng !== undefined
         ? Number(row.address_lng)
         : Number.isFinite(Number(row?.institutionAddressMeta?.lng))
-        ? Number(row.institutionAddressMeta.lng)
-        : null,
+          ? Number(row.institutionAddressMeta.lng)
+          : null,
   },
 
   classification: row.classification || "",
@@ -825,7 +825,7 @@ export default function TechnologyRollout() {
     const buildKeyValueRecord = (r, recordIndex) => {
       const coords =
         Number.isFinite(r?.institutionAddressMeta?.lat) &&
-        Number.isFinite(r?.institutionAddressMeta?.lng)
+          Number.isFinite(r?.institutionAddressMeta?.lng)
           ? `${r.institutionAddressMeta.lat}, ${r.institutionAddressMeta.lng}`
           : "—";
 
@@ -920,7 +920,7 @@ export default function TechnologyRollout() {
 
       const coords =
         Number.isFinite(r?.institutionAddressMeta?.lat) &&
-        Number.isFinite(r?.institutionAddressMeta?.lng)
+          Number.isFinite(r?.institutionAddressMeta?.lng)
           ? `${r.institutionAddressMeta.lat}, ${r.institutionAddressMeta.lng}`
           : "—";
 
@@ -1003,7 +1003,7 @@ export default function TechnologyRollout() {
   const buildRecordSheetInner = (record, layoutKey, titleLabel) => {
     const coords =
       Number.isFinite(record?.institutionAddressMeta?.lat) &&
-      Number.isFinite(record?.institutionAddressMeta?.lng)
+        Number.isFinite(record?.institutionAddressMeta?.lng)
         ? `${record.institutionAddressMeta.lat}, ${record.institutionAddressMeta.lng}`
         : "—";
 
@@ -1087,8 +1087,8 @@ export default function TechnologyRollout() {
       layoutKey === "FORM"
         ? formLayout
         : layoutKey === "TABLE"
-        ? tableLayout
-        : compactLayout;
+          ? tableLayout
+          : compactLayout;
 
     return `
       <div class="sheet">
@@ -1194,10 +1194,10 @@ export default function TechnologyRollout() {
     try {
       win.onload = () => {
         setTimeout(() => {
-          try { win.print(); } catch {}
+          try { win.print(); } catch { }
         }, 250);
       };
-    } catch {}
+    } catch { }
   };
 
   // ===== State =====
@@ -1314,7 +1314,7 @@ export default function TechnologyRollout() {
 
     async function loadTechRolloutCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find((m) => {
@@ -1361,13 +1361,13 @@ export default function TechnologyRollout() {
         const finalCustomFields = customFields.length
           ? customFields
           : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
+            {
+              fieldKey: "funding",
+              fieldLabel: "Funding",
+              fieldType: "Text",
+              sortOrder: 999,
+            },
+          ];
 
         if (!cancelled) setTechRolloutCustomFields(finalCustomFields);
       } catch (err) {
@@ -1413,8 +1413,8 @@ export default function TechnologyRollout() {
       const rows = Array.isArray(res?.data)
         ? res.data
         : Array.isArray(res?.data?.rows)
-        ? res.data.rows
-        : [];
+          ? res.data.rows
+          : [];
 
       setRecords(
         rows.map((row) => {
@@ -2010,7 +2010,7 @@ export default function TechnologyRollout() {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -2203,10 +2203,10 @@ export default function TechnologyRollout() {
       mode === "manual"
         ? "Manual Input"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -2239,25 +2239,25 @@ export default function TechnologyRollout() {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              manualText: manualText.trim(),
-              displayText: manualText.trim(),
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            manualText: manualText.trim(),
+            displayText: manualText.trim(),
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -2491,9 +2491,9 @@ export default function TechnologyRollout() {
       institutionAddress: finalAddress,
       institutionAddressMeta: meta
         ? {
-            ...meta,
-            displayText: meta.displayText || finalAddress,
-          }
+          ...meta,
+          displayText: meta.displayText || finalAddress,
+        }
         : null,
     }));
   };
@@ -3521,7 +3521,7 @@ export default function TechnologyRollout() {
                 Math.max(
                   1,
                   Math.floor((prev - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW -
-                    (PAGE_NUMBER_WINDOW - 1)
+                  (PAGE_NUMBER_WINDOW - 1)
                 )
               )
             }
@@ -3562,8 +3562,8 @@ export default function TechnologyRollout() {
             onClick={() =>
               setCurrentPage(
                 Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
-                  PAGE_NUMBER_WINDOW +
-                  1
+                PAGE_NUMBER_WINDOW +
+                1
               )
             }
             disabled={false}
@@ -4072,7 +4072,7 @@ export default function TechnologyRollout() {
         </div>
       </PopupModal>
 
-          </div>
+    </div>
   );
 }
 

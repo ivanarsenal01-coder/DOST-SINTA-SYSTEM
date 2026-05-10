@@ -178,7 +178,7 @@ const PANGASINAN_DISTRICTS = [
   },
 ];
 
-const API = `${API_BASE}/api/packaging-labeling`;
+const API = `${API_BASE}/packaging-labeling`;
 
 
 const parseMaybeJSON = (value, fallback = null) => {
@@ -449,9 +449,9 @@ export default function PackagingAndLabeling() {
   const flattenProducts = (r) =>
     Array.isArray(r?.products) && r.products.length
       ? r.products
-          .map((p) => String(p?.productName || "").trim())
-          .filter(Boolean)
-          .join(" | ")
+        .map((p) => String(p?.productName || "").trim())
+        .filter(Boolean)
+        .join(" | ")
       : "";
 
   const safeFilePart = (s) =>
@@ -571,206 +571,206 @@ export default function PackagingAndLabeling() {
   };
 
 
-  
+
   // ===== Export helpers (PDF / DOCX using templates) =====
   // ===== Export helpers (PDF / DOCX using templates) =====
 
-const exportRecordsPDF = async (rows, options) => {
-  // ✅ Auto-download PDF (no print dialog), using jsPDF + autotable (reliable in CRA)
-  const {
-    template = "FORM",
-    preset = "a4",
-    orientation = "landscape",
-    customSize = { width: 8.5, height: 13 },
-    filename = "PackagingAndLabeling.pdf",
-    titleLabel = "Packaging and Labeling Export",
-  } = options || {};
+  const exportRecordsPDF = async (rows, options) => {
+    // ✅ Auto-download PDF (no print dialog), using jsPDF + autotable (reliable in CRA)
+    const {
+      template = "FORM",
+      preset = "a4",
+      orientation = "landscape",
+      customSize = { width: 8.5, height: 13 },
+      filename = "PackagingAndLabeling.pdf",
+      titleLabel = "Packaging and Labeling Export",
+    } = options || {};
 
-  const mmFromIn = (inch) => Number(inch) * 25.4;
+    const mmFromIn = (inch) => Number(inch) * 25.4;
 
-  let format = "a4";
-  if (preset === "letter") format = "letter";
-  else if (preset === "legal") format = "legal";
-  else if (preset === "custom") {
-    const w = Number(customSize?.width) || 8.5;
-    const h = Number(customSize?.height) || 13;
-    const wmm = mmFromIn(w);
-    const hmm = mmFromIn(h);
-    format = [wmm, hmm]; // jsPDF accepts custom size array in the same unit
-  }
+    let format = "a4";
+    if (preset === "letter") format = "letter";
+    else if (preset === "legal") format = "legal";
+    else if (preset === "custom") {
+      const w = Number(customSize?.width) || 8.5;
+      const h = Number(customSize?.height) || 13;
+      const wmm = mmFromIn(w);
+      const hmm = mmFromIn(h);
+      format = [wmm, hmm]; // jsPDF accepts custom size array in the same unit
+    }
 
-  const doc = new jsPDF({
-    orientation: orientation === "portrait" ? "p" : "l",
-    unit: "mm",
-    format,
-  });
+    const doc = new jsPDF({
+      orientation: orientation === "portrait" ? "p" : "l",
+      unit: "mm",
+      format,
+    });
 
-  const safeName = String(filename || "PackagingAndLabeling.pdf");
-  const outName = safeName.toLowerCase().endsWith(".pdf") ? safeName : `${safeName}.pdf`;
+    const safeName = String(filename || "PackagingAndLabeling.pdf");
+    const outName = safeName.toLowerCase().endsWith(".pdf") ? safeName : `${safeName}.pdf`;
 
-  const hasMany = Array.isArray(rows) && rows.length > 1;
+    const hasMany = Array.isArray(rows) && rows.length > 1;
 
-  // Helper: dataset table (like Excel export)
-  const buildDatasetTable = (rowsToUse) => {
-    const head = [[
-      "NO",
-      "PROVINCE",
-      "NAME OF PRODUCT",
-      "TYPE OF INTERVENTION",
-      "SIZE/VARIANT/PACKAGING TYPE",
-      "NO. OF PACKAGING MATERIALS PROVIDED",
-      "DATE COMPLETED/EXECUTED",
-      "CUSTOMER NAME",
-      "SEX",
-      "FIRM/INSTITUTION",
-      "ADDRESS / VENUE",
-      "MUNICIPALITY",
-      "BARANGAY",
-      "LAT",
-      "LNG",
-      "MEANS OF VERIFICATION",
-      "NAME OF STAFF",
-      "REMARKS",
-      "PHOTO COUNT",
-      "QUARTER",
-    ]];
+    // Helper: dataset table (like Excel export)
+    const buildDatasetTable = (rowsToUse) => {
+      const head = [[
+        "NO",
+        "PROVINCE",
+        "NAME OF PRODUCT",
+        "TYPE OF INTERVENTION",
+        "SIZE/VARIANT/PACKAGING TYPE",
+        "NO. OF PACKAGING MATERIALS PROVIDED",
+        "DATE COMPLETED/EXECUTED",
+        "CUSTOMER NAME",
+        "SEX",
+        "FIRM/INSTITUTION",
+        "ADDRESS / VENUE",
+        "MUNICIPALITY",
+        "BARANGAY",
+        "LAT",
+        "LNG",
+        "MEANS OF VERIFICATION",
+        "NAME OF STAFF",
+        "REMARKS",
+        "PHOTO COUNT",
+        "QUARTER",
+      ]];
 
-    const body = (rowsToUse || []).map((r, i) => {
-      const muni = r?.addressMeta?.municipality || "";
-      const brgy = r?.addressMeta?.barangay || "";
-      const lat = Number.isFinite(r?.addressMeta?.lat) ? r.addressMeta.lat : "";
-      const lng = Number.isFinite(r?.addressMeta?.lng) ? r.addressMeta.lng : "";
+      const body = (rowsToUse || []).map((r, i) => {
+        const muni = r?.addressMeta?.municipality || "";
+        const brgy = r?.addressMeta?.barangay || "";
+        const lat = Number.isFinite(r?.addressMeta?.lat) ? r.addressMeta.lat : "";
+        const lng = Number.isFinite(r?.addressMeta?.lng) ? r.addressMeta.lng : "";
 
-      return [
-        i + 1,
-        r?.province || "Pangasinan",
-        flattenProducts(r),
-        r?.typeOfIntervention || "",
-        r?.sizeVariant || "",
-        r?.packagingMaterialsProvided || "",
-        r?.dateCompleted || "",
-        r?.customerName || "",
-        r?.sex || "",
-        r?.firmName || "",
-        r?.address || "",
-        muni,
-        brgy,
-        lat,
-        lng,
-        r?.meansOfVerification || "",
-        r?.nameOfStaff || "",
-        r?.remarks || "",
-        Array.isArray(r?.photos) ? r.photos.length : 0,
-        r?.quarter ? `${String(r.quarter)}Q` : "",
+        return [
+          i + 1,
+          r?.province || "Pangasinan",
+          flattenProducts(r),
+          r?.typeOfIntervention || "",
+          r?.sizeVariant || "",
+          r?.packagingMaterialsProvided || "",
+          r?.dateCompleted || "",
+          r?.customerName || "",
+          r?.sex || "",
+          r?.firmName || "",
+          r?.address || "",
+          muni,
+          brgy,
+          lat,
+          lng,
+          r?.meansOfVerification || "",
+          r?.nameOfStaff || "",
+          r?.remarks || "",
+          Array.isArray(r?.photos) ? r.photos.length : 0,
+          r?.quarter ? `${String(r.quarter)}Q` : "",
+        ];
+      });
+
+      doc.setFontSize(14);
+      doc.text(String(titleLabel || "Packaging and Labeling Export"), 10, 12);
+      doc.setFontSize(9);
+      doc.text(`Rows: ${body.length}`, 10, 18);
+
+      autoTable(doc, {
+        head,
+        body,
+        startY: 22,
+        styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak" },
+        headStyles: { fontSize: 7 },
+        columnStyles: {
+          0: { cellWidth: 8 },
+          1: { cellWidth: 18 },
+          2: { cellWidth: 26 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 28 },
+          5: { cellWidth: 18 },
+          6: { cellWidth: 18 },
+          7: { cellWidth: 22 },
+          8: { cellWidth: 10 },
+          9: { cellWidth: 24 },
+          10: { cellWidth: 26 },
+          11: { cellWidth: 18 },
+          12: { cellWidth: 18 },
+          13: { cellWidth: 12 },
+          14: { cellWidth: 12 },
+          15: { cellWidth: 30 },
+          16: { cellWidth: 22 },
+          17: { cellWidth: 12 },
+          18: { cellWidth: 12 },
+        },
+        didDrawPage: (data) => {
+          const pageCount = doc.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.text(`Page ${data.pageNumber} / ${pageCount}`, doc.internal.pageSize.getWidth() - 30, doc.internal.pageSize.getHeight() - 6);
+        },
+      });
+    };
+
+    // Helper: key-value sheet per record (FORM/ISO/etc)
+    const buildKeyValueRecord = (r, recordIndex) => {
+      const coords =
+        Number.isFinite(r?.addressMeta?.lat) && Number.isFinite(r?.addressMeta?.lng)
+          ? `${r.addressMeta.lat}, ${r.addressMeta.lng}`
+          : "—";
+
+      const pairsBase = [
+        ["Quarter", r?.quarter ? `${String(r.quarter)}Q` : "—"],
+        ["Province", r?.province || "Pangasinan"],
+        ["Date Completed/Executed", r?.dateCompleted || "—"],
+        ["Type of Intervention", r?.typeOfIntervention || "—"],
+        ["Size/Variant", r?.sizeVariant || "—"],
+        ["No. of Packaging Materials Provided", r?.packagingMaterialsProvided || "—"],
+        ["Customer Name", r?.customerName || "—"],
+        ["Sex", r?.sex || "—"],
+        ["Firm/Institution", r?.firmName || "—"],
+        ["Address / Venue", r?.address || "—"],
+        ["Coordinates", coords],
+        ["Products", flattenProducts(r) || "—"],
+        ["Means of Verification", r?.meansOfVerification || "—"],
+        ["Name of Staff", r?.nameOfStaff || "—"],
+        ["Remarks", r?.remarks || "—"],
+        ["Photo Count", Array.isArray(r?.photos) ? r.photos.length : 0],
       ];
-    });
 
-    doc.setFontSize(14);
-    doc.text(String(titleLabel || "Packaging and Labeling Export"), 10, 12);
-    doc.setFontSize(9);
-    doc.text(`Rows: ${body.length}`, 10, 18);
+      const isoExtra = [
+        ["Design no", (Array.isArray(r?.products) && r.products[0]?.productName) ? r.products[0].productName : "—"],
+        ["Project no", ""],
+        ["Team leader", ""],
+        ["Design change approved", "YES / NO"],
+        ["Designation", ""],
+        ["Signature", ""],
+      ];
 
-    autoTable(doc, {
-      head,
-      body,
-      startY: 22,
-      styles: { fontSize: 7, cellPadding: 1.5, overflow: "linebreak" },
-      headStyles: { fontSize: 7 },
-      columnStyles: {
-        0: { cellWidth: 8 },
-        1: { cellWidth: 18 },
-        2: { cellWidth: 26 },
-        3: { cellWidth: 20 },
-        4: { cellWidth: 28 },
-        5: { cellWidth: 18 },
-        6: { cellWidth: 18 },
-        7: { cellWidth: 22 },
-        8: { cellWidth: 10 },
-        9: { cellWidth: 24 },
-        10: { cellWidth: 26 },
-        11: { cellWidth: 18 },
-        12: { cellWidth: 18 },
-        13: { cellWidth: 12 },
-        14: { cellWidth: 12 },
-        15: { cellWidth: 30 },
-        16: { cellWidth: 22 },
-        17: { cellWidth: 12 },
-        18: { cellWidth: 12 },
-      },
-      didDrawPage: (data) => {
-        const pageCount = doc.getNumberOfPages();
-        doc.setFontSize(8);
-        doc.text(`Page ${data.pageNumber} / ${pageCount}`, doc.internal.pageSize.getWidth() - 30, doc.internal.pageSize.getHeight() - 6);
-      },
-    });
+      const pairs = template === "ISO" ? [...pairsBase, ...isoExtra] : pairsBase;
+
+      doc.setFontSize(14);
+      doc.text(`${titleLabel || "Record"} — ${recordIndex + 1}`, 10, 12);
+      doc.setFontSize(10);
+      doc.text(`Template: ${template}`, 10, 18);
+
+      autoTable(doc, {
+        head: [["Field", "Value"]],
+        body: pairs.map(([k, v]) => [String(k), String(v ?? "")]),
+        startY: 22,
+        styles: { fontSize: 9, cellPadding: 2, overflow: "linebreak" },
+        columnStyles: { 0: { cellWidth: 55 }, 1: { cellWidth: "auto" } },
+      });
+    };
+
+    // Decision:
+    // - If exporting MANY rows: always export as dataset table (like Excel) — this matches what you asked ("tables").
+    // - If exporting ONE row: use the selected template (including ISO) as a key-value record.
+    if (hasMany) {
+      buildDatasetTable(rows);
+    } else {
+      const r = (rows || [])[0];
+      if (!r) return alert("No record to export.");
+      buildKeyValueRecord(r, 0);
+    }
+
+    doc.save(outName);
   };
 
-  // Helper: key-value sheet per record (FORM/ISO/etc)
-  const buildKeyValueRecord = (r, recordIndex) => {
-    const coords =
-      Number.isFinite(r?.addressMeta?.lat) && Number.isFinite(r?.addressMeta?.lng)
-        ? `${r.addressMeta.lat}, ${r.addressMeta.lng}`
-        : "—";
-
-    const pairsBase = [
-      ["Quarter", r?.quarter ? `${String(r.quarter)}Q` : "—"],
-      ["Province", r?.province || "Pangasinan"],
-      ["Date Completed/Executed", r?.dateCompleted || "—"],
-      ["Type of Intervention", r?.typeOfIntervention || "—"],
-      ["Size/Variant", r?.sizeVariant || "—"],
-      ["No. of Packaging Materials Provided", r?.packagingMaterialsProvided || "—"],
-      ["Customer Name", r?.customerName || "—"],
-      ["Sex", r?.sex || "—"],
-      ["Firm/Institution", r?.firmName || "—"],
-      ["Address / Venue", r?.address || "—"],
-      ["Coordinates", coords],
-      ["Products", flattenProducts(r) || "—"],
-      ["Means of Verification", r?.meansOfVerification || "—"],
-      ["Name of Staff", r?.nameOfStaff || "—"],
-      ["Remarks", r?.remarks || "—"],
-      ["Photo Count", Array.isArray(r?.photos) ? r.photos.length : 0],
-    ];
-
-    const isoExtra = [
-      ["Design no", (Array.isArray(r?.products) && r.products[0]?.productName) ? r.products[0].productName : "—"],
-      ["Project no", ""],
-      ["Team leader", ""],
-      ["Design change approved", "YES / NO"],
-      ["Designation", ""],
-      ["Signature", ""],
-    ];
-
-    const pairs = template === "ISO" ? [...pairsBase, ...isoExtra] : pairsBase;
-
-    doc.setFontSize(14);
-    doc.text(`${titleLabel || "Record"} — ${recordIndex + 1}`, 10, 12);
-    doc.setFontSize(10);
-    doc.text(`Template: ${template}`, 10, 18);
-
-    autoTable(doc, {
-      head: [["Field", "Value"]],
-      body: pairs.map(([k, v]) => [String(k), String(v ?? "")]),
-      startY: 22,
-      styles: { fontSize: 9, cellPadding: 2, overflow: "linebreak" },
-      columnStyles: { 0: { cellWidth: 55 }, 1: { cellWidth: "auto" } },
-    });
-  };
-
-  // Decision:
-  // - If exporting MANY rows: always export as dataset table (like Excel) — this matches what you asked ("tables").
-  // - If exporting ONE row: use the selected template (including ISO) as a key-value record.
-  if (hasMany) {
-    buildDatasetTable(rows);
-  } else {
-    const r = (rows || [])[0];
-    if (!r) return alert("No record to export.");
-    buildKeyValueRecord(r, 0);
-  }
-
-  doc.save(outName);
-};
-
-const exportRecordsDOCX = async (rows, options) => {
+  const exportRecordsDOCX = async (rows, options) => {
     const { template, filename, orientation } = options;
 
     const children = [];
@@ -895,7 +895,7 @@ const exportRecordsDOCX = async (rows, options) => {
     downloadBlob(blob, filename.endsWith(".docx") ? filename : `${filename}.docx`);
   };
 
-// ===== State =====
+  // ===== State =====
   const [records, setRecords] = useState([]);
   const [packagingCustomFields, setPackagingCustomFields] = useState([]);
   const [search, setSearch] = useState("");
@@ -1003,10 +1003,10 @@ const exportRecordsDOCX = async (rows, options) => {
       const rows = Array.isArray(payload?.data)
         ? payload.data
         : Array.isArray(payload?.rows)
-        ? payload.rows
-        : Array.isArray(payload)
-        ? payload
-        : [];
+          ? payload.rows
+          : Array.isArray(payload)
+            ? payload
+            : [];
 
       const normalized = rows.map(normalizePackagingRecordFromApi);
       const sorted = sortPackagingRecordsByLinkedIntervention(normalized);
@@ -1082,7 +1082,7 @@ const exportRecordsDOCX = async (rows, options) => {
 
     async function loadPackagingCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find((m) => {
@@ -1120,13 +1120,13 @@ const exportRecordsDOCX = async (rows, options) => {
         const finalCustomFields = customFields.length
           ? customFields
           : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
+            {
+              fieldKey: "funding",
+              fieldLabel: "Funding",
+              fieldType: "Text",
+              sortOrder: 999,
+            },
+          ];
 
         if (!cancelled) setPackagingCustomFields(finalCustomFields);
       } catch (err) {
@@ -1189,21 +1189,21 @@ const exportRecordsDOCX = async (rows, options) => {
     setRecords(next);
   };
 
-  
+
 
   const nextPhoto = useCallback(() => {
-  if (!photoViewer) return;
-  const n = photoViewer.photos.length;
-  setPhotoIndex((p) => (p + 1) % n);
-}, [photoViewer]);
+    if (!photoViewer) return;
+    const n = photoViewer.photos.length;
+    setPhotoIndex((p) => (p + 1) % n);
+  }, [photoViewer]);
 
-const prevPhoto = useCallback(() => {
-  if (!photoViewer) return;
-  const n = photoViewer.photos.length;
-  setPhotoIndex((p) => (p - 1 + n) % n);
-}, [photoViewer]);
+  const prevPhoto = useCallback(() => {
+    if (!photoViewer) return;
+    const n = photoViewer.photos.length;
+    setPhotoIndex((p) => (p - 1 + n) % n);
+  }, [photoViewer]);
 
-useEffect(() => {
+  useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") {
         setShowAdd(false);
@@ -1526,26 +1526,26 @@ useEffect(() => {
 
     const productList = products.length
       ? `<ol>${products
-          .map((p) => `<li>${escapeHtml(p.productName || "—")}</li>`)
-          .join("")}</ol>`
+        .map((p) => `<li>${escapeHtml(p.productName || "—")}</li>`)
+        .join("")}</ol>`
       : `<div class="muted">—</div>`;
 
     const photoGrid = photos.length
       ? `<div class="photos">${photos
-          .map(
-            (p) => `
+        .map(
+          (p) => `
               <div class="photo-card">
                 <img src="${p.dataUrl}" alt="${escapeHtml(p.name || "photo")}" />
                 <div class="photo-name">${escapeHtml(p.name || "Photo")}</div>
               </div>
             `
-          )
-          .join("")}</div>`
+        )
+        .join("")}</div>`
       : `<div class="muted">—</div>`;
 
     const coords =
       Number.isFinite(record?.addressMeta?.lat) &&
-      Number.isFinite(record?.addressMeta?.lng)
+        Number.isFinite(record?.addressMeta?.lng)
         ? `${record.addressMeta.lat}, ${record.addressMeta.lng}`
         : "—";
 
@@ -1564,8 +1564,8 @@ useEffect(() => {
         <div class="field">
           <div class="label">Quarter</div>
           <div class="value">${escapeHtml(
-            String(record.quarter || "") ? `${record.quarter}Q` : "—"
-          )}</div>
+      String(record.quarter || "") ? `${record.quarter}Q` : "—"
+    )}</div>
         </div>
         <div class="field">
           <div class="label">Province</div>
@@ -1640,8 +1640,8 @@ useEffect(() => {
       <table class="kvTable">
         <tbody>
           <tr><th>Quarter</th><td>${escapeHtml(
-            String(record.quarter || "") ? `${record.quarter}Q` : "—"
-          )}</td><th>Province</th><td>${escapeHtml(record.province || "Pangasinan")}</td></tr>
+      String(record.quarter || "") ? `${record.quarter}Q` : "—"
+    )}</td><th>Province</th><td>${escapeHtml(record.province || "Pangasinan")}</td></tr>
           <tr><th>Date Completed</th><td>${escapeHtml(record.dateCompleted || "—")}</td><th>Type of Intervention</th><td>${escapeHtml(record.typeOfIntervention || "—")}</td></tr>
           <tr><th>Size/Variant</th><td>${escapeHtml(record.sizeVariant || "—")}</td><th>Materials Provided</th><td>${escapeHtml(record.packagingMaterialsProvided || "—")}</td></tr>
           <tr><th>Customer</th><td>${escapeHtml(record.customerName || "—")}</td><th>Sex</th><td>${escapeHtml(record.sex || "—")}</td></tr>
@@ -1665,8 +1665,8 @@ useEffect(() => {
         <div><b>Customer:</b> ${escapeHtml(record.customerName || "—")} &nbsp; <b>(${escapeHtml(record.sex || "—")})</b></div>
         <div><b>Firm:</b> ${escapeHtml(record.firmName || "—")}</div>
         <div><b>Date:</b> ${escapeHtml(record.dateCompleted || "—")} &nbsp; <b>Quarter:</b> ${escapeHtml(
-          String(record.quarter || "") ? `${record.quarter}Q` : "—"
-        )}</div>
+      String(record.quarter || "") ? `${record.quarter}Q` : "—"
+    )}</div>
         <div><b>Intervention:</b> ${escapeHtml(record.typeOfIntervention || "—")}</div>
         <div><b>Variant/Type:</b> ${escapeHtml(record.sizeVariant || "—")}</div>
         <div><b>Materials Provided:</b> ${escapeHtml(record.packagingMaterialsProvided || "—")}</div>
@@ -1676,11 +1676,10 @@ useEffect(() => {
         <div><b>MOV:</b> ${escapeHtml(record.meansOfVerification || "—")}</div>
         <div><b>Name of Staff:</b> ${escapeHtml(record.nameOfStaff || "—")}</div>
         <div><b>Photos:</b> ${photos.length}</div>
-        ${
-          record.remarks
-            ? `<div><b>Remarks:</b> ${escapeHtml(record.remarks)}</div>`
-            : ""
-        }
+        ${record.remarks
+        ? `<div><b>Remarks:</b> ${escapeHtml(record.remarks)}</div>`
+        : ""
+      }
       </div>
     `;
 
@@ -1713,12 +1712,12 @@ useEffect(() => {
       layoutKey === "FORM"
         ? formLayout
         : layoutKey === "TABLE"
-        ? tableLayout
-        : layoutKey === "COMPACT"
-        ? compactLayout
-        : layoutKey === "LABEL"
-        ? labelLayout
-        : isoLayout;
+          ? tableLayout
+          : layoutKey === "COMPACT"
+            ? compactLayout
+            : layoutKey === "LABEL"
+              ? labelLayout
+              : isoLayout;
 
     return `
       <div class="sheet">
@@ -1858,30 +1857,30 @@ useEffect(() => {
   };
 
   const doPrint = (rows, options) => {
-  const win = window.open("", "_blank", "width=1200,height=900");
-  if (!win) {
-    alert("Popup blocked. Please allow popups for printing.");
-    return;
-  }
+    const win = window.open("", "_blank", "width=1200,height=900");
+    if (!win) {
+      alert("Popup blocked. Please allow popups for printing.");
+      return;
+    }
 
-  const html = buildPrintDocument(rows, options);
+    const html = buildPrintDocument(rows, options);
 
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
-  win.focus();
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
 
-  // Try open print dialog (some browsers may block; HTML also calls print on load)
-  try {
-    win.onload = () => {
-      setTimeout(() => {
-        try { win.print(); } catch {}
-      }, 250);
-    };
-  } catch {}
-};
+    // Try open print dialog (some browsers may block; HTML also calls print on load)
+    try {
+      win.onload = () => {
+        setTimeout(() => {
+          try { win.print(); } catch { }
+        }, 250);
+      };
+    } catch { }
+  };
 
-const openPrintPopupRow = (recordId) => {
+  const openPrintPopupRow = (recordId) => {
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -2138,80 +2137,80 @@ const openPrintPopupRow = (recordId) => {
     setShowAdd(true);
   };
 
-const saveRecord = async () => {
-  if (!form.dateCompleted)
-    return alert("Required: Date Completed/Executed");
-  if (!form.typeOfIntervention.trim())
-    return alert("Required: Type of Intervention");
-  if (!form.sizeVariant.trim())
-    return alert(
-      "Required: Size/Variant of Label Design / Type of Packaging Material"
-    );
+  const saveRecord = async () => {
+    if (!form.dateCompleted)
+      return alert("Required: Date Completed/Executed");
+    if (!form.typeOfIntervention.trim())
+      return alert("Required: Type of Intervention");
+    if (!form.sizeVariant.trim())
+      return alert(
+        "Required: Size/Variant of Label Design / Type of Packaging Material"
+      );
 
-  if (String(form.packagingMaterialsProvided ?? "").trim() === "")
-    return alert("Required: No. of Packaging Materials Provided");
+    if (String(form.packagingMaterialsProvided ?? "").trim() === "")
+      return alert("Required: No. of Packaging Materials Provided");
 
-  if (!form.customerName.trim()) return alert("Required: Name of Customer");
-  if (!form.firmName.trim())
-    return alert("Required: Name of Firm/Institution");
-  if (!form.address.trim()) return alert("Required: Address / Venue");
+    if (!form.customerName.trim()) return alert("Required: Name of Customer");
+    if (!form.firmName.trim())
+      return alert("Required: Name of Firm/Institution");
+    if (!form.address.trim()) return alert("Required: Address / Venue");
 
-  const computedQuarter = quarterFromDate(form.dateCompleted);
-  if (!computedQuarter) return alert("Invalid Date Completed/Executed");
+    const computedQuarter = quarterFromDate(form.dateCompleted);
+    if (!computedQuarter) return alert("Invalid Date Completed/Executed");
 
-  const existingProducts = editRecordId
-    ? records.find((r) => String(r.id) === String(editRecordId))?.products || []
-    : [];
+    const existingProducts = editRecordId
+      ? records.find((r) => String(r.id) === String(editRecordId))?.products || []
+      : [];
 
-  const payload = {
-    quarter: String(computedQuarter),
-    province: "Pangasinan",
-    dateCompleted: form.dateCompleted || "",
-    typeOfIntervention: (form.typeOfIntervention || "").trim(),
-    sizeVariant: (form.sizeVariant || "").trim(),
-    packagingMaterialsProvided: (form.packagingMaterialsProvided || "").trim(),
-    customerName: (form.customerName || "").trim(),
-    sex: (form.sex || "").trim(),
-    firmName: (form.firmName || "").trim(),
-    address: (form.address || "").trim(),
-    addressMeta: form.addressMeta || null,
-    meansOfVerification: (form.meansOfVerification || "").trim(),
-    nameOfStaff: (form.nameOfStaff || "").trim(),
-    remarks: (form.remarks || "").trim(),
-    custom_fields: form.customFields || {},
-    customFields: form.customFields || {},
-    photos: Array.isArray(form.photos) ? form.photos : [],
-    products: existingProducts,
+    const payload = {
+      quarter: String(computedQuarter),
+      province: "Pangasinan",
+      dateCompleted: form.dateCompleted || "",
+      typeOfIntervention: (form.typeOfIntervention || "").trim(),
+      sizeVariant: (form.sizeVariant || "").trim(),
+      packagingMaterialsProvided: (form.packagingMaterialsProvided || "").trim(),
+      customerName: (form.customerName || "").trim(),
+      sex: (form.sex || "").trim(),
+      firmName: (form.firmName || "").trim(),
+      address: (form.address || "").trim(),
+      addressMeta: form.addressMeta || null,
+      meansOfVerification: (form.meansOfVerification || "").trim(),
+      nameOfStaff: (form.nameOfStaff || "").trim(),
+      remarks: (form.remarks || "").trim(),
+      custom_fields: form.customFields || {},
+      customFields: form.customFields || {},
+      photos: Array.isArray(form.photos) ? form.photos : [],
+      products: existingProducts,
+    };
+
+    try {
+      if (!editRecordId) {
+        await axios.post(API, payload);
+      } else {
+        await axios.put(`${API}/${editRecordId}`, payload);
+      }
+
+      await fetchRecords();
+      setShowAdd(false);
+      setEditRecordId(null);
+      resetForm();
+    } catch (err) {
+      console.error("Failed to save packaging and labeling record:", err);
+      alert("Failed to save record.");
+    }
   };
 
-  try {
-    if (!editRecordId) {
-      await axios.post(API, payload);
-    } else {
-      await axios.put(`${API}/${editRecordId}`, payload);
+  const deleteRecord = async (id) => {
+    if (!window.confirm("Delete this entry?")) return;
+
+    try {
+      await axios.delete(`${API}/${id}`);
+      await fetchRecords();
+    } catch (err) {
+      console.error("Failed to delete packaging and labeling record:", err);
+      alert("Failed to delete record.");
     }
-
-    await fetchRecords();
-    setShowAdd(false);
-    setEditRecordId(null);
-    resetForm();
-  } catch (err) {
-    console.error("Failed to save packaging and labeling record:", err);
-    alert("Failed to save record.");
-  }
-};
-
-const deleteRecord = async (id) => {
-  if (!window.confirm("Delete this entry?")) return;
-
-  try {
-    await axios.delete(`${API}/${id}`);
-    await fetchRecords();
-  } catch (err) {
-    console.error("Failed to delete packaging and labeling record:", err);
-    alert("Failed to delete record.");
-  }
-};
+  };
 
   // ===== PRODUCT CRUD =====
   const openProductModal_Add = (recordId) => {
@@ -2228,51 +2227,51 @@ const deleteRecord = async (id) => {
     setProductModalFor({ recordId, mode: "edit", productId });
   };
 
-const saveProduct = async () => {
-  if (!productModalFor) return;
-  if (!productForm.productName.trim()) return alert("Required: Product Name");
+  const saveProduct = async () => {
+    if (!productModalFor) return;
+    if (!productForm.productName.trim()) return alert("Required: Product Name");
 
-  try {
-    if (productModalFor.mode === "add") {
-      await axios.post(`${API}/${productModalFor.recordId}/products`, {
-        productName: productForm.productName.trim(),
-      });
-    } else {
-      await axios.put(`${API}/products/${productModalFor.productId}`, {
-        productName: productForm.productName.trim(),
-      });
+    try {
+      if (productModalFor.mode === "add") {
+        await axios.post(`${API}/${productModalFor.recordId}/products`, {
+          productName: productForm.productName.trim(),
+        });
+      } else {
+        await axios.put(`${API}/products/${productModalFor.productId}`, {
+          productName: productForm.productName.trim(),
+        });
+      }
+
+      await fetchRecords();
+      setSelectedProductByRecord((prev) => ({
+        ...prev,
+        [productModalFor.recordId]: "",
+      }));
+      setProductModalFor(null);
+      resetProductForm();
+    } catch (err) {
+      console.error("Failed to save product:", err);
+      alert("Failed to save product.");
     }
+  };
 
-    await fetchRecords();
-    setSelectedProductByRecord((prev) => ({
-      ...prev,
-      [productModalFor.recordId]: "",
-    }));
-    setProductModalFor(null);
-    resetProductForm();
-  } catch (err) {
-    console.error("Failed to save product:", err);
-    alert("Failed to save product.");
-  }
-};
+  const deleteProduct = async (recordId, productId) => {
+    if (!window.confirm("Delete this product?")) return;
 
-const deleteProduct = async (recordId, productId) => {
-  if (!window.confirm("Delete this product?")) return;
+    try {
+      await axios.delete(`${API}/products/${productId}`);
+      await fetchRecords();
 
-  try {
-    await axios.delete(`${API}/products/${productId}`);
-    await fetchRecords();
-
-    setSelectedProductByRecord((prev) => {
-      if (prev[recordId] !== productId) return prev;
-      const { [recordId]: _, ...rest } = prev;
-      return rest;
-    });
-  } catch (err) {
-    console.error("Failed to delete product:", err);
-    alert("Failed to delete product.");
-  }
-};
+      setSelectedProductByRecord((prev) => {
+        if (prev[recordId] !== productId) return prev;
+        const { [recordId]: _, ...rest } = prev;
+        return rest;
+      });
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+      alert("Failed to delete product.");
+    }
+  };
 
   // ===== Map helpers =====
   const getFeatureName = (feature) => {
@@ -2418,7 +2417,7 @@ const deleteProduct = async (recordId, productId) => {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -2623,10 +2622,10 @@ const deleteProduct = async (recordId, productId) => {
       mode === "manual"
         ? "Manual Input"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality || "Municipality"} > Select Barangay`
-        : `Pangasinan > ${municipality || "Municipality"} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality || "Municipality"} > Select Barangay`
+            : `Pangasinan > ${municipality || "Municipality"} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -2684,27 +2683,27 @@ const deleteProduct = async (recordId, productId) => {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              venue: venue.trim(),
-              manualText: baseAddress,
-              displayText: finalDisplay || (coords ? `${coords.lat}, ${coords.lng}` : ""),
-              province: "",
-              municipality: municipality || "",
-              barangay: barangay || "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            venue: venue.trim(),
+            manualText: baseAddress,
+            displayText: finalDisplay || (coords ? `${coords.lat}, ${coords.lng}` : ""),
+            province: "",
+            municipality: municipality || "",
+            barangay: barangay || "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              venue: venue.trim(),
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              displayText: finalDisplay,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            venue: venue.trim(),
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            displayText: finalDisplay,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -4101,7 +4100,7 @@ const deleteProduct = async (recordId, productId) => {
       <div style={styles.titleBar}>
         <div>PACKAGING AND LABELING</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
-          
+
         </div>
       </div>
 

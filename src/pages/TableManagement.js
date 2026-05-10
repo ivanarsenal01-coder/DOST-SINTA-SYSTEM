@@ -1270,8 +1270,8 @@ function TableManagement() {
 
     try {
       const [configRes, dropdownRes] = await Promise.all([
-        fetch(`${API_BASE}/api/table-management/config`),
-        fetch(`${API_BASE}/api/table-management/dropdowns`),
+        fetch(`${API_BASE}/table-management/config`),
+        fetch(`${API_BASE}/table-management/dropdowns`),
       ]);
 
       if (!configRes.ok) {
@@ -1370,7 +1370,7 @@ function TableManagement() {
     try {
       setSavingMessage("Saving configuration to database...");
 
-      const res = await fetch(`${API_BASE}/api/table-management/config/save`, {
+      const res = await fetch(`${API_BASE}/table-management/config/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1464,7 +1464,7 @@ function TableManagement() {
     if (!dropdownMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/dropdown-options`, {
+      const res = await fetch(`${API_BASE}/table-management/dropdown-options`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1501,7 +1501,7 @@ function TableManagement() {
     if (!optionMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/dropdown-options/${optionMeta.id}`, {
+      const res = await fetch(`${API_BASE}/table-management/dropdown-options/${optionMeta.id}`, {
         method: "DELETE",
       });
 
@@ -1539,7 +1539,7 @@ function TableManagement() {
     if (!moduleMeta?.id || !tableMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/dropdowns`, {
+      const res = await fetch(`${API_BASE}/table-management/dropdowns`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1604,7 +1604,7 @@ function TableManagement() {
     if (!dropdownMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/dropdowns/${dropdownMeta.id}`, {
+      const res = await fetch(`${API_BASE}/table-management/dropdowns/${dropdownMeta.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1644,7 +1644,7 @@ function TableManagement() {
     if (!dropdownMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/dropdowns/${dropdownMeta.id}`, {
+      const res = await fetch(`${API_BASE}/table-management/dropdowns/${dropdownMeta.id}`, {
         method: "DELETE",
       });
 
@@ -1714,11 +1714,11 @@ function TableManagement() {
         columns: current.columns.map((col) =>
           col.id === fieldId || col.key === updatedField?.key
             ? {
-                ...col,
-                label: updatedField?.label ?? col.label,
-                type: updatedField?.type ?? col.type,
-                required: updatedField?.required ?? col.required,
-              }
+              ...col,
+              label: updatedField?.label ?? col.label,
+              type: updatedField?.type ?? col.type,
+              required: updatedField?.required ?? col.required,
+            }
             : col
         ),
       };
@@ -1727,7 +1727,7 @@ function TableManagement() {
     if (!updatedField || typeof fieldId !== "number" || updatedField.isSystemField) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/fields/${fieldId}`, {
+      const res = await fetch(`${API_BASE}/table-management/fields/${fieldId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1777,7 +1777,7 @@ function TableManagement() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/fields/${fieldId}`, {
+      const res = await fetch(`${API_BASE}/table-management/fields/${fieldId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1813,7 +1813,7 @@ function TableManagement() {
     if (typeof fieldId !== "number") return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/fields/${fieldId}`, {
+      const res = await fetch(`${API_BASE}/table-management/fields/${fieldId}`, {
         method: "DELETE",
       });
 
@@ -1885,9 +1885,9 @@ function TableManagement() {
       dropdowns:
         newField.type === "Dropdown"
           ? {
-              ...current.dropdowns,
-              [label]: ["Sample Option 1", "Sample Option 2"],
-            }
+            ...current.dropdowns,
+            [label]: ["Sample Option 1", "Sample Option 2"],
+          }
           : current.dropdowns,
     }));
 
@@ -1902,7 +1902,7 @@ function TableManagement() {
     if (!moduleMeta?.id || !tableMeta?.id) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/table-management/fields`, {
+      const res = await fetch(`${API_BASE}/table-management/fields`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1938,7 +1938,7 @@ function TableManagement() {
           </p>
         </div>
 
-        
+
       </div>
 
       {(isLoadingConfig || configError || savingMessage) && (

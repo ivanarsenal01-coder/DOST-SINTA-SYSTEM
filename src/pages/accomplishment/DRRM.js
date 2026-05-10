@@ -49,7 +49,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const QUARTERS = ["1st", "2nd", "3rd", "4th"];
 const BARANGAY_URL = "/data/pangasinan_barangays.json";
 const PAGE_SIZE = 10;
-const DRRM_API = `${API_BASE}/api/drrm`;
+const DRRM_API = `${API_BASE}/drrm`;
 const PSCP_YEAR = new Date().getFullYear();
 
 const fontFamily = '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial';
@@ -214,12 +214,12 @@ function normalizeEntry(raw) {
     partners: Array.isArray(e.partners)
       ? e.partners
       : typeof e.partners === "string"
-      ? e.partners.split(",").map((x) => x.trim()).filter(Boolean)
-      : Array.isArray(e.stakeholders)
-      ? e.stakeholders
-      : typeof e.stakeholders === "string"
-      ? e.stakeholders.split(",").map((x) => x.trim()).filter(Boolean)
-      : [],
+        ? e.partners.split(",").map((x) => x.trim()).filter(Boolean)
+        : Array.isArray(e.stakeholders)
+          ? e.stakeholders
+          : typeof e.stakeholders === "string"
+            ? e.stakeholders.split(",").map((x) => x.trim()).filter(Boolean)
+            : [],
     venueMeta: typeof e.venueMeta === "string" ? safeParse(e.venueMeta, null) : e.venueMeta || null,
   };
 }
@@ -344,7 +344,7 @@ function FitAndLockToPangasinan({ bounds, borderMode, selectedMuni, selectedDist
         const layer = L.geoJSON(geo);
         const b = layer.getBounds();
         if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-      } catch {}
+      } catch { }
     };
     if ((borderMode === "municipality" && selectedMuni) || (borderMode === "district" && selectedDist)) {
       if (filteredGeo?.features?.length) {

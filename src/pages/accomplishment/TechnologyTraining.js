@@ -36,7 +36,7 @@ export default function TechnologyTraining() {
   // =========================
   // API
   // =========================
-  const TRAINING_API = `${API_BASE}/api/technology-training`;
+  const TRAINING_API = `${API_BASE}/technology-training`;
   const PROGRAM_ADD = "__ADD_PROGRAM__";
 
   const parseTechTrainingCustomFields = (value) => {
@@ -442,7 +442,7 @@ export default function TechnologyTraining() {
 
     async function loadTechTrainingCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find((m) => {
@@ -486,13 +486,13 @@ export default function TechnologyTraining() {
         const finalCustomFields = customFields.length
           ? customFields
           : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
+            {
+              fieldKey: "funding",
+              fieldLabel: "Funding",
+              fieldType: "Text",
+              sortOrder: 999,
+            },
+          ];
 
         if (!cancelled) setTechTrainingCustomFields(finalCustomFields);
       } catch (err) {
@@ -538,25 +538,25 @@ export default function TechnologyTraining() {
       const rows = Array.isArray(payload?.data)
         ? payload.data
         : Array.isArray(payload?.rows)
-        ? payload.rows
-        : Array.isArray(payload)
-        ? payload
-        : [];
+          ? payload.rows
+          : Array.isArray(payload)
+            ? payload
+            : [];
 
       const total = Number(
         payload?.total ??
-          payload?.totalRows ??
-          payload?.count ??
-          rows.length ??
-          0
+        payload?.totalRows ??
+        payload?.count ??
+        rows.length ??
+        0
       );
 
       const totalPages = Math.max(
         1,
         Number(
           payload?.totalPages ??
-            Math.ceil(total / rowsPerPage) ??
-            1
+          Math.ceil(total / rowsPerPage) ??
+          1
         ) || 1
       );
 
@@ -654,15 +654,15 @@ export default function TechnologyTraining() {
     return [...arr].sort((a, b) => {
       const aFromIntervention =
         a?.interventionId !== null &&
-        a?.interventionId !== undefined &&
-        a?.interventionId !== ""
+          a?.interventionId !== undefined &&
+          a?.interventionId !== ""
           ? 1
           : 0;
 
       const bFromIntervention =
         b?.interventionId !== null &&
-        b?.interventionId !== undefined &&
-        b?.interventionId !== ""
+          b?.interventionId !== undefined &&
+          b?.interventionId !== ""
           ? 1
           : 0;
 
@@ -903,7 +903,7 @@ export default function TechnologyTraining() {
   };
   const confirmPrint = () => {
     const rows = buildTrainingRows(printModal.scope, printModal.entryId);
-    const body = printModal.layout === "TABLE" ? `<table><thead><tr>${trainingColumns.map((c)=>`<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r)=>`<tr>${trainingColumns.map((c)=>`<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${trainingColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>` : `${rows.length ? rows.map((r)=>`<div class="card">${trainingColumns.map((c)=>`<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`}`;
+    const body = printModal.layout === "TABLE" ? `<table><thead><tr>${trainingColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${trainingColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${trainingColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>` : `${rows.length ? rows.map((r) => `<div class="card">${trainingColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`}`;
     const win = window.open("", "_blank", "width=1200,height=900"); if (!win) return alert("Popup blocked. Please allow popups for printing.");
     win.document.write(`<!doctype html><html><head><title>Technology Training Print</title><style>@page{size:${printModal.preset || "a4"} ${printModal.orientation || "landscape"};margin:10mm;}body{font-family:Arial;padding:12px;color:#0f172a}h1{font-size:18px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #94a3b8;padding:6px;font-size:11px;vertical-align:top}th{background:#e2e8f0}.card{border:1px solid #94a3b8;border-radius:8px;padding:10px;margin-bottom:10px;display:grid;gap:4px;font-size:12px}</style></head><body><h1>Technology Training Print</h1>${body}<script>setTimeout(()=>window.print(),250)</script></body></html>`); win.document.close(); win.focus();
     setPrintModal((p) => ({ ...p, open: false }));
@@ -1917,10 +1917,10 @@ export default function TechnologyTraining() {
       mode === "manual"
         ? "Manual Input"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -1954,25 +1954,25 @@ export default function TechnologyTraining() {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              manualText: manualText.trim(),
-              displayText: manualText.trim(),
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            manualText: manualText.trim(),
+            displayText: manualText.trim(),
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -2516,7 +2516,7 @@ export default function TechnologyTraining() {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -3568,8 +3568,8 @@ export default function TechnologyTraining() {
                       entryForm.costDost === "" && entryForm.costPartnerAgency === ""
                         ? ""
                         : peso(
-                            toNumber(entryForm.costDost) + toNumber(entryForm.costPartnerAgency)
-                          )
+                          toNumber(entryForm.costDost) + toNumber(entryForm.costPartnerAgency)
+                        )
                     }
                     readOnly
                   />
@@ -3990,7 +3990,7 @@ export default function TechnologyTraining() {
         <div style={{ ...styles.modalBackdrop, zIndex: 3600 }} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>
           <div style={{ ...styles.modal, width: "min(720px, 100%)", position: "relative", zIndex: 3601 }} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}><div>{exportModal.scope === "row" ? "Export (This Row)" : "Export (Filtered Rows)"}</div><button style={styles.closeX} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>✕</button></div>
-            <div style={styles.modalBody}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{["excel","csv","pdf","docx"].map((f) => <button key={f} type="button" style={exportModal.format === f ? styles.btnDark : styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, format: f }))}>{f.toUpperCase()}</button>)}</div></div>
+            <div style={styles.modalBody}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{["excel", "csv", "pdf", "docx"].map((f) => <button key={f} type="button" style={exportModal.format === f ? styles.btnDark : styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, format: f }))}>{f.toUpperCase()}</button>)}</div></div>
             <div style={styles.modalFooter}><button style={styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>Cancel</button><button style={styles.btnDark} onClick={confirmExport}>Export Now</button></div>
           </div>
         </div>
