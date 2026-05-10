@@ -130,16 +130,16 @@ export default function CEST() {
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
 
- const INTERVENTION_OPTIONS = [
-  "Training",
-  "Tech Roll Out",
-  "Tech Promo",
-  "S&T Promo",
-  "TACS",
-  "Packaging & Labeling",
-  "Calibration",
-  "TNA Report",
-];
+  const INTERVENTION_OPTIONS = [
+    "Training",
+    "Tech Roll Out",
+    "Tech Promo",
+    "S&T Promo",
+    "TACS",
+    "Packaging & Labeling",
+    "Calibration",
+    "TNA Report",
+  ];
   const COMMUNITY_TYPE_OPTIONS = ["New Communities", "Continuing Communities"];
   const TACS_CONSULTANCY_OPTIONS = [
     "Advisory Services",
@@ -229,44 +229,44 @@ export default function CEST() {
     });
 
   const getInterventionLabel = (it) => {
-  const type = it?.type || "";
+    const type = it?.type || "";
 
-  if (type === "Tech Roll Out") {
-    try {
-      const obj = JSON.parse(it?.notes || "");
-      const rows = Array.isArray(obj?.techRollOutRows)
-        ? obj.techRollOutRows
-        : [];
+    if (type === "Tech Roll Out") {
+      try {
+        const obj = JSON.parse(it?.notes || "");
+        const rows = Array.isArray(obj?.techRollOutRows)
+          ? obj.techRollOutRows
+          : [];
 
-      const firstTech = rows
-        .map((r) =>
-          String(
-            r?.nameOfTechnologyTransferred ||
+        const firstTech = rows
+          .map((r) =>
+            String(
+              r?.nameOfTechnologyTransferred ||
               r?.knowledgeTech ||
               ""
-          ).trim()
-        )
-        .find((x) => x);
+            ).trim()
+          )
+          .find((x) => x);
 
-      if (firstTech) return firstTech;
-    } catch {}
-    return "Tech Roll Out";
-  }
+        if (firstTech) return firstTech;
+      } catch { }
+      return "Tech Roll Out";
+    }
 
-  if (
-  type === "Training" ||
-  type === "Tech Promo" ||
-  type === "S&T Promo"
-) {
-  return (it?.title || type || "Training").trim();
-}
+    if (
+      type === "Training" ||
+      type === "Tech Promo" ||
+      type === "S&T Promo"
+    ) {
+      return (it?.title || type || "Training").trim();
+    }
 
-  if (type === "TNA Report") {
-    return (it?.notes || "").trim() || "TNA Report";
-  }
+    if (type === "TNA Report") {
+      return (it?.notes || "").trim() || "TNA Report";
+    }
 
-  return (it?.title || type || "—").trim();
-};
+    return (it?.title || type || "—").trim();
+  };
 
   // ===== State =====
   const [projects, setProjects] = useState([]);
@@ -308,336 +308,336 @@ export default function CEST() {
   });
 
   // Address modal
- const [addressFlowOpen, setAddressFlowOpen] = useState(false);
-const [addressFlowTarget, setAddressFlowTarget] = useState("project");
-const [addressViewForProjectId, setAddressViewForProjectId] = useState(null);
-const [cestCustomFields, setCestCustomFields] = useState([]);
+  const [addressFlowOpen, setAddressFlowOpen] = useState(false);
+  const [addressFlowTarget, setAddressFlowTarget] = useState("project");
+  const [addressViewForProjectId, setAddressViewForProjectId] = useState(null);
+  const [cestCustomFields, setCestCustomFields] = useState([]);
 
   // Intervention picker
   const [pickForId, setPickForId] = useState(null);
   const [selectedInterventionByProject, setSelectedInterventionByProject] = useState({});
 
   // Intervention details modal
- const [detailFor, setDetailFor] = useState(null);
+  const [detailFor, setDetailFor] = useState(null);
 
-const makeDefaultTechRows = () => [
-  {
-    quarter: "",
-    unitCenter: "DOST-PANGASINAN",
-    nameOfTechnologyTransferred: "",
-    technologyGenerator: "",
-    modeOfTransfer: "",
-    isDostDevelopedFunded: false,
-    dateTransferred: "",
-    activityTitle: "",
-    activityDate: "",
-    activityVenue: "",
-    institutionName: "",
-    institutionAddress: "",
-    institutionAddressMeta: null,
-    classification: "",
-    representativeName: "",
-    representativeDesignation: "",
-    sex: "",
-  },
-];
+  const makeDefaultTechRows = () => [
+    {
+      quarter: "",
+      unitCenter: "DOST-PANGASINAN",
+      nameOfTechnologyTransferred: "",
+      technologyGenerator: "",
+      modeOfTransfer: "",
+      isDostDevelopedFunded: false,
+      dateTransferred: "",
+      activityTitle: "",
+      activityDate: "",
+      activityVenue: "",
+      institutionName: "",
+      institutionAddress: "",
+      institutionAddressMeta: null,
+      classification: "",
+      representativeName: "",
+      representativeDesignation: "",
+      sex: "",
+    },
+  ];
 
-const CALIBRATION_MC_RANGE_OPTIONS = ["<100 Kg", ">=100 Kg"];
+  const CALIBRATION_MC_RANGE_OPTIONS = ["<100 Kg", ">=100 Kg"];
 
-const makeCalibrationBreakdownRow = (prefillSample = "", autoFilled = false) => ({
-  id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-  range: "",
-  noOfSample: prefillSample,
-  cost: "",
-  feesCollected: "",
-  autoFilled,
-});
-
-const computeCalibrationBreakdownTotals = (rows, category) => {
-  const cleanRows = Array.isArray(rows) ? rows : [];
-  const totalSamples = cleanRows.reduce((sum, r) => sum + toNumber(r.noOfSample), 0);
-  const totalFees =
-    category === "PAYING"
-      ? cleanRows.reduce((sum, r) => sum + toNumber(r.noOfSample) * toNumber(r.cost), 0)
-      : 0;
-
-  return { totalSamples, totalFees };
-};
-
-const updateTechRow = (idx, key, val) => {
-  setDetailForm((prev) => {
-    const next = [...(prev.techRows || [])];
-    next[idx] = { ...(next[idx] || {}), [key]: val };
-    return { ...prev, techRows: next };
+  const makeCalibrationBreakdownRow = (prefillSample = "", autoFilled = false) => ({
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    range: "",
+    noOfSample: prefillSample,
+    cost: "",
+    feesCollected: "",
+    autoFilled,
   });
-};
 
-const addTechRow = () => {
-  setDetailForm((prev) => ({
-    ...prev,
-    techRows: [...(prev.techRows || []), ...makeDefaultTechRows()],
-  }));
-};
+  const computeCalibrationBreakdownTotals = (rows, category) => {
+    const cleanRows = Array.isArray(rows) ? rows : [];
+    const totalSamples = cleanRows.reduce((sum, r) => sum + toNumber(r.noOfSample), 0);
+    const totalFees =
+      category === "PAYING"
+        ? cleanRows.reduce((sum, r) => sum + toNumber(r.noOfSample) * toNumber(r.cost), 0)
+        : 0;
 
-const removeTechRow = (idx) => {
-  setDetailForm((prev) => {
-    const arr = [...(prev.techRows || [])];
-    arr.splice(idx, 1);
-    return {
+    return { totalSamples, totalFees };
+  };
+
+  const updateTechRow = (idx, key, val) => {
+    setDetailForm((prev) => {
+      const next = [...(prev.techRows || [])];
+      next[idx] = { ...(next[idx] || {}), [key]: val };
+      return { ...prev, techRows: next };
+    });
+  };
+
+  const addTechRow = () => {
+    setDetailForm((prev) => ({
       ...prev,
-      techRows: arr.length ? arr : makeDefaultTechRows(),
-    };
-  });
-};
+      techRows: [...(prev.techRows || []), ...makeDefaultTechRows()],
+    }));
+  };
+
+  const removeTechRow = (idx) => {
+    setDetailForm((prev) => {
+      const arr = [...(prev.techRows || [])];
+      arr.splice(idx, 1);
+      return {
+        ...prev,
+        techRows: arr.length ? arr : makeDefaultTechRows(),
+      };
+    });
+  };
 
 
-const updateCalibrationForm = (key, value) => {
-  setDetailForm((prev) => {
-    const next = { ...prev, [key]: value };
+  const updateCalibrationForm = (key, value) => {
+    setDetailForm((prev) => {
+      const next = { ...prev, [key]: value };
 
-    if (key === "calibrationTypeOfSample") {
-      if (value === "Weighing Scale") {
-        next.calibrationTestType = "Mass Calibration";
-        next.calibrationRange = "";
-        if (!Array.isArray(next.calibrationMcBreakdown) || !next.calibrationMcBreakdown.length) {
+      if (key === "calibrationTypeOfSample") {
+        if (value === "Weighing Scale") {
+          next.calibrationTestType = "Mass Calibration";
+          next.calibrationRange = "";
+          if (!Array.isArray(next.calibrationMcBreakdown) || !next.calibrationMcBreakdown.length) {
+            next.calibrationMcBreakdown = [makeCalibrationBreakdownRow()];
+          }
+          const totals = computeCalibrationBreakdownTotals(
+            next.calibrationMcBreakdown,
+            next.calibrationCategory
+          );
+          next.calibrationNoOfSample = String(totals.totalSamples || "");
+          next.calibrationFeesCollected = String(totals.totalFees || "");
+          next.calibrationCost = "";
+        } else if (value === "Bucket") {
+          next.calibrationTestType = "Volume Calibration";
           next.calibrationMcBreakdown = [makeCalibrationBreakdownRow()];
+          next.calibrationRange = "";
+          next.calibrationNoOfSample = "";
+          next.calibrationCost = "";
+          next.calibrationFeesCollected = "";
         }
+      }
+
+      if (key === "calibrationFemale" || key === "calibrationMale") {
+        const female = key === "calibrationFemale" ? toNumber(value) : toNumber(next.calibrationFemale);
+        const male = key === "calibrationMale" ? toNumber(value) : toNumber(next.calibrationMale);
+        const total = female + male;
+        next.calibrationTotalCustomers = String(total || "");
+        next.calibrationNoOfFirms = String(total || "");
+      }
+
+      if (
+        next.calibrationTypeOfSample === "Bucket" &&
+        (key === "calibrationCost" || key === "calibrationNoOfSample" || key === "calibrationCategory")
+      ) {
+        const cost = key === "calibrationCost" ? toNumber(value) : toNumber(next.calibrationCost);
+        const noOfSample =
+          key === "calibrationNoOfSample" ? toNumber(value) : toNumber(next.calibrationNoOfSample);
+        const category = key === "calibrationCategory" ? value : next.calibrationCategory;
+        next.calibrationFeesCollected =
+          category === "PAYING" ? String(cost * noOfSample || "") : "";
+      }
+
+      if (key === "calibrationCategory" && next.calibrationTypeOfSample === "Weighing Scale") {
         const totals = computeCalibrationBreakdownTotals(
           next.calibrationMcBreakdown,
-          next.calibrationCategory
+          value
         );
         next.calibrationNoOfSample = String(totals.totalSamples || "");
         next.calibrationFeesCollected = String(totals.totalFees || "");
-        next.calibrationCost = "";
-      } else if (value === "Bucket") {
-        next.calibrationTestType = "Volume Calibration";
-        next.calibrationMcBreakdown = [makeCalibrationBreakdownRow()];
-        next.calibrationRange = "";
-        next.calibrationNoOfSample = "";
-        next.calibrationCost = "";
-        next.calibrationFeesCollected = "";
       }
-    }
 
-    if (key === "calibrationFemale" || key === "calibrationMale") {
-      const female = key === "calibrationFemale" ? toNumber(value) : toNumber(next.calibrationFemale);
-      const male = key === "calibrationMale" ? toNumber(value) : toNumber(next.calibrationMale);
-      const total = female + male;
-      next.calibrationTotalCustomers = String(total || "");
-      next.calibrationNoOfFirms = String(total || "");
-    }
-
-    if (
-      next.calibrationTypeOfSample === "Bucket" &&
-      (key === "calibrationCost" || key === "calibrationNoOfSample" || key === "calibrationCategory")
-    ) {
-      const cost = key === "calibrationCost" ? toNumber(value) : toNumber(next.calibrationCost);
-      const noOfSample =
-        key === "calibrationNoOfSample" ? toNumber(value) : toNumber(next.calibrationNoOfSample);
-      const category = key === "calibrationCategory" ? value : next.calibrationCategory;
-      next.calibrationFeesCollected =
-        category === "PAYING" ? String(cost * noOfSample || "") : "";
-    }
-
-    if (key === "calibrationCategory" && next.calibrationTypeOfSample === "Weighing Scale") {
-      const totals = computeCalibrationBreakdownTotals(
-        next.calibrationMcBreakdown,
-        value
-      );
-      next.calibrationNoOfSample = String(totals.totalSamples || "");
-      next.calibrationFeesCollected = String(totals.totalFees || "");
-    }
-
-    return next;
-  });
-};
-
-const updateCalibrationBreakdownRow = (rowId, key, value) => {
-  setDetailForm((prev) => {
-    const rows = [...(prev.calibrationMcBreakdown || [])];
-    const currentIndex = rows.findIndex((row) => row.id === rowId);
-
-    const updatedRows = rows.map((row) => {
-      if (row.id !== rowId) return row;
-
-      const nextRow = {
-        ...row,
-        [key]: value,
-        autoFilled: key === "noOfSample" ? false : row.autoFilled,
-      };
-
-      nextRow.feesCollected =
-        prev.calibrationCategory === "PAYING"
-          ? String(toNumber(nextRow.noOfSample) * toNumber(nextRow.cost) || "")
-          : "";
-
-      return nextRow;
+      return next;
     });
+  };
 
-    if (key === "noOfSample" && currentIndex >= 0 && currentIndex < updatedRows.length - 1) {
-      const nextIndex = currentIndex + 1;
-      const nextRow = updatedRows[nextIndex];
+  const updateCalibrationBreakdownRow = (rowId, key, value) => {
+    setDetailForm((prev) => {
+      const rows = [...(prev.calibrationMcBreakdown || [])];
+      const currentIndex = rows.findIndex((row) => row.id === rowId);
 
-      if (
-        nextRow &&
-        (nextRow.autoFilled ||
-          String(nextRow.noOfSample || "").trim() === "" ||
-          toNumber(nextRow.noOfSample) === 0)
-      ) {
-        const usedWithoutNext = updatedRows.reduce((sum, row, idx) => {
-          if (idx === nextIndex) return sum;
-          return sum + toNumber(row.noOfSample);
-        }, 0);
+      const updatedRows = rows.map((row) => {
+        if (row.id !== rowId) return row;
 
-        const remainingForNext = Math.max(
-          0,
-          toNumber(prev.calibrationNoOfSample) - usedWithoutNext
-        );
-
-        updatedRows[nextIndex] = {
-          ...nextRow,
-          noOfSample: remainingForNext ? String(remainingForNext) : "",
-          autoFilled: true,
-          feesCollected:
-            prev.calibrationCategory === "PAYING"
-              ? String(remainingForNext * toNumber(nextRow.cost) || "")
-              : "",
+        const nextRow = {
+          ...row,
+          [key]: value,
+          autoFilled: key === "noOfSample" ? false : row.autoFilled,
         };
-      }
-    }
 
-    const totalFees =
-      prev.calibrationCategory === "PAYING"
-        ? updatedRows.reduce(
+        nextRow.feesCollected =
+          prev.calibrationCategory === "PAYING"
+            ? String(toNumber(nextRow.noOfSample) * toNumber(nextRow.cost) || "")
+            : "";
+
+        return nextRow;
+      });
+
+      if (key === "noOfSample" && currentIndex >= 0 && currentIndex < updatedRows.length - 1) {
+        const nextIndex = currentIndex + 1;
+        const nextRow = updatedRows[nextIndex];
+
+        if (
+          nextRow &&
+          (nextRow.autoFilled ||
+            String(nextRow.noOfSample || "").trim() === "" ||
+            toNumber(nextRow.noOfSample) === 0)
+        ) {
+          const usedWithoutNext = updatedRows.reduce((sum, row, idx) => {
+            if (idx === nextIndex) return sum;
+            return sum + toNumber(row.noOfSample);
+          }, 0);
+
+          const remainingForNext = Math.max(
+            0,
+            toNumber(prev.calibrationNoOfSample) - usedWithoutNext
+          );
+
+          updatedRows[nextIndex] = {
+            ...nextRow,
+            noOfSample: remainingForNext ? String(remainingForNext) : "",
+            autoFilled: true,
+            feesCollected:
+              prev.calibrationCategory === "PAYING"
+                ? String(remainingForNext * toNumber(nextRow.cost) || "")
+                : "",
+          };
+        }
+      }
+
+      const totalFees =
+        prev.calibrationCategory === "PAYING"
+          ? updatedRows.reduce(
             (sum, r) => sum + toNumber(r.noOfSample) * toNumber(r.cost),
             0
           )
-        : 0;
+          : 0;
 
-    return {
-      ...prev,
-      calibrationMcBreakdown: updatedRows,
-      calibrationFeesCollected: String(totalFees || ""),
-    };
+      return {
+        ...prev,
+        calibrationMcBreakdown: updatedRows,
+        calibrationFeesCollected: String(totalFees || ""),
+      };
+    });
+  };
+
+  const addCalibrationBreakdownRow = () => {
+    setDetailForm((prev) => {
+      const currentTotal = (prev.calibrationMcBreakdown || []).reduce(
+        (sum, r) => sum + toNumber(r.noOfSample),
+        0
+      );
+      const remaining = Math.max(0, toNumber(prev.calibrationNoOfSample) - currentTotal);
+      return {
+        ...prev,
+        calibrationMcBreakdown: [
+          ...(prev.calibrationMcBreakdown || []),
+          makeCalibrationBreakdownRow(remaining ? String(remaining) : "", true),
+        ],
+      };
+    });
+  };
+
+  const removeCalibrationBreakdownRow = (rowId) => {
+    setDetailForm((prev) => {
+      const remaining = (prev.calibrationMcBreakdown || []).filter((row) => row.id !== rowId);
+      const rows = remaining.length ? remaining : [makeCalibrationBreakdownRow()];
+      const totals = computeCalibrationBreakdownTotals(rows, prev.calibrationCategory);
+      return {
+        ...prev,
+        calibrationMcBreakdown: rows,
+        calibrationNoOfSample: String(totals.totalSamples || ""),
+        calibrationFeesCollected: String(totals.totalFees || ""),
+      };
+    });
+  };
+
+  const [detailForm, setDetailForm] = useState({
+    type: "",
+    title: "",
+    date: "",
+    venue: "",
+    noOfFirms: "",
+    male: "",
+    female: "",
+    total: "",
+    projectProgramUnit: "",
+    notes: "",
+    techRows: [],
+
+    trainingProgram: "",
+    trainingProvince: "PANGASINAN",
+    trainingStartDate: "",
+    trainingEndDate: "",
+    trainingVenueAddress: "",
+    trainingVenueAddressMeta: null,
+    trainingParticipantsFemale: "",
+    trainingParticipantsMale: "",
+    trainingSeniorFemale: "",
+    trainingSeniorMale: "",
+    trainingIpFemale: "",
+    trainingIpMale: "",
+    trainingFourPsFemale: "",
+    trainingFourPsMale: "",
+    trainingPwdFemale: "",
+    trainingPwdMale: "",
+    trainingFirmsSucsHeisLgusCount: "",
+    trainingFirmsAssociationsList: "",
+    trainingTrainorAffiliation: "",
+    trainingCostDost: "",
+    trainingCostPartnerAgency: "",
+
+    promoProject: "",
+    promoActivityDate: "",
+    promoTechnologyPromoted: "",
+    promoTechnologyGenerator: "",
+    promoModeOfPromotion: "Social Media",
+    promoActivityTitle: "",
+    promoActivityVenueAddress: "",
+    promoActivityVenueMeta: null,
+    promoCustomerName: "",
+    promoCustomerAddress: "",
+    promoCustomerAddressMeta: null,
+    promoSex: "N/A",
+    promoStaffName: "",
+    promoMeansVerification: "",
+    promoPhotos: [],
+
+    calibrationCategory: "PAYING",
+    calibrationDate: "",
+    calibrationTypeOfSample: "Weighing Scale",
+    calibrationTestType: "Mass Calibration",
+    calibrationNoOfSample: "",
+    calibrationRange: "",
+    calibrationCost: "",
+    calibrationFeesCollected: "",
+    calibrationMcBreakdown: [makeCalibrationBreakdownRow()],
+    calibrationBarangay: "",
+    calibrationAddress: "",
+    calibrationAddressMeta: null,
+    calibrationFemale: "",
+    calibrationMale: "",
+    calibrationTotalCustomers: "",
+    calibrationNoOfFirms: "",
+    calibrationNoOfNewFirms: "",
+    calibrationAgeRange: "",
+    calibrationPwd: "",
+    calibrationIp: "",
+    calibrationSc: "",
+    calibrationFourPs: "",
+
+    consultancyType: "",
+    dateEngagement: "",
+    expertInstitution: "",
+    customerName: "",
+    customerSex: "",
+    customerAddress: "",
+    customerAddressMeta: null,
+    meansVerification: "",
+    noOfAdvice: "",
+    tacsPhotos: [],
   });
-};
-
-const addCalibrationBreakdownRow = () => {
-  setDetailForm((prev) => {
-    const currentTotal = (prev.calibrationMcBreakdown || []).reduce(
-      (sum, r) => sum + toNumber(r.noOfSample),
-      0
-    );
-    const remaining = Math.max(0, toNumber(prev.calibrationNoOfSample) - currentTotal);
-    return {
-      ...prev,
-      calibrationMcBreakdown: [
-        ...(prev.calibrationMcBreakdown || []),
-        makeCalibrationBreakdownRow(remaining ? String(remaining) : "", true),
-      ],
-    };
-  });
-};
-
-const removeCalibrationBreakdownRow = (rowId) => {
-  setDetailForm((prev) => {
-    const remaining = (prev.calibrationMcBreakdown || []).filter((row) => row.id !== rowId);
-    const rows = remaining.length ? remaining : [makeCalibrationBreakdownRow()];
-    const totals = computeCalibrationBreakdownTotals(rows, prev.calibrationCategory);
-    return {
-      ...prev,
-      calibrationMcBreakdown: rows,
-      calibrationNoOfSample: String(totals.totalSamples || ""),
-      calibrationFeesCollected: String(totals.totalFees || ""),
-    };
-  });
-};
-
-const [detailForm, setDetailForm] = useState({
-  type: "",
-  title: "",
-  date: "",
-  venue: "",
-  noOfFirms: "",
-  male: "",
-  female: "",
-  total: "",
-  projectProgramUnit: "",
-  notes: "",
-  techRows: [],
-
-  trainingProgram: "",
-  trainingProvince: "PANGASINAN",
-  trainingStartDate: "",
-  trainingEndDate: "",
-  trainingVenueAddress: "",
-  trainingVenueAddressMeta: null,
-  trainingParticipantsFemale: "",
-  trainingParticipantsMale: "",
-  trainingSeniorFemale: "",
-  trainingSeniorMale: "",
-  trainingIpFemale: "",
-  trainingIpMale: "",
-  trainingFourPsFemale: "",
-  trainingFourPsMale: "",
-  trainingPwdFemale: "",
-  trainingPwdMale: "",
-  trainingFirmsSucsHeisLgusCount: "",
-  trainingFirmsAssociationsList: "",
-  trainingTrainorAffiliation: "",
-  trainingCostDost: "",
-  trainingCostPartnerAgency: "",
-
-  promoProject: "",
-  promoActivityDate: "",
-  promoTechnologyPromoted: "",
-  promoTechnologyGenerator: "",
-  promoModeOfPromotion: "Social Media",
-  promoActivityTitle: "",
-  promoActivityVenueAddress: "",
-  promoActivityVenueMeta: null,
-  promoCustomerName: "",
-  promoCustomerAddress: "",
-  promoCustomerAddressMeta: null,
-  promoSex: "N/A",
-  promoStaffName: "",
-  promoMeansVerification: "",
-  promoPhotos: [],
-
-  calibrationCategory: "PAYING",
-  calibrationDate: "",
-  calibrationTypeOfSample: "Weighing Scale",
-  calibrationTestType: "Mass Calibration",
-  calibrationNoOfSample: "",
-  calibrationRange: "",
-  calibrationCost: "",
-  calibrationFeesCollected: "",
-  calibrationMcBreakdown: [makeCalibrationBreakdownRow()],
-  calibrationBarangay: "",
-  calibrationAddress: "",
-  calibrationAddressMeta: null,
-  calibrationFemale: "",
-  calibrationMale: "",
-  calibrationTotalCustomers: "",
-  calibrationNoOfFirms: "",
-  calibrationNoOfNewFirms: "",
-  calibrationAgeRange: "",
-  calibrationPwd: "",
-  calibrationIp: "",
-  calibrationSc: "",
-  calibrationFourPs: "",
-
-  consultancyType: "",
-  dateEngagement: "",
-  expertInstitution: "",
-  customerName: "",
-  customerSex: "",
-  customerAddress: "",
-  customerAddressMeta: null,
-  meansVerification: "",
-  noOfAdvice: "",
-  tacsPhotos: [],
-});
 
   const trainingTotalFemale =
     toNumber(detailForm.trainingParticipantsFemale) +
@@ -994,7 +994,7 @@ const [detailForm, setDetailForm] = useState({
   const PAGE_NUMBER_WINDOW = 10;
 
   // Load storage
-    const fetchProjects = async (pageArg = currentPage) => {
+  const fetchProjects = async (pageArg = currentPage) => {
     try {
       const params = {
         page: pageArg,
@@ -1013,8 +1013,8 @@ const [detailForm, setDetailForm] = useState({
       const rows = Array.isArray(payload?.data)
         ? payload.data
         : Array.isArray(res?.data)
-        ? res.data
-        : [];
+          ? res.data
+          : [];
 
       const normalized = rows.map((p) => {
         const municipality =
@@ -1062,22 +1062,22 @@ const [detailForm, setDetailForm] = useState({
           customFields:
             typeof (p.customFields ?? p.custom_fields ?? {}) === "string"
               ? (() => {
-                  try {
-                    return JSON.parse(p.customFields ?? p.custom_fields ?? "{}");
-                  } catch {
-                    return {};
-                  }
-                })()
+                try {
+                  return JSON.parse(p.customFields ?? p.custom_fields ?? "{}");
+                } catch {
+                  return {};
+                }
+              })()
               : p.customFields ?? p.custom_fields ?? {},
           custom_fields:
             typeof (p.custom_fields ?? p.customFields ?? {}) === "string"
               ? (() => {
-                  try {
-                    return JSON.parse(p.custom_fields ?? p.customFields ?? "{}");
-                  } catch {
-                    return {};
-                  }
-                })()
+                try {
+                  return JSON.parse(p.custom_fields ?? p.customFields ?? "{}");
+                } catch {
+                  return {};
+                }
+              })()
               : p.custom_fields ?? p.customFields ?? {},
           district,
           interventions: Array.isArray(p.interventions) ? p.interventions : [],
@@ -1162,7 +1162,7 @@ const [detailForm, setDetailForm] = useState({
 
     async function loadCestCustomFields() {
       try {
-        const res = await axios.get(`${API}/api/table-management/config`);
+        const res = await axios.get(`${API}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const cestModule = modules.find(
@@ -1180,10 +1180,10 @@ const [detailForm, setDetailForm] = useState({
         const fields = Array.isArray(mainTable?.fields)
           ? mainTable.fields
           : Array.isArray(cestModule?.fields)
-          ? cestModule.fields
-          : Array.isArray(cestModule?.formFields)
-          ? cestModule.formFields
-          : [];
+            ? cestModule.fields
+            : Array.isArray(cestModule?.formFields)
+              ? cestModule.formFields
+              : [];
 
         const customFields = fields
           .filter((f) => {
@@ -1215,7 +1215,7 @@ const [detailForm, setDetailForm] = useState({
     };
   }, []);
 
-// Load GeoJSON files
+  // Load GeoJSON files
   useEffect(() => {
     let cancelled = false;
 
@@ -1275,7 +1275,7 @@ const [detailForm, setDetailForm] = useState({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-    const saveProjects = (next) => {
+  const saveProjects = (next) => {
     setProjects(next);
   };
 
@@ -1302,118 +1302,118 @@ const [detailForm, setDetailForm] = useState({
       startupsAssisted: "",
       jobsGenerated: "",
       customFields: {},
-          });
+    });
   };
 
   const resetDetailForm = (type = "") => {
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
-  const isCalibration = type === "Calibration";
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
+    const isCalibration = type === "Calibration";
 
-  setDetailForm({
-    type: type || "",
-    title: "",
-    date: "",
-    venue: "",
-    noOfFirms: "",
-    male: "",
-    female: "",
-    total: "",
-    projectProgramUnit: "",
-    notes: "",
-    techRows: isTech ? makeDefaultTechRows() : [],
+    setDetailForm({
+      type: type || "",
+      title: "",
+      date: "",
+      venue: "",
+      noOfFirms: "",
+      male: "",
+      female: "",
+      total: "",
+      projectProgramUnit: "",
+      notes: "",
+      techRows: isTech ? makeDefaultTechRows() : [],
 
-    packagingQuarter: isPackaging ? "" : "",
-    packagingProvince: isPackaging ? "Pangasinan" : "Pangasinan",
-    packagingDateCompleted: isPackaging ? "" : "",
-    packagingTypeOfIntervention: isPackaging ? "Label Design" : "Label Design",
-    packagingProductName: isPackaging ? "" : "",
-    packagingSizeVariant: isPackaging ? "" : "",
-    packagingMaterialsProvided: isPackaging ? "" : "",
-    packagingCustomerName: isPackaging ? "" : "",
-    packagingSex: isPackaging ? "" : "",
-    packagingFirmInstitution: isPackaging ? "" : "",
-    packagingAddress: isPackaging ? "" : "",
-    packagingAddressMeta: null,
-    packagingMeansVerification: isPackaging ? "" : "",
-    packagingPhotos: [],
+      packagingQuarter: isPackaging ? "" : "",
+      packagingProvince: isPackaging ? "Pangasinan" : "Pangasinan",
+      packagingDateCompleted: isPackaging ? "" : "",
+      packagingTypeOfIntervention: isPackaging ? "Label Design" : "Label Design",
+      packagingProductName: isPackaging ? "" : "",
+      packagingSizeVariant: isPackaging ? "" : "",
+      packagingMaterialsProvided: isPackaging ? "" : "",
+      packagingCustomerName: isPackaging ? "" : "",
+      packagingSex: isPackaging ? "" : "",
+      packagingFirmInstitution: isPackaging ? "" : "",
+      packagingAddress: isPackaging ? "" : "",
+      packagingAddressMeta: null,
+      packagingMeansVerification: isPackaging ? "" : "",
+      packagingPhotos: [],
 
-    trainingProgram: isTraining ? "" : "",
-    trainingProvince: "PANGASINAN",
-    trainingStartDate: isTraining ? "" : "",
-    trainingEndDate: isTraining ? "" : "",
-    trainingVenueAddress: isTraining ? "" : "",
-    trainingVenueAddressMeta: null,
-    trainingParticipantsFemale: isTraining ? "" : "",
-    trainingParticipantsMale: isTraining ? "" : "",
-    trainingSeniorFemale: isTraining ? "" : "",
-    trainingSeniorMale: isTraining ? "" : "",
-    trainingIpFemale: isTraining ? "" : "",
-    trainingIpMale: isTraining ? "" : "",
-    trainingFourPsFemale: isTraining ? "" : "",
-    trainingFourPsMale: isTraining ? "" : "",
-    trainingPwdFemale: isTraining ? "" : "",
-    trainingPwdMale: isTraining ? "" : "",
-    trainingFirmsSucsHeisLgusCount: isTraining ? "" : "",
-    trainingFirmsAssociationsList: isTraining ? "" : "",
-    trainingTrainorAffiliation: isTraining ? "" : "",
-    trainingCostDost: isTraining ? "" : "",
-    trainingCostPartnerAgency: isTraining ? "" : "",
+      trainingProgram: isTraining ? "" : "",
+      trainingProvince: "PANGASINAN",
+      trainingStartDate: isTraining ? "" : "",
+      trainingEndDate: isTraining ? "" : "",
+      trainingVenueAddress: isTraining ? "" : "",
+      trainingVenueAddressMeta: null,
+      trainingParticipantsFemale: isTraining ? "" : "",
+      trainingParticipantsMale: isTraining ? "" : "",
+      trainingSeniorFemale: isTraining ? "" : "",
+      trainingSeniorMale: isTraining ? "" : "",
+      trainingIpFemale: isTraining ? "" : "",
+      trainingIpMale: isTraining ? "" : "",
+      trainingFourPsFemale: isTraining ? "" : "",
+      trainingFourPsMale: isTraining ? "" : "",
+      trainingPwdFemale: isTraining ? "" : "",
+      trainingPwdMale: isTraining ? "" : "",
+      trainingFirmsSucsHeisLgusCount: isTraining ? "" : "",
+      trainingFirmsAssociationsList: isTraining ? "" : "",
+      trainingTrainorAffiliation: isTraining ? "" : "",
+      trainingCostDost: isTraining ? "" : "",
+      trainingCostPartnerAgency: isTraining ? "" : "",
 
-    promoProject: isPromoLike ? "CEST" : "",
-    promoActivityDate: isPromoLike ? "" : "",
-    promoTechnologyPromoted: isPromoLike ? "" : "",
-    promoTechnologyGenerator: isPromoLike ? "" : "",
-    promoModeOfPromotion: isPromoLike ? "Social Media" : "Social Media",
-    promoActivityTitle: isPromoLike ? "" : "",
-    promoActivityVenueAddress: isPromoLike ? "" : "",
-    promoActivityVenueMeta: null,
-    promoCustomerName: isPromoLike ? "" : "",
-    promoCustomerAddress: isPromoLike ? "" : "",
-    promoCustomerAddressMeta: null,
-    promoSex: isPromoLike ? "N/A" : "N/A",
-    promoStaffName: isPromoLike ? "" : "",
-    promoMeansVerification: isPromoLike ? "" : "",
-    promoPhotos: [],
+      promoProject: isPromoLike ? "CEST" : "",
+      promoActivityDate: isPromoLike ? "" : "",
+      promoTechnologyPromoted: isPromoLike ? "" : "",
+      promoTechnologyGenerator: isPromoLike ? "" : "",
+      promoModeOfPromotion: isPromoLike ? "Social Media" : "Social Media",
+      promoActivityTitle: isPromoLike ? "" : "",
+      promoActivityVenueAddress: isPromoLike ? "" : "",
+      promoActivityVenueMeta: null,
+      promoCustomerName: isPromoLike ? "" : "",
+      promoCustomerAddress: isPromoLike ? "" : "",
+      promoCustomerAddressMeta: null,
+      promoSex: isPromoLike ? "N/A" : "N/A",
+      promoStaffName: isPromoLike ? "" : "",
+      promoMeansVerification: isPromoLike ? "" : "",
+      promoPhotos: [],
 
-    calibrationCategory: isCalibration ? "PAYING" : "PAYING",
-    calibrationDate: isCalibration ? "" : "",
-    calibrationTypeOfSample: isCalibration ? "Weighing Scale" : "Weighing Scale",
-    calibrationTestType: isCalibration ? "Mass Calibration" : "Mass Calibration",
-    calibrationNoOfSample: isCalibration ? "" : "",
-    calibrationRange: isCalibration ? "" : "",
-    calibrationCost: isCalibration ? "" : "",
-    calibrationFeesCollected: isCalibration ? "" : "",
-    calibrationMcBreakdown: isCalibration ? [makeCalibrationBreakdownRow()] : [makeCalibrationBreakdownRow()],
-    calibrationBarangay: isCalibration ? "" : "",
-    calibrationAddress: isCalibration ? "" : "",
-    calibrationAddressMeta: null,
-    calibrationFemale: isCalibration ? "" : "",
-    calibrationMale: isCalibration ? "" : "",
-    calibrationTotalCustomers: isCalibration ? "" : "",
-    calibrationNoOfFirms: isCalibration ? "" : "",
-    calibrationNoOfNewFirms: isCalibration ? "" : "",
-    calibrationAgeRange: isCalibration ? "" : "",
-    calibrationPwd: isCalibration ? "" : "",
-    calibrationIp: isCalibration ? "" : "",
-    calibrationSc: isCalibration ? "" : "",
-    calibrationFourPs: isCalibration ? "" : "",
+      calibrationCategory: isCalibration ? "PAYING" : "PAYING",
+      calibrationDate: isCalibration ? "" : "",
+      calibrationTypeOfSample: isCalibration ? "Weighing Scale" : "Weighing Scale",
+      calibrationTestType: isCalibration ? "Mass Calibration" : "Mass Calibration",
+      calibrationNoOfSample: isCalibration ? "" : "",
+      calibrationRange: isCalibration ? "" : "",
+      calibrationCost: isCalibration ? "" : "",
+      calibrationFeesCollected: isCalibration ? "" : "",
+      calibrationMcBreakdown: isCalibration ? [makeCalibrationBreakdownRow()] : [makeCalibrationBreakdownRow()],
+      calibrationBarangay: isCalibration ? "" : "",
+      calibrationAddress: isCalibration ? "" : "",
+      calibrationAddressMeta: null,
+      calibrationFemale: isCalibration ? "" : "",
+      calibrationMale: isCalibration ? "" : "",
+      calibrationTotalCustomers: isCalibration ? "" : "",
+      calibrationNoOfFirms: isCalibration ? "" : "",
+      calibrationNoOfNewFirms: isCalibration ? "" : "",
+      calibrationAgeRange: isCalibration ? "" : "",
+      calibrationPwd: isCalibration ? "" : "",
+      calibrationIp: isCalibration ? "" : "",
+      calibrationSc: isCalibration ? "" : "",
+      calibrationFourPs: isCalibration ? "" : "",
 
-    consultancyType: isTacs ? "" : "",
-    dateEngagement: isTacs ? "" : "",
-    expertInstitution: isTacs ? "" : "",
-    customerName: isTacs ? "" : "",
-    customerSex: isTacs ? "" : "",
-    customerAddress: isTacs ? "" : "",
-    customerAddressMeta: null,
-    meansVerification: isTacs ? "" : "",
-    noOfAdvice: isTacs ? "" : "",
-    tacsPhotos: [],
-  });
-};
+      consultancyType: isTacs ? "" : "",
+      dateEngagement: isTacs ? "" : "",
+      expertInstitution: isTacs ? "" : "",
+      customerName: isTacs ? "" : "",
+      customerSex: isTacs ? "" : "",
+      customerAddress: isTacs ? "" : "",
+      customerAddressMeta: null,
+      meansVerification: isTacs ? "" : "",
+      noOfAdvice: isTacs ? "" : "",
+      tacsPhotos: [],
+    });
+  };
 
   // ===== PROJECT CRUD =====
   const openAddProject = () => {
@@ -1460,59 +1460,59 @@ const [detailForm, setDetailForm] = useState({
     setShowAdd(true);
   };
 
-    const saveProject = async () => {
-  if (!form.projectTitle.trim()) return alert("Required: Project Title");
-  if (!form.dateProjectApproval) return alert("Required: Date of Project Approval");
-  if (form.approvedProjectCost === "" || Number.isNaN(Number(form.approvedProjectCost))) {
-    return alert("Required: Approved Project Cost (number)");
-  }
-  if (!form.address.trim()) return alert("Required: Venue/Address");
-  if (!form.projectProponent.trim()) return alert("Required: Name of Project Proponent");
+  const saveProject = async () => {
+    if (!form.projectTitle.trim()) return alert("Required: Project Title");
+    if (!form.dateProjectApproval) return alert("Required: Date of Project Approval");
+    if (form.approvedProjectCost === "" || Number.isNaN(Number(form.approvedProjectCost))) {
+      return alert("Required: Approved Project Cost (number)");
+    }
+    if (!form.address.trim()) return alert("Required: Venue/Address");
+    if (!form.projectProponent.trim()) return alert("Required: Name of Project Proponent");
 
-  const payload = {
-    quarter: String(form.quarter || "1"),
-    type: (form.type || "New Communities").trim(),
-    projectTitle: form.projectTitle.trim(),
-    dateProjectApproval: form.dateProjectApproval || "",
-    approvedProjectCost: toNumber(form.approvedProjectCost),
-    dateFundRelease: form.dateFundRelease || "",
-    associationName: form.associationName.trim(),
-    address: form.address.trim(),
-    addressMeta: form.addressMeta || null,
-    lguNumbersOfCommunities: String(form.lguNumbersOfCommunities || "").trim(),
-    numberOfMoa: toNumber(form.numberOfMoa),
-    projectProponent: form.projectProponent.trim(),
-    sex: (form.sex || "").trim(),
-    processSystem: (form.processSystem || "").trim(),
-    staffName: (form.staffName || "").trim(),
-    communitiesAssisted: toNumber(form.communitiesAssisted),
-    technologiesDeployed: toNumber(form.technologiesDeployed),
-    beneficiaries: toNumber(form.beneficiaries),
-    startupsAssisted: String(form.startupsAssisted || "").trim(),
-    jobsGenerated: toNumber(form.jobsGenerated),
-    custom_fields: form.customFields || {},
-    customFields: form.customFields || {},
+    const payload = {
+      quarter: String(form.quarter || "1"),
+      type: (form.type || "New Communities").trim(),
+      projectTitle: form.projectTitle.trim(),
+      dateProjectApproval: form.dateProjectApproval || "",
+      approvedProjectCost: toNumber(form.approvedProjectCost),
+      dateFundRelease: form.dateFundRelease || "",
+      associationName: form.associationName.trim(),
+      address: form.address.trim(),
+      addressMeta: form.addressMeta || null,
+      lguNumbersOfCommunities: String(form.lguNumbersOfCommunities || "").trim(),
+      numberOfMoa: toNumber(form.numberOfMoa),
+      projectProponent: form.projectProponent.trim(),
+      sex: (form.sex || "").trim(),
+      processSystem: (form.processSystem || "").trim(),
+      staffName: (form.staffName || "").trim(),
+      communitiesAssisted: toNumber(form.communitiesAssisted),
+      technologiesDeployed: toNumber(form.technologiesDeployed),
+      beneficiaries: toNumber(form.beneficiaries),
+      startupsAssisted: String(form.startupsAssisted || "").trim(),
+      jobsGenerated: toNumber(form.jobsGenerated),
+      custom_fields: form.customFields || {},
+      customFields: form.customFields || {},
+    };
+
+    try {
+      if (!editProjectId) {
+        await axios.post(`${API}/cest`, payload);
+      } else {
+        await axios.put(`${API}/cest/${editProjectId}`, payload);
+      }
+
+      await fetchProjects();
+      setShowAdd(false);
+      setEditProjectId(null);
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save project.");
+    }
   };
 
-  try {
-    if (!editProjectId) {
-      await axios.post(`${API}/cest`, payload);
-    } else {
-      await axios.put(`${API}/cest/${editProjectId}`, payload);
-    }
 
-    await fetchProjects();
-    setShowAdd(false);
-    setEditProjectId(null);
-    resetForm();
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save project.");
-  }
-};
-
-
-    const deleteProject = async (id) => {
+  const deleteProject = async (id) => {
     if (!window.confirm("Delete this project?")) return;
 
     try {
@@ -1534,143 +1534,143 @@ const [detailForm, setDetailForm] = useState({
   };
 
   const openInterventionDetails_Edit = (projectId, entryId) => {
-  const p = projects.find((x) => x.id === projectId);
-  const entry = p?.interventions?.find((x) => x.id === entryId);
-  if (!p || !entry) return;
+    const p = projects.find((x) => x.id === projectId);
+    const entry = p?.interventions?.find((x) => x.id === entryId);
+    if (!p || !entry) return;
 
-  const type = entry.type || "";
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTrainingLike = isTraining || isPromoLike;
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
-  const isCalibration = type === "Calibration";
+    const type = entry.type || "";
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTrainingLike = isTraining || isPromoLike;
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
+    const isCalibration = type === "Calibration";
 
-  let parsedRows = null;
-  let parsedFreeText = null;
+    let parsedRows = null;
+    let parsedFreeText = null;
 
-  if (isTech) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
-        if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
-      }
-    } catch {}
-  }
+    if (isTech) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
+          if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
+        }
+      } catch { }
+    }
 
-  let packagingQuarter = "";
-  let packagingProvince = "Pangasinan";
-  let packagingDateCompleted = entry.date || "";
-  let packagingTypeOfIntervention = "Label Design";
-  let packagingProductName = "";
-  let packagingSizeVariant = "";
-  let packagingMaterialsProvided = "";
-  let packagingCustomerName = "";
-  let packagingSex = "";
-  let packagingFirmInstitution = "";
-  let packagingAddress = entry.venue || "";
-  let packagingAddressMeta = null;
-  let packagingMeansVerification = "";
-  let packagingPhotos = [];
-  let packagingRemarks = entry.notes || "";
+    let packagingQuarter = "";
+    let packagingProvince = "Pangasinan";
+    let packagingDateCompleted = entry.date || "";
+    let packagingTypeOfIntervention = "Label Design";
+    let packagingProductName = "";
+    let packagingSizeVariant = "";
+    let packagingMaterialsProvided = "";
+    let packagingCustomerName = "";
+    let packagingSex = "";
+    let packagingFirmInstitution = "";
+    let packagingAddress = entry.venue || "";
+    let packagingAddressMeta = null;
+    let packagingMeansVerification = "";
+    let packagingPhotos = [];
+    let packagingRemarks = entry.notes || "";
 
-  let trainingProgram = "";
-  let trainingProvince = "PANGASINAN";
-  let trainingStartDate = entry.date || "";
-  let trainingEndDate = "";
-  let trainingVenueAddress = entry.venue || "";
-  let trainingVenueAddressMeta = null;
-  let trainingNoOfFirms = entry.noOfFirms ?? "";
-  let trainingParticipantsFemale = "";
-  let trainingParticipantsMale = "";
-  let trainingSeniorFemale = "";
-  let trainingSeniorMale = "";
-  let trainingIpFemale = "";
-  let trainingIpMale = "";
-  let trainingFourPsFemale = "";
-  let trainingFourPsMale = "";
-  let trainingPwdFemale = "";
-  let trainingPwdMale = "";
-  let trainingFirmsSucsHeisLgusCount = "";
-  let trainingFirmsAssociationsList = "";
-  let trainingTrainorAffiliation = "";
-  let trainingProjectProgramUnit = "";
-  let trainingCostDost = "";
-  let trainingCostPartnerAgency = "";
-  let trainingRemarks = entry.notes || "";
-  let promoProject = "CEST";
-  let promoActivityDate = entry.date || "";
-  let promoTechnologyPromoted = "";
-  let promoTechnologyGenerator = "";
-  let promoModeOfPromotion = "Social Media";
-  let promoActivityTitle = entry.title || "";
-  let promoActivityVenueAddress = entry.venue || "";
-  let promoActivityVenueMeta = null;
-  let promoCustomerName = "";
-  let promoCustomerAddress = "";
-  let promoCustomerAddressMeta = null;
-  let promoSex = "N/A";
-  let promoStaffName = "";
-  let promoMeansVerification = "";
-  let promoPhotos = [];
-  let tacsConsultancyType = "";
-  let tacsDateEngagement = "";
-  let tacsExpertInstitution = "";
-  let tacsCustomerName = "";
-  let tacsCustomerSex = "";
-  let tacsCustomerAddress = "";
-  let tacsCustomerAddressMeta = null;
-  let tacsMeansVerification = "";
-  let tacsNoOfAdvice = "";
-  let tacsPhotos = [];
-  let tacsRemarks = entry.notes || "";
-  let calibrationCategory = "PAYING";
-  let calibrationDate = entry.date || "";
-  let calibrationTypeOfSample = "Weighing Scale";
-  let calibrationTestType = "Mass Calibration";
-  let calibrationNoOfSample = "";
-  let calibrationRange = "";
-  let calibrationCost = "";
-  let calibrationFeesCollected = "";
-  let calibrationMcBreakdown = [makeCalibrationBreakdownRow()];
-  let calibrationBarangay = "";
-  let calibrationAddress = entry.venue || "";
-  let calibrationAddressMeta = null;
-  let calibrationFemale = entry.female ?? "";
-  let calibrationMale = entry.male ?? "";
-  let calibrationTotalCustomers = entry.total ?? "";
-  let calibrationNoOfFirms = entry.noOfFirms ?? "";
-  let calibrationNoOfNewFirms = "";
-  let calibrationAgeRange = "";
-  let calibrationPwd = "";
-  let calibrationIp = "";
-  let calibrationSc = "";
-  let calibrationFourPs = "";
-  let calibrationRemarks = entry.notes || "";
+    let trainingProgram = "";
+    let trainingProvince = "PANGASINAN";
+    let trainingStartDate = entry.date || "";
+    let trainingEndDate = "";
+    let trainingVenueAddress = entry.venue || "";
+    let trainingVenueAddressMeta = null;
+    let trainingNoOfFirms = entry.noOfFirms ?? "";
+    let trainingParticipantsFemale = "";
+    let trainingParticipantsMale = "";
+    let trainingSeniorFemale = "";
+    let trainingSeniorMale = "";
+    let trainingIpFemale = "";
+    let trainingIpMale = "";
+    let trainingFourPsFemale = "";
+    let trainingFourPsMale = "";
+    let trainingPwdFemale = "";
+    let trainingPwdMale = "";
+    let trainingFirmsSucsHeisLgusCount = "";
+    let trainingFirmsAssociationsList = "";
+    let trainingTrainorAffiliation = "";
+    let trainingProjectProgramUnit = "";
+    let trainingCostDost = "";
+    let trainingCostPartnerAgency = "";
+    let trainingRemarks = entry.notes || "";
+    let promoProject = "CEST";
+    let promoActivityDate = entry.date || "";
+    let promoTechnologyPromoted = "";
+    let promoTechnologyGenerator = "";
+    let promoModeOfPromotion = "Social Media";
+    let promoActivityTitle = entry.title || "";
+    let promoActivityVenueAddress = entry.venue || "";
+    let promoActivityVenueMeta = null;
+    let promoCustomerName = "";
+    let promoCustomerAddress = "";
+    let promoCustomerAddressMeta = null;
+    let promoSex = "N/A";
+    let promoStaffName = "";
+    let promoMeansVerification = "";
+    let promoPhotos = [];
+    let tacsConsultancyType = "";
+    let tacsDateEngagement = "";
+    let tacsExpertInstitution = "";
+    let tacsCustomerName = "";
+    let tacsCustomerSex = "";
+    let tacsCustomerAddress = "";
+    let tacsCustomerAddressMeta = null;
+    let tacsMeansVerification = "";
+    let tacsNoOfAdvice = "";
+    let tacsPhotos = [];
+    let tacsRemarks = entry.notes || "";
+    let calibrationCategory = "PAYING";
+    let calibrationDate = entry.date || "";
+    let calibrationTypeOfSample = "Weighing Scale";
+    let calibrationTestType = "Mass Calibration";
+    let calibrationNoOfSample = "";
+    let calibrationRange = "";
+    let calibrationCost = "";
+    let calibrationFeesCollected = "";
+    let calibrationMcBreakdown = [makeCalibrationBreakdownRow()];
+    let calibrationBarangay = "";
+    let calibrationAddress = entry.venue || "";
+    let calibrationAddressMeta = null;
+    let calibrationFemale = entry.female ?? "";
+    let calibrationMale = entry.male ?? "";
+    let calibrationTotalCustomers = entry.total ?? "";
+    let calibrationNoOfFirms = entry.noOfFirms ?? "";
+    let calibrationNoOfNewFirms = "";
+    let calibrationAgeRange = "";
+    let calibrationPwd = "";
+    let calibrationIp = "";
+    let calibrationSc = "";
+    let calibrationFourPs = "";
+    let calibrationRemarks = entry.notes || "";
 
-  if (isCalibration) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        calibrationCategory = obj.category || "PAYING";
-        calibrationDate = obj.date || entry.date || "";
-        calibrationTypeOfSample = obj.typeOfSample || "Weighing Scale";
-        calibrationTestType =
-          obj.testType ||
-          (calibrationTypeOfSample === "Bucket" ? "Volume Calibration" : "Mass Calibration");
-        calibrationNoOfSample =
-          obj.noOfSample === null || obj.noOfSample === undefined ? "" : String(obj.noOfSample);
-        calibrationRange = obj.range || "";
-        calibrationCost =
-          obj.cost === null || obj.cost === undefined ? "" : String(obj.cost);
-        calibrationFeesCollected =
-          obj.feesCollected === null || obj.feesCollected === undefined
-            ? ""
-            : String(obj.feesCollected);
-        calibrationMcBreakdown = Array.isArray(obj.mcBreakdown) && obj.mcBreakdown.length
-          ? obj.mcBreakdown.map((row) => ({
+    if (isCalibration) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          calibrationCategory = obj.category || "PAYING";
+          calibrationDate = obj.date || entry.date || "";
+          calibrationTypeOfSample = obj.typeOfSample || "Weighing Scale";
+          calibrationTestType =
+            obj.testType ||
+            (calibrationTypeOfSample === "Bucket" ? "Volume Calibration" : "Mass Calibration");
+          calibrationNoOfSample =
+            obj.noOfSample === null || obj.noOfSample === undefined ? "" : String(obj.noOfSample);
+          calibrationRange = obj.range || "";
+          calibrationCost =
+            obj.cost === null || obj.cost === undefined ? "" : String(obj.cost);
+          calibrationFeesCollected =
+            obj.feesCollected === null || obj.feesCollected === undefined
+              ? ""
+              : String(obj.feesCollected);
+          calibrationMcBreakdown = Array.isArray(obj.mcBreakdown) && obj.mcBreakdown.length
+            ? obj.mcBreakdown.map((row) => ({
               id: row?.id || `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
               range: row?.range || "",
               noOfSample:
@@ -1685,258 +1685,258 @@ const [detailForm, setDetailForm] = useState({
                   : String(row.feesCollected),
               autoFilled: Boolean(row?.autoFilled),
             }))
-          : [makeCalibrationBreakdownRow()];
-        calibrationBarangay = obj.barangay || "";
-        calibrationAddress = obj.address || entry.venue || "";
-        calibrationAddressMeta = obj.addressMeta || null;
-        calibrationFemale =
-          obj.female === null || obj.female === undefined ? "" : String(obj.female);
-        calibrationMale =
-          obj.male === null || obj.male === undefined ? "" : String(obj.male);
-        calibrationTotalCustomers =
-          obj.totalCustomers === null || obj.totalCustomers === undefined
-            ? ""
-            : String(obj.totalCustomers);
-        calibrationNoOfFirms =
-          obj.noOfFirms === null || obj.noOfFirms === undefined ? "" : String(obj.noOfFirms);
-        calibrationNoOfNewFirms =
-          obj.noOfNewFirms === null || obj.noOfNewFirms === undefined
-            ? ""
-            : String(obj.noOfNewFirms);
-        calibrationAgeRange = obj.ageRange || "";
-        calibrationPwd =
-          obj.pwd === null || obj.pwd === undefined ? "" : String(obj.pwd);
-        calibrationIp =
-          obj.ip === null || obj.ip === undefined ? "" : String(obj.ip);
-        calibrationSc =
-          obj.sc === null || obj.sc === undefined ? "" : String(obj.sc);
-        calibrationFourPs =
-          obj.fourPs === null || obj.fourPs === undefined ? "" : String(obj.fourPs);
-        calibrationRemarks = obj.remarks || entry.notes || "";
+            : [makeCalibrationBreakdownRow()];
+          calibrationBarangay = obj.barangay || "";
+          calibrationAddress = obj.address || entry.venue || "";
+          calibrationAddressMeta = obj.addressMeta || null;
+          calibrationFemale =
+            obj.female === null || obj.female === undefined ? "" : String(obj.female);
+          calibrationMale =
+            obj.male === null || obj.male === undefined ? "" : String(obj.male);
+          calibrationTotalCustomers =
+            obj.totalCustomers === null || obj.totalCustomers === undefined
+              ? ""
+              : String(obj.totalCustomers);
+          calibrationNoOfFirms =
+            obj.noOfFirms === null || obj.noOfFirms === undefined ? "" : String(obj.noOfFirms);
+          calibrationNoOfNewFirms =
+            obj.noOfNewFirms === null || obj.noOfNewFirms === undefined
+              ? ""
+              : String(obj.noOfNewFirms);
+          calibrationAgeRange = obj.ageRange || "";
+          calibrationPwd =
+            obj.pwd === null || obj.pwd === undefined ? "" : String(obj.pwd);
+          calibrationIp =
+            obj.ip === null || obj.ip === undefined ? "" : String(obj.ip);
+          calibrationSc =
+            obj.sc === null || obj.sc === undefined ? "" : String(obj.sc);
+          calibrationFourPs =
+            obj.fourPs === null || obj.fourPs === undefined ? "" : String(obj.fourPs);
+          calibrationRemarks = obj.remarks || entry.notes || "";
+        }
+      } catch {
+        calibrationRemarks = entry.notes || "";
       }
-    } catch {
-      calibrationRemarks = entry.notes || "";
     }
-  }
 
-  if (type === "Training") {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        trainingProgram = obj.trainingProgram || "";
-        trainingProvince = obj.trainingProvince || "PANGASINAN";
-        trainingStartDate = obj.trainingStartDate || entry.date || "";
-        trainingEndDate = obj.trainingEndDate || "";
-        trainingVenueAddress = obj.trainingVenueAddress || entry.venue || "";
-        trainingVenueAddressMeta = obj.trainingVenueAddressMeta || null;
-        trainingNoOfFirms =
-          obj.trainingNoOfFirms === null || obj.trainingNoOfFirms === undefined
-            ? entry.noOfFirms ?? ""
-            : String(obj.trainingNoOfFirms);
-        trainingParticipantsFemale =
-          obj.trainingParticipantsFemale === null || obj.trainingParticipantsFemale === undefined
-            ? ""
-            : String(obj.trainingParticipantsFemale);
-        trainingParticipantsMale =
-          obj.trainingParticipantsMale === null || obj.trainingParticipantsMale === undefined
-            ? ""
-            : String(obj.trainingParticipantsMale);
-        trainingSeniorFemale = obj.trainingSeniorFemale === null || obj.trainingSeniorFemale === undefined ? "" : String(obj.trainingSeniorFemale);
-        trainingSeniorMale = obj.trainingSeniorMale === null || obj.trainingSeniorMale === undefined ? "" : String(obj.trainingSeniorMale);
-        trainingIpFemale = obj.trainingIpFemale === null || obj.trainingIpFemale === undefined ? "" : String(obj.trainingIpFemale);
-        trainingIpMale = obj.trainingIpMale === null || obj.trainingIpMale === undefined ? "" : String(obj.trainingIpMale);
-        trainingFourPsFemale = obj.trainingFourPsFemale === null || obj.trainingFourPsFemale === undefined ? "" : String(obj.trainingFourPsFemale);
-        trainingFourPsMale = obj.trainingFourPsMale === null || obj.trainingFourPsMale === undefined ? "" : String(obj.trainingFourPsMale);
-        trainingPwdFemale = obj.trainingPwdFemale === null || obj.trainingPwdFemale === undefined ? "" : String(obj.trainingPwdFemale);
-        trainingPwdMale = obj.trainingPwdMale === null || obj.trainingPwdMale === undefined ? "" : String(obj.trainingPwdMale);
-        trainingFirmsSucsHeisLgusCount = obj.trainingFirmsSucsHeisLgusCount === null || obj.trainingFirmsSucsHeisLgusCount === undefined ? "" : String(obj.trainingFirmsSucsHeisLgusCount);
-        trainingFirmsAssociationsList = obj.trainingFirmsAssociationsList || "";
-        trainingTrainorAffiliation = obj.trainingTrainorAffiliation || "";
-        trainingProjectProgramUnit = obj.projectProgramUnit || "";
-        trainingCostDost = obj.trainingCostDost === null || obj.trainingCostDost === undefined ? "" : String(obj.trainingCostDost);
-        trainingCostPartnerAgency = obj.trainingCostPartnerAgency === null || obj.trainingCostPartnerAgency === undefined ? "" : String(obj.trainingCostPartnerAgency);
-        trainingRemarks = typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
-      }
-    } catch {
-      trainingRemarks = entry.notes || "";
-      trainingProjectProgramUnit = "";
-    }
-  } else if (isPromoLike) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        promoProject = obj.project || "CEST";
-        promoActivityDate = obj.activityDate || entry.date || "";
-        promoTechnologyPromoted = obj.technologyPromoted || "";
-        promoTechnologyGenerator = obj.technologyGenerator || "";
-        promoModeOfPromotion = obj.modeOfPromotion || "Social Media";
-        promoActivityTitle = obj.activityTitle || entry.title || "";
-        promoActivityVenueAddress = obj.activityVenueAddress || entry.venue || "";
-        promoActivityVenueMeta = obj.activityVenueMeta || null;
-        promoCustomerName = obj.customerParticipantName || "";
-        promoCustomerAddress = obj.customerParticipantAddress || "";
-        promoCustomerAddressMeta = obj.customerParticipantAddressMeta || null;
-        promoSex = obj.sex || "N/A";
-        promoStaffName = obj.staffName || "";
-        promoMeansVerification = obj.meansOfVerification || "";
-        promoPhotos = Array.isArray(obj.photos) ? obj.photos : [];
-        trainingProjectProgramUnit =
-          typeof obj.projectProgramUnit === "string" ? obj.projectProgramUnit : "";
-        trainingRemarks =
-          typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
-      }
-    } catch {
-      promoProject = "CEST";
-      promoActivityDate = entry.date || "";
-      promoTechnologyPromoted = entry.title || "";
-      promoTechnologyGenerator = "";
-      promoModeOfPromotion = "Social Media";
-      promoActivityTitle = entry.title || "";
-      promoActivityVenueAddress = entry.venue || "";
-      promoActivityVenueMeta = null;
-      promoCustomerName = "";
-      promoCustomerAddress = "";
-      promoCustomerAddressMeta = null;
-      promoSex = "N/A";
-      promoStaffName = "";
-      promoMeansVerification = "";
-      promoPhotos = [];
-      trainingProjectProgramUnit = "";
-      trainingRemarks = entry.notes || "";
-    }
-  }
-
-  if (isPackaging) {
-    packagingQuarter =
-      entry?.packagingQuarter === null || entry?.packagingQuarter === undefined
-        ? ""
-        : String(entry.packagingQuarter || "");
-    packagingProvince = entry?.packagingProvince || "Pangasinan";
-    packagingDateCompleted =
-      entry?.packagingDateCompleted || entry?.date || "";
-    packagingTypeOfIntervention =
-      entry?.packagingTypeOfIntervention || "Label Design";
-    packagingProductName = entry?.packagingProductName || "";
-    packagingSizeVariant = entry?.packagingSizeVariant || "";
-    packagingMaterialsProvided = entry?.packagingMaterialsProvided || "";
-    packagingCustomerName = entry?.packagingCustomerName || "";
-    packagingSex = entry?.packagingSex || "";
-    packagingFirmInstitution = entry?.packagingFirmInstitution || "";
-    packagingAddress = entry?.packagingAddress || entry?.venue || "";
-    packagingAddressMeta = entry?.packagingAddressMeta || null;
-    packagingMeansVerification = entry?.packagingMeansVerification || "";
-    packagingPhotos = Array.isArray(entry?.packagingPhotos) ? entry.packagingPhotos : [];
-    packagingRemarks = entry?.packagingRemarks || "";
-
-    if (
-      !packagingQuarter &&
-      !packagingProductName &&
-      !packagingSizeVariant &&
-      !packagingMaterialsProvided &&
-      !packagingCustomerName &&
-      !packagingFirmInstitution &&
-      !packagingAddress &&
-      (entry?.notes || "").trim().startsWith("{")
-    ) {
+    if (type === "Training") {
       try {
         const obj = JSON.parse(entry?.notes || "");
         if (obj && typeof obj === "object") {
-          packagingQuarter =
-            obj.quarter === null || obj.quarter === undefined ? "" : String(obj.quarter);
-          packagingProvince = obj.province || "Pangasinan";
-          packagingDateCompleted =
-            obj.dateCompletedExecuted || obj.dateCompleted || entry.date || "";
-          packagingTypeOfIntervention =
-            obj.packagingType || obj.typeOfIntervention || "Label Design";
-          packagingProductName =
-            obj.packagingProductName || obj.productName || "";
-          packagingSizeVariant =
-            obj.sizeVariantMaterial || obj.sizeVariant || "";
-          packagingMaterialsProvided =
-            obj.noOfPackagingMaterialsProvided ||
-            obj.packagingMaterialsProvided ||
-            "";
-          packagingCustomerName =
-            obj.packagingCustomerName || obj.customerName || "";
-          packagingSex = obj.packagingSex || obj.sex || "";
-          packagingFirmInstitution =
-            obj.packagingFirmInstitution || obj.firmName || "";
-          packagingAddress =
-            obj.packagingAddress || obj.address || entry.venue || "";
-          packagingAddressMeta =
-            obj.packagingAddressMeta || obj.addressMeta || null;
-          packagingMeansVerification =
-            obj.packagingMeansVerification || obj.meansOfVerification || "";
-          packagingPhotos = Array.isArray(obj.packagingPhotos)
-            ? obj.packagingPhotos
-            : Array.isArray(obj.photos)
-            ? obj.photos
-            : [];
-          packagingRemarks =
-            obj.packagingNotesRemarks ||
-            obj.packagingRemarks ||
-            obj.remarks ||
-            "";
+          trainingProgram = obj.trainingProgram || "";
+          trainingProvince = obj.trainingProvince || "PANGASINAN";
+          trainingStartDate = obj.trainingStartDate || entry.date || "";
+          trainingEndDate = obj.trainingEndDate || "";
+          trainingVenueAddress = obj.trainingVenueAddress || entry.venue || "";
+          trainingVenueAddressMeta = obj.trainingVenueAddressMeta || null;
+          trainingNoOfFirms =
+            obj.trainingNoOfFirms === null || obj.trainingNoOfFirms === undefined
+              ? entry.noOfFirms ?? ""
+              : String(obj.trainingNoOfFirms);
+          trainingParticipantsFemale =
+            obj.trainingParticipantsFemale === null || obj.trainingParticipantsFemale === undefined
+              ? ""
+              : String(obj.trainingParticipantsFemale);
+          trainingParticipantsMale =
+            obj.trainingParticipantsMale === null || obj.trainingParticipantsMale === undefined
+              ? ""
+              : String(obj.trainingParticipantsMale);
+          trainingSeniorFemale = obj.trainingSeniorFemale === null || obj.trainingSeniorFemale === undefined ? "" : String(obj.trainingSeniorFemale);
+          trainingSeniorMale = obj.trainingSeniorMale === null || obj.trainingSeniorMale === undefined ? "" : String(obj.trainingSeniorMale);
+          trainingIpFemale = obj.trainingIpFemale === null || obj.trainingIpFemale === undefined ? "" : String(obj.trainingIpFemale);
+          trainingIpMale = obj.trainingIpMale === null || obj.trainingIpMale === undefined ? "" : String(obj.trainingIpMale);
+          trainingFourPsFemale = obj.trainingFourPsFemale === null || obj.trainingFourPsFemale === undefined ? "" : String(obj.trainingFourPsFemale);
+          trainingFourPsMale = obj.trainingFourPsMale === null || obj.trainingFourPsMale === undefined ? "" : String(obj.trainingFourPsMale);
+          trainingPwdFemale = obj.trainingPwdFemale === null || obj.trainingPwdFemale === undefined ? "" : String(obj.trainingPwdFemale);
+          trainingPwdMale = obj.trainingPwdMale === null || obj.trainingPwdMale === undefined ? "" : String(obj.trainingPwdMale);
+          trainingFirmsSucsHeisLgusCount = obj.trainingFirmsSucsHeisLgusCount === null || obj.trainingFirmsSucsHeisLgusCount === undefined ? "" : String(obj.trainingFirmsSucsHeisLgusCount);
+          trainingFirmsAssociationsList = obj.trainingFirmsAssociationsList || "";
+          trainingTrainorAffiliation = obj.trainingTrainorAffiliation || "";
+          trainingProjectProgramUnit = obj.projectProgramUnit || "";
+          trainingCostDost = obj.trainingCostDost === null || obj.trainingCostDost === undefined ? "" : String(obj.trainingCostDost);
+          trainingCostPartnerAgency = obj.trainingCostPartnerAgency === null || obj.trainingCostPartnerAgency === undefined ? "" : String(obj.trainingCostPartnerAgency);
+          trainingRemarks = typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
         }
-      } catch {}
-    }
-  }
-
-  if (isTacs) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        tacsConsultancyType = obj.consultancyType || entry.title || "";
-        tacsDateEngagement = obj.dateEngagement || entry.date || "";
-        tacsExpertInstitution = obj.expertInstitution || "";
-        tacsCustomerName = obj.customerName || "";
-        tacsCustomerSex = obj.customerSex || "";
-        tacsCustomerAddress = obj.customerAddress || entry.venue || "";
-        tacsCustomerAddressMeta = obj.customerAddressMeta || null;
-        tacsMeansVerification = obj.meansVerification || "";
-        tacsNoOfAdvice =
-          obj.noOfAdvice === null || obj.noOfAdvice === undefined
-            ? ""
-            : String(obj.noOfAdvice);
-        tacsPhotos = Array.isArray(obj.tacsPhotos)
-          ? obj.tacsPhotos
-          : Array.isArray(obj.photos)
-          ? obj.photos
-          : [];
-        tacsRemarks = obj.remarks || "";
+      } catch {
+        trainingRemarks = entry.notes || "";
+        trainingProjectProgramUnit = "";
       }
-    } catch {
-      tacsConsultancyType = entry.title || "";
-      tacsDateEngagement = entry.date || "";
-      tacsCustomerAddress = entry.venue || "";
-      tacsRemarks = entry.notes || "";
+    } else if (isPromoLike) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          promoProject = obj.project || "CEST";
+          promoActivityDate = obj.activityDate || entry.date || "";
+          promoTechnologyPromoted = obj.technologyPromoted || "";
+          promoTechnologyGenerator = obj.technologyGenerator || "";
+          promoModeOfPromotion = obj.modeOfPromotion || "Social Media";
+          promoActivityTitle = obj.activityTitle || entry.title || "";
+          promoActivityVenueAddress = obj.activityVenueAddress || entry.venue || "";
+          promoActivityVenueMeta = obj.activityVenueMeta || null;
+          promoCustomerName = obj.customerParticipantName || "";
+          promoCustomerAddress = obj.customerParticipantAddress || "";
+          promoCustomerAddressMeta = obj.customerParticipantAddressMeta || null;
+          promoSex = obj.sex || "N/A";
+          promoStaffName = obj.staffName || "";
+          promoMeansVerification = obj.meansOfVerification || "";
+          promoPhotos = Array.isArray(obj.photos) ? obj.photos : [];
+          trainingProjectProgramUnit =
+            typeof obj.projectProgramUnit === "string" ? obj.projectProgramUnit : "";
+          trainingRemarks =
+            typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
+        }
+      } catch {
+        promoProject = "CEST";
+        promoActivityDate = entry.date || "";
+        promoTechnologyPromoted = entry.title || "";
+        promoTechnologyGenerator = "";
+        promoModeOfPromotion = "Social Media";
+        promoActivityTitle = entry.title || "";
+        promoActivityVenueAddress = entry.venue || "";
+        promoActivityVenueMeta = null;
+        promoCustomerName = "";
+        promoCustomerAddress = "";
+        promoCustomerAddressMeta = null;
+        promoSex = "N/A";
+        promoStaffName = "";
+        promoMeansVerification = "";
+        promoPhotos = [];
+        trainingProjectProgramUnit = "";
+        trainingRemarks = entry.notes || "";
+      }
     }
-  }
 
-  setDetailFor({ projectId, mode: "edit", entryId });
+    if (isPackaging) {
+      packagingQuarter =
+        entry?.packagingQuarter === null || entry?.packagingQuarter === undefined
+          ? ""
+          : String(entry.packagingQuarter || "");
+      packagingProvince = entry?.packagingProvince || "Pangasinan";
+      packagingDateCompleted =
+        entry?.packagingDateCompleted || entry?.date || "";
+      packagingTypeOfIntervention =
+        entry?.packagingTypeOfIntervention || "Label Design";
+      packagingProductName = entry?.packagingProductName || "";
+      packagingSizeVariant = entry?.packagingSizeVariant || "";
+      packagingMaterialsProvided = entry?.packagingMaterialsProvided || "";
+      packagingCustomerName = entry?.packagingCustomerName || "";
+      packagingSex = entry?.packagingSex || "";
+      packagingFirmInstitution = entry?.packagingFirmInstitution || "";
+      packagingAddress = entry?.packagingAddress || entry?.venue || "";
+      packagingAddressMeta = entry?.packagingAddressMeta || null;
+      packagingMeansVerification = entry?.packagingMeansVerification || "";
+      packagingPhotos = Array.isArray(entry?.packagingPhotos) ? entry.packagingPhotos : [];
+      packagingRemarks = entry?.packagingRemarks || "";
 
-  setDetailForm({
-    type,
-    title: entry.title || (isTrainingLike ? "" : type),
-    date: entry.date || "",
-    venue: entry.venue || "",
-    noOfFirms: entry.noOfFirms ?? "",
-    male: entry.male ?? "",
-    female: entry.female ?? "",
-    total: entry.total ?? "",
-    projectProgramUnit: trainingProjectProgramUnit,
-    notes: isTech
-      ? parsedFreeText ?? ""
-      : isTrainingLike
-      ? trainingRemarks
-      : isPackaging
-      ? packagingRemarks
-      : isTacs
-      ? tacsRemarks
-      : entry.notes || "",
-    techRows: isTech
-      ? Array.isArray(parsedRows) && parsedRows.length
-        ? parsedRows.map((row) => ({
+      if (
+        !packagingQuarter &&
+        !packagingProductName &&
+        !packagingSizeVariant &&
+        !packagingMaterialsProvided &&
+        !packagingCustomerName &&
+        !packagingFirmInstitution &&
+        !packagingAddress &&
+        (entry?.notes || "").trim().startsWith("{")
+      ) {
+        try {
+          const obj = JSON.parse(entry?.notes || "");
+          if (obj && typeof obj === "object") {
+            packagingQuarter =
+              obj.quarter === null || obj.quarter === undefined ? "" : String(obj.quarter);
+            packagingProvince = obj.province || "Pangasinan";
+            packagingDateCompleted =
+              obj.dateCompletedExecuted || obj.dateCompleted || entry.date || "";
+            packagingTypeOfIntervention =
+              obj.packagingType || obj.typeOfIntervention || "Label Design";
+            packagingProductName =
+              obj.packagingProductName || obj.productName || "";
+            packagingSizeVariant =
+              obj.sizeVariantMaterial || obj.sizeVariant || "";
+            packagingMaterialsProvided =
+              obj.noOfPackagingMaterialsProvided ||
+              obj.packagingMaterialsProvided ||
+              "";
+            packagingCustomerName =
+              obj.packagingCustomerName || obj.customerName || "";
+            packagingSex = obj.packagingSex || obj.sex || "";
+            packagingFirmInstitution =
+              obj.packagingFirmInstitution || obj.firmName || "";
+            packagingAddress =
+              obj.packagingAddress || obj.address || entry.venue || "";
+            packagingAddressMeta =
+              obj.packagingAddressMeta || obj.addressMeta || null;
+            packagingMeansVerification =
+              obj.packagingMeansVerification || obj.meansOfVerification || "";
+            packagingPhotos = Array.isArray(obj.packagingPhotos)
+              ? obj.packagingPhotos
+              : Array.isArray(obj.photos)
+                ? obj.photos
+                : [];
+            packagingRemarks =
+              obj.packagingNotesRemarks ||
+              obj.packagingRemarks ||
+              obj.remarks ||
+              "";
+          }
+        } catch { }
+      }
+    }
+
+    if (isTacs) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          tacsConsultancyType = obj.consultancyType || entry.title || "";
+          tacsDateEngagement = obj.dateEngagement || entry.date || "";
+          tacsExpertInstitution = obj.expertInstitution || "";
+          tacsCustomerName = obj.customerName || "";
+          tacsCustomerSex = obj.customerSex || "";
+          tacsCustomerAddress = obj.customerAddress || entry.venue || "";
+          tacsCustomerAddressMeta = obj.customerAddressMeta || null;
+          tacsMeansVerification = obj.meansVerification || "";
+          tacsNoOfAdvice =
+            obj.noOfAdvice === null || obj.noOfAdvice === undefined
+              ? ""
+              : String(obj.noOfAdvice);
+          tacsPhotos = Array.isArray(obj.tacsPhotos)
+            ? obj.tacsPhotos
+            : Array.isArray(obj.photos)
+              ? obj.photos
+              : [];
+          tacsRemarks = obj.remarks || "";
+        }
+      } catch {
+        tacsConsultancyType = entry.title || "";
+        tacsDateEngagement = entry.date || "";
+        tacsCustomerAddress = entry.venue || "";
+        tacsRemarks = entry.notes || "";
+      }
+    }
+
+    setDetailFor({ projectId, mode: "edit", entryId });
+
+    setDetailForm({
+      type,
+      title: entry.title || (isTrainingLike ? "" : type),
+      date: entry.date || "",
+      venue: entry.venue || "",
+      noOfFirms: entry.noOfFirms ?? "",
+      male: entry.male ?? "",
+      female: entry.female ?? "",
+      total: entry.total ?? "",
+      projectProgramUnit: trainingProjectProgramUnit,
+      notes: isTech
+        ? parsedFreeText ?? ""
+        : isTrainingLike
+          ? trainingRemarks
+          : isPackaging
+            ? packagingRemarks
+            : isTacs
+              ? tacsRemarks
+              : entry.notes || "",
+      techRows: isTech
+        ? Array.isArray(parsedRows) && parsedRows.length
+          ? parsedRows.map((row) => ({
             quarter: row?.quarter || "",
             unitCenter: row?.unitCenter || "DOST-PANGASINAN",
             nameOfTechnologyTransferred:
@@ -1966,99 +1966,99 @@ const [detailForm, setDetailForm] = useState({
               "",
             sex: row?.sex || "",
           }))
-        : makeDefaultTechRows()
-      : [],
+          : makeDefaultTechRows()
+        : [],
 
-    packagingQuarter: isPackaging ? packagingQuarter : "",
-    packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
-    packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
-    packagingTypeOfIntervention: isPackaging ? packagingTypeOfIntervention : "Label Design",
-    packagingProductName: isPackaging ? packagingProductName : "",
-    packagingSizeVariant: isPackaging ? packagingSizeVariant : "",
-    packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
-    packagingCustomerName: isPackaging ? packagingCustomerName : "",
-    packagingSex: isPackaging ? packagingSex : "",
-    packagingFirmInstitution: isPackaging ? packagingFirmInstitution : "",
-    packagingAddress: isPackaging ? packagingAddress : "",
-    packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
-    packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
-    packagingPhotos: isPackaging ? packagingPhotos : [],
+      packagingQuarter: isPackaging ? packagingQuarter : "",
+      packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
+      packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
+      packagingTypeOfIntervention: isPackaging ? packagingTypeOfIntervention : "Label Design",
+      packagingProductName: isPackaging ? packagingProductName : "",
+      packagingSizeVariant: isPackaging ? packagingSizeVariant : "",
+      packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
+      packagingCustomerName: isPackaging ? packagingCustomerName : "",
+      packagingSex: isPackaging ? packagingSex : "",
+      packagingFirmInstitution: isPackaging ? packagingFirmInstitution : "",
+      packagingAddress: isPackaging ? packagingAddress : "",
+      packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
+      packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
+      packagingPhotos: isPackaging ? packagingPhotos : [],
 
-    trainingProgram,
-    trainingProvince,
-    trainingStartDate,
-    trainingEndDate,
-    trainingVenueAddress,
-    trainingVenueAddressMeta,
-    trainingParticipantsFemale,
-    trainingParticipantsMale,
-    trainingSeniorFemale,
-    trainingSeniorMale,
-    trainingIpFemale,
-    trainingIpMale,
-    trainingFourPsFemale,
-    trainingFourPsMale,
-    trainingPwdFemale,
-    trainingPwdMale,
-    trainingFirmsSucsHeisLgusCount,
-    trainingFirmsAssociationsList,
-    trainingTrainorAffiliation,
-    trainingCostDost,
-    trainingCostPartnerAgency,
+      trainingProgram,
+      trainingProvince,
+      trainingStartDate,
+      trainingEndDate,
+      trainingVenueAddress,
+      trainingVenueAddressMeta,
+      trainingParticipantsFemale,
+      trainingParticipantsMale,
+      trainingSeniorFemale,
+      trainingSeniorMale,
+      trainingIpFemale,
+      trainingIpMale,
+      trainingFourPsFemale,
+      trainingFourPsMale,
+      trainingPwdFemale,
+      trainingPwdMale,
+      trainingFirmsSucsHeisLgusCount,
+      trainingFirmsAssociationsList,
+      trainingTrainorAffiliation,
+      trainingCostDost,
+      trainingCostPartnerAgency,
 
-    promoProject: isTrainingLike && !isTraining ? promoProject : "",
-    promoActivityDate: isTrainingLike && !isTraining ? promoActivityDate : "",
-    promoTechnologyPromoted: isTrainingLike && !isTraining ? promoTechnologyPromoted : "",
-    promoTechnologyGenerator: isTrainingLike && !isTraining ? promoTechnologyGenerator : "",
-    promoModeOfPromotion: isTrainingLike && !isTraining ? promoModeOfPromotion : "Social Media",
-    promoActivityTitle: isTrainingLike && !isTraining ? promoActivityTitle : "",
-    promoActivityVenueAddress: isTrainingLike && !isTraining ? promoActivityVenueAddress : "",
-    promoActivityVenueMeta: isTrainingLike && !isTraining ? promoActivityVenueMeta : null,
-    promoCustomerName: isTrainingLike && !isTraining ? promoCustomerName : "",
-    promoCustomerAddress: isTrainingLike && !isTraining ? promoCustomerAddress : "",
-    promoCustomerAddressMeta: isTrainingLike && !isTraining ? promoCustomerAddressMeta : null,
-    promoSex: isTrainingLike && !isTraining ? promoSex : "N/A",
-    promoStaffName: isTrainingLike && !isTraining ? promoStaffName : "",
-    promoMeansVerification: isTrainingLike && !isTraining ? promoMeansVerification : "",
-    promoPhotos: isTrainingLike && !isTraining ? promoPhotos : [],
+      promoProject: isTrainingLike && !isTraining ? promoProject : "",
+      promoActivityDate: isTrainingLike && !isTraining ? promoActivityDate : "",
+      promoTechnologyPromoted: isTrainingLike && !isTraining ? promoTechnologyPromoted : "",
+      promoTechnologyGenerator: isTrainingLike && !isTraining ? promoTechnologyGenerator : "",
+      promoModeOfPromotion: isTrainingLike && !isTraining ? promoModeOfPromotion : "Social Media",
+      promoActivityTitle: isTrainingLike && !isTraining ? promoActivityTitle : "",
+      promoActivityVenueAddress: isTrainingLike && !isTraining ? promoActivityVenueAddress : "",
+      promoActivityVenueMeta: isTrainingLike && !isTraining ? promoActivityVenueMeta : null,
+      promoCustomerName: isTrainingLike && !isTraining ? promoCustomerName : "",
+      promoCustomerAddress: isTrainingLike && !isTraining ? promoCustomerAddress : "",
+      promoCustomerAddressMeta: isTrainingLike && !isTraining ? promoCustomerAddressMeta : null,
+      promoSex: isTrainingLike && !isTraining ? promoSex : "N/A",
+      promoStaffName: isTrainingLike && !isTraining ? promoStaffName : "",
+      promoMeansVerification: isTrainingLike && !isTraining ? promoMeansVerification : "",
+      promoPhotos: isTrainingLike && !isTraining ? promoPhotos : [],
 
-    calibrationCategory: isCalibration ? calibrationCategory : "PAYING",
-    calibrationDate: isCalibration ? calibrationDate : "",
-    calibrationTypeOfSample: isCalibration ? calibrationTypeOfSample : "Weighing Scale",
-    calibrationTestType: isCalibration ? calibrationTestType : "Mass Calibration",
-    calibrationNoOfSample: isCalibration ? calibrationNoOfSample : "",
-    calibrationRange: isCalibration ? calibrationRange : "",
-    calibrationCost: isCalibration ? calibrationCost : "",
-    calibrationFeesCollected: isCalibration ? calibrationFeesCollected : "",
-    calibrationMcBreakdown: isCalibration ? calibrationMcBreakdown : [makeCalibrationBreakdownRow()],
-    calibrationBarangay: isCalibration ? calibrationBarangay : "",
-    calibrationAddress: isCalibration ? calibrationAddress : "",
-    calibrationAddressMeta: isCalibration ? calibrationAddressMeta : null,
-    calibrationFemale: isCalibration ? calibrationFemale : "",
-    calibrationMale: isCalibration ? calibrationMale : "",
-    calibrationTotalCustomers: isCalibration ? calibrationTotalCustomers : "",
-    calibrationNoOfFirms: isCalibration ? calibrationNoOfFirms : "",
-    calibrationNoOfNewFirms: isCalibration ? calibrationNoOfNewFirms : "",
-    calibrationAgeRange: isCalibration ? calibrationAgeRange : "",
-    calibrationPwd: isCalibration ? calibrationPwd : "",
-    calibrationIp: isCalibration ? calibrationIp : "",
-    calibrationSc: isCalibration ? calibrationSc : "",
-    calibrationFourPs: isCalibration ? calibrationFourPs : "",
+      calibrationCategory: isCalibration ? calibrationCategory : "PAYING",
+      calibrationDate: isCalibration ? calibrationDate : "",
+      calibrationTypeOfSample: isCalibration ? calibrationTypeOfSample : "Weighing Scale",
+      calibrationTestType: isCalibration ? calibrationTestType : "Mass Calibration",
+      calibrationNoOfSample: isCalibration ? calibrationNoOfSample : "",
+      calibrationRange: isCalibration ? calibrationRange : "",
+      calibrationCost: isCalibration ? calibrationCost : "",
+      calibrationFeesCollected: isCalibration ? calibrationFeesCollected : "",
+      calibrationMcBreakdown: isCalibration ? calibrationMcBreakdown : [makeCalibrationBreakdownRow()],
+      calibrationBarangay: isCalibration ? calibrationBarangay : "",
+      calibrationAddress: isCalibration ? calibrationAddress : "",
+      calibrationAddressMeta: isCalibration ? calibrationAddressMeta : null,
+      calibrationFemale: isCalibration ? calibrationFemale : "",
+      calibrationMale: isCalibration ? calibrationMale : "",
+      calibrationTotalCustomers: isCalibration ? calibrationTotalCustomers : "",
+      calibrationNoOfFirms: isCalibration ? calibrationNoOfFirms : "",
+      calibrationNoOfNewFirms: isCalibration ? calibrationNoOfNewFirms : "",
+      calibrationAgeRange: isCalibration ? calibrationAgeRange : "",
+      calibrationPwd: isCalibration ? calibrationPwd : "",
+      calibrationIp: isCalibration ? calibrationIp : "",
+      calibrationSc: isCalibration ? calibrationSc : "",
+      calibrationFourPs: isCalibration ? calibrationFourPs : "",
 
-    consultancyType: isTacs ? tacsConsultancyType : "",
-    dateEngagement: isTacs ? tacsDateEngagement : "",
-    expertInstitution: isTacs ? tacsExpertInstitution : "",
-    customerName: isTacs ? tacsCustomerName : "",
-    customerSex: isTacs ? tacsCustomerSex : "",
-    customerAddress: isTacs ? tacsCustomerAddress : "",
-    customerAddressMeta: isTacs ? tacsCustomerAddressMeta : null,
-    meansVerification: isTacs ? tacsMeansVerification : "",
-    noOfAdvice: isTacs ? tacsNoOfAdvice : "",
-    tacsPhotos: isTacs ? tacsPhotos : [],
-  });
-};
+      consultancyType: isTacs ? tacsConsultancyType : "",
+      dateEngagement: isTacs ? tacsDateEngagement : "",
+      expertInstitution: isTacs ? tacsExpertInstitution : "",
+      customerName: isTacs ? tacsCustomerName : "",
+      customerSex: isTacs ? tacsCustomerSex : "",
+      customerAddress: isTacs ? tacsCustomerAddress : "",
+      customerAddressMeta: isTacs ? tacsCustomerAddressMeta : null,
+      meansVerification: isTacs ? tacsMeansVerification : "",
+      noOfAdvice: isTacs ? tacsNoOfAdvice : "",
+      tacsPhotos: isTacs ? tacsPhotos : [],
+    });
+  };
 
-    const deleteIntervention = async (projectId, entryId) => {
+  const deleteIntervention = async (projectId, entryId) => {
     if (!window.confirm("Delete this intervention entry?")) return;
 
     try {
@@ -2077,574 +2077,574 @@ const [detailForm, setDetailForm] = useState({
     }
   };
 
-    const saveInterventionDetails = async () => {
-  if (!detailFor) return;
+  const saveInterventionDetails = async () => {
+    if (!detailFor) return;
 
-  const type = (detailForm.type || "").trim();
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTrainingLike =
-    type === "Training" ||
-    type === "Tech Promo" ||
-    type === "S&T Promo";
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
-  const isCalibration = type === "Calibration";
+    const type = (detailForm.type || "").trim();
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTrainingLike =
+      type === "Training" ||
+      type === "Tech Promo" ||
+      type === "S&T Promo";
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
+    const isCalibration = type === "Calibration";
 
-  if (!type) return alert("Missing intervention type");
+    if (!type) return alert("Missing intervention type");
 
-  if (isTech) {
-    const rows = Array.isArray(detailForm.techRows) ? detailForm.techRows : [];
-    const firstRow = rows[0] || {};
-    const hasValidRow = rows.some(
-      (r) =>
-        (r?.nameOfTechnologyTransferred || "").trim() ||
-        (r?.activityTitle || "").trim() ||
-        (r?.institutionName || "").trim()
-    );
-
-    if (!hasValidRow) {
-      return alert("Required: at least one Tech Roll Out row");
-    }
-
-    if (!(firstRow?.quarter || "").trim()) return alert("Required: Quarter");
-    if (!(firstRow?.unitCenter || "").trim()) return alert("Required: Unit/Center");
-    if (!(firstRow?.nameOfTechnologyTransferred || "").trim()) return alert("Required: Name of Knowledge/Technology Transferred");
-    if (!(firstRow?.technologyGenerator || "").trim()) return alert("Required: Technology Generator");
-    if (!(firstRow?.modeOfTransfer || "").trim()) return alert("Required: Mode of Transfer");
-    if (!(firstRow?.dateTransferred || "").trim()) return alert("Required: Date Transferred");
-    if (!(firstRow?.activityTitle || "").trim()) return alert("Required: Activity Title");
-    if (!(firstRow?.activityDate || "").trim()) return alert("Required: Activity Date");
-    if (!(firstRow?.institutionName || "").trim()) return alert("Required: Institution Name");
-    if (!(firstRow?.institutionAddress || "").trim()) return alert("Required: Institution Address");
-    if (!(firstRow?.classification || "").trim()) return alert("Required: Classification");
-    if (!(firstRow?.representativeName || "").trim()) return alert("Required: Representative Name");
-  }
-
-  if (isTraining && !(detailForm.title || "").trim()) {
-    return alert("Required: Training Title");
-  }
-  if (isTraining && !(detailForm.trainingStartDate || "").trim()) {
-    return alert("Required: Start Date");
-  }
-  if (isTraining && !(detailForm.trainingVenueAddress || "").trim()) {
-    return alert("Required: Venue/Address");
-  }
-  if (isPackaging && !(detailForm.packagingQuarter || "").trim()) {
-    return alert("Required: Quarter");
-  }
-  if (isPackaging && !(detailForm.packagingDateCompleted || "").trim()) {
-    return alert("Required: Date Completed/Executed");
-  }
-  if (isPackaging && !(detailForm.packagingTypeOfIntervention || "").trim()) {
-    return alert("Required: Type of Intervention");
-  }
-  if (isPackaging && !(detailForm.packagingSizeVariant || "").trim()) {
-    return alert("Required: Size/Variant of Label Design/Type of Packaging Material");
-  }
-  if (isPackaging && !(detailForm.packagingMaterialsProvided || "").trim()) {
-    return alert("Required: No. of Packaging Materials Provided");
-  }
-  if (isPackaging && !(detailForm.packagingCustomerName || "").trim()) {
-    return alert("Required: Name of Customer");
-  }
-  if (isPackaging && !(detailForm.packagingFirmInstitution || "").trim()) {
-    return alert("Required: Name of Firm/Institution");
-  }
-  if (isPackaging && !(detailForm.packagingAddress || "").trim()) {
-    return alert("Required: Venue/Address");
-  }
-  if (isPromoLike && !(detailForm.promoTechnologyPromoted || "").trim()) {
-    return alert(`Required: ${type} - Technology Promoted`);
-  }
-  if (isPromoLike && !(detailForm.promoTechnologyGenerator || "").trim()) {
-    return alert(`Required: ${type} - Technology Generator`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityTitle || "").trim()) {
-    return alert(`Required: ${type} - Activity Title`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityDate || "").trim()) {
-    return alert(`Required: ${type} - Activity Date`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityVenueAddress || "").trim()) {
-    return alert(`Required: ${type} - Activity Venue/Address`);
-  }
-  if (isPromoLike && !(detailForm.promoCustomerName || "").trim()) {
-    return alert(`Required: ${type} - Name of Customer/Participant`);
-  }
-  if (isPromoLike && !(detailForm.promoCustomerAddress || "").trim()) {
-    return alert(`Required: ${type} - Customer/Participant Address`);
-  }
-  if (isPromoLike && !(detailForm.promoStaffName || "").trim()) {
-    return alert(`Required: ${type} - Name of Staff`);
-  }
-  if (isCalibration) {
-    if (!(detailForm.calibrationCategory || "").trim()) {
-      return alert("Required: Category");
-    }
-    if (!(detailForm.calibrationDate || "").trim()) {
-      return alert("Required: Date");
-    }
-    if (!(detailForm.calibrationTypeOfSample || "").trim()) {
-      return alert("Required: Type of Samples");
-    }
-    if (
-      !String(detailForm.calibrationNoOfSample).trim() ||
-      toNumber(detailForm.calibrationNoOfSample) <= 0
-    ) {
-      return alert("Required: No. of Sample");
-    }
-
-    if (detailForm.calibrationTypeOfSample === "Weighing Scale") {
-      const validRows = (detailForm.calibrationMcBreakdown || []).filter(
-        (r) => r.range || toNumber(r.noOfSample) > 0 || toNumber(r.cost) > 0
+    if (isTech) {
+      const rows = Array.isArray(detailForm.techRows) ? detailForm.techRows : [];
+      const firstRow = rows[0] || {};
+      const hasValidRow = rows.some(
+        (r) =>
+          (r?.nameOfTechnologyTransferred || "").trim() ||
+          (r?.activityTitle || "").trim() ||
+          (r?.institutionName || "").trim()
       );
-      if (!validRows.length) {
-        return alert("Add at least one MC breakdown row.");
+
+      if (!hasValidRow) {
+        return alert("Required: at least one Tech Roll Out row");
       }
-      const breakdownTotal = validRows.reduce((sum, r) => sum + toNumber(r.noOfSample), 0);
-      if (breakdownTotal > toNumber(detailForm.calibrationNoOfSample)) {
-        return alert("MC breakdown total cannot be greater than the main No. of Sample.");
-      }
-      for (const row of validRows) {
-        if (!row.range) return alert("Each MC breakdown row needs a range.");
-        if (toNumber(row.noOfSample) <= 0) return alert("Each MC breakdown row needs no. of sample.");
-        if (
-          detailForm.calibrationCategory === "PAYING" &&
-          toNumber(row.cost) <= 0
-        ) {
-          return alert("Each MC breakdown row needs cost for PAYING.");
-        }
-      }
-      if (breakdownTotal !== toNumber(detailForm.calibrationNoOfSample)) {
-        return alert("MC breakdown total samples must match the main No. of Sample.");
-      }
-    } else {
-      if (
-        detailForm.calibrationCategory === "PAYING" &&
-        toNumber(detailForm.calibrationCost) <= 0
-      ) {
-        return alert("Required: Cost for PAYING entry");
-      }
+
+      if (!(firstRow?.quarter || "").trim()) return alert("Required: Quarter");
+      if (!(firstRow?.unitCenter || "").trim()) return alert("Required: Unit/Center");
+      if (!(firstRow?.nameOfTechnologyTransferred || "").trim()) return alert("Required: Name of Knowledge/Technology Transferred");
+      if (!(firstRow?.technologyGenerator || "").trim()) return alert("Required: Technology Generator");
+      if (!(firstRow?.modeOfTransfer || "").trim()) return alert("Required: Mode of Transfer");
+      if (!(firstRow?.dateTransferred || "").trim()) return alert("Required: Date Transferred");
+      if (!(firstRow?.activityTitle || "").trim()) return alert("Required: Activity Title");
+      if (!(firstRow?.activityDate || "").trim()) return alert("Required: Activity Date");
+      if (!(firstRow?.institutionName || "").trim()) return alert("Required: Institution Name");
+      if (!(firstRow?.institutionAddress || "").trim()) return alert("Required: Institution Address");
+      if (!(firstRow?.classification || "").trim()) return alert("Required: Classification");
+      if (!(firstRow?.representativeName || "").trim()) return alert("Required: Representative Name");
     }
 
-    if (!(detailForm.calibrationAddress || "").trim()) {
+    if (isTraining && !(detailForm.title || "").trim()) {
+      return alert("Required: Training Title");
+    }
+    if (isTraining && !(detailForm.trainingStartDate || "").trim()) {
+      return alert("Required: Start Date");
+    }
+    if (isTraining && !(detailForm.trainingVenueAddress || "").trim()) {
       return alert("Required: Venue/Address");
     }
-  }
-  if (isTacs && !(detailForm.consultancyType || "").trim()) {
-    return alert("Required: Type of Consultancy");
-  }
-  if (isTacs && !(detailForm.dateEngagement || "").trim()) {
-    return alert("Required: Date of Engagement");
-  }
-  if (isTacs && !(detailForm.customerName || "").trim()) {
-    return alert("Required: Name of Customer");
-  }
-  if (isTacs && !(detailForm.customerAddress || "").trim()) {
-    return alert("Required: Venue/Address of Customer");
-  }
-  if (
-    isTacs &&
-    (detailForm.noOfAdvice === "" || Number.isNaN(Number(detailForm.noOfAdvice)))
-  ) {
-    return alert("Required: No. of Advice / Recommendations");
-  }
+    if (isPackaging && !(detailForm.packagingQuarter || "").trim()) {
+      return alert("Required: Quarter");
+    }
+    if (isPackaging && !(detailForm.packagingDateCompleted || "").trim()) {
+      return alert("Required: Date Completed/Executed");
+    }
+    if (isPackaging && !(detailForm.packagingTypeOfIntervention || "").trim()) {
+      return alert("Required: Type of Intervention");
+    }
+    if (isPackaging && !(detailForm.packagingSizeVariant || "").trim()) {
+      return alert("Required: Size/Variant of Label Design/Type of Packaging Material");
+    }
+    if (isPackaging && !(detailForm.packagingMaterialsProvided || "").trim()) {
+      return alert("Required: No. of Packaging Materials Provided");
+    }
+    if (isPackaging && !(detailForm.packagingCustomerName || "").trim()) {
+      return alert("Required: Name of Customer");
+    }
+    if (isPackaging && !(detailForm.packagingFirmInstitution || "").trim()) {
+      return alert("Required: Name of Firm/Institution");
+    }
+    if (isPackaging && !(detailForm.packagingAddress || "").trim()) {
+      return alert("Required: Venue/Address");
+    }
+    if (isPromoLike && !(detailForm.promoTechnologyPromoted || "").trim()) {
+      return alert(`Required: ${type} - Technology Promoted`);
+    }
+    if (isPromoLike && !(detailForm.promoTechnologyGenerator || "").trim()) {
+      return alert(`Required: ${type} - Technology Generator`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityTitle || "").trim()) {
+      return alert(`Required: ${type} - Activity Title`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityDate || "").trim()) {
+      return alert(`Required: ${type} - Activity Date`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityVenueAddress || "").trim()) {
+      return alert(`Required: ${type} - Activity Venue/Address`);
+    }
+    if (isPromoLike && !(detailForm.promoCustomerName || "").trim()) {
+      return alert(`Required: ${type} - Name of Customer/Participant`);
+    }
+    if (isPromoLike && !(detailForm.promoCustomerAddress || "").trim()) {
+      return alert(`Required: ${type} - Customer/Participant Address`);
+    }
+    if (isPromoLike && !(detailForm.promoStaffName || "").trim()) {
+      return alert(`Required: ${type} - Name of Staff`);
+    }
+    if (isCalibration) {
+      if (!(detailForm.calibrationCategory || "").trim()) {
+        return alert("Required: Category");
+      }
+      if (!(detailForm.calibrationDate || "").trim()) {
+        return alert("Required: Date");
+      }
+      if (!(detailForm.calibrationTypeOfSample || "").trim()) {
+        return alert("Required: Type of Samples");
+      }
+      if (
+        !String(detailForm.calibrationNoOfSample).trim() ||
+        toNumber(detailForm.calibrationNoOfSample) <= 0
+      ) {
+        return alert("Required: No. of Sample");
+      }
 
-  const cleanTechRows = (rows) =>
-    (Array.isArray(rows) ? rows : []).map((r) => ({
-      quarter: (r.quarter || "").trim(),
-      unitCenter: (r.unitCenter || "DOST-PANGASINAN").trim(),
-      nameOfTechnologyTransferred: (r.nameOfTechnologyTransferred || "").trim(),
-      technologyGenerator: (r.technologyGenerator || "").trim(),
-      modeOfTransfer: (r.modeOfTransfer || "").trim(),
-      isDostDevelopedFunded: Boolean(r.isDostDevelopedFunded),
-      dateTransferred: r.dateTransferred || "",
-      activityTitle: (r.activityTitle || "").trim(),
-      activityDate: r.activityDate || "",
-      activityVenue: (r.activityVenue || "").trim(),
-      institutionName: (r.institutionName || "").trim(),
-      institutionAddress: (r.institutionAddress || "").trim(),
-      institutionAddressMeta: r.institutionAddressMeta || null,
-      classification: (r.classification || "").trim(),
-      representativeName: (r.representativeName || "").trim(),
-      representativeDesignation: (r.representativeDesignation || "").trim(),
-      sex: (r.sex || "").trim(),
-    }));
+      if (detailForm.calibrationTypeOfSample === "Weighing Scale") {
+        const validRows = (detailForm.calibrationMcBreakdown || []).filter(
+          (r) => r.range || toNumber(r.noOfSample) > 0 || toNumber(r.cost) > 0
+        );
+        if (!validRows.length) {
+          return alert("Add at least one MC breakdown row.");
+        }
+        const breakdownTotal = validRows.reduce((sum, r) => sum + toNumber(r.noOfSample), 0);
+        if (breakdownTotal > toNumber(detailForm.calibrationNoOfSample)) {
+          return alert("MC breakdown total cannot be greater than the main No. of Sample.");
+        }
+        for (const row of validRows) {
+          if (!row.range) return alert("Each MC breakdown row needs a range.");
+          if (toNumber(row.noOfSample) <= 0) return alert("Each MC breakdown row needs no. of sample.");
+          if (
+            detailForm.calibrationCategory === "PAYING" &&
+            toNumber(row.cost) <= 0
+          ) {
+            return alert("Each MC breakdown row needs cost for PAYING.");
+          }
+        }
+        if (breakdownTotal !== toNumber(detailForm.calibrationNoOfSample)) {
+          return alert("MC breakdown total samples must match the main No. of Sample.");
+        }
+      } else {
+        if (
+          detailForm.calibrationCategory === "PAYING" &&
+          toNumber(detailForm.calibrationCost) <= 0
+        ) {
+          return alert("Required: Cost for PAYING entry");
+        }
+      }
 
-  const cleanCalibrationBreakdown = (rows) =>
-    (Array.isArray(rows) ? rows : [])
-      .filter((r) => r.range && toNumber(r.noOfSample) > 0)
-      .map((r) => ({
-        id: r.id || `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        range: r.range,
-        noOfSample: toNumber(r.noOfSample),
-        cost: toNumber(r.cost),
-        feesCollected:
-          detailForm.calibrationCategory === "PAYING"
-            ? toNumber(r.noOfSample) * toNumber(r.cost)
-            : 0,
-        autoFilled: Boolean(r.autoFilled),
+      if (!(detailForm.calibrationAddress || "").trim()) {
+        return alert("Required: Venue/Address");
+      }
+    }
+    if (isTacs && !(detailForm.consultancyType || "").trim()) {
+      return alert("Required: Type of Consultancy");
+    }
+    if (isTacs && !(detailForm.dateEngagement || "").trim()) {
+      return alert("Required: Date of Engagement");
+    }
+    if (isTacs && !(detailForm.customerName || "").trim()) {
+      return alert("Required: Name of Customer");
+    }
+    if (isTacs && !(detailForm.customerAddress || "").trim()) {
+      return alert("Required: Venue/Address of Customer");
+    }
+    if (
+      isTacs &&
+      (detailForm.noOfAdvice === "" || Number.isNaN(Number(detailForm.noOfAdvice)))
+    ) {
+      return alert("Required: No. of Advice / Recommendations");
+    }
+
+    const cleanTechRows = (rows) =>
+      (Array.isArray(rows) ? rows : []).map((r) => ({
+        quarter: (r.quarter || "").trim(),
+        unitCenter: (r.unitCenter || "DOST-PANGASINAN").trim(),
+        nameOfTechnologyTransferred: (r.nameOfTechnologyTransferred || "").trim(),
+        technologyGenerator: (r.technologyGenerator || "").trim(),
+        modeOfTransfer: (r.modeOfTransfer || "").trim(),
+        isDostDevelopedFunded: Boolean(r.isDostDevelopedFunded),
+        dateTransferred: r.dateTransferred || "",
+        activityTitle: (r.activityTitle || "").trim(),
+        activityDate: r.activityDate || "",
+        activityVenue: (r.activityVenue || "").trim(),
+        institutionName: (r.institutionName || "").trim(),
+        institutionAddress: (r.institutionAddress || "").trim(),
+        institutionAddressMeta: r.institutionAddressMeta || null,
+        classification: (r.classification || "").trim(),
+        representativeName: (r.representativeName || "").trim(),
+        representativeDesignation: (r.representativeDesignation || "").trim(),
+        sex: (r.sex || "").trim(),
       }));
 
-  const cleanCalibrationRows = cleanCalibrationBreakdown(
-    detailForm.calibrationMcBreakdown
-  );
-  const calibrationBreakdownTotals = computeCalibrationBreakdownTotals(
-    cleanCalibrationRows,
-    detailForm.calibrationCategory
-  );
+    const cleanCalibrationBreakdown = (rows) =>
+      (Array.isArray(rows) ? rows : [])
+        .filter((r) => r.range && toNumber(r.noOfSample) > 0)
+        .map((r) => ({
+          id: r.id || `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          range: r.range,
+          noOfSample: toNumber(r.noOfSample),
+          cost: toNumber(r.cost),
+          feesCollected:
+            detailForm.calibrationCategory === "PAYING"
+              ? toNumber(r.noOfSample) * toNumber(r.cost)
+              : 0,
+          autoFilled: Boolean(r.autoFilled),
+        }));
 
-  const notesToSave = isTech
-    ? JSON.stringify({
+    const cleanCalibrationRows = cleanCalibrationBreakdown(
+      detailForm.calibrationMcBreakdown
+    );
+    const calibrationBreakdownTotals = computeCalibrationBreakdownTotals(
+      cleanCalibrationRows,
+      detailForm.calibrationCategory
+    );
+
+    const notesToSave = isTech
+      ? JSON.stringify({
         techRollOutRows: cleanTechRows(detailForm.techRows),
         freeText: (detailForm.notes || "").trim(),
       })
-    : isTraining
-    ? JSON.stringify({
-        trainingProgram: (detailForm.trainingProgram || "").trim(),
-        trainingProvince: (detailForm.trainingProvince || "PANGASINAN").trim(),
-        trainingStartDate: detailForm.trainingStartDate || "",
-        trainingEndDate: detailForm.trainingEndDate || "",
-        trainingVenueAddress: (detailForm.trainingVenueAddress || "").trim(),
-        trainingVenueAddressMeta: detailForm.trainingVenueAddressMeta || null,
-        trainingNoOfFirms: detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms),
-        trainingParticipantsFemale: toNumber(detailForm.trainingParticipantsFemale),
-        trainingParticipantsMale: toNumber(detailForm.trainingParticipantsMale),
-        trainingSeniorFemale: toNumber(detailForm.trainingSeniorFemale),
-        trainingSeniorMale: toNumber(detailForm.trainingSeniorMale),
-        trainingIpFemale: toNumber(detailForm.trainingIpFemale),
-        trainingIpMale: toNumber(detailForm.trainingIpMale),
-        trainingFourPsFemale: toNumber(detailForm.trainingFourPsFemale),
-        trainingFourPsMale: toNumber(detailForm.trainingFourPsMale),
-        trainingPwdFemale: toNumber(detailForm.trainingPwdFemale),
-        trainingPwdMale: toNumber(detailForm.trainingPwdMale),
-        trainingFirmsSucsHeisLgusCount:
-          detailForm.trainingFirmsSucsHeisLgusCount === ""
-            ? 0
-            : toNumber(detailForm.trainingFirmsSucsHeisLgusCount),
-        trainingFirmsAssociationsList: (detailForm.trainingFirmsAssociationsList || "").trim(),
-        trainingTrainorAffiliation: (detailForm.trainingTrainorAffiliation || "").trim(),
-        projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
-        trainingCostDost: toNumber(detailForm.trainingCostDost),
-        trainingCostPartnerAgency: toNumber(detailForm.trainingCostPartnerAgency),
-        totalFemale: trainingTotalFemale,
-        totalMale: trainingTotalMale,
-        totalParticipants: trainingTotalParticipants,
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : isPackaging
-    ? (detailForm.notes || "").trim()
-    : isCalibration
-    ? JSON.stringify({
-        category: (detailForm.calibrationCategory || "PAYING").trim(),
-        date: detailForm.calibrationDate || "",
-        typeOfSample: (detailForm.calibrationTypeOfSample || "Weighing Scale").trim(),
-        testType: (detailForm.calibrationTestType || "").trim(),
-        noOfSample: toNumber(detailForm.calibrationNoOfSample),
-        range: (detailForm.calibrationRange || "").trim(),
-        cost:
-          detailForm.calibrationTypeOfSample === "Bucket"
-            ? toNumber(detailForm.calibrationCost)
-            : 0,
-        feesCollected:
-          detailForm.calibrationTypeOfSample === "Weighing Scale"
-            ? (detailForm.calibrationCategory === "PAYING"
-                ? calibrationBreakdownTotals.totalFees
-                : 0)
-            : (detailForm.calibrationCategory === "PAYING"
-                ? toNumber(detailForm.calibrationFeesCollected)
-                : 0),
-        mcBreakdown:
-          detailForm.calibrationTypeOfSample === "Weighing Scale"
-            ? cleanCalibrationRows
-            : [],
-        barangay: (detailForm.calibrationBarangay || "").trim(),
-        address: (detailForm.calibrationAddress || "").trim(),
-        addressMeta: detailForm.calibrationAddressMeta || null,
-        female: toNumber(detailForm.calibrationFemale),
-        male: toNumber(detailForm.calibrationMale),
-        totalCustomers: toNumber(detailForm.calibrationTotalCustomers),
-        noOfFirms: toNumber(detailForm.calibrationNoOfFirms),
-        noOfNewFirms: toNumber(detailForm.calibrationNoOfNewFirms),
-        ageRange: (detailForm.calibrationAgeRange || "").trim(),
-        pwd: toNumber(detailForm.calibrationPwd),
-        ip: toNumber(detailForm.calibrationIp),
-        sc: toNumber(detailForm.calibrationSc),
-        fourPs: toNumber(detailForm.calibrationFourPs),
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : isPromoLike
-    ? JSON.stringify({
-        project: (detailForm.promoProject || "").trim(),
-        activityDate: detailForm.promoActivityDate || "",
-        technologyPromoted: (detailForm.promoTechnologyPromoted || "").trim(),
-        technologyGenerator: (detailForm.promoTechnologyGenerator || "").trim(),
-        modeOfPromotion: (detailForm.promoModeOfPromotion || "").trim(),
-        activityTitle: (detailForm.promoActivityTitle || "").trim(),
-        activityVenueAddress: (detailForm.promoActivityVenueAddress || "").trim(),
-        activityVenueMeta: detailForm.promoActivityVenueMeta || null,
-        customerParticipantName: (detailForm.promoCustomerName || "").trim(),
-        customerParticipantAddress: (detailForm.promoCustomerAddress || "").trim(),
-        customerParticipantAddressMeta: detailForm.promoCustomerAddressMeta || null,
-        sex: (detailForm.promoSex || "").trim(),
-        staffName: (detailForm.promoStaffName || "").trim(),
-        meansOfVerification: (detailForm.promoMeansVerification || "").trim(),
-        photos: Array.isArray(detailForm.promoPhotos) ? detailForm.promoPhotos : [],
-        projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : isTacs
-    ? JSON.stringify({
-        consultancyType: (detailForm.consultancyType || "").trim(),
-        dateEngagement: detailForm.dateEngagement || "",
-        expertInstitution: (detailForm.expertInstitution || "").trim(),
-        customerName: (detailForm.customerName || "").trim(),
-        customerSex: (detailForm.customerSex || "").trim(),
-        customerAddress: (detailForm.customerAddress || "").trim(),
-        customerAddressMeta: detailForm.customerAddressMeta || null,
-        meansVerification: (detailForm.meansVerification || "").trim(),
-        noOfAdvice: detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice),
-        tacsPhotos: Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [],
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : (detailForm.notes || "").trim();
+      : isTraining
+        ? JSON.stringify({
+          trainingProgram: (detailForm.trainingProgram || "").trim(),
+          trainingProvince: (detailForm.trainingProvince || "PANGASINAN").trim(),
+          trainingStartDate: detailForm.trainingStartDate || "",
+          trainingEndDate: detailForm.trainingEndDate || "",
+          trainingVenueAddress: (detailForm.trainingVenueAddress || "").trim(),
+          trainingVenueAddressMeta: detailForm.trainingVenueAddressMeta || null,
+          trainingNoOfFirms: detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms),
+          trainingParticipantsFemale: toNumber(detailForm.trainingParticipantsFemale),
+          trainingParticipantsMale: toNumber(detailForm.trainingParticipantsMale),
+          trainingSeniorFemale: toNumber(detailForm.trainingSeniorFemale),
+          trainingSeniorMale: toNumber(detailForm.trainingSeniorMale),
+          trainingIpFemale: toNumber(detailForm.trainingIpFemale),
+          trainingIpMale: toNumber(detailForm.trainingIpMale),
+          trainingFourPsFemale: toNumber(detailForm.trainingFourPsFemale),
+          trainingFourPsMale: toNumber(detailForm.trainingFourPsMale),
+          trainingPwdFemale: toNumber(detailForm.trainingPwdFemale),
+          trainingPwdMale: toNumber(detailForm.trainingPwdMale),
+          trainingFirmsSucsHeisLgusCount:
+            detailForm.trainingFirmsSucsHeisLgusCount === ""
+              ? 0
+              : toNumber(detailForm.trainingFirmsSucsHeisLgusCount),
+          trainingFirmsAssociationsList: (detailForm.trainingFirmsAssociationsList || "").trim(),
+          trainingTrainorAffiliation: (detailForm.trainingTrainorAffiliation || "").trim(),
+          projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
+          trainingCostDost: toNumber(detailForm.trainingCostDost),
+          trainingCostPartnerAgency: toNumber(detailForm.trainingCostPartnerAgency),
+          totalFemale: trainingTotalFemale,
+          totalMale: trainingTotalMale,
+          totalParticipants: trainingTotalParticipants,
+          remarks: (detailForm.notes || "").trim(),
+        })
+        : isPackaging
+          ? (detailForm.notes || "").trim()
+          : isCalibration
+            ? JSON.stringify({
+              category: (detailForm.calibrationCategory || "PAYING").trim(),
+              date: detailForm.calibrationDate || "",
+              typeOfSample: (detailForm.calibrationTypeOfSample || "Weighing Scale").trim(),
+              testType: (detailForm.calibrationTestType || "").trim(),
+              noOfSample: toNumber(detailForm.calibrationNoOfSample),
+              range: (detailForm.calibrationRange || "").trim(),
+              cost:
+                detailForm.calibrationTypeOfSample === "Bucket"
+                  ? toNumber(detailForm.calibrationCost)
+                  : 0,
+              feesCollected:
+                detailForm.calibrationTypeOfSample === "Weighing Scale"
+                  ? (detailForm.calibrationCategory === "PAYING"
+                    ? calibrationBreakdownTotals.totalFees
+                    : 0)
+                  : (detailForm.calibrationCategory === "PAYING"
+                    ? toNumber(detailForm.calibrationFeesCollected)
+                    : 0),
+              mcBreakdown:
+                detailForm.calibrationTypeOfSample === "Weighing Scale"
+                  ? cleanCalibrationRows
+                  : [],
+              barangay: (detailForm.calibrationBarangay || "").trim(),
+              address: (detailForm.calibrationAddress || "").trim(),
+              addressMeta: detailForm.calibrationAddressMeta || null,
+              female: toNumber(detailForm.calibrationFemale),
+              male: toNumber(detailForm.calibrationMale),
+              totalCustomers: toNumber(detailForm.calibrationTotalCustomers),
+              noOfFirms: toNumber(detailForm.calibrationNoOfFirms),
+              noOfNewFirms: toNumber(detailForm.calibrationNoOfNewFirms),
+              ageRange: (detailForm.calibrationAgeRange || "").trim(),
+              pwd: toNumber(detailForm.calibrationPwd),
+              ip: toNumber(detailForm.calibrationIp),
+              sc: toNumber(detailForm.calibrationSc),
+              fourPs: toNumber(detailForm.calibrationFourPs),
+              remarks: (detailForm.notes || "").trim(),
+            })
+            : isPromoLike
+              ? JSON.stringify({
+                project: (detailForm.promoProject || "").trim(),
+                activityDate: detailForm.promoActivityDate || "",
+                technologyPromoted: (detailForm.promoTechnologyPromoted || "").trim(),
+                technologyGenerator: (detailForm.promoTechnologyGenerator || "").trim(),
+                modeOfPromotion: (detailForm.promoModeOfPromotion || "").trim(),
+                activityTitle: (detailForm.promoActivityTitle || "").trim(),
+                activityVenueAddress: (detailForm.promoActivityVenueAddress || "").trim(),
+                activityVenueMeta: detailForm.promoActivityVenueMeta || null,
+                customerParticipantName: (detailForm.promoCustomerName || "").trim(),
+                customerParticipantAddress: (detailForm.promoCustomerAddress || "").trim(),
+                customerParticipantAddressMeta: detailForm.promoCustomerAddressMeta || null,
+                sex: (detailForm.promoSex || "").trim(),
+                staffName: (detailForm.promoStaffName || "").trim(),
+                meansOfVerification: (detailForm.promoMeansVerification || "").trim(),
+                photos: Array.isArray(detailForm.promoPhotos) ? detailForm.promoPhotos : [],
+                projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
+                remarks: (detailForm.notes || "").trim(),
+              })
+              : isTacs
+                ? JSON.stringify({
+                  consultancyType: (detailForm.consultancyType || "").trim(),
+                  dateEngagement: detailForm.dateEngagement || "",
+                  expertInstitution: (detailForm.expertInstitution || "").trim(),
+                  customerName: (detailForm.customerName || "").trim(),
+                  customerSex: (detailForm.customerSex || "").trim(),
+                  customerAddress: (detailForm.customerAddress || "").trim(),
+                  customerAddressMeta: detailForm.customerAddressMeta || null,
+                  meansVerification: (detailForm.meansVerification || "").trim(),
+                  noOfAdvice: detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice),
+                  tacsPhotos: Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [],
+                  remarks: (detailForm.notes || "").trim(),
+                })
+                : (detailForm.notes || "").trim();
 
-  const male = toNumber(detailForm.male);
-  const female = toNumber(detailForm.female);
-  const totalAuto = male + female;
-  const total = detailForm.total !== "" ? toNumber(detailForm.total) : totalAuto;
+    const male = toNumber(detailForm.male);
+    const female = toNumber(detailForm.female);
+    const totalAuto = male + female;
+    const total = detailForm.total !== "" ? toNumber(detailForm.total) : totalAuto;
 
-  const cleanedTechRows = cleanTechRows(detailForm.techRows);
-  const primaryTechRow = cleanedTechRows[0] || makeDefaultTechRows()[0];
-  const primaryTechAddressMeta = primaryTechRow?.institutionAddressMeta || null;
+    const cleanedTechRows = cleanTechRows(detailForm.techRows);
+    const primaryTechRow = cleanedTechRows[0] || makeDefaultTechRows()[0];
+    const primaryTechAddressMeta = primaryTechRow?.institutionAddressMeta || null;
 
-  const payload = {
-    type,
-    title: isTech
-      ? (
+    const payload = {
+      type,
+      title: isTech
+        ? (
           cleanedTechRows.find(
             (r) => (r.nameOfTechnologyTransferred || "").trim()
           )?.nameOfTechnologyTransferred || type
         )
-      : isTraining
-      ? (detailForm.title || "").trim()
-      : isPackaging
-      ? (detailForm.packagingTypeOfIntervention || "").trim()
-      : isCalibration
-      ? `Calibration - ${(detailForm.calibrationTypeOfSample || "Weighing Scale").trim()}`
-      : isPromoLike
-      ? ((detailForm.promoActivityTitle || "").trim() || (detailForm.promoTechnologyPromoted || "").trim() || type)
-      : isTacs
-      ? (detailForm.consultancyType || "").trim()
-      : type,
-    date: isTech
-      ? (
+        : isTraining
+          ? (detailForm.title || "").trim()
+          : isPackaging
+            ? (detailForm.packagingTypeOfIntervention || "").trim()
+            : isCalibration
+              ? `Calibration - ${(detailForm.calibrationTypeOfSample || "Weighing Scale").trim()}`
+              : isPromoLike
+                ? ((detailForm.promoActivityTitle || "").trim() || (detailForm.promoTechnologyPromoted || "").trim() || type)
+                : isTacs
+                  ? (detailForm.consultancyType || "").trim()
+                  : type,
+      date: isTech
+        ? (
           cleanedTechRows.find((r) => r.dateTransferred)?.dateTransferred || ""
         )
-      : isTraining
-      ? detailForm.trainingStartDate || ""
-      : isPackaging
-      ? detailForm.packagingDateCompleted || ""
-      : isCalibration
-      ? detailForm.calibrationDate || ""
-      : isPromoLike
-      ? detailForm.promoActivityDate || ""
-      : isTacs
-      ? detailForm.dateEngagement || ""
-      : "",
-    venue: isTech
-      ? (
+        : isTraining
+          ? detailForm.trainingStartDate || ""
+          : isPackaging
+            ? detailForm.packagingDateCompleted || ""
+            : isCalibration
+              ? detailForm.calibrationDate || ""
+              : isPromoLike
+                ? detailForm.promoActivityDate || ""
+                : isTacs
+                  ? detailForm.dateEngagement || ""
+                  : "",
+      venue: isTech
+        ? (
           cleanedTechRows.find(
             (r) => (r.institutionAddress || "").trim()
           )?.institutionAddress || ""
         )
-      : isTraining
-      ? (detailForm.trainingVenueAddress || "").trim()
-      : isPackaging
-      ? (detailForm.packagingAddress || "").trim()
-      : isCalibration
-      ? (detailForm.calibrationAddress || "").trim()
-      : isPromoLike
-      ? (detailForm.promoActivityVenueAddress || "").trim()
-      : isTacs
-      ? (detailForm.customerAddress || "").trim()
-      : "",
-    latitude: isTech
-      ? (primaryTechAddressMeta?.lat ?? null)
-      : isTraining
-      ? (detailForm.trainingVenueAddressMeta?.lat ?? null)
-      : isPackaging
-      ? (detailForm.packagingAddressMeta?.lat ?? null)
-      : isCalibration
-      ? (detailForm.calibrationAddressMeta?.lat ?? null)
-      : isPromoLike
-      ? (detailForm.promoActivityVenueMeta?.lat ?? null)
-      : isTacs
-      ? (detailForm.customerAddressMeta?.lat ?? null)
-      : null,
-    longitude: isTech
-      ? (primaryTechAddressMeta?.lng ?? null)
-      : isTraining
-      ? (detailForm.trainingVenueAddressMeta?.lng ?? null)
-      : isPackaging
-      ? (detailForm.packagingAddressMeta?.lng ?? null)
-      : isCalibration
-      ? (detailForm.calibrationAddressMeta?.lng ?? null)
-      : isPromoLike
-      ? (detailForm.promoActivityVenueMeta?.lng ?? null)
-      : isTacs
-      ? (detailForm.customerAddressMeta?.lng ?? null)
-      : null,
-    noOfFirms: isTraining
-      ? (detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms))
-      : isCalibration
-      ? toNumber(detailForm.calibrationNoOfFirms)
-      : isPromoLike
-      ? null
-      : null,
-    male: isTraining
-      ? trainingTotalMale
-      : isCalibration
-      ? toNumber(detailForm.calibrationMale)
-      : isPromoLike
-      ? null
-      : null,
-    female: isTraining
-      ? trainingTotalFemale
-      : isCalibration
-      ? toNumber(detailForm.calibrationFemale)
-      : isPromoLike
-      ? null
-      : null,
-    total: isTraining
-      ? trainingTotalParticipants
-      : isCalibration
-      ? toNumber(detailForm.calibrationTotalCustomers)
-      : isPromoLike
-      ? null
-      : null,
-    notes: notesToSave,
+        : isTraining
+          ? (detailForm.trainingVenueAddress || "").trim()
+          : isPackaging
+            ? (detailForm.packagingAddress || "").trim()
+            : isCalibration
+              ? (detailForm.calibrationAddress || "").trim()
+              : isPromoLike
+                ? (detailForm.promoActivityVenueAddress || "").trim()
+                : isTacs
+                  ? (detailForm.customerAddress || "").trim()
+                  : "",
+      latitude: isTech
+        ? (primaryTechAddressMeta?.lat ?? null)
+        : isTraining
+          ? (detailForm.trainingVenueAddressMeta?.lat ?? null)
+          : isPackaging
+            ? (detailForm.packagingAddressMeta?.lat ?? null)
+            : isCalibration
+              ? (detailForm.calibrationAddressMeta?.lat ?? null)
+              : isPromoLike
+                ? (detailForm.promoActivityVenueMeta?.lat ?? null)
+                : isTacs
+                  ? (detailForm.customerAddressMeta?.lat ?? null)
+                  : null,
+      longitude: isTech
+        ? (primaryTechAddressMeta?.lng ?? null)
+        : isTraining
+          ? (detailForm.trainingVenueAddressMeta?.lng ?? null)
+          : isPackaging
+            ? (detailForm.packagingAddressMeta?.lng ?? null)
+            : isCalibration
+              ? (detailForm.calibrationAddressMeta?.lng ?? null)
+              : isPromoLike
+                ? (detailForm.promoActivityVenueMeta?.lng ?? null)
+                : isTacs
+                  ? (detailForm.customerAddressMeta?.lng ?? null)
+                  : null,
+      noOfFirms: isTraining
+        ? (detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms))
+        : isCalibration
+          ? toNumber(detailForm.calibrationNoOfFirms)
+          : isPromoLike
+            ? null
+            : null,
+      male: isTraining
+        ? trainingTotalMale
+        : isCalibration
+          ? toNumber(detailForm.calibrationMale)
+          : isPromoLike
+            ? null
+            : null,
+      female: isTraining
+        ? trainingTotalFemale
+        : isCalibration
+          ? toNumber(detailForm.calibrationFemale)
+          : isPromoLike
+            ? null
+            : null,
+      total: isTraining
+        ? trainingTotalParticipants
+        : isCalibration
+          ? toNumber(detailForm.calibrationTotalCustomers)
+          : isPromoLike
+            ? null
+            : null,
+      notes: notesToSave,
 
-    packagingQuarter: isPackaging
-      ? (detailForm.packagingQuarter === "" ? null : Number(detailForm.packagingQuarter))
-      : null,
-    packagingProvince: isPackaging
-      ? (detailForm.packagingProvince || "Pangasinan").trim()
-      : null,
-    packagingDateCompleted: isPackaging ? detailForm.packagingDateCompleted || "" : null,
-    packagingTypeOfIntervention: isPackaging
-      ? (detailForm.packagingTypeOfIntervention || "").trim()
-      : null,
-    packagingProductName: isPackaging ? (detailForm.packagingProductName || "").trim() : null,
-    packagingSizeVariant: isPackaging ? (detailForm.packagingSizeVariant || "").trim() : null,
-    packagingMaterialsProvided: isPackaging
-      ? (detailForm.packagingMaterialsProvided || "").trim()
-      : null,
-    packagingCustomerName: isPackaging ? (detailForm.packagingCustomerName || "").trim() : null,
-    packagingSex: isPackaging ? (detailForm.packagingSex || "").trim() : null,
-    packagingFirmInstitution: isPackaging
-      ? (detailForm.packagingFirmInstitution || "").trim()
-      : null,
-    packagingAddress: isPackaging ? (detailForm.packagingAddress || "").trim() : null,
-    packagingAddressMeta: isPackaging ? detailForm.packagingAddressMeta || null : null,
-    packagingMeansVerification: isPackaging
-      ? (detailForm.packagingMeansVerification || "").trim()
-      : null,
-    packagingPhotos: isPackaging
-      ? (Array.isArray(detailForm.packagingPhotos) ? detailForm.packagingPhotos : [])
-      : [],
-    packagingRemarks: isPackaging ? (detailForm.notes || "").trim() : null,
+      packagingQuarter: isPackaging
+        ? (detailForm.packagingQuarter === "" ? null : Number(detailForm.packagingQuarter))
+        : null,
+      packagingProvince: isPackaging
+        ? (detailForm.packagingProvince || "Pangasinan").trim()
+        : null,
+      packagingDateCompleted: isPackaging ? detailForm.packagingDateCompleted || "" : null,
+      packagingTypeOfIntervention: isPackaging
+        ? (detailForm.packagingTypeOfIntervention || "").trim()
+        : null,
+      packagingProductName: isPackaging ? (detailForm.packagingProductName || "").trim() : null,
+      packagingSizeVariant: isPackaging ? (detailForm.packagingSizeVariant || "").trim() : null,
+      packagingMaterialsProvided: isPackaging
+        ? (detailForm.packagingMaterialsProvided || "").trim()
+        : null,
+      packagingCustomerName: isPackaging ? (detailForm.packagingCustomerName || "").trim() : null,
+      packagingSex: isPackaging ? (detailForm.packagingSex || "").trim() : null,
+      packagingFirmInstitution: isPackaging
+        ? (detailForm.packagingFirmInstitution || "").trim()
+        : null,
+      packagingAddress: isPackaging ? (detailForm.packagingAddress || "").trim() : null,
+      packagingAddressMeta: isPackaging ? detailForm.packagingAddressMeta || null : null,
+      packagingMeansVerification: isPackaging
+        ? (detailForm.packagingMeansVerification || "").trim()
+        : null,
+      packagingPhotos: isPackaging
+        ? (Array.isArray(detailForm.packagingPhotos) ? detailForm.packagingPhotos : [])
+        : [],
+      packagingRemarks: isPackaging ? (detailForm.notes || "").trim() : null,
 
-    techrollout_quarter: isTech
-      ? (primaryTechRow.quarter === "" ? null : Number(primaryTechRow.quarter))
-      : null,
-    techrollout_unit_center: isTech ? (primaryTechRow.unitCenter || "DOST-PANGASINAN").trim() : null,
-    techrollout_name_of_technology_transferred: isTech
-      ? (primaryTechRow.nameOfTechnologyTransferred || "").trim()
-      : null,
-    techrollout_technology_generator: isTech
-      ? (primaryTechRow.technologyGenerator || "").trim()
-      : null,
-    techrollout_mode_of_transfer: isTech
-      ? (primaryTechRow.modeOfTransfer || "").trim()
-      : null,
-    techrollout_is_dost_developed_funded: isTech
-      ? (primaryTechRow.isDostDevelopedFunded ? 1 : 0)
-      : 0,
-    techrollout_date_transferred: isTech ? primaryTechRow.dateTransferred || null : null,
-    techrollout_activity_title: isTech ? (primaryTechRow.activityTitle || "").trim() : null,
-    techrollout_activity_date: isTech ? primaryTechRow.activityDate || null : null,
-    techrollout_activity_venue: isTech ? (primaryTechRow.activityVenue || "").trim() : null,
-    techrollout_institution_name: isTech ? (primaryTechRow.institutionName || "").trim() : null,
-    techrollout_institution_address: isTech ? (primaryTechRow.institutionAddress || "").trim() : null,
-    techrollout_institution_address_meta: isTech ? primaryTechAddressMeta : null,
-    techrollout_classification: isTech ? (primaryTechRow.classification || "").trim() : null,
-    techrollout_representative_name: isTech ? (primaryTechRow.representativeName || "").trim() : null,
-    techrollout_representative_designation: isTech
-      ? (primaryTechRow.representativeDesignation || "").trim()
-      : null,
-    techrollout_sex: isTech ? (primaryTechRow.sex || "").trim() : null,
-    address_mode: isTech ? primaryTechAddressMeta?.mode || null : null,
-    address_manual_text: isTech ? primaryTechAddressMeta?.manualText || null : null,
-    address_display_text: isTech ? primaryTechAddressMeta?.displayText || null : null,
-    address_province: isTech ? primaryTechAddressMeta?.province || null : null,
-    address_municipality: isTech ? primaryTechAddressMeta?.municipality || null : null,
-    address_barangay: isTech ? primaryTechAddressMeta?.barangay || null : null,
-    address_lat: isTech ? (primaryTechAddressMeta?.lat ?? null) : null,
-    address_lng: isTech ? (primaryTechAddressMeta?.lng ?? null) : null,
+      techrollout_quarter: isTech
+        ? (primaryTechRow.quarter === "" ? null : Number(primaryTechRow.quarter))
+        : null,
+      techrollout_unit_center: isTech ? (primaryTechRow.unitCenter || "DOST-PANGASINAN").trim() : null,
+      techrollout_name_of_technology_transferred: isTech
+        ? (primaryTechRow.nameOfTechnologyTransferred || "").trim()
+        : null,
+      techrollout_technology_generator: isTech
+        ? (primaryTechRow.technologyGenerator || "").trim()
+        : null,
+      techrollout_mode_of_transfer: isTech
+        ? (primaryTechRow.modeOfTransfer || "").trim()
+        : null,
+      techrollout_is_dost_developed_funded: isTech
+        ? (primaryTechRow.isDostDevelopedFunded ? 1 : 0)
+        : 0,
+      techrollout_date_transferred: isTech ? primaryTechRow.dateTransferred || null : null,
+      techrollout_activity_title: isTech ? (primaryTechRow.activityTitle || "").trim() : null,
+      techrollout_activity_date: isTech ? primaryTechRow.activityDate || null : null,
+      techrollout_activity_venue: isTech ? (primaryTechRow.activityVenue || "").trim() : null,
+      techrollout_institution_name: isTech ? (primaryTechRow.institutionName || "").trim() : null,
+      techrollout_institution_address: isTech ? (primaryTechRow.institutionAddress || "").trim() : null,
+      techrollout_institution_address_meta: isTech ? primaryTechAddressMeta : null,
+      techrollout_classification: isTech ? (primaryTechRow.classification || "").trim() : null,
+      techrollout_representative_name: isTech ? (primaryTechRow.representativeName || "").trim() : null,
+      techrollout_representative_designation: isTech
+        ? (primaryTechRow.representativeDesignation || "").trim()
+        : null,
+      techrollout_sex: isTech ? (primaryTechRow.sex || "").trim() : null,
+      address_mode: isTech ? primaryTechAddressMeta?.mode || null : null,
+      address_manual_text: isTech ? primaryTechAddressMeta?.manualText || null : null,
+      address_display_text: isTech ? primaryTechAddressMeta?.displayText || null : null,
+      address_province: isTech ? primaryTechAddressMeta?.province || null : null,
+      address_municipality: isTech ? primaryTechAddressMeta?.municipality || null : null,
+      address_barangay: isTech ? primaryTechAddressMeta?.barangay || null : null,
+      address_lat: isTech ? (primaryTechAddressMeta?.lat ?? null) : null,
+      address_lng: isTech ? (primaryTechAddressMeta?.lng ?? null) : null,
 
-    technologiesPromotedTotal: isPromoLike ? 1 : 0,
-    promotionalActivitiesPressRelease: isPromoLike ? 1 : 0,
-    pwd: "",
-    fourPs: "",
-    ip: "",
-    seniors: "",
+      technologiesPromotedTotal: isPromoLike ? 1 : 0,
+      promotionalActivitiesPressRelease: isPromoLike ? 1 : 0,
+      pwd: "",
+      fourPs: "",
+      ip: "",
+      seniors: "",
 
-    tacsConsultancyType: isTacs ? (detailForm.consultancyType || "").trim() : "",
-    tacsDateEngagement: isTacs ? detailForm.dateEngagement || "" : "",
-    tacsExpertInstitution: isTacs ? (detailForm.expertInstitution || "").trim() : "",
-    tacsCustomerName: isTacs ? (detailForm.customerName || "").trim() : "",
-    tacsCustomerSex: isTacs ? (detailForm.customerSex || "").trim() : "",
-    tacsCustomerAddress: isTacs ? (detailForm.customerAddress || "").trim() : "",
-    tacsCustomerAddressMeta: isTacs ? detailForm.customerAddressMeta || null : null,
-    tacsMeansVerification: isTacs ? (detailForm.meansVerification || "").trim() : "",
-    tacsNoOfAdvice: isTacs ? (detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice)) : null,
-    tacsPhotos: isTacs
-      ? (Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [])
-      : [],
-    tacsRemarks: isTacs ? (detailForm.notes || "").trim() : "",
-  };
+      tacsConsultancyType: isTacs ? (detailForm.consultancyType || "").trim() : "",
+      tacsDateEngagement: isTacs ? detailForm.dateEngagement || "" : "",
+      tacsExpertInstitution: isTacs ? (detailForm.expertInstitution || "").trim() : "",
+      tacsCustomerName: isTacs ? (detailForm.customerName || "").trim() : "",
+      tacsCustomerSex: isTacs ? (detailForm.customerSex || "").trim() : "",
+      tacsCustomerAddress: isTacs ? (detailForm.customerAddress || "").trim() : "",
+      tacsCustomerAddressMeta: isTacs ? detailForm.customerAddressMeta || null : null,
+      tacsMeansVerification: isTacs ? (detailForm.meansVerification || "").trim() : "",
+      tacsNoOfAdvice: isTacs ? (detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice)) : null,
+      tacsPhotos: isTacs
+        ? (Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [])
+        : [],
+      tacsRemarks: isTacs ? (detailForm.notes || "").trim() : "",
+    };
 
-  try {
-    let savedId = detailFor.entryId || "";
+    try {
+      let savedId = detailFor.entryId || "";
 
-    if (detailFor.mode === "add") {
-      const res = await axios.post(
-        `${API}/cest/${detailFor.projectId}/interventions`,
-        payload
-      );
-      savedId = res?.data?.id || "";
-    } else {
-      await axios.put(`${API}/cest-interventions/${detailFor.entryId}`, payload);
-      savedId = detailFor.entryId;
+      if (detailFor.mode === "add") {
+        const res = await axios.post(
+          `${API}/cest/${detailFor.projectId}/interventions`,
+          payload
+        );
+        savedId = res?.data?.id || "";
+      } else {
+        await axios.put(`${API}/cest-interventions/${detailFor.entryId}`, payload);
+        savedId = detailFor.entryId;
+      }
+
+      await fetchProjects();
+
+      setSelectedInterventionByProject((prev) => ({
+        ...prev,
+        [detailFor.projectId]: savedId,
+      }));
+
+      setDetailFor(null);
+      resetDetailForm("");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save intervention.");
     }
-
-    await fetchProjects();
-
-    setSelectedInterventionByProject((prev) => ({
-      ...prev,
-      [detailFor.projectId]: savedId,
-    }));
-
-    setDetailFor(null);
-    resetDetailForm("");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save intervention.");
-  }
-};
+  };
 
 
   // ===== Map helpers =====
@@ -2940,7 +2940,7 @@ const [detailForm, setDetailForm] = useState({
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -3193,10 +3193,10 @@ const [detailForm, setDetailForm] = useState({
       mode === "manual"
         ? "Manual Venue/Address"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -3233,29 +3233,29 @@ const [detailForm, setDetailForm] = useState({
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              venueName: venueName.trim(),
-              manualText: manualText.trim(),
-              addressOnlyText: manualText.trim(),
-              displayText,
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            venueName: venueName.trim(),
+            manualText: manualText.trim(),
+            addressOnlyText: manualText.trim(),
+            displayText,
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              venueName: venueName.trim(),
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              addressOnlyText: baseAddressText,
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            venueName: venueName.trim(),
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            addressOnlyText: baseAddressText,
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -3588,74 +3588,74 @@ const [detailForm, setDetailForm] = useState({
   }
 
   const applyAddressMetaToForm = (meta) => {
-  setForm((prev) => ({
-    ...prev,
-    address: meta?.displayText || "",
-    addressMeta: meta || null,
-  }));
-};
+    setForm((prev) => ({
+      ...prev,
+      address: meta?.displayText || "",
+      addressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToDetailForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    customerAddress: meta?.displayText || "",
-    customerAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToDetailForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      customerAddress: meta?.displayText || "",
+      customerAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToCalibrationForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    calibrationBarangay: meta?.barangay || "",
-    calibrationAddress: meta?.displayText || "",
-    calibrationAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToCalibrationForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      calibrationBarangay: meta?.barangay || "",
+      calibrationAddress: meta?.displayText || "",
+      calibrationAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToTrainingForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    trainingVenueAddress: meta?.displayText || "",
-    venue: meta?.displayText || "",
-    trainingVenueAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToTrainingForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      trainingVenueAddress: meta?.displayText || "",
+      venue: meta?.displayText || "",
+      trainingVenueAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPromoVenue = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    promoActivityVenueAddress: meta?.displayText || "",
-    promoActivityVenueMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPromoVenue = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      promoActivityVenueAddress: meta?.displayText || "",
+      promoActivityVenueMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPromoCustomer = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    promoCustomerAddress: meta?.displayText || "",
-    promoCustomerAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPromoCustomer = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      promoCustomerAddress: meta?.displayText || "",
+      promoCustomerAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPackagingForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    packagingAddress: meta?.displayText || "",
-    packagingAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPackagingForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      packagingAddress: meta?.displayText || "",
+      packagingAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToTechInstitution = (idx, meta) => {
-  setDetailForm((prev) => {
-    const next = [...(prev.techRows || [])];
-    next[idx] = {
-      ...(next[idx] || {}),
-      institutionAddress: meta?.displayText || "",
-      institutionAddressMeta: meta || null,
-    };
-    return { ...prev, techRows: next };
-  });
-};
+  const applyAddressMetaToTechInstitution = (idx, meta) => {
+    setDetailForm((prev) => {
+      const next = [...(prev.techRows || [])];
+      next[idx] = {
+        ...(next[idx] || {}),
+        institutionAddress: meta?.displayText || "",
+        institutionAddressMeta: meta || null,
+      };
+      return { ...prev, techRows: next };
+    });
+  };
 
   function AddressViewModal({ project, onClose }) {
     if (!project) return null;
@@ -4548,202 +4548,202 @@ const applyAddressMetaToTechInstitution = (idx, meta) => {
   }, [addressViewForProjectId, projects]);
 
   const [viewPressReleaseInput, setViewPressReleaseInput] = useState("");
-const [viewStartupsAssistedInput, setViewStartupsAssistedInput] = useState("");
-const [viewJobsGeneratedInput, setViewJobsGeneratedInput] = useState("");
+  const [viewStartupsAssistedInput, setViewStartupsAssistedInput] = useState("");
+  const [viewJobsGeneratedInput, setViewJobsGeneratedInput] = useState("");
 
   const viewInterventionSums = useMemo(() => {
-  if (!viewProject) return { techPromoted: 0, pressRelease: 0 };
-  const arr = Array.isArray(viewProject.interventions) ? viewProject.interventions : [];
-  return {
-    techPromoted: arr.reduce((sum, it) => sum + toNumber(it.technologiesPromotedTotal), 0),
-    pressRelease: arr.reduce((sum, it) => sum + toNumber(it.promotionalActivitiesPressRelease), 0),
-  };
-}, [viewProject]);
-
-
-useEffect(() => {
-  if (!viewProjectId || !viewProject) {
-    setViewPressReleaseInput("");
-    setViewStartupsAssistedInput("");
-    setViewJobsGeneratedInput("");
-    return;
-  }
-  setViewPressReleaseInput(toNumber(viewProject.pressRelease) === 0 ? "" : String(toNumber(viewProject.pressRelease)));
-  setViewStartupsAssistedInput(String(viewProject.startupsAssisted || "").trim());
-  setViewJobsGeneratedInput(
-    toNumber(viewProject.jobsGenerated) === 0 ? "" : String(toNumber(viewProject.jobsGenerated))
-  );
-}, [viewProjectId, viewProject]);
-
-const saveViewPressRelease = async () => {
-  if (!viewProject) return;
-  try {
-    await axios.put(`${API}/cest/${viewProject.id}`, {
-      quarter: String(viewProject.quarter || "1"),
-      type: (viewProject.type || "New Communities").trim(),
-      projectTitle: (viewProject.projectTitle || "").trim(),
-      dateProjectApproval: viewProject.dateProjectApproval || "",
-      approvedProjectCost: toNumber(viewProject.approvedProjectCost),
-      dateFundRelease: viewProject.dateFundRelease || "",
-      associationName: (viewProject.associationName || "").trim(),
-      address: (viewProject.address || "").trim(),
-      addressMeta: viewProject.addressMeta || null,
-      lguNumbersOfCommunities: String(viewProject.lguNumbersOfCommunities || "").trim(),
-      numberOfMoa: toNumber(viewProject.numberOfMoa),
-      projectProponent: (viewProject.projectProponent || "").trim(),
-      sex: (viewProject.sex || "").trim(),
-      processSystem: (viewProject.processSystem || "").trim(),
-      staffName: (viewProject.staffName || "").trim(),
-      pressRelease: toNumber(viewPressReleaseInput),
-      startupsAssisted: String(viewStartupsAssistedInput || "").trim(),
-      jobsGenerated: toNumber(viewJobsGeneratedInput),
-      custom_fields: viewProject.customFields || viewProject.custom_fields || {},
-      customFields: viewProject.customFields || viewProject.custom_fields || {},
-    });
-
-    await fetchProjects();
-    setViewProjectId(null);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save Press Release.");
-  }
-};
-
-
-const escapeHtml = (value = "") =>
-  String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-const normalizeExportProjectRows = (rows = []) =>
-  (Array.isArray(rows) ? rows : []).map((p) => {
-    const municipality =
-      p?.addressMeta?.municipality ||
-      p?.address_municipality ||
-      (() => {
-        const addr = String(p?.address || "").trim();
-        if (!addr) return "";
-        const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
-        return parts.length >= 2 ? parts[parts.length - 2] : "";
-      })();
-
-    const district =
-      PANGASINAN_DISTRICTS.find((d) =>
-        d.municipalities.includes(String(municipality || "").trim())
-      )?.id || "";
-
+    if (!viewProject) return { techPromoted: 0, pressRelease: 0 };
+    const arr = Array.isArray(viewProject.interventions) ? viewProject.interventions : [];
     return {
-      id: p.id,
-      quarter: String(p.quarter || "1"),
-      type: p.type || "New Communities",
-      projectTitle: p.projectTitle || p.project_title || "",
-      dateProjectApproval: p.dateProjectApproval || p.date_approved || "",
-      approvedProjectCost: Number(p.approvedProjectCost ?? p.amount ?? 0),
-      dateFundRelease: p.dateFundRelease || p.date_fund_release || "",
-      associationName: p.associationName || p.firmName || p.firm_name || "",
-      address: p.address || "",
-      addressMeta: p.addressMeta || null,
-      lguNumbersOfCommunities:
-        p.lguNumbersOfCommunities ?? p.lgu_numbers_of_communities ?? "",
-      numberOfMoa: Number(p.numberOfMoa ?? p.number_of_moa ?? 0),
-      projectProponent: p.projectProponent || "",
-      sex: p.sex || "",
-      processSystem: p.processSystem || "",
-      staffName: p.staffName || p.nameOfStaff || p.staff_name || "",
-      communitiesAssisted: Number(p.communitiesAssisted ?? 0),
-      technologiesDeployed: Number(p.technologiesDeployed ?? 0),
-      beneficiaries: Number(p.beneficiaries ?? 0),
-      pressRelease: Number(p.pressRelease ?? p.press_release ?? 0),
-      startupsAssisted:
-        p.startupsAssisted === null || p.startupsAssisted === undefined
-          ? ""
-          : String(p.startupsAssisted),
-      jobsGenerated: Number(p.jobsGenerated ?? 0),
-      district,
-      interventions: Array.isArray(p.interventions) ? p.interventions : [],
+      techPromoted: arr.reduce((sum, it) => sum + toNumber(it.technologiesPromotedTotal), 0),
+      pressRelease: arr.reduce((sum, it) => sum + toNumber(it.promotionalActivitiesPressRelease), 0),
     };
-  });
+  }, [viewProject]);
 
-const getCestExportParams = (limit = Math.max(serverTotal || 0, filteredProjects.length || 0, 10000)) => {
-  const params = { page: 1, limit };
-  if (debouncedSearch) params.search = debouncedSearch;
-  if (tableFilterYear !== "ALL") params.year = tableFilterYear;
-  if (tableFilterDistrict !== "ALL") params.district = tableFilterDistrict;
-  if (tableFilterMonth !== "ALL") params.month = tableFilterMonth;
-  if (tableFilterMunicipality !== "ALL") params.municipality = tableFilterMunicipality;
-  if (tableFilterStatus !== "ALL") params.status = tableFilterStatus;
-  return params;
-};
 
-const loadCestRowsForOutput = async () => {
-  try {
-    const res = await axios.get(`${API}/cest`, {
-      params: getCestExportParams(),
+  useEffect(() => {
+    if (!viewProjectId || !viewProject) {
+      setViewPressReleaseInput("");
+      setViewStartupsAssistedInput("");
+      setViewJobsGeneratedInput("");
+      return;
+    }
+    setViewPressReleaseInput(toNumber(viewProject.pressRelease) === 0 ? "" : String(toNumber(viewProject.pressRelease)));
+    setViewStartupsAssistedInput(String(viewProject.startupsAssisted || "").trim());
+    setViewJobsGeneratedInput(
+      toNumber(viewProject.jobsGenerated) === 0 ? "" : String(toNumber(viewProject.jobsGenerated))
+    );
+  }, [viewProjectId, viewProject]);
+
+  const saveViewPressRelease = async () => {
+    if (!viewProject) return;
+    try {
+      await axios.put(`${API}/cest/${viewProject.id}`, {
+        quarter: String(viewProject.quarter || "1"),
+        type: (viewProject.type || "New Communities").trim(),
+        projectTitle: (viewProject.projectTitle || "").trim(),
+        dateProjectApproval: viewProject.dateProjectApproval || "",
+        approvedProjectCost: toNumber(viewProject.approvedProjectCost),
+        dateFundRelease: viewProject.dateFundRelease || "",
+        associationName: (viewProject.associationName || "").trim(),
+        address: (viewProject.address || "").trim(),
+        addressMeta: viewProject.addressMeta || null,
+        lguNumbersOfCommunities: String(viewProject.lguNumbersOfCommunities || "").trim(),
+        numberOfMoa: toNumber(viewProject.numberOfMoa),
+        projectProponent: (viewProject.projectProponent || "").trim(),
+        sex: (viewProject.sex || "").trim(),
+        processSystem: (viewProject.processSystem || "").trim(),
+        staffName: (viewProject.staffName || "").trim(),
+        pressRelease: toNumber(viewPressReleaseInput),
+        startupsAssisted: String(viewStartupsAssistedInput || "").trim(),
+        jobsGenerated: toNumber(viewJobsGeneratedInput),
+        custom_fields: viewProject.customFields || viewProject.custom_fields || {},
+        customFields: viewProject.customFields || viewProject.custom_fields || {},
+      });
+
+      await fetchProjects();
+      setViewProjectId(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save Press Release.");
+    }
+  };
+
+
+  const escapeHtml = (value = "") =>
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  const normalizeExportProjectRows = (rows = []) =>
+    (Array.isArray(rows) ? rows : []).map((p) => {
+      const municipality =
+        p?.addressMeta?.municipality ||
+        p?.address_municipality ||
+        (() => {
+          const addr = String(p?.address || "").trim();
+          if (!addr) return "";
+          const parts = addr.split(",").map((s) => s.trim()).filter(Boolean);
+          return parts.length >= 2 ? parts[parts.length - 2] : "";
+        })();
+
+      const district =
+        PANGASINAN_DISTRICTS.find((d) =>
+          d.municipalities.includes(String(municipality || "").trim())
+        )?.id || "";
+
+      return {
+        id: p.id,
+        quarter: String(p.quarter || "1"),
+        type: p.type || "New Communities",
+        projectTitle: p.projectTitle || p.project_title || "",
+        dateProjectApproval: p.dateProjectApproval || p.date_approved || "",
+        approvedProjectCost: Number(p.approvedProjectCost ?? p.amount ?? 0),
+        dateFundRelease: p.dateFundRelease || p.date_fund_release || "",
+        associationName: p.associationName || p.firmName || p.firm_name || "",
+        address: p.address || "",
+        addressMeta: p.addressMeta || null,
+        lguNumbersOfCommunities:
+          p.lguNumbersOfCommunities ?? p.lgu_numbers_of_communities ?? "",
+        numberOfMoa: Number(p.numberOfMoa ?? p.number_of_moa ?? 0),
+        projectProponent: p.projectProponent || "",
+        sex: p.sex || "",
+        processSystem: p.processSystem || "",
+        staffName: p.staffName || p.nameOfStaff || p.staff_name || "",
+        communitiesAssisted: Number(p.communitiesAssisted ?? 0),
+        technologiesDeployed: Number(p.technologiesDeployed ?? 0),
+        beneficiaries: Number(p.beneficiaries ?? 0),
+        pressRelease: Number(p.pressRelease ?? p.press_release ?? 0),
+        startupsAssisted:
+          p.startupsAssisted === null || p.startupsAssisted === undefined
+            ? ""
+            : String(p.startupsAssisted),
+        jobsGenerated: Number(p.jobsGenerated ?? 0),
+        district,
+        interventions: Array.isArray(p.interventions) ? p.interventions : [],
+      };
     });
-    const payload = res?.data || {};
-    const rows = Array.isArray(payload?.data)
-      ? payload.data
-      : Array.isArray(res?.data)
-      ? res.data
-      : [];
-    const normalized = normalizeExportProjectRows(rows);
-    return normalized.length ? normalized : filteredProjects;
-  } catch (err) {
-    console.error(err);
-    return filteredProjects;
-  }
-};
 
-const buildCestExportRows = (items = []) =>
-  (Array.isArray(items) ? items : []).map((p, idx) => ({
-    "No.": idx + 1,
-    "Type": p?.type || "",
-    "Project Title": p?.projectTitle || "",
-    "Date of Project Approval": p?.dateProjectApproval || "",
-    "Approved Project Cost (in Peso)": toNumber(p?.approvedProjectCost),
-    "Name of Association / Cooperative": p?.associationName || "",
-    "Venue/Address": p?.address || "",
-    "Name of LGU-Communities": p?.lguNumbersOfCommunities || "",
-    "Number of MOA": toNumber(p?.numberOfMoa),
-    "Name of Project Proponent": p?.projectProponent || "",
-    "Sex": p?.sex || "",
-    "Name of Staff": p?.staffName || "",
-    "Process/System Developed/Improved": p?.processSystem || "",
-    "Communities Assisted": toNumber(p?.communitiesAssisted),
-    "Technologies Deployed": toNumber(p?.technologiesDeployed),
-    "Beneficiaries": toNumber(p?.beneficiaries),
-    "Startups Assisted": p?.startupsAssisted || "",
-    "Jobs Generated": toNumber(p?.jobsGenerated),
-    "S&T Interventions Count": Array.isArray(p?.interventions) ? p.interventions.length : 0,
-  }));
+  const getCestExportParams = (limit = Math.max(serverTotal || 0, filteredProjects.length || 0, 10000)) => {
+    const params = { page: 1, limit };
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (tableFilterYear !== "ALL") params.year = tableFilterYear;
+    if (tableFilterDistrict !== "ALL") params.district = tableFilterDistrict;
+    if (tableFilterMonth !== "ALL") params.month = tableFilterMonth;
+    if (tableFilterMunicipality !== "ALL") params.municipality = tableFilterMunicipality;
+    if (tableFilterStatus !== "ALL") params.status = tableFilterStatus;
+    return params;
+  };
 
-const makeCestExportFilename = (label = "cest_export") =>
-  `${String(label || "cest_export").replace(/[^a-z0-9]+/gi, "_")}.xlsx`;
+  const loadCestRowsForOutput = async () => {
+    try {
+      const res = await axios.get(`${API}/cest`, {
+        params: getCestExportParams(),
+      });
+      const payload = res?.data || {};
+      const rows = Array.isArray(payload?.data)
+        ? payload.data
+        : Array.isArray(res?.data)
+          ? res.data
+          : [];
+      const normalized = normalizeExportProjectRows(rows);
+      return normalized.length ? normalized : filteredProjects;
+    } catch (err) {
+      console.error(err);
+      return filteredProjects;
+    }
+  };
 
-const exportCestRows = async (items = null, filename = "cest_export.xlsx") => {
-  const sourceRows = items || (await loadCestRowsForOutput());
-  const rows = buildCestExportRows(sourceRows);
-  if (!rows.length) return alert("No records to export.");
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "CEST");
-  XLSX.writeFile(wb, filename);
-};
+  const buildCestExportRows = (items = []) =>
+    (Array.isArray(items) ? items : []).map((p, idx) => ({
+      "No.": idx + 1,
+      "Type": p?.type || "",
+      "Project Title": p?.projectTitle || "",
+      "Date of Project Approval": p?.dateProjectApproval || "",
+      "Approved Project Cost (in Peso)": toNumber(p?.approvedProjectCost),
+      "Name of Association / Cooperative": p?.associationName || "",
+      "Venue/Address": p?.address || "",
+      "Name of LGU-Communities": p?.lguNumbersOfCommunities || "",
+      "Number of MOA": toNumber(p?.numberOfMoa),
+      "Name of Project Proponent": p?.projectProponent || "",
+      "Sex": p?.sex || "",
+      "Name of Staff": p?.staffName || "",
+      "Process/System Developed/Improved": p?.processSystem || "",
+      "Communities Assisted": toNumber(p?.communitiesAssisted),
+      "Technologies Deployed": toNumber(p?.technologiesDeployed),
+      "Beneficiaries": toNumber(p?.beneficiaries),
+      "Startups Assisted": p?.startupsAssisted || "",
+      "Jobs Generated": toNumber(p?.jobsGenerated),
+      "S&T Interventions Count": Array.isArray(p?.interventions) ? p.interventions.length : 0,
+    }));
 
-const printCestRows = async (items = null, title = "CEST Report") => {
-  const sourceRows = items || (await loadCestRowsForOutput());
-  const rows = buildCestExportRows(sourceRows);
-  if (!rows.length) return alert("No records to print.");
-  const headers = Object.keys(rows[0]);
-  const bodyRows = rows
-    .map((row) => `<tr>${headers.map((h) => `<td>${escapeHtml(row[h]) || "&nbsp;"}</td>`).join("")}</tr>`)
-    .join("");
-  const printWindow = window.open("", "_blank", "width=1200,height=800");
-  if (!printWindow) return alert("Please allow popups to print this report.");
-  printWindow.document.write(`
+  const makeCestExportFilename = (label = "cest_export") =>
+    `${String(label || "cest_export").replace(/[^a-z0-9]+/gi, "_")}.xlsx`;
+
+  const exportCestRows = async (items = null, filename = "cest_export.xlsx") => {
+    const sourceRows = items || (await loadCestRowsForOutput());
+    const rows = buildCestExportRows(sourceRows);
+    if (!rows.length) return alert("No records to export.");
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "CEST");
+    XLSX.writeFile(wb, filename);
+  };
+
+  const printCestRows = async (items = null, title = "CEST Report") => {
+    const sourceRows = items || (await loadCestRowsForOutput());
+    const rows = buildCestExportRows(sourceRows);
+    if (!rows.length) return alert("No records to print.");
+    const headers = Object.keys(rows[0]);
+    const bodyRows = rows
+      .map((row) => `<tr>${headers.map((h) => `<td>${escapeHtml(row[h]) || "&nbsp;"}</td>`).join("")}</tr>`)
+      .join("");
+    const printWindow = window.open("", "_blank", "width=1200,height=800");
+    if (!printWindow) return alert("Please allow popups to print this report.");
+    printWindow.document.write(`
     <html>
       <head>
         <title>${escapeHtml(title)}</title>
@@ -4767,10 +4767,10 @@ const printCestRows = async (items = null, title = "CEST Report") => {
       </body>
     </html>
   `);
-  printWindow.document.close();
-  printWindow.focus();
-  setTimeout(() => printWindow.print(), 300);
-};
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 300);
+  };
 
 
   const OUTPUT_LAYOUT_LABEL = {
@@ -4950,31 +4950,31 @@ const printCestRows = async (items = null, title = "CEST Report") => {
     setExportModal((p) => ({ ...p, open: false }));
   };
 
-const viewStyles = {
-  value: {
-    fontWeight: 900,
-    fontSize: 16,
-    color: "#0f172a",
-    marginTop: 4,
-  },
-  boxValue: {
-    marginTop: 4,
-    border: "1px solid #cbd5e1",
-    background: "#f8fafc",
-    borderRadius: 10,
-    padding: "10px 12px",
-    fontWeight: 900,
-    fontSize: 16,
-    color: "#0f172a",
-  },
-};
+  const viewStyles = {
+    value: {
+      fontWeight: 900,
+      fontSize: 16,
+      color: "#0f172a",
+      marginTop: 4,
+    },
+    boxValue: {
+      marginTop: 4,
+      border: "1px solid #cbd5e1",
+      background: "#f8fafc",
+      borderRadius: 10,
+      padding: "10px 12px",
+      fontWeight: 900,
+      fontSize: 16,
+      color: "#0f172a",
+    },
+  };
 
-return (
+  return (
     <div style={styles.page} className="cest-page">
       <div style={styles.titleBar}>
         <div>CEST</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
-          
+
         </div>
       </div>
 
@@ -5345,8 +5345,8 @@ return (
 
                     <td style={styles.tdCenter}>
                       {p.numberOfMoa === "" ||
-                      p.numberOfMoa === null ||
-                      p.numberOfMoa === undefined
+                        p.numberOfMoa === null ||
+                        p.numberOfMoa === undefined
                         ? "—"
                         : toNumber(p.numberOfMoa)}
                     </td>
@@ -5468,7 +5468,7 @@ return (
                 Math.max(
                   1,
                   Math.floor((prev - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW -
-                    (PAGE_NUMBER_WINDOW - 1)
+                  (PAGE_NUMBER_WINDOW - 1)
                 )
               )
             }
@@ -5506,8 +5506,8 @@ return (
             onClick={() =>
               setCurrentPage(
                 Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
-                  PAGE_NUMBER_WINDOW +
-                  1
+                PAGE_NUMBER_WINDOW +
+                1
               )
             }
             disabled={false}
@@ -5548,152 +5548,230 @@ return (
 
       {/* ===== INTERVENTION DETAILS MODAL ===== */}
       {detailFor && (
-  <div style={{ ...styles.modalBackdrop, zIndex: 2000 }} className="cest-modal-backdrop" onClick={() => setDetailFor(null)}>
-    <div style={{ ...styles.detailsModal, position: "relative", zIndex: 2001 }} onClick={(e) => e.stopPropagation()}>
-      <div style={styles.modalHeader}>
-        <div>
-          {detailForm.type === "Calibration"
-            ? `${detailFor.mode === "edit" ? "Edit" : "Add"} Calibration Entry`
-            : `${detailFor.mode === "edit" ? "Edit" : "Add"} ${detailForm.type} Details`}
-          {detailProject ? (
-            <span style={{ opacity: 0.9, fontWeight: 800 }}>
-              {" "}
-              — {detailProject.projectTitle}
-            </span>
-          ) : null}
-        </div>
-        <button style={styles.closeX} onClick={() => setDetailFor(null)}>
-          ✕
-        </button>
-      </div>
-
-      <div style={styles.modalBody}>
-        <div style={{ maxWidth: 360 }}>
-          <div style={styles.label}>Intervention Type</div>
-          <input style={styles.input} value={detailForm.type} disabled />
-        </div>
-
-        {detailForm.type === "Calibration" ? (
-          <>
-            <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
-              Calibration Entry
+        <div style={{ ...styles.modalBackdrop, zIndex: 2000 }} className="cest-modal-backdrop" onClick={() => setDetailFor(null)}>
+          <div style={{ ...styles.detailsModal, position: "relative", zIndex: 2001 }} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <div>
+                {detailForm.type === "Calibration"
+                  ? `${detailFor.mode === "edit" ? "Edit" : "Add"} Calibration Entry`
+                  : `${detailFor.mode === "edit" ? "Edit" : "Add"} ${detailForm.type} Details`}
+                {detailProject ? (
+                  <span style={{ opacity: 0.9, fontWeight: 800 }}>
+                    {" "}
+                    — {detailProject.projectTitle}
+                  </span>
+                ) : null}
+              </div>
+              <button style={styles.closeX} onClick={() => setDetailFor(null)}>
+                ✕
+              </button>
             </div>
 
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Category<span style={styles.req}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.calibrationCategory}
-                  onChange={(e) => updateCalibrationForm("calibrationCategory", e.target.value)}
-                >
-                  <option value="PAYING">PAYING</option>
-                  <option value="NON-PAYING">NON-PAYING</option>
-                </select>
+            <div style={styles.modalBody}>
+              <div style={{ maxWidth: 360 }}>
+                <div style={styles.label}>Intervention Type</div>
+                <input style={styles.input} value={detailForm.type} disabled />
               </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Date<span style={styles.req}>*</span></div>
-                <input
-                  type="date"
-                  style={styles.input}
-                  value={detailForm.calibrationDate}
-                  onChange={(e) => updateCalibrationForm("calibrationDate", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Samples<span style={styles.req}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.calibrationTypeOfSample}
-                  onChange={(e) => updateCalibrationForm("calibrationTypeOfSample", e.target.value)}
-                >
-                  <option value="Weighing Scale">Weighing Scale</option>
-                  <option value="Bucket">Bucket</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Test / Analysis / Calibration (Per Lab)</div>
-                <input
-                  type="text"
-                  style={{ ...styles.input, background: "#f8fafc" }}
-                  value={detailForm.calibrationTestType}
-                  readOnly
-                />
-              </div>
-
-              {detailForm.calibrationTypeOfSample === "Weighing Scale" ? (
+              {detailForm.type === "Calibration" ? (
                 <>
-                  <div style={styles.field}>
-                    <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
-                    <input
-                      type="number"
-                      min="1"
-                      style={styles.input}
-                      value={detailForm.calibrationNoOfSample}
-                      onChange={(e) => updateCalibrationForm("calibrationNoOfSample", e.target.value)}
-                    />
+                  <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
+                    Calibration Entry
                   </div>
 
-                  <div style={styles.field}>
-                    <div style={styles.label}>Fees Collected (PHP)</div>
-                    <input
-                      type="number"
-                      style={{ ...styles.input, background: "#f8fafc" }}
-                      value={detailForm.calibrationFeesCollected}
-                      readOnly
-                    />
-                  </div>
-
-                  <div style={styles.breakdownBox}>
-                    <div style={styles.breakdownHead}>MC Range Breakdown<span style={styles.req}>*</span></div>
-                    <div style={{ fontSize: 12, marginBottom: 8, opacity: 0.8 }}>
-                      Tip: when you add a new row, the system auto-fills the next row with the remaining sample count. You can still edit it.
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Category<span style={styles.req}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.calibrationCategory}
+                        onChange={(e) => updateCalibrationForm("calibrationCategory", e.target.value)}
+                      >
+                        <option value="PAYING">PAYING</option>
+                        <option value="NON-PAYING">NON-PAYING</option>
+                      </select>
                     </div>
-                    {toNumber(detailForm.calibrationNoOfSample) <= 0 ? (
-                      <div style={{ fontSize: 12, marginBottom: 8, color: "#b45309", fontWeight: 800 }}>
-                        Please enter a value in the main No. of Sample field first before editing the breakdown sample fields.
-                      </div>
-                    ) : null}
 
-                    {(detailForm.calibrationMcBreakdown || []).map((row, index) => (
-                      <div key={row.id} style={styles.breakdownRow}>
-                        <div style={styles.field}>
-                          <div style={styles.label}>Range<span style={styles.req}>*</span></div>
-                          <select
-                            style={styles.input}
-                            value={row.range}
-                            onChange={(e) => updateCalibrationBreakdownRow(row.id, "range", e.target.value)}
-                          >
-                            <option value="">Select range</option>
-                            {CALIBRATION_MC_RANGE_OPTIONS.map((r) => (
-                              <option key={r} value={r}>{r}</option>
-                            ))}
-                          </select>
-                        </div>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Date<span style={styles.req}>*</span></div>
+                      <input
+                        type="date"
+                        style={styles.input}
+                        value={detailForm.calibrationDate}
+                        onChange={(e) => updateCalibrationForm("calibrationDate", e.target.value)}
+                      />
+                    </div>
 
+                    <div style={styles.field}>
+                      <div style={styles.label}>Type of Samples<span style={styles.req}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.calibrationTypeOfSample}
+                        onChange={(e) => updateCalibrationForm("calibrationTypeOfSample", e.target.value)}
+                      >
+                        <option value="Weighing Scale">Weighing Scale</option>
+                        <option value="Bucket">Bucket</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Type of Test / Analysis / Calibration (Per Lab)</div>
+                      <input
+                        type="text"
+                        style={{ ...styles.input, background: "#f8fafc" }}
+                        value={detailForm.calibrationTestType}
+                        readOnly
+                      />
+                    </div>
+
+                    {detailForm.calibrationTypeOfSample === "Weighing Scale" ? (
+                      <>
                         <div style={styles.field}>
                           <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
                           <input
                             type="number"
                             min="1"
-                            style={{
-                              ...styles.input,
-                              background:
-                                toNumber(detailForm.calibrationNoOfSample) > 0 ? "#fff" : "#f1f5f9",
-                              cursor:
-                                toNumber(detailForm.calibrationNoOfSample) > 0 ? "text" : "not-allowed",
-                            }}
-                            value={row.noOfSample}
-                            onChange={(e) => updateCalibrationBreakdownRow(row.id, "noOfSample", e.target.value)}
-                            disabled={toNumber(detailForm.calibrationNoOfSample) <= 0}
-                            placeholder={
-                              toNumber(detailForm.calibrationNoOfSample) > 0
-                                ? ""
-                                : "Enter main No. of Sample first"
-                            }
+                            style={styles.input}
+                            value={detailForm.calibrationNoOfSample}
+                            onChange={(e) => updateCalibrationForm("calibrationNoOfSample", e.target.value)}
+                          />
+                        </div>
+
+                        <div style={styles.field}>
+                          <div style={styles.label}>Fees Collected (PHP)</div>
+                          <input
+                            type="number"
+                            style={{ ...styles.input, background: "#f8fafc" }}
+                            value={detailForm.calibrationFeesCollected}
+                            readOnly
+                          />
+                        </div>
+
+                        <div style={styles.breakdownBox}>
+                          <div style={styles.breakdownHead}>MC Range Breakdown<span style={styles.req}>*</span></div>
+                          <div style={{ fontSize: 12, marginBottom: 8, opacity: 0.8 }}>
+                            Tip: when you add a new row, the system auto-fills the next row with the remaining sample count. You can still edit it.
+                          </div>
+                          {toNumber(detailForm.calibrationNoOfSample) <= 0 ? (
+                            <div style={{ fontSize: 12, marginBottom: 8, color: "#b45309", fontWeight: 800 }}>
+                              Please enter a value in the main No. of Sample field first before editing the breakdown sample fields.
+                            </div>
+                          ) : null}
+
+                          {(detailForm.calibrationMcBreakdown || []).map((row, index) => (
+                            <div key={row.id} style={styles.breakdownRow}>
+                              <div style={styles.field}>
+                                <div style={styles.label}>Range<span style={styles.req}>*</span></div>
+                                <select
+                                  style={styles.input}
+                                  value={row.range}
+                                  onChange={(e) => updateCalibrationBreakdownRow(row.id, "range", e.target.value)}
+                                >
+                                  <option value="">Select range</option>
+                                  {CALIBRATION_MC_RANGE_OPTIONS.map((r) => (
+                                    <option key={r} value={r}>{r}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div style={styles.field}>
+                                <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  style={{
+                                    ...styles.input,
+                                    background:
+                                      toNumber(detailForm.calibrationNoOfSample) > 0 ? "#fff" : "#f1f5f9",
+                                    cursor:
+                                      toNumber(detailForm.calibrationNoOfSample) > 0 ? "text" : "not-allowed",
+                                  }}
+                                  value={row.noOfSample}
+                                  onChange={(e) => updateCalibrationBreakdownRow(row.id, "noOfSample", e.target.value)}
+                                  disabled={toNumber(detailForm.calibrationNoOfSample) <= 0}
+                                  placeholder={
+                                    toNumber(detailForm.calibrationNoOfSample) > 0
+                                      ? ""
+                                      : "Enter main No. of Sample first"
+                                  }
+                                />
+                              </div>
+
+                              <div style={styles.field}>
+                                <div style={styles.label}>
+                                  Cost{detailForm.calibrationCategory === "PAYING" ? <span style={styles.req}>*</span> : null}
+                                </div>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  style={styles.input}
+                                  value={row.cost}
+                                  onChange={(e) => updateCalibrationBreakdownRow(row.id, "cost", e.target.value)}
+                                />
+                              </div>
+
+                              <div style={styles.field}>
+                                <div style={styles.label}>Fees Collected</div>
+                                <input
+                                  type="number"
+                                  style={{ ...styles.input, background: "#f8fafc" }}
+                                  value={row.feesCollected}
+                                  readOnly
+                                />
+                              </div>
+
+                              <div style={{ alignSelf: "end" }}>
+                                <button
+                                  type="button"
+                                  style={
+                                    index === 0 && (detailForm.calibrationMcBreakdown || []).length === 1
+                                      ? { ...styles.dangerTiny, opacity: 0.45, cursor: "not-allowed" }
+                                      : styles.dangerTiny
+                                  }
+                                  disabled={index === 0 && (detailForm.calibrationMcBreakdown || []).length === 1}
+                                  onClick={() => removeCalibrationBreakdownRow(row.id)}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                            <button type="button" style={styles.pillBtn} onClick={addCalibrationBreakdownRow}>
+                              + Add MC Range Breakdown
+                            </button>
+
+                            <div style={styles.breakdownTotals}>
+                              <div>Main No. of Sample: {toNumber(detailForm.calibrationNoOfSample)}</div>
+                              <div>Breakdown Total: {calibrationBreakdownTotal}</div>
+                              <div>Remaining: {calibrationRemainingSamples}</div>
+                              <div>Total Fees: {money(detailForm.calibrationFeesCollected)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={styles.field}>
+                          <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
+                          <input
+                            type="number"
+                            min="1"
+                            style={styles.input}
+                            value={detailForm.calibrationNoOfSample}
+                            onChange={(e) => updateCalibrationForm("calibrationNoOfSample", e.target.value)}
+                          />
+                        </div>
+
+                        <div style={styles.field}>
+                          <div style={styles.label}>Range</div>
+                          <input
+                            style={styles.input}
+                            value={detailForm.calibrationRange}
+                            onChange={(e) => updateCalibrationForm("calibrationRange", e.target.value)}
+                            placeholder="Optional for VC"
                           />
                         </div>
 
@@ -5706,842 +5784,335 @@ return (
                             min="0"
                             step="0.01"
                             style={styles.input}
-                            value={row.cost}
-                            onChange={(e) => updateCalibrationBreakdownRow(row.id, "cost", e.target.value)}
+                            value={detailForm.calibrationCost}
+                            onChange={(e) => updateCalibrationForm("calibrationCost", e.target.value)}
                           />
                         </div>
 
                         <div style={styles.field}>
-                          <div style={styles.label}>Fees Collected</div>
+                          <div style={styles.label}>Fees Collected (PHP)</div>
                           <input
                             type="number"
+                            min="0"
+                            step="0.01"
                             style={{ ...styles.input, background: "#f8fafc" }}
-                            value={row.feesCollected}
+                            value={detailForm.calibrationFeesCollected}
                             readOnly
                           />
                         </div>
+                      </>
+                    )}
 
-                        <div style={{ alignSelf: "end" }}>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Venue/Address<span style={styles.req}>*</span></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("calibration");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.calibrationAddress))}
+                      >
+                        <span style={{ opacity: detailForm.calibrationAddress ? 1 : 0.6 }}>
+                          {detailForm.calibrationAddress || "Click to select venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.calibrationAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+
+                      {Number.isFinite(detailForm?.calibrationAddressMeta?.lat) &&
+                        Number.isFinite(detailForm?.calibrationAddressMeta?.lng) ? (
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} className="cest-inline-actions">
                           <button
                             type="button"
-                            style={
-                              index === 0 && (detailForm.calibrationMcBreakdown || []).length === 1
-                                ? { ...styles.dangerTiny, opacity: 0.45, cursor: "not-allowed" }
-                                : styles.dangerTiny
+                            style={styles.tinyBtn}
+                            onClick={() =>
+                              openGoogleMap(
+                                detailForm.calibrationAddressMeta.lat,
+                                detailForm.calibrationAddressMeta.lng
+                              )
                             }
-                            disabled={index === 0 && (detailForm.calibrationMcBreakdown || []).length === 1}
-                            onClick={() => removeCalibrationBreakdownRow(row.id)}
                           >
-                            Remove
+                            Map
                           </button>
+                          <button
+                            type="button"
+                            style={styles.tinyBtn}
+                            onClick={() =>
+                              openGoogleDirections(
+                                detailForm.calibrationAddressMeta.lat,
+                                detailForm.calibrationAddressMeta.lng
+                              )
+                            }
+                          >
+                            Directions
+                          </button>
+                          <div style={{ fontSize: 12, opacity: 0.85, alignSelf: "center", ...styles.mono }}>
+                            {detailForm.calibrationAddressMeta.lat.toFixed(6)}, {detailForm.calibrationAddressMeta.lng.toFixed(6)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                      <button type="button" style={styles.pillBtn} onClick={addCalibrationBreakdownRow}>
-                        + Add MC Range Breakdown
-                      </button>
-
-                      <div style={styles.breakdownTotals}>
-                        <div>Main No. of Sample: {toNumber(detailForm.calibrationNoOfSample)}</div>
-                        <div>Breakdown Total: {calibrationBreakdownTotal}</div>
-                        <div>Remaining: {calibrationRemainingSamples}</div>
-                        <div>Total Fees: {money(detailForm.calibrationFeesCollected)}</div>
-                      </div>
+                      ) : null}
                     </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={styles.field}>
-                    <div style={styles.label}>No. of Sample<span style={styles.req}>*</span></div>
-                    <input
-                      type="number"
-                      min="1"
-                      style={styles.input}
-                      value={detailForm.calibrationNoOfSample}
-                      onChange={(e) => updateCalibrationForm("calibrationNoOfSample", e.target.value)}
-                    />
-                  </div>
 
-                  <div style={styles.field}>
-                    <div style={styles.label}>Range</div>
-                    <input
-                      style={styles.input}
-                      value={detailForm.calibrationRange}
-                      onChange={(e) => updateCalibrationForm("calibrationRange", e.target.value)}
-                      placeholder="Optional for VC"
-                    />
-                  </div>
-
-                  <div style={styles.field}>
-                    <div style={styles.label}>
-                      Cost{detailForm.calibrationCategory === "PAYING" ? <span style={styles.req}>*</span> : null}
-                    </div>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      style={styles.input}
-                      value={detailForm.calibrationCost}
-                      onChange={(e) => updateCalibrationForm("calibrationCost", e.target.value)}
-                    />
-                  </div>
-
-                  <div style={styles.field}>
-                    <div style={styles.label}>Fees Collected (PHP)</div>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      style={{ ...styles.input, background: "#f8fafc" }}
-                      value={detailForm.calibrationFeesCollected}
-                      readOnly
-                    />
-                  </div>
-                </>
-              )}
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Venue/Address<span style={styles.req}>*</span></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("calibration");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.calibrationAddress))}
-                >
-                  <span style={{ opacity: detailForm.calibrationAddress ? 1 : 0.6 }}>
-                    {detailForm.calibrationAddress || "Click to select venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.calibrationAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-
-                {Number.isFinite(detailForm?.calibrationAddressMeta?.lat) &&
-                Number.isFinite(detailForm?.calibrationAddressMeta?.lng) ? (
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} className="cest-inline-actions">
-                    <button
-                      type="button"
-                      style={styles.tinyBtn}
-                      onClick={() =>
-                        openGoogleMap(
-                          detailForm.calibrationAddressMeta.lat,
-                          detailForm.calibrationAddressMeta.lng
-                        )
-                      }
-                    >
-                      Map
-                    </button>
-                    <button
-                      type="button"
-                      style={styles.tinyBtn}
-                      onClick={() =>
-                        openGoogleDirections(
-                          detailForm.calibrationAddressMeta.lat,
-                          detailForm.calibrationAddressMeta.lng
-                        )
-                      }
-                    >
-                      Directions
-                    </button>
-                    <div style={{ fontSize: 12, opacity: 0.85, alignSelf: "center", ...styles.mono }}>
-                      {detailForm.calibrationAddressMeta.lat.toFixed(6)}, {detailForm.calibrationAddressMeta.lng.toFixed(6)}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Female</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationFemale}
-                  onChange={(e) => updateCalibrationForm("calibrationFemale", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Male</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationMale}
-                  onChange={(e) => updateCalibrationForm("calibrationMale", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Total Customers</div>
-                <input
-                  type="number"
-                  style={{ ...styles.input, background: "#f8fafc" }}
-                  value={detailForm.calibrationTotalCustomers}
-                  readOnly
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Firms</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationNoOfFirms}
-                  onChange={(e) => updateCalibrationForm("calibrationNoOfFirms", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of New Firms</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationNoOfNewFirms}
-                  onChange={(e) => updateCalibrationForm("calibrationNoOfNewFirms", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Age Range</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.calibrationAgeRange}
-                  onChange={(e) => updateCalibrationForm("calibrationAgeRange", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>PWD</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationPwd}
-                  onChange={(e) => updateCalibrationForm("calibrationPwd", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>IP</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationIp}
-                  onChange={(e) => updateCalibrationForm("calibrationIp", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Senior Citizen</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationSc}
-                  onChange={(e) => updateCalibrationForm("calibrationSc", e.target.value)}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>4PS</div>
-                <input
-                  type="number"
-                  min="0"
-                  style={styles.input}
-                  value={detailForm.calibrationFourPs}
-                  onChange={(e) => updateCalibrationForm("calibrationFourPs", e.target.value)}
-                />
-              </div>
-            </div>
-          </>
-        ) : detailForm.type === "Training" ? (
-          <>
-            <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
-              Training Details
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Program / Training (optional)</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.trainingProgram}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingProgram: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Province</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.trainingProvince}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingProvince: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Start Date *</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.trainingStartDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingStartDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>End Date</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.trainingEndDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingEndDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Title *</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.title}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, title: e.target.value }))}
-                />
-              </div>              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Venue/Address *</div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("training");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.trainingVenueAddress))}
-                >
-                  <span style={{ opacity: detailForm.trainingVenueAddress ? 1 : 0.6 }}>
-                    {detailForm.trainingVenueAddress || "Click to select venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.trainingVenueAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Firms</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  value={detailForm.noOfFirms}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, noOfFirms: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Firms / SUCs / HEIs / LGUs</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  value={detailForm.trainingFirmsSucsHeisLgusCount}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsSucsHeisLgusCount: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}><div style={styles.label}>Participants Female</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingParticipantsFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Participants Male</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingParticipantsMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Senior Female</div><input style={styles.input} type="number" value={detailForm.trainingSeniorFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingSeniorFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Senior Male</div><input style={styles.input} type="number" value={detailForm.trainingSeniorMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingSeniorMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>IPs Female</div><input style={styles.input} type="number" value={detailForm.trainingIpFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingIpFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>IPs Male</div><input style={styles.input} type="number" value={detailForm.trainingIpMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingIpMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>4Ps Female</div><input style={styles.input} type="number" value={detailForm.trainingFourPsFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingFourPsFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>4Ps Male</div><input style={styles.input} type="number" value={detailForm.trainingFourPsMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingFourPsMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>PWD Female</div><input style={styles.input} type="number" value={detailForm.trainingPwdFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingPwdFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>PWD Male</div><input style={styles.input} type="number" value={detailForm.trainingPwdMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingPwdMale:e.target.value}))} /></div>
-
-              <div style={styles.field}><div style={styles.label}>Total Female</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalFemale} readOnly /></div>
-              <div style={styles.field}><div style={styles.label}>Total Male</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalMale} readOnly /></div>
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}><div style={styles.label}>Total Participants</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalParticipants} readOnly /></div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>List of Firms / Associations</div>
-                <textarea style={styles.textarea} value={detailForm.trainingFirmsAssociationsList} onChange={(e)=>setDetailForm((p)=>({...p,trainingFirmsAssociationsList:e.target.value}))} />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Name of Trainor / Affiliation</div>
-                <textarea style={styles.textarea} value={detailForm.trainingTrainorAffiliation} onChange={(e)=>setDetailForm((p)=>({...p,trainingTrainorAffiliation:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name Of Program / Project / Unit</div>
-                <input style={styles.input} value={detailForm.projectProgramUnit} onChange={(e)=>setDetailForm((p)=>({...p,projectProgramUnit:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>DOST Cost</div>
-                <input style={styles.input} type="number" value={detailForm.trainingCostDost} onChange={(e)=>setDetailForm((p)=>({...p,trainingCostDost:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Partner Agency Cost</div>
-                <input style={styles.input} type="number" value={detailForm.trainingCostPartnerAgency} onChange={(e)=>setDetailForm((p)=>({...p,trainingCostPartnerAgency:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Total Cost</div>
-                <input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalCost} readOnly />
-              </div>
-            </div>
-          </>
-        ) : detailForm.type === "Packaging & Labeling" ? (
-          <>
-            <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
-              Packaging & Labeling Details
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Quarter <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingQuarter}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingQuarter: e.target.value }))}
-                >
-                  <option value="">--</option>
-                  <option value="1">1Q</option>
-                  <option value="2">2Q</option>
-                  <option value="3">3Q</option>
-                  <option value="4">4Q</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Province <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingProvince}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingProvince: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Date Completed/Executed <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.packagingDateCompleted}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingDateCompleted: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Intervention <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingTypeOfIntervention}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingTypeOfIntervention: e.target.value }))}
-                >
-                  <option value="Label Design">Label Design</option>
-                  <option value="Packaging Design">Packaging Design</option>
-                  <option value="Label Printing">Label Printing</option>
-                  <option value="Packaging Material">Packaging Material</option>
-                  <option value="Other Packaging Support">Other Packaging Support</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Size/Variant of Label Design/Type of Packaging Material <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingSizeVariant}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingSizeVariant: e.target.value }))}
-                  placeholder="e.g. 4x5.6 inches Sticker type"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Packaging Materials Provided <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingMaterialsProvided}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingMaterialsProvided: e.target.value }))}
-                  placeholder="e.g. N/A or quantity"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingCustomerName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingCustomerName: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingSex}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingSex: e.target.value }))}
-                >
-                  <option value="">--</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Product Name</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingProductName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingProductName: e.target.value }))}
-                  placeholder="Optional product name"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Firm/Institution <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingFirmInstitution}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingFirmInstitution: e.target.value }))}
-                  placeholder="e.g. RiceBIS Bayambang Agriculture Cooperative"
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("packaging");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.packagingAddress))}
-                >
-                  <span style={{ opacity: detailForm.packagingAddress ? 1 : 0.6 }}>
-                    {detailForm.packagingAddress || "Click to select venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.packagingAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.packagingMeansVerification}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingMeansVerification: e.target.value }))}
-                  placeholder="Design approval sheet / links / OR / AR / report / photos..."
-                />
-
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
-                  <button type="button" style={styles.tinyBtn} onClick={() => openLinkMaybe(detailForm.packagingMeansVerification)}>
-                    View Link
-                  </button>
-
-                  <button type="button" style={styles.tinyBtn} onClick={triggerAddPackagingPhotos}>
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPackagingPhotoViewerAt(0)}
-                    disabled={!packagingPhotoCount()}
-                  >
-                    Photos: {packagingPhotoCount()}
-                  </button>
-                </div>
-
-                <input
-                  ref={packagingPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickPackagingPhotos(e.target.files)}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
-              * After saving the entry, add the product names from the main table.
-            </div>
-          </>
-        ) : ["Tech Promo", "S&T Promo"].includes(detailForm.type) ? (
-          <>
-            <div
-              style={{
-                marginTop: 12,
-                fontSize: 12,
-                opacity: 0.8,
-                fontWeight: 900,
-                marginBottom: 10,
-              }}
-            >
-              Fields with <span style={{ color: "#dc2626" }}>*</span> are required. (Project is optional.)
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Project (optional)</div>
-                <input
-                  style={{ ...styles.input, background: "#f3f4f6", cursor: "not-allowed" }}
-                  value="CEST"
-                  readOnly
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Activity Date <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.promoActivityDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Technology Promoted <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoTechnologyPromoted}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyPromoted: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Technology Generator <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoTechnologyGenerator}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyGenerator: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Mode of Promotion <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.promoModeOfPromotion}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoModeOfPromotion: e.target.value }))}
-                >
-                  <option value="Social Media">Social Media</option>
-                  <option value="Press Release">Press Release</option>
-                  <option value="Radio">Radio</option>
-                  <option value="TV">TV</option>
-                  <option value="Print">Print</option>
-                  <option value="Forum / Event">Forum / Event</option>
-                  <option value="Exhibit">Exhibit</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Activity Title <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoActivityTitle}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityTitle: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Activity Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("promoVenue");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.promoActivityVenueAddress))}
-                >
-                  <span style={{ opacity: detailForm.promoActivityVenueAddress ? 1 : 0.6 }}>
-                    {detailForm.promoActivityVenueAddress || "Click to select activity venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.promoActivityVenueAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer/Participant <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoCustomerName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerName: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Customer/Participant Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoCustomerAddress}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerAddress: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.promoSex}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoSex: e.target.value }))}
-                >
-                  <option value="N/A">N/A</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Staff <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoStaffName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoStaffName: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.promoMeansVerification}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoMeansVerification: e.target.value }))}
-                  placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    marginTop: 8,
-                  }}
-                >
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openLinkMaybe(detailForm.promoMeansVerification)}
-                  >
-                    View First Link
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={triggerAddPromoPhotos}
-                  >
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPromoPhotoViewerAt(0)}
-                    disabled={!promoPhotoCount()}
-                    title={!promoPhotoCount() ? "No photos yet" : "View saved photo(s)"}
-                  >
-                    Photos: {promoPhotoCount()}
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPromoPhotoViewerAt(0)}
-                    disabled={!promoPhotoCount()}
-                  >
-                    View Photos
-                  </button>
-                </div>
-
-                {promoPhotoCount() > 0 ? (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {(detailForm.promoPhotos || []).map((photo, idx) => (
-                      <button
-                        key={`${photo?.name || "photo"}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openPromoPhotoViewerAt(idx)}
-                      >
-                        Photo {idx + 1}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-
-                {extractLinks(detailForm.promoMeansVerification).length > 0 ? (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {extractLinks(detailForm.promoMeansVerification).map((url, idx) => (
-                      <button
-                        key={`${url}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openSpecificLink(url)}
-                        title={url}
-                      >
-                        Link {idx + 1}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-
-                <input
-                  ref={promoPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickPromoPhotos(e.target.files)}
-                />
-              </div>
-            </div>
-          </>
-        ) : null}
-        {detailForm.type === "Tech Roll Out" ? (
-          <>
-            <div style={{ ...styles.grid, marginTop: 12 }}>
-              {(() => {
-                const r = (detailForm.techRows || [])[0] || makeDefaultTechRows()[0];
-                return (
-                  <>
                     <div style={styles.field}>
-                      <div style={styles.label}>Quarter *</div>
+                      <div style={styles.label}>Female</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationFemale}
+                        onChange={(e) => updateCalibrationForm("calibrationFemale", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Male</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationMale}
+                        onChange={(e) => updateCalibrationForm("calibrationMale", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Total Customers</div>
+                      <input
+                        type="number"
+                        style={{ ...styles.input, background: "#f8fafc" }}
+                        value={detailForm.calibrationTotalCustomers}
+                        readOnly
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Firms</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationNoOfFirms}
+                        onChange={(e) => updateCalibrationForm("calibrationNoOfFirms", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of New Firms</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationNoOfNewFirms}
+                        onChange={(e) => updateCalibrationForm("calibrationNoOfNewFirms", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Age Range</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.calibrationAgeRange}
+                        onChange={(e) => updateCalibrationForm("calibrationAgeRange", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>PWD</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationPwd}
+                        onChange={(e) => updateCalibrationForm("calibrationPwd", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>IP</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationIp}
+                        onChange={(e) => updateCalibrationForm("calibrationIp", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Senior Citizen</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationSc}
+                        onChange={(e) => updateCalibrationForm("calibrationSc", e.target.value)}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>4PS</div>
+                      <input
+                        type="number"
+                        min="0"
+                        style={styles.input}
+                        value={detailForm.calibrationFourPs}
+                        onChange={(e) => updateCalibrationForm("calibrationFourPs", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : detailForm.type === "Training" ? (
+                <>
+                  <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
+                    Training Details
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Program / Training (optional)</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.trainingProgram}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingProgram: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Province</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.trainingProvince}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingProvince: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Start Date *</div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.trainingStartDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingStartDate: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>End Date</div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.trainingEndDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingEndDate: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Title *</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.title}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, title: e.target.value }))}
+                      />
+                    </div>              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Venue/Address *</div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("training");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.trainingVenueAddress))}
+                      >
+                        <span style={{ opacity: detailForm.trainingVenueAddress ? 1 : 0.6 }}>
+                          {detailForm.trainingVenueAddress || "Click to select venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.trainingVenueAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Firms</div>
+                      <input
+                        style={styles.input}
+                        type="number"
+                        value={detailForm.noOfFirms}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, noOfFirms: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Firms / SUCs / HEIs / LGUs</div>
+                      <input
+                        style={styles.input}
+                        type="number"
+                        value={detailForm.trainingFirmsSucsHeisLgusCount}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsSucsHeisLgusCount: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}><div style={styles.label}>Participants Female</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingParticipantsFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Participants Male</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingParticipantsMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Senior Female</div><input style={styles.input} type="number" value={detailForm.trainingSeniorFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingSeniorFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Senior Male</div><input style={styles.input} type="number" value={detailForm.trainingSeniorMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingSeniorMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>IPs Female</div><input style={styles.input} type="number" value={detailForm.trainingIpFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingIpFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>IPs Male</div><input style={styles.input} type="number" value={detailForm.trainingIpMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingIpMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>4Ps Female</div><input style={styles.input} type="number" value={detailForm.trainingFourPsFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFourPsFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>4Ps Male</div><input style={styles.input} type="number" value={detailForm.trainingFourPsMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFourPsMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>PWD Female</div><input style={styles.input} type="number" value={detailForm.trainingPwdFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingPwdFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>PWD Male</div><input style={styles.input} type="number" value={detailForm.trainingPwdMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingPwdMale: e.target.value }))} /></div>
+
+                    <div style={styles.field}><div style={styles.label}>Total Female</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalFemale} readOnly /></div>
+                    <div style={styles.field}><div style={styles.label}>Total Male</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalMale} readOnly /></div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}><div style={styles.label}>Total Participants</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalParticipants} readOnly /></div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>List of Firms / Associations</div>
+                      <textarea style={styles.textarea} value={detailForm.trainingFirmsAssociationsList} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsAssociationsList: e.target.value }))} />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Name of Trainor / Affiliation</div>
+                      <textarea style={styles.textarea} value={detailForm.trainingTrainorAffiliation} onChange={(e) => setDetailForm((p) => ({ ...p, trainingTrainorAffiliation: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name Of Program / Project / Unit</div>
+                      <input style={styles.input} value={detailForm.projectProgramUnit} onChange={(e) => setDetailForm((p) => ({ ...p, projectProgramUnit: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>DOST Cost</div>
+                      <input style={styles.input} type="number" value={detailForm.trainingCostDost} onChange={(e) => setDetailForm((p) => ({ ...p, trainingCostDost: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Partner Agency Cost</div>
+                      <input style={styles.input} type="number" value={detailForm.trainingCostPartnerAgency} onChange={(e) => setDetailForm((p) => ({ ...p, trainingCostPartnerAgency: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Total Cost</div>
+                      <input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalCost} readOnly />
+                    </div>
+                  </div>
+                </>
+              ) : detailForm.type === "Packaging & Labeling" ? (
+                <>
+                  <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
+                    Packaging & Labeling Details
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Quarter <span style={{ color: "#dc2626" }}>*</span></div>
                       <select
                         style={styles.input}
-                        value={r.quarter || ""}
-                        onChange={(e) => updateTechRow(0, "quarter", e.target.value)}
+                        value={detailForm.packagingQuarter}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingQuarter: e.target.value }))}
                       >
                         <option value="">--</option>
                         <option value="1">1Q</option>
@@ -6552,170 +6123,65 @@ return (
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Unit/Center *</div>
+                      <div style={styles.label}>Province <span style={{ color: "#dc2626" }}>*</span></div>
                       <input
                         style={styles.input}
-                        value={r.unitCenter || ""}
-                        onChange={(e) => updateTechRow(0, "unitCenter", e.target.value)}
+                        value={detailForm.packagingProvince}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingProvince: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Name of Knowledge/Technology Transferred *</div>
+                      <div style={styles.label}>Date Completed/Executed <span style={{ color: "#dc2626" }}>*</span></div>
                       <input
                         style={styles.input}
-                        value={r.nameOfTechnologyTransferred || ""}
-                        onChange={(e) => updateTechRow(0, "nameOfTechnologyTransferred", e.target.value)}
+                        type="date"
+                        value={detailForm.packagingDateCompleted}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingDateCompleted: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Technology Generator *</div>
-                      <input
-                        style={styles.input}
-                        value={r.technologyGenerator || ""}
-                        onChange={(e) => updateTechRow(0, "technologyGenerator", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Mode of Transfer *</div>
+                      <div style={styles.label}>Type of Intervention <span style={{ color: "#dc2626" }}>*</span></div>
                       <select
                         style={styles.input}
-                        value={r.modeOfTransfer || ""}
-                        onChange={(e) => updateTechRow(0, "modeOfTransfer", e.target.value)}
+                        value={detailForm.packagingTypeOfIntervention}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingTypeOfIntervention: e.target.value }))}
                       >
-                        <option value="">-- Select --</option>
-                        <option value="Commercialization">Commercialization</option>
-                        <option value="Extension">Extension</option>
-                        <option value="Public Good">Public Good</option>
-                        <option value="Technology Adoption">Technology Adoption</option>
-                        <option value="Training">Training</option>
-                        <option value="Technical Assistance">Technical Assistance</option>
+                        <option value="Label Design">Label Design</option>
+                        <option value="Packaging Design">Packaging Design</option>
+                        <option value="Label Printing">Label Printing</option>
+                        <option value="Packaging Material">Packaging Material</option>
+                        <option value="Other Packaging Support">Other Packaging Support</option>
                       </select>
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Date Transferred *</div>
+                      <div style={styles.label}>Size/Variant of Label Design/Type of Packaging Material <span style={{ color: "#dc2626" }}>*</span></div>
                       <input
                         style={styles.input}
-                        type="date"
-                        value={r.dateTransferred || ""}
-                        onChange={(e) => updateTechRow(0, "dateTransferred", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>DOST-developed/funded knowledge/technology</div>
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          padding: "2px 0 0",
-                          fontSize: 13,
-                          fontWeight: 700,
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={Boolean(r.isDostDevelopedFunded)}
-                          onChange={(e) => updateTechRow(0, "isDostDevelopedFunded", e.target.checked)}
-                          style={{ width: 16, height: 16, margin: 0 }}
-                        />
-                        <span>The transferred knowledge/technology is DOST-developed/funded</span>
-                      </label>
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Activity Title *</div>
-                      <input
-                        style={styles.input}
-                        value={r.activityTitle || ""}
-                        onChange={(e) => updateTechRow(0, "activityTitle", e.target.value)}
+                        value={detailForm.packagingSizeVariant}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingSizeVariant: e.target.value }))}
+                        placeholder="e.g. 4x5.6 inches Sticker type"
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Activity Date *</div>
+                      <div style={styles.label}>No. of Packaging Materials Provided <span style={{ color: "#dc2626" }}>*</span></div>
                       <input
                         style={styles.input}
-                        type="date"
-                        value={r.activityDate || ""}
-                        onChange={(e) => updateTechRow(0, "activityDate", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>Activity Venue</div>
-                      <input
-                        style={styles.input}
-                        value={r.activityVenue || ""}
-                        onChange={(e) => updateTechRow(0, "activityVenue", e.target.value)}
+                        value={detailForm.packagingMaterialsProvided}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingMaterialsProvided: e.target.value }))}
+                        placeholder="e.g. N/A or quantity"
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Institution Name *</div>
+                      <div style={styles.label}>Name of Customer <span style={{ color: "#dc2626" }}>*</span></div>
                       <input
                         style={styles.input}
-                        value={r.institutionName || ""}
-                        onChange={(e) => updateTechRow(0, "institutionName", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Classification *</div>
-                      <select
-                        style={styles.input}
-                        value={r.classification || ""}
-                        onChange={(e) => updateTechRow(0, "classification", e.target.value)}
-                      >
-                        <option value="">-- Select --</option>
-                        <option value="Individual">Individual</option>
-                        <option value="MSME/Firm">MSME/Firm</option>
-                        <option value="Academe">Academe</option>
-                        <option value="LGU">LGU</option>
-                        <option value="Cooperative/Association">Cooperative/Association</option>
-                        <option value="NGO">NGO</option>
-                        <option value="National Agency">National Agency</option>
-                      </select>
-                    </div>
-
-                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>Institution Address *</div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddressFlowTarget(`techInstitution:0`);
-                          setAddressFlowOpen(true);
-                        }}
-                        style={styles.inputButton(Boolean(r.institutionAddress))}
-                      >
-                        <span style={{ opacity: r.institutionAddress ? 1 : 0.6 }}>
-                          {r.institutionAddress || "Click to select address"}
-                        </span>
-                        <span style={{ fontSize: 11, opacity: 0.65 }}>
-                          {r.institutionAddress ? "Change" : "Select"}
-                        </span>
-                      </button>
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Representative Name *</div>
-                      <input
-                        style={styles.input}
-                        value={r.representativeName || ""}
-                        onChange={(e) => updateTechRow(0, "representativeName", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Representative Designation</div>
-                      <input
-                        style={styles.input}
-                        value={r.representativeDesignation || ""}
-                        onChange={(e) => updateTechRow(0, "representativeDesignation", e.target.value)}
+                        value={detailForm.packagingCustomerName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingCustomerName: e.target.value }))}
                       />
                     </div>
 
@@ -6723,277 +6189,811 @@ return (
                       <div style={styles.label}>Sex (M/F)</div>
                       <select
                         style={styles.input}
-                        value={r.sex || ""}
-                        onChange={(e) => updateTechRow(0, "sex", e.target.value)}
+                        value={detailForm.packagingSex}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingSex: e.target.value }))}
                       >
                         <option value="">--</option>
                         <option value="M">M</option>
                         <option value="F">F</option>
                       </select>
                     </div>
-                  </>
-                );
-              })()}
-            </div>
-          </>
-        ) : null}
 
-{detailForm.type === "TACS" ? (
-          <>
-            <div
-              style={{
-                marginTop: 12,
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#0f172a",
-              }}
-            >
-              TACS Entry
-            </div>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Product Name</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingProductName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingProductName: e.target.value }))}
+                        placeholder="Optional product name"
+                      />
+                    </div>
 
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Consultancy *</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.consultancyType}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      consultancyType: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">-- Select --</option>
-                  {TACS_CONSULTANCY_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Firm/Institution <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingFirmInstitution}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingFirmInstitution: e.target.value }))}
+                        placeholder="e.g. RiceBIS Bayambang Agriculture Cooperative"
+                      />
+                    </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Date of Engagement *</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.dateEngagement}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      dateEngagement: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("packaging");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.packagingAddress))}
+                      >
+                        <span style={{ opacity: detailForm.packagingAddress ? 1 : 0.6 }}>
+                          {detailForm.packagingAddress || "Click to select venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.packagingAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Expert / Institution</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.expertInstitution}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      expertInstitution: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. Engr. Arnold C. Santos"
-                />
-              </div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.packagingMeansVerification}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingMeansVerification: e.target.value }))}
+                        placeholder="Design approval sheet / links / OR / AR / report / photos..."
+                      />
 
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer *</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.customerName}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      customerName: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. Mr. Oliver Caasi"
-                />
-              </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
+                        <button type="button" style={styles.tinyBtn} onClick={() => openLinkMaybe(detailForm.packagingMeansVerification)}>
+                          View Link
+                        </button>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.customerSex}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      customerSex: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">--</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
+                        <button type="button" style={styles.tinyBtn} onClick={triggerAddPackagingPhotos}>
+                          Add Photos
+                        </button>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Address of Customer *</div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("tacs");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.customerAddress))}
-                >
-                  <span style={{ opacity: detailForm.customerAddress ? 1 : 0.6 }}>
-                    {detailForm.customerAddress || "Click to select address of customer"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.customerAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPackagingPhotoViewerAt(0)}
+                          disabled={!packagingPhotoCount()}
+                        >
+                          Photos: {packagingPhotoCount()}
+                        </button>
+                      </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Advice/Recommendations *</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  min="0"
-                  value={detailForm.noOfAdvice}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      noOfAdvice: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. 1"
-                />
-              </div>
+                      <input
+                        ref={packagingPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickPackagingPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
 
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.meansVerification}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      meansVerification: e.target.value,
-                    }))
-                  }
-                  placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    marginTop: 8,
-                  }}
-                >
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openLinkMaybe(detailForm.meansVerification)}
-                  >
-                    View Link
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={triggerAddTacsPhotos}
-                  >
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openTacsPhotoViewerAt(0)}
-                    disabled={!tacsPhotoCount()}
-                  >
-                    Photos: {tacsPhotoCount()}
-                  </button>
-                </div>
-
-                {tacsPhotoCount() > 0 ? (
+                  <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
+                    * After saving the entry, add the product names from the main table.
+                  </div>
+                </>
+              ) : ["Tech Promo", "S&T Promo"].includes(detailForm.type) ? (
+                <>
                   <div
                     style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
+                      marginTop: 12,
+                      fontSize: 12,
+                      opacity: 0.8,
+                      fontWeight: 900,
+                      marginBottom: 10,
                     }}
                   >
-                    {(detailForm.tacsPhotos || []).map((photo, idx) => (
-                      <button
-                        key={`${photo?.name || "photo"}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openTacsPhotoViewerAt(idx)}
-                      >
-                        Photo {idx + 1}
-                      </button>
-                    ))}
+                    Fields with <span style={{ color: "#dc2626" }}>*</span> are required. (Project is optional.)
                   </div>
-                ) : null}
 
-                <input
-                  ref={tacsPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickTacsPhotos(e.target.files)}
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Project (optional)</div>
+                      <input
+                        style={{ ...styles.input, background: "#f3f4f6", cursor: "not-allowed" }}
+                        value="CEST"
+                        readOnly
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Activity Date <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.promoActivityDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityDate: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Technology Promoted <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoTechnologyPromoted}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyPromoted: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Technology Generator <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoTechnologyGenerator}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyGenerator: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Mode of Promotion <span style={{ color: "#dc2626" }}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.promoModeOfPromotion}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoModeOfPromotion: e.target.value }))}
+                      >
+                        <option value="Social Media">Social Media</option>
+                        <option value="Press Release">Press Release</option>
+                        <option value="Radio">Radio</option>
+                        <option value="TV">TV</option>
+                        <option value="Print">Print</option>
+                        <option value="Forum / Event">Forum / Event</option>
+                        <option value="Exhibit">Exhibit</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Activity Title <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoActivityTitle}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityTitle: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Activity Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("promoVenue");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.promoActivityVenueAddress))}
+                      >
+                        <span style={{ opacity: detailForm.promoActivityVenueAddress ? 1 : 0.6 }}>
+                          {detailForm.promoActivityVenueAddress || "Click to select activity venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.promoActivityVenueAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Customer/Participant <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoCustomerName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerName: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Customer/Participant Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoCustomerAddress}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerAddress: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Sex (M/F)</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.promoSex}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoSex: e.target.value }))}
+                      >
+                        <option value="N/A">N/A</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Staff <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoStaffName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoStaffName: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.promoMeansVerification}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoMeansVerification: e.target.value }))}
+                        placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openLinkMaybe(detailForm.promoMeansVerification)}
+                        >
+                          View First Link
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={triggerAddPromoPhotos}
+                        >
+                          Add Photos
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPromoPhotoViewerAt(0)}
+                          disabled={!promoPhotoCount()}
+                          title={!promoPhotoCount() ? "No photos yet" : "View saved photo(s)"}
+                        >
+                          Photos: {promoPhotoCount()}
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPromoPhotoViewerAt(0)}
+                          disabled={!promoPhotoCount()}
+                        >
+                          View Photos
+                        </button>
+                      </div>
+
+                      {promoPhotoCount() > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(detailForm.promoPhotos || []).map((photo, idx) => (
+                            <button
+                              key={`${photo?.name || "photo"}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openPromoPhotoViewerAt(idx)}
+                            >
+                              Photo {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      {extractLinks(detailForm.promoMeansVerification).length > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {extractLinks(detailForm.promoMeansVerification).map((url, idx) => (
+                            <button
+                              key={`${url}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openSpecificLink(url)}
+                              title={url}
+                            >
+                              Link {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <input
+                        ref={promoPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickPromoPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
+              {detailForm.type === "Tech Roll Out" ? (
+                <>
+                  <div style={{ ...styles.grid, marginTop: 12 }}>
+                    {(() => {
+                      const r = (detailForm.techRows || [])[0] || makeDefaultTechRows()[0];
+                      return (
+                        <>
+                          <div style={styles.field}>
+                            <div style={styles.label}>Quarter *</div>
+                            <select
+                              style={styles.input}
+                              value={r.quarter || ""}
+                              onChange={(e) => updateTechRow(0, "quarter", e.target.value)}
+                            >
+                              <option value="">--</option>
+                              <option value="1">1Q</option>
+                              <option value="2">2Q</option>
+                              <option value="3">3Q</option>
+                              <option value="4">4Q</option>
+                            </select>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Unit/Center *</div>
+                            <input
+                              style={styles.input}
+                              value={r.unitCenter || ""}
+                              onChange={(e) => updateTechRow(0, "unitCenter", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Name of Knowledge/Technology Transferred *</div>
+                            <input
+                              style={styles.input}
+                              value={r.nameOfTechnologyTransferred || ""}
+                              onChange={(e) => updateTechRow(0, "nameOfTechnologyTransferred", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Technology Generator *</div>
+                            <input
+                              style={styles.input}
+                              value={r.technologyGenerator || ""}
+                              onChange={(e) => updateTechRow(0, "technologyGenerator", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Mode of Transfer *</div>
+                            <select
+                              style={styles.input}
+                              value={r.modeOfTransfer || ""}
+                              onChange={(e) => updateTechRow(0, "modeOfTransfer", e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="Commercialization">Commercialization</option>
+                              <option value="Extension">Extension</option>
+                              <option value="Public Good">Public Good</option>
+                              <option value="Technology Adoption">Technology Adoption</option>
+                              <option value="Training">Training</option>
+                              <option value="Technical Assistance">Technical Assistance</option>
+                            </select>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Date Transferred *</div>
+                            <input
+                              style={styles.input}
+                              type="date"
+                              value={r.dateTransferred || ""}
+                              onChange={(e) => updateTechRow(0, "dateTransferred", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>DOST-developed/funded knowledge/technology</div>
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                padding: "2px 0 0",
+                                fontSize: 13,
+                                fontWeight: 700,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(r.isDostDevelopedFunded)}
+                                onChange={(e) => updateTechRow(0, "isDostDevelopedFunded", e.target.checked)}
+                                style={{ width: 16, height: 16, margin: 0 }}
+                              />
+                              <span>The transferred knowledge/technology is DOST-developed/funded</span>
+                            </label>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Activity Title *</div>
+                            <input
+                              style={styles.input}
+                              value={r.activityTitle || ""}
+                              onChange={(e) => updateTechRow(0, "activityTitle", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Activity Date *</div>
+                            <input
+                              style={styles.input}
+                              type="date"
+                              value={r.activityDate || ""}
+                              onChange={(e) => updateTechRow(0, "activityDate", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>Activity Venue</div>
+                            <input
+                              style={styles.input}
+                              value={r.activityVenue || ""}
+                              onChange={(e) => updateTechRow(0, "activityVenue", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Institution Name *</div>
+                            <input
+                              style={styles.input}
+                              value={r.institutionName || ""}
+                              onChange={(e) => updateTechRow(0, "institutionName", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Classification *</div>
+                            <select
+                              style={styles.input}
+                              value={r.classification || ""}
+                              onChange={(e) => updateTechRow(0, "classification", e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="Individual">Individual</option>
+                              <option value="MSME/Firm">MSME/Firm</option>
+                              <option value="Academe">Academe</option>
+                              <option value="LGU">LGU</option>
+                              <option value="Cooperative/Association">Cooperative/Association</option>
+                              <option value="NGO">NGO</option>
+                              <option value="National Agency">National Agency</option>
+                            </select>
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>Institution Address *</div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAddressFlowTarget(`techInstitution:0`);
+                                setAddressFlowOpen(true);
+                              }}
+                              style={styles.inputButton(Boolean(r.institutionAddress))}
+                            >
+                              <span style={{ opacity: r.institutionAddress ? 1 : 0.6 }}>
+                                {r.institutionAddress || "Click to select address"}
+                              </span>
+                              <span style={{ fontSize: 11, opacity: 0.65 }}>
+                                {r.institutionAddress ? "Change" : "Select"}
+                              </span>
+                            </button>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Representative Name *</div>
+                            <input
+                              style={styles.input}
+                              value={r.representativeName || ""}
+                              onChange={(e) => updateTechRow(0, "representativeName", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Representative Designation</div>
+                            <input
+                              style={styles.input}
+                              value={r.representativeDesignation || ""}
+                              onChange={(e) => updateTechRow(0, "representativeDesignation", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Sex (M/F)</div>
+                            <select
+                              style={styles.input}
+                              value={r.sex || ""}
+                              onChange={(e) => updateTechRow(0, "sex", e.target.value)}
+                            >
+                              <option value="">--</option>
+                              <option value="M">M</option>
+                              <option value="F">F</option>
+                            </select>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </>
+              ) : null}
+
+              {detailForm.type === "TACS" ? (
+                <>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontWeight: 900,
+                      fontSize: 13,
+                      color: "#0f172a",
+                    }}
+                  >
+                    TACS Entry
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Type of Consultancy *</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.consultancyType}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            consultancyType: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">-- Select --</option>
+                        {TACS_CONSULTANCY_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Date of Engagement *</div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.dateEngagement}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            dateEngagement: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Expert / Institution</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.expertInstitution}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            expertInstitution: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. Engr. Arnold C. Santos"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Customer *</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.customerName}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            customerName: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. Mr. Oliver Caasi"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Sex (M/F)</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.customerSex}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            customerSex: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">--</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Address of Customer *</div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("tacs");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.customerAddress))}
+                      >
+                        <span style={{ opacity: detailForm.customerAddress ? 1 : 0.6 }}>
+                          {detailForm.customerAddress || "Click to select address of customer"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.customerAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Advice/Recommendations *</div>
+                      <input
+                        style={styles.input}
+                        type="number"
+                        min="0"
+                        value={detailForm.noOfAdvice}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            noOfAdvice: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. 1"
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.meansVerification}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            meansVerification: e.target.value,
+                          }))
+                        }
+                        placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openLinkMaybe(detailForm.meansVerification)}
+                        >
+                          View Link
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={triggerAddTacsPhotos}
+                        >
+                          Add Photos
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openTacsPhotoViewerAt(0)}
+                          disabled={!tacsPhotoCount()}
+                        >
+                          Photos: {tacsPhotoCount()}
+                        </button>
+                      </div>
+
+                      {tacsPhotoCount() > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(detailForm.tacsPhotos || []).map((photo, idx) => (
+                            <button
+                              key={`${photo?.name || "photo"}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openTacsPhotoViewerAt(idx)}
+                            >
+                              Photo {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <input
+                        ref={tacsPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickTacsPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
+              <div style={{ ...styles.field, marginTop: 12 }}>
+                <div style={styles.label}>{detailForm.type === "Calibration" ? "Remarks" : "Notes / Remarks"}</div>
+                <textarea
+                  style={styles.textarea}
+                  value={detailForm.notes}
+                  onChange={(e) =>
+                    setDetailForm((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
-          </>
-        ) : null}
 
-        <div style={{ ...styles.field, marginTop: 12 }}>
-          <div style={styles.label}>{detailForm.type === "Calibration" ? "Remarks" : "Notes / Remarks"}</div>
-          <textarea
-            style={styles.textarea}
-            value={detailForm.notes}
-            onChange={(e) =>
-              setDetailForm((prev) => ({
-                ...prev,
-                notes: e.target.value,
-              }))
-            }
-          />
+            <div style={styles.modalFooter}>
+              <button
+                style={styles.btnGhost}
+                onClick={() => {
+                  setDetailFor(null);
+                  resetDetailForm("");
+                }}
+              >
+                Cancel
+              </button>
+              <button style={styles.btnDark} onClick={saveInterventionDetails}>
+                {detailForm.type === "Calibration"
+                  ? detailFor.mode === "edit"
+                    ? "Update Entry"
+                    : "Save Entry"
+                  : detailFor.mode === "edit"
+                    ? "Update"
+                    : "Save"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div style={styles.modalFooter}>
-        <button
-          style={styles.btnGhost}
-          onClick={() => {
-            setDetailFor(null);
-            resetDetailForm("");
-          }}
-        >
-          Cancel
-        </button>
-        <button style={styles.btnDark} onClick={saveInterventionDetails}>
-          {detailForm.type === "Calibration"
-            ? detailFor.mode === "edit"
-              ? "Update Entry"
-              : "Save Entry"
-            : detailFor.mode === "edit"
-            ? "Update"
-            : "Save"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {promoPhotoViewerIndex >= 0 && Array.isArray(detailForm.promoPhotos) && detailForm.promoPhotos[promoPhotoViewerIndex] ? (
         <div style={styles.photoViewerBackdrop} onClick={closePromoPhotoViewer}>
@@ -7175,487 +7175,487 @@ return (
       ) : null}
       {/* ===== VIEW PROJECT MODAL ===== */}
       {viewProjectId && viewProject && (
-  <div style={{ ...styles.modalBackdrop, zIndex: 1500 }} onClick={() => setViewProjectId(null)}>
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        ...styles.modal,
-        position: "relative",
-        zIndex: 1501,
-        width: "min(980px, calc(100vw - 24px))",
-        maxWidth: "980px",
-        maxHeight: "calc(100vh - 24px)",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div style={styles.modalHeader}>
-        <div>View Project</div>
-        <button style={styles.closeX} onClick={() => setViewProjectId(null)}>
-          ✕
-        </button>
-      </div>
-
-      <div
-        style={{
-          ...styles.modalBody,
-          overflowY: "auto",
-          flex: 1,
-          paddingBottom: 24,
-        }}
-      >
-        {/* PROJECT INFORMATION */}
-        <div style={{ fontWeight: 900, fontSize: 22, marginBottom: 12 }}>
-          Project Information
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 18,
-            marginBottom: 14,
-          }}
-        >
-          <div>
-            <div style={styles.label}>Project Title</div>
-            <div style={viewStyles.value}>{viewProject.projectTitle || "—"}</div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Name of Firm</div>
-            <div style={viewStyles.value}>
-              {viewProject.associationName || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Name of Project Proponent</div>
-            <div style={viewStyles.value}>
-              {viewProject.projectProponent || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Sex</div>
-            <div style={viewStyles.value}>{viewProject.sex || "—"}</div>
-          </div>
-
-          <div>
-            <div style={styles.label}>District</div>
-            <div style={viewStyles.value}>
-              {(() => {
-                const muni =
-                  viewProject?.addressMeta?.municipality ||
-                  getProjectMunicipality(viewProject);
-                const found = PANGASINAN_DISTRICTS.find((d) =>
-                  d.municipalities.includes(muni)
-                );
-                return found?.id || "—";
-              })()}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Date of Fund Release</div>
-            <div style={viewStyles.value}>
-              {viewProject.dateFundRelease || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Amount</div>
-            <div style={viewStyles.value}>
-              {money(viewProject.approvedProjectCost)}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Status</div>
-            <div style={viewStyles.value}>Ongoing</div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Type</div>
-            <div style={viewStyles.value}>
-              {viewProject.type || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Date Approved</div>
-            <div style={viewStyles.value}>
-              {viewProject.dateProjectApproval || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Name of Staff</div>
-            <div style={viewStyles.value}>{viewProject.staffName || "—"}</div>
-          </div>
-        </div>
-
-        {/* ADDRESS */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={styles.label}>Venue/Address</div>
-          <div style={viewStyles.boxValue}>
-            {viewProject.address || "—"}
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 18,
-            marginBottom: 8,
-          }}
-        >
-          <div>
-            <div style={styles.label}>Name of LGU-Communities</div>
-            <div style={viewStyles.value}>
-              {viewProject.lguNumbersOfCommunities === "" ||
-              viewProject.lguNumbersOfCommunities === null ||
-              viewProject.lguNumbersOfCommunities === undefined
-                ? "—"
-                : toNumber(viewProject.lguNumbersOfCommunities)}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Number of MOA</div>
-            <div style={viewStyles.value}>
-              {viewProject.numberOfMoa === "" ||
-              viewProject.numberOfMoa === null ||
-              viewProject.numberOfMoa === undefined
-                ? "—"
-                : toNumber(viewProject.numberOfMoa)}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Venue/Address Mode</div>
-            <div style={viewStyles.value}>
-              {viewProject?.addressMeta?.mode || "—"}
-            </div>
-          </div>
-
-          <div>
-            <div style={styles.label}>Coordinates</div>
-            <div style={viewStyles.value}>
-              {Number.isFinite(viewProject?.addressMeta?.lat) &&
-              Number.isFinite(viewProject?.addressMeta?.lng)
-                ? `${viewProject.addressMeta.lat}, ${viewProject.addressMeta.lng}`
-                : "—"}
-            </div>
-          </div>
-        </div>
-
-        {Number.isFinite(viewProject?.addressMeta?.lat) &&
-        Number.isFinite(viewProject?.addressMeta?.lng) ? (
-          <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
-            <button
-              style={styles.tinyBtn}
-              onClick={() =>
-                openGoogleMap(
-                  viewProject.addressMeta.lat,
-                  viewProject.addressMeta.lng
-                )
-              }
-            >
-              Map
-            </button>
-            <button
-              style={styles.tinyBtn}
-              onClick={() =>
-                openGoogleDirections(
-                  viewProject.addressMeta.lat,
-                  viewProject.addressMeta.lng
-                )
-              }
-            >
-              Directions
-            </button>
-          </div>
-        ) : null}
-
-        {/* PROCESS / SYSTEM */}
-        <div style={{ marginBottom: 18 }}>
-          <div style={styles.label}>Process / System</div>
-          <div style={viewStyles.boxValue}>
-            {viewProject.processSystem || "—"}
-          </div>
-        </div>
-
-        {/* PRESS RELEASE + OUTCOME 4 */}
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ ...styles.modalBackdrop, zIndex: 1500 }} onClick={() => setViewProjectId(null)}>
           <div
+            onClick={(e) => e.stopPropagation()}
             style={{
-              ...styles.dividerTitle,
-              fontWeight: 900,
-              fontSize: 13,
-              color: "#0f172a",
-              marginBottom: 8,
+              ...styles.modal,
+              position: "relative",
+              zIndex: 1501,
+              width: "min(980px, calc(100vw - 24px))",
+              maxWidth: "980px",
+              maxHeight: "calc(100vh - 24px)",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            Other Indication (Outcome 4)
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 10,
-              alignItems: "end",
-            }}
-          >
-            <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-              <div style={styles.label}>Number of startups assisted</div>
-              <textarea
-                style={styles.textarea}
-                placeholder={"Ilagay ang mga firm na nabigyan ng startup assistance\nHalimbawa:\nABC Foods\nXYZ Enterprise"}
-                value={viewStartupsAssistedInput}
-                onChange={(e) => setViewStartupsAssistedInput(e.target.value)}
-              />
+            <div style={styles.modalHeader}>
+              <div>View Project</div>
+              <button style={styles.closeX} onClick={() => setViewProjectId(null)}>
+                ✕
+              </button>
             </div>
-
-            <div style={styles.field}>
-              <div style={styles.label}>No. of jobs generated</div>
-              <input
-                type="number"
-                min="0"
-                style={styles.input}
-                value={viewJobsGeneratedInput}
-                onChange={(e) => setViewJobsGeneratedInput(e.target.value)}
-              />
-            </div>
-
-            <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-              <div style={styles.label}>Press Release</div>
-              <input
-                type="number"
-                min="0"
-                style={styles.input}
-                value={
-                  Number(viewPressReleaseInput || 0) === 0
-                    ? ""
-                    : viewPressReleaseInput
-                }
-                onChange={(e) => setViewPressReleaseInput(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div style={{ fontSize: 12, opacity: 0.75, marginTop: 8 }}>
-            * Note: “Technologies promoted” and “Press release activities” are encoded inside each S&amp;T Intervention entry.
-          </div>
-        </div>
-
-        {/* S&T INTERVENTIONS */}
-        <div style={{ fontWeight: 900, fontSize: 20, marginBottom: 10 }}>
-          S&amp;T Interventions
-        </div>
-
-        <div style={{ ...styles.tableWrap, marginBottom: 18 }}>
-          <table style={{ ...styles.table, minWidth: 760 }}>
-            <colgroup>
-              <col style={{ width: "6%" }} />
-              <col style={{ width: "18%" }} />
-              <col style={{ width: "22%" }} />
-              <col style={{ width: "14%" }} />
-              <col style={{ width: "30%" }} />
-              <col style={{ width: "10%" }} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th style={styles.th}>#</th>
-                <th style={styles.th}>Type</th>
-                <th style={styles.th}>Title / Label</th>
-                <th style={styles.th}>Date</th>
-                <th style={styles.th}>Venue</th>
-                <th style={styles.th}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(viewProject.interventions || []).length ? (
-                viewProject.interventions.map((it, i) => (
-                  <tr key={it.id}>
-                    <td style={styles.tdCenter}>{i + 1}</td>
-                    <td style={styles.tdCenter}>{it.type || "—"}</td>
-                    <td style={styles.td}>{getInterventionLabel(it)}</td>
-                    <td style={styles.tdCenter}>{it.date || "—"}</td>
-                    <td style={styles.td}>{it.venue || "—"}</td>
-                    <td style={styles.tdCenter}>
-                      <button
-                        style={styles.tinyBtn}
-                        onClick={() =>
-                          openInterventionDetails_Edit(viewProject.id, it.id)
-                        }
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td style={styles.tdCenter} colSpan={6}>
-                    —
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* OTHER INDICATORS */}
-        {/* OTHER INDICATORS */}
-<div style={{ fontWeight: 900, fontSize: 20, marginBottom: 10 }}>
-  Other Indicators
-</div>
-
-<div style={styles.tableWrap}>
-  <table style={{ ...styles.table, minWidth: 760 }}>
-    <colgroup>
-      <col style={{ width: "86%" }} />
-      <col style={{ width: "14%" }} />
-    </colgroup>
-    <thead>
-      <tr>
-        <th style={styles.th}>Indicator</th>
-        <th style={styles.th}>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style={styles.td}>Number of technologies deployed to communities</td>
-        <td style={styles.tdCenter}>
-          {
-            Array.isArray(viewProject.interventions)
-              ? viewProject.interventions.filter((it) => it.type === "Tech Roll Out").length
-              : 0
-          }
-        </td>
-      </tr>
-
-      <tr>
-        <td style={styles.td}>Number of beneficiaries</td>
-        <td style={styles.tdCenter}>
-          {
-            Array.isArray(viewProject.interventions)
-              ? viewProject.interventions
-                  .filter((it) => it.type === "Training")
-                  .reduce((sum, it) => sum + toNumber(it.total), 0)
-              : 0
-          }
-        </td>
-      </tr>
-
-      <tr>
-        <td style={styles.td}>Number of S&amp;T Intervention</td>
-        <td style={styles.tdCenter}>
-          {Array.isArray(viewProject.interventions)
-            ? viewProject.interventions.length
-            : 0}
-        </td>
-      </tr>
-
-      <tr>
-        <td style={styles.td}>No. of technologies promoted (total)</td>
-        <td style={styles.tdCenter}>
-          {toNumber(viewInterventionSums.techPromoted)}
-        </td>
-      </tr>
-
-      <tr>
-        <td style={styles.td}>
-          No. of S&amp;T promotion activities conducted (total) press release - City/Municipal Level
-        </td>
-        <td style={styles.tdCenter}>
-          {toNumber(viewProject.pressRelease)}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-      </div>
-
-      
-      {(() => {
-        const projectCustomFields =
-          typeof (viewProject?.customFields || viewProject?.custom_fields || {}) === "string"
-            ? (() => {
-                try {
-                  return JSON.parse(viewProject?.customFields || viewProject?.custom_fields || "{}");
-                } catch {
-                  return {};
-                }
-              })()
-            : viewProject?.customFields || viewProject?.custom_fields || {};
-
-        const displayCustomFields =
-          cestCustomFields.length > 0
-            ? cestCustomFields
-            : Object.keys(projectCustomFields || {}).map((key) => ({
-                key,
-                fieldKey: key,
-                fieldLabel: key,
-                field_label: key,
-              }));
-
-        return displayCustomFields.length > 0 ? (
-          <div
-            style={{
-              padding: "0 16px 16px",
-              borderTop: "1px solid #e5e7eb",
-            }}
-          >
 
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                gap: 14,
+                ...styles.modalBody,
+                overflowY: "auto",
+                flex: 1,
+                paddingBottom: 24,
               }}
             >
-              {displayCustomFields.map((field) => {
-                const key = field.fieldKey || field.field_key || field.key;
-                const label = field.fieldLabel || field.field_label || field.label || key;
-                const value = projectCustomFields?.[key];
+              {/* PROJECT INFORMATION */}
+              <div style={{ fontWeight: 900, fontSize: 22, marginBottom: 12 }}>
+                Project Information
+              </div>
 
-                return (
-                  <div key={key}>
-                    <div style={styles.label}>{label}</div>
-                    <div
-                      style={{
-                        minHeight: 42,
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 12,
-                        padding: "10px 12px",
-                        background: "#f8fafc",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {value === null || value === undefined || value === "" ? "—" : String(value)}
-                    </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gap: 18,
+                  marginBottom: 14,
+                }}
+              >
+                <div>
+                  <div style={styles.label}>Project Title</div>
+                  <div style={viewStyles.value}>{viewProject.projectTitle || "—"}</div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Name of Firm</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.associationName || "—"}
                   </div>
-                );
-              })}
+                </div>
+
+                <div>
+                  <div style={styles.label}>Name of Project Proponent</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.projectProponent || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Sex</div>
+                  <div style={viewStyles.value}>{viewProject.sex || "—"}</div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>District</div>
+                  <div style={viewStyles.value}>
+                    {(() => {
+                      const muni =
+                        viewProject?.addressMeta?.municipality ||
+                        getProjectMunicipality(viewProject);
+                      const found = PANGASINAN_DISTRICTS.find((d) =>
+                        d.municipalities.includes(muni)
+                      );
+                      return found?.id || "—";
+                    })()}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Date of Fund Release</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.dateFundRelease || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Amount</div>
+                  <div style={viewStyles.value}>
+                    {money(viewProject.approvedProjectCost)}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Status</div>
+                  <div style={viewStyles.value}>Ongoing</div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Type</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.type || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Date Approved</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.dateProjectApproval || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Name of Staff</div>
+                  <div style={viewStyles.value}>{viewProject.staffName || "—"}</div>
+                </div>
+              </div>
+
+              {/* ADDRESS */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={styles.label}>Venue/Address</div>
+                <div style={viewStyles.boxValue}>
+                  {viewProject.address || "—"}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gap: 18,
+                  marginBottom: 8,
+                }}
+              >
+                <div>
+                  <div style={styles.label}>Name of LGU-Communities</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.lguNumbersOfCommunities === "" ||
+                      viewProject.lguNumbersOfCommunities === null ||
+                      viewProject.lguNumbersOfCommunities === undefined
+                      ? "—"
+                      : toNumber(viewProject.lguNumbersOfCommunities)}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Number of MOA</div>
+                  <div style={viewStyles.value}>
+                    {viewProject.numberOfMoa === "" ||
+                      viewProject.numberOfMoa === null ||
+                      viewProject.numberOfMoa === undefined
+                      ? "—"
+                      : toNumber(viewProject.numberOfMoa)}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Venue/Address Mode</div>
+                  <div style={viewStyles.value}>
+                    {viewProject?.addressMeta?.mode || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={styles.label}>Coordinates</div>
+                  <div style={viewStyles.value}>
+                    {Number.isFinite(viewProject?.addressMeta?.lat) &&
+                      Number.isFinite(viewProject?.addressMeta?.lng)
+                      ? `${viewProject.addressMeta.lat}, ${viewProject.addressMeta.lng}`
+                      : "—"}
+                  </div>
+                </div>
+              </div>
+
+              {Number.isFinite(viewProject?.addressMeta?.lat) &&
+                Number.isFinite(viewProject?.addressMeta?.lng) ? (
+                <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+                  <button
+                    style={styles.tinyBtn}
+                    onClick={() =>
+                      openGoogleMap(
+                        viewProject.addressMeta.lat,
+                        viewProject.addressMeta.lng
+                      )
+                    }
+                  >
+                    Map
+                  </button>
+                  <button
+                    style={styles.tinyBtn}
+                    onClick={() =>
+                      openGoogleDirections(
+                        viewProject.addressMeta.lat,
+                        viewProject.addressMeta.lng
+                      )
+                    }
+                  >
+                    Directions
+                  </button>
+                </div>
+              ) : null}
+
+              {/* PROCESS / SYSTEM */}
+              <div style={{ marginBottom: 18 }}>
+                <div style={styles.label}>Process / System</div>
+                <div style={viewStyles.boxValue}>
+                  {viewProject.processSystem || "—"}
+                </div>
+              </div>
+
+              {/* PRESS RELEASE + OUTCOME 4 */}
+              <div style={{ marginBottom: 18 }}>
+                <div
+                  style={{
+                    ...styles.dividerTitle,
+                    fontWeight: 900,
+                    fontSize: 13,
+                    color: "#0f172a",
+                    marginBottom: 8,
+                  }}
+                >
+                  Other Indication (Outcome 4)
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10,
+                    alignItems: "end",
+                  }}
+                >
+                  <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                    <div style={styles.label}>Number of startups assisted</div>
+                    <textarea
+                      style={styles.textarea}
+                      placeholder={"Ilagay ang mga firm na nabigyan ng startup assistance\nHalimbawa:\nABC Foods\nXYZ Enterprise"}
+                      value={viewStartupsAssistedInput}
+                      onChange={(e) => setViewStartupsAssistedInput(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={styles.field}>
+                    <div style={styles.label}>No. of jobs generated</div>
+                    <input
+                      type="number"
+                      min="0"
+                      style={styles.input}
+                      value={viewJobsGeneratedInput}
+                      onChange={(e) => setViewJobsGeneratedInput(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                    <div style={styles.label}>Press Release</div>
+                    <input
+                      type="number"
+                      min="0"
+                      style={styles.input}
+                      value={
+                        Number(viewPressReleaseInput || 0) === 0
+                          ? ""
+                          : viewPressReleaseInput
+                      }
+                      onChange={(e) => setViewPressReleaseInput(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 12, opacity: 0.75, marginTop: 8 }}>
+                  * Note: “Technologies promoted” and “Press release activities” are encoded inside each S&amp;T Intervention entry.
+                </div>
+              </div>
+
+              {/* S&T INTERVENTIONS */}
+              <div style={{ fontWeight: 900, fontSize: 20, marginBottom: 10 }}>
+                S&amp;T Interventions
+              </div>
+
+              <div style={{ ...styles.tableWrap, marginBottom: 18 }}>
+                <table style={{ ...styles.table, minWidth: 760 }}>
+                  <colgroup>
+                    <col style={{ width: "6%" }} />
+                    <col style={{ width: "18%" }} />
+                    <col style={{ width: "22%" }} />
+                    <col style={{ width: "14%" }} />
+                    <col style={{ width: "30%" }} />
+                    <col style={{ width: "10%" }} />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>#</th>
+                      <th style={styles.th}>Type</th>
+                      <th style={styles.th}>Title / Label</th>
+                      <th style={styles.th}>Date</th>
+                      <th style={styles.th}>Venue</th>
+                      <th style={styles.th}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(viewProject.interventions || []).length ? (
+                      viewProject.interventions.map((it, i) => (
+                        <tr key={it.id}>
+                          <td style={styles.tdCenter}>{i + 1}</td>
+                          <td style={styles.tdCenter}>{it.type || "—"}</td>
+                          <td style={styles.td}>{getInterventionLabel(it)}</td>
+                          <td style={styles.tdCenter}>{it.date || "—"}</td>
+                          <td style={styles.td}>{it.venue || "—"}</td>
+                          <td style={styles.tdCenter}>
+                            <button
+                              style={styles.tinyBtn}
+                              onClick={() =>
+                                openInterventionDetails_Edit(viewProject.id, it.id)
+                              }
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td style={styles.tdCenter} colSpan={6}>
+                          —
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* OTHER INDICATORS */}
+              {/* OTHER INDICATORS */}
+              <div style={{ fontWeight: 900, fontSize: 20, marginBottom: 10 }}>
+                Other Indicators
+              </div>
+
+              <div style={styles.tableWrap}>
+                <table style={{ ...styles.table, minWidth: 760 }}>
+                  <colgroup>
+                    <col style={{ width: "86%" }} />
+                    <col style={{ width: "14%" }} />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>Indicator</th>
+                      <th style={styles.th}>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={styles.td}>Number of technologies deployed to communities</td>
+                      <td style={styles.tdCenter}>
+                        {
+                          Array.isArray(viewProject.interventions)
+                            ? viewProject.interventions.filter((it) => it.type === "Tech Roll Out").length
+                            : 0
+                        }
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style={styles.td}>Number of beneficiaries</td>
+                      <td style={styles.tdCenter}>
+                        {
+                          Array.isArray(viewProject.interventions)
+                            ? viewProject.interventions
+                              .filter((it) => it.type === "Training")
+                              .reduce((sum, it) => sum + toNumber(it.total), 0)
+                            : 0
+                        }
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style={styles.td}>Number of S&amp;T Intervention</td>
+                      <td style={styles.tdCenter}>
+                        {Array.isArray(viewProject.interventions)
+                          ? viewProject.interventions.length
+                          : 0}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style={styles.td}>No. of technologies promoted (total)</td>
+                      <td style={styles.tdCenter}>
+                        {toNumber(viewInterventionSums.techPromoted)}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style={styles.td}>
+                        No. of S&amp;T promotion activities conducted (total) press release - City/Municipal Level
+                      </td>
+                      <td style={styles.tdCenter}>
+                        {toNumber(viewProject.pressRelease)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            {(() => {
+              const projectCustomFields =
+                typeof (viewProject?.customFields || viewProject?.custom_fields || {}) === "string"
+                  ? (() => {
+                    try {
+                      return JSON.parse(viewProject?.customFields || viewProject?.custom_fields || "{}");
+                    } catch {
+                      return {};
+                    }
+                  })()
+                  : viewProject?.customFields || viewProject?.custom_fields || {};
+
+              const displayCustomFields =
+                cestCustomFields.length > 0
+                  ? cestCustomFields
+                  : Object.keys(projectCustomFields || {}).map((key) => ({
+                    key,
+                    fieldKey: key,
+                    fieldLabel: key,
+                    field_label: key,
+                  }));
+
+              return displayCustomFields.length > 0 ? (
+                <div
+                  style={{
+                    padding: "0 16px 16px",
+                    borderTop: "1px solid #e5e7eb",
+                  }}
+                >
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                      gap: 14,
+                    }}
+                  >
+                    {displayCustomFields.map((field) => {
+                      const key = field.fieldKey || field.field_key || field.key;
+                      const label = field.fieldLabel || field.field_label || field.label || key;
+                      const value = projectCustomFields?.[key];
+
+                      return (
+                        <div key={key}>
+                          <div style={styles.label}>{label}</div>
+                          <div
+                            style={{
+                              minHeight: 42,
+                              border: "1px solid #e5e7eb",
+                              borderRadius: 12,
+                              padding: "10px 12px",
+                              background: "#f8fafc",
+                              fontWeight: 800,
+                            }}
+                          >
+                            {value === null || value === undefined || value === "" ? "—" : String(value)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null;
+            })()}
+            <div style={styles.modalFooter}>
+              <button style={styles.btnGhost} onClick={() => setViewProjectId(null)}>
+                Cancel
+              </button>
+              <button style={styles.btnDark} onClick={saveViewPressRelease}>
+                Save
+              </button>
             </div>
           </div>
-        ) : null;
-      })()}
-<div style={styles.modalFooter}>
-        <button style={styles.btnGhost} onClick={() => setViewProjectId(null)}>
-          Cancel
-        </button>
-        <button style={styles.btnDark} onClick={saveViewPressRelease}>
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
 
       {/* ===== ADD/EDIT PROJECT MODAL ===== */}
       {showAdd && (
@@ -7811,10 +7811,10 @@ return (
                     onChange={(e) => setForm({ ...form, processSystem: e.target.value })}
                   />
                 </div>
-</div>
+              </div>
             </div>
 
-            
+
             {cestCustomFields.length > 0 ? (
               <div
                 style={{
@@ -7912,7 +7912,7 @@ return (
                 </div>
               </div>
             ) : null}
-<div style={styles.modalFooter}>
+            <div style={styles.modalFooter}>
               <button
                 style={styles.btnGhost}
                 onClick={() => {
@@ -7929,7 +7929,7 @@ return (
             </div>
           </div>
         </div>
-           )}
+      )}
 
 
 
@@ -8011,18 +8011,18 @@ return (
             addressFlowTarget === "tacs"
               ? detailForm.customerAddressMeta
               : addressFlowTarget === "calibration"
-              ? detailForm.calibrationAddressMeta
-              : addressFlowTarget === "training"
-              ? detailForm.trainingVenueAddressMeta
-              : addressFlowTarget === "packaging"
-              ? detailForm.packagingAddressMeta
-              : addressFlowTarget === "promoVenue"
-              ? detailForm.promoActivityVenueMeta
-              : addressFlowTarget === "promoCustomer"
-              ? detailForm.promoCustomerAddressMeta
-              : String(addressFlowTarget).startsWith("techInstitution:")
-              ? detailForm.techRows?.[Number(String(addressFlowTarget).split(":")[1])]?.institutionAddressMeta || null
-              : form.addressMeta
+                ? detailForm.calibrationAddressMeta
+                : addressFlowTarget === "training"
+                  ? detailForm.trainingVenueAddressMeta
+                  : addressFlowTarget === "packaging"
+                    ? detailForm.packagingAddressMeta
+                    : addressFlowTarget === "promoVenue"
+                      ? detailForm.promoActivityVenueMeta
+                      : addressFlowTarget === "promoCustomer"
+                        ? detailForm.promoCustomerAddressMeta
+                        : String(addressFlowTarget).startsWith("techInstitution:")
+                          ? detailForm.techRows?.[Number(String(addressFlowTarget).split(":")[1])]?.institutionAddressMeta || null
+                          : form.addressMeta
           }
         />
       )}
