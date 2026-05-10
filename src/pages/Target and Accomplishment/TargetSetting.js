@@ -526,7 +526,7 @@ export default function Setup() {
   ) => {
     try {
       const res = await axios.get(
-        `${API}/api/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`
+        `${API}/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`
       );
       setter(normalizeRows(defaults, res.data || []));
       if (setStatus) {
@@ -579,7 +579,7 @@ export default function Setup() {
       const payloadRows = buildRowsPayload(moduleName, rowsData, year);
 
       await axios.put(
-        `${API}/api/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`,
+        `${API}/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`,
         {
           moduleName,
           module_name: moduleName,
@@ -614,7 +614,7 @@ export default function Setup() {
   ) => {
     try {
       await axios.put(
-        `${API}/api/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`,
+        `${API}/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`,
         {
           moduleName,
           module_name: moduleName,
@@ -940,7 +940,7 @@ export default function Setup() {
     setGlobalStatus(`Copying targets from ${previousYear} to ${targetYear}...`);
     for (const m of targetModules) {
       const res = await axios.get(
-        `${API}/api/target-settings/${encodeURIComponent(m.key)}?year=${encodeURIComponent(previousYear)}`
+        `${API}/target-settings/${encodeURIComponent(m.key)}?year=${encodeURIComponent(previousYear)}`
       );
       m.setter(normalizeRows(m.defaults, res.data || []));
       m.statusSetter(`Copied from ${previousYear}. Review then Save ${targetYear}.`);

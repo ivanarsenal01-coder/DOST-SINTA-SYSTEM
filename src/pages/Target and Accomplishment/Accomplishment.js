@@ -447,7 +447,7 @@ export default function Setup() {
     try {
       const requests = projectIds.map((id) =>
         axios
-          .get(`${API}/api/projects/${id}/other-indicators`)
+          .get(`${API}/projects/${id}/other-indicators`)
           .then((res) => ({ id, data: res.data }))
           .catch(() => ({ id, data: null }))
       );
@@ -478,7 +478,7 @@ export default function Setup() {
 
   const fetchTargetSettings = async (moduleName, defaultShape, keyOrderMap = null, year = selectedYear) => {
     try {
-      const res = await axios.get(`${API}/api/target-settings/${moduleName}`, {
+      const res = await axios.get(`${API}/target-settings/${moduleName}`, {
         params: { year },
       });
       const rows = Array.isArray(res.data) ? res.data : [];
@@ -581,7 +581,7 @@ export default function Setup() {
   // ✅ TECHNOLOGY TRAINING from DATABASE/API
   const fetchTechTrainingEntries = async (year = selectedYear) => {
     try {
-      const res = await axios.get(`${API}/api/technology-training/summary`, {
+      const res = await axios.get(`${API}/technology-training/summary`, {
         params: { year },
       });
       const data = res.data || {};
@@ -831,7 +831,7 @@ export default function Setup() {
 
   const fetchProjects = async (year = selectedYear) => {
     try {
-      const res = await axios.get(`${API}/api/projects`, {
+      const res = await axios.get(`${API}/projects`, {
         params: {
           page: 1,
           limit: 100000,
