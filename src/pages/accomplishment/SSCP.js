@@ -152,22 +152,22 @@ const readLocalProjects = () => {
       // ✅ Projects (per LGU/Community) — full SSCP fields per project
       sscProjects: Array.isArray(p?.sscProjects)
         ? p.sscProjects.map((x) => ({
-            id: x?.id ?? x?.projectId ?? `ssc_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
-            quarter: String(x?.quarter || "1"),
-            projectTitle: x?.projectTitle || x?.title || "",
-            dateProjectApproval: x?.dateProjectApproval || "",
-            approvedProjectCost: Number(x?.approvedProjectCost ?? x?.cost ?? 0),
-            dateFundRelease: x?.dateFundRelease || "",
-            address: x?.address || p?.address || "",
-            addressMeta: x?.addressMeta || p?.addressMeta || null,
-            projectProponent: x?.projectProponent || "",
-            sex: x?.sex || "",
-            processSystem: x?.processSystem || "",
-            // keep compatibility (old fields)
-            title: x?.projectTitle || x?.title || "",
-            cost: Number(x?.approvedProjectCost ?? x?.cost ?? 0),
-            interventions: Array.isArray(x?.interventions) ? x.interventions : [],
-          }))
+          id: x?.id ?? x?.projectId ?? `ssc_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
+          quarter: String(x?.quarter || "1"),
+          projectTitle: x?.projectTitle || x?.title || "",
+          dateProjectApproval: x?.dateProjectApproval || "",
+          approvedProjectCost: Number(x?.approvedProjectCost ?? x?.cost ?? 0),
+          dateFundRelease: x?.dateFundRelease || "",
+          address: x?.address || p?.address || "",
+          addressMeta: x?.addressMeta || p?.addressMeta || null,
+          projectProponent: x?.projectProponent || "",
+          sex: x?.sex || "",
+          processSystem: x?.processSystem || "",
+          // keep compatibility (old fields)
+          title: x?.projectTitle || x?.title || "",
+          cost: Number(x?.approvedProjectCost ?? x?.cost ?? 0),
+          interventions: Array.isArray(x?.interventions) ? x.interventions : [],
+        }))
         : [],
 
       // ✅ Remarks (separate from old fields)
@@ -187,7 +187,7 @@ const readLocalProjects = () => {
 const writeLocalProjects = (arr) => {
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
-  } catch {}
+  } catch { }
 };
 
 
@@ -196,16 +196,16 @@ export default function SSCP() {
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
 
- const INTERVENTION_OPTIONS = [
-  "Training",
-  "Tech Roll Out",
-  "Tech Promo",
-  "S&T Promo",
-  "TACS",
-  "Packaging & Labeling",
-  "Calibration",
-  "TNA Report",
-];
+  const INTERVENTION_OPTIONS = [
+    "Training",
+    "Tech Roll Out",
+    "Tech Promo",
+    "S&T Promo",
+    "TACS",
+    "Packaging & Labeling",
+    "Calibration",
+    "TNA Report",
+  ];
   const TACS_CONSULTANCY_OPTIONS = [
     "Advisory Services",
     "Technical Assistance",
@@ -294,44 +294,44 @@ export default function SSCP() {
     });
 
   const getInterventionLabel = (it) => {
-  const type = it?.type || "";
+    const type = it?.type || "";
 
-  if (type === "Tech Roll Out") {
-    try {
-      const obj = JSON.parse(it?.notes || "");
-      const rows = Array.isArray(obj?.techRollOutRows)
-        ? obj.techRollOutRows
-        : [];
+    if (type === "Tech Roll Out") {
+      try {
+        const obj = JSON.parse(it?.notes || "");
+        const rows = Array.isArray(obj?.techRollOutRows)
+          ? obj.techRollOutRows
+          : [];
 
-      const firstTech = rows
-        .map((r) =>
-          String(
-            r?.nameOfTechnologyTransferred ||
+        const firstTech = rows
+          .map((r) =>
+            String(
+              r?.nameOfTechnologyTransferred ||
               r?.knowledgeTech ||
               ""
-          ).trim()
-        )
-        .find((x) => x);
+            ).trim()
+          )
+          .find((x) => x);
 
-      if (firstTech) return firstTech;
-    } catch {}
-    return "Tech Roll Out";
-  }
+        if (firstTech) return firstTech;
+      } catch { }
+      return "Tech Roll Out";
+    }
 
-  if (
-  type === "Training" ||
-  type === "Tech Promo" ||
-  type === "S&T Promo"
-) {
-  return (it?.title || type || "Training").trim();
-}
+    if (
+      type === "Training" ||
+      type === "Tech Promo" ||
+      type === "S&T Promo"
+    ) {
+      return (it?.title || type || "Training").trim();
+    }
 
-  if (type === "TNA Report") {
-    return (it?.notes || "").trim() || "TNA Report";
-  }
+    if (type === "TNA Report") {
+      return (it?.notes || "").trim() || "TNA Report";
+    }
 
-  return (it?.title || type || "—").trim();
-};
+    return (it?.title || type || "—").trim();
+  };
 
   // ===== State =====
   const [projects, setProjects] = useState([]);
@@ -363,10 +363,10 @@ export default function SSCP() {
     customFields: {},
   });
   // Address modal
- const [addressFlowOpen, setAddressFlowOpen] = useState(false);
-const [addressFlowTarget, setAddressFlowTarget] = useState("project");
-const [addressViewForProjectId, setAddressViewForProjectId] = useState(null);
-const [sscpCustomFields, setSscpCustomFields] = useState([]);
+  const [addressFlowOpen, setAddressFlowOpen] = useState(false);
+  const [addressFlowTarget, setAddressFlowTarget] = useState("project");
+  const [addressViewForProjectId, setAddressViewForProjectId] = useState(null);
+  const [sscpCustomFields, setSscpCustomFields] = useState([]);
 
   // Intervention picker
   const [pickForId, setPickForId] = useState(null);
@@ -392,118 +392,118 @@ const [sscpCustomFields, setSscpCustomFields] = useState([]);
 
 
   // Intervention details modal
- const [detailFor, setDetailFor] = useState(null);
+  const [detailFor, setDetailFor] = useState(null);
 
-const makeDefaultTechRows = () => [
-  {
-    quarter: "",
-    unitCenter: "DOST-PANGASINAN",
-    nameOfTechnologyTransferred: "",
-    technologyGenerator: "",
-    modeOfTransfer: "",
-    isDostDevelopedFunded: false,
-    dateTransferred: "",
-    activityTitle: "",
-    activityDate: "",
-    activityVenue: "",
-    institutionName: "",
-    institutionAddress: "",
-    institutionAddressMeta: null,
-    classification: "",
-    representativeName: "",
-    representativeDesignation: "",
-    sex: "",
-  },
-];
+  const makeDefaultTechRows = () => [
+    {
+      quarter: "",
+      unitCenter: "DOST-PANGASINAN",
+      nameOfTechnologyTransferred: "",
+      technologyGenerator: "",
+      modeOfTransfer: "",
+      isDostDevelopedFunded: false,
+      dateTransferred: "",
+      activityTitle: "",
+      activityDate: "",
+      activityVenue: "",
+      institutionName: "",
+      institutionAddress: "",
+      institutionAddressMeta: null,
+      classification: "",
+      representativeName: "",
+      representativeDesignation: "",
+      sex: "",
+    },
+  ];
 
-const updateTechRow = (idx, key, val) => {
-  setDetailForm((prev) => {
-    const next = [...(prev.techRows || [])];
-    next[idx] = { ...(next[idx] || {}), [key]: val };
-    return { ...prev, techRows: next };
-  });
-};
+  const updateTechRow = (idx, key, val) => {
+    setDetailForm((prev) => {
+      const next = [...(prev.techRows || [])];
+      next[idx] = { ...(next[idx] || {}), [key]: val };
+      return { ...prev, techRows: next };
+    });
+  };
 
-const addTechRow = () => {
-  setDetailForm((prev) => ({
-    ...prev,
-    techRows: [...(prev.techRows || []), ...makeDefaultTechRows()],
-  }));
-};
-
-const removeTechRow = (idx) => {
-  setDetailForm((prev) => {
-    const arr = [...(prev.techRows || [])];
-    arr.splice(idx, 1);
-    return {
+  const addTechRow = () => {
+    setDetailForm((prev) => ({
       ...prev,
-      techRows: arr.length ? arr : makeDefaultTechRows(),
-    };
+      techRows: [...(prev.techRows || []), ...makeDefaultTechRows()],
+    }));
+  };
+
+  const removeTechRow = (idx) => {
+    setDetailForm((prev) => {
+      const arr = [...(prev.techRows || [])];
+      arr.splice(idx, 1);
+      return {
+        ...prev,
+        techRows: arr.length ? arr : makeDefaultTechRows(),
+      };
+    });
+  };
+
+  const [detailForm, setDetailForm] = useState({
+    type: "",
+    title: "",
+    date: "",
+    venue: "",
+    noOfFirms: "",
+    male: "",
+    female: "",
+    total: "",
+    projectProgramUnit: "",
+    notes: "",
+    techRows: [],
+
+    trainingProgram: "",
+    trainingProvince: "PANGASINAN",
+    trainingStartDate: "",
+    trainingEndDate: "",
+    trainingVenueAddress: "",
+    trainingVenueAddressMeta: null,
+    trainingParticipantsFemale: "",
+    trainingParticipantsMale: "",
+    trainingSeniorFemale: "",
+    trainingSeniorMale: "",
+    trainingIpFemale: "",
+    trainingIpMale: "",
+    trainingFourPsFemale: "",
+    trainingFourPsMale: "",
+    trainingPwdFemale: "",
+    trainingPwdMale: "",
+    trainingFirmsSucsHeisLgusCount: "",
+    trainingFirmsAssociationsList: "",
+    trainingTrainorAffiliation: "",
+    trainingCostDost: "",
+    trainingCostPartnerAgency: "",
+
+    promoProject: "",
+    promoActivityDate: "",
+    promoTechnologyPromoted: "",
+    promoTechnologyGenerator: "",
+    promoModeOfPromotion: "Social Media",
+    promoActivityTitle: "",
+    promoActivityVenueAddress: "",
+    promoActivityVenueMeta: null,
+    promoCustomerName: "",
+    promoCustomerAddress: "",
+    promoCustomerAddressMeta: null,
+    promoSex: "N/A",
+    promoStaffName: "",
+    promoMeansVerification: "",
+    promoPhotos: [],
+
+    consultancyType: "",
+    dateEngagement: "",
+    expertInstitution: "",
+    customerName: "",
+    customerSex: "",
+    customerAddress: "",
+    customerAddressMeta: null,
+    meansVerification: "",
+    noOfAdvice: "",
+    tacsPhotos: [],
   });
-};
-
-const [detailForm, setDetailForm] = useState({
-  type: "",
-  title: "",
-  date: "",
-  venue: "",
-  noOfFirms: "",
-  male: "",
-  female: "",
-  total: "",
-  projectProgramUnit: "",
-  notes: "",
-  techRows: [],
-
-  trainingProgram: "",
-  trainingProvince: "PANGASINAN",
-  trainingStartDate: "",
-  trainingEndDate: "",
-  trainingVenueAddress: "",
-  trainingVenueAddressMeta: null,
-  trainingParticipantsFemale: "",
-  trainingParticipantsMale: "",
-  trainingSeniorFemale: "",
-  trainingSeniorMale: "",
-  trainingIpFemale: "",
-  trainingIpMale: "",
-  trainingFourPsFemale: "",
-  trainingFourPsMale: "",
-  trainingPwdFemale: "",
-  trainingPwdMale: "",
-  trainingFirmsSucsHeisLgusCount: "",
-  trainingFirmsAssociationsList: "",
-  trainingTrainorAffiliation: "",
-  trainingCostDost: "",
-  trainingCostPartnerAgency: "",
-
-  promoProject: "",
-  promoActivityDate: "",
-  promoTechnologyPromoted: "",
-  promoTechnologyGenerator: "",
-  promoModeOfPromotion: "Social Media",
-  promoActivityTitle: "",
-  promoActivityVenueAddress: "",
-  promoActivityVenueMeta: null,
-  promoCustomerName: "",
-  promoCustomerAddress: "",
-  promoCustomerAddressMeta: null,
-  promoSex: "N/A",
-  promoStaffName: "",
-  promoMeansVerification: "",
-  promoPhotos: [],
-
-  consultancyType: "",
-  dateEngagement: "",
-  expertInstitution: "",
-  customerName: "",
-  customerSex: "",
-  customerAddress: "",
-  customerAddressMeta: null,
-  meansVerification: "",
-  noOfAdvice: "",
-  tacsPhotos: [],
-});
 
   const trainingTotalFemale =
     toNumber(detailForm.trainingParticipantsFemale) +
@@ -834,8 +834,8 @@ const [detailForm, setDetailForm] = useState({
   const [printPaperSize, setPrintPaperSize] = useState('A4');
   const [customPaperWidth, setCustomPaperWidth] = useState('8.5');
   const [customPaperHeight, setCustomPaperHeight] = useState('13');
-// Load storage
-    const fetchProjects = async () => {
+  // Load storage
+  const fetchProjects = async () => {
     if (OFFLINE_MODE) {
       setProjects(readLocalProjects());
       return;
@@ -846,7 +846,7 @@ const [detailForm, setDetailForm] = useState({
 
       const normalized = (res.data || []).map((p) => ({
         id: p.id,
-lguCommunity:
+        lguCommunity:
           p.lguCommunity ||
           p.lguName ||
           p.community ||
@@ -866,9 +866,9 @@ lguCommunity:
 
         sscProjects: Array.isArray(p.sscProjects)
           ? p.sscProjects.map((x) => ({
-              ...x,
-              interventions: Array.isArray(x?.interventions) ? x.interventions : [],
-            }))
+            ...x,
+            interventions: Array.isArray(x?.interventions) ? x.interventions : [],
+          }))
           : [],
         remarks: p.remarks || "",
 
@@ -936,7 +936,7 @@ lguCommunity:
 
     async function loadSscpCustomFields() {
       try {
-        const res = await axios.get(`${API}/api/table-management/config`);
+        const res = await axios.get(`${API}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const sscpModule = modules.find(
@@ -954,10 +954,10 @@ lguCommunity:
         const fields = Array.isArray(mainTable?.fields)
           ? mainTable.fields
           : Array.isArray(sscpModule?.fields)
-          ? sscpModule.fields
-          : Array.isArray(sscpModule?.formFields)
-          ? sscpModule.formFields
-          : [];
+            ? sscpModule.fields
+            : Array.isArray(sscpModule?.formFields)
+              ? sscpModule.formFields
+              : [];
 
         const customFields = fields
           .filter((f) => {
@@ -1059,7 +1059,7 @@ lguCommunity:
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-    const saveProjects = (next) => {
+  const saveProjects = (next) => {
     setProjects(next);
   };
 
@@ -1080,90 +1080,90 @@ lguCommunity:
   };
 
   const resetDetailForm = (type = "") => {
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
 
-  setDetailForm({
-    type: type || "",
-    title: "",
-    date: "",
-    venue: "",
-    noOfFirms: "",
-    male: "",
-    female: "",
-    total: "",
-    projectProgramUnit: "",
-    notes: "",
-    techRows: isTech ? makeDefaultTechRows() : [],
+    setDetailForm({
+      type: type || "",
+      title: "",
+      date: "",
+      venue: "",
+      noOfFirms: "",
+      male: "",
+      female: "",
+      total: "",
+      projectProgramUnit: "",
+      notes: "",
+      techRows: isTech ? makeDefaultTechRows() : [],
 
-    packagingQuarter: isPackaging ? "" : "",
-    packagingProvince: isPackaging ? "Pangasinan" : "Pangasinan",
-    packagingDateCompleted: isPackaging ? "" : "",
-    packagingTypeOfIntervention: isPackaging ? "Label Design" : "Label Design",
-    packagingProductName: isPackaging ? "" : "",
-    packagingSizeVariant: isPackaging ? "" : "",
-    packagingMaterialsProvided: isPackaging ? "" : "",
-    packagingCustomerName: isPackaging ? "" : "",
-    packagingSex: isPackaging ? "" : "",
-    packagingFirmInstitution: isPackaging ? "" : "",
-    packagingAddress: isPackaging ? "" : "",
-    packagingAddressMeta: null,
-    packagingMeansVerification: isPackaging ? "" : "",
-    packagingPhotos: [],
+      packagingQuarter: isPackaging ? "" : "",
+      packagingProvince: isPackaging ? "Pangasinan" : "Pangasinan",
+      packagingDateCompleted: isPackaging ? "" : "",
+      packagingTypeOfIntervention: isPackaging ? "Label Design" : "Label Design",
+      packagingProductName: isPackaging ? "" : "",
+      packagingSizeVariant: isPackaging ? "" : "",
+      packagingMaterialsProvided: isPackaging ? "" : "",
+      packagingCustomerName: isPackaging ? "" : "",
+      packagingSex: isPackaging ? "" : "",
+      packagingFirmInstitution: isPackaging ? "" : "",
+      packagingAddress: isPackaging ? "" : "",
+      packagingAddressMeta: null,
+      packagingMeansVerification: isPackaging ? "" : "",
+      packagingPhotos: [],
 
-    trainingProgram: isTraining ? "" : "",
-    trainingProvince: "PANGASINAN",
-    trainingStartDate: isTraining ? "" : "",
-    trainingEndDate: isTraining ? "" : "",
-    trainingVenueAddress: isTraining ? "" : "",
-    trainingVenueAddressMeta: null,
-    trainingParticipantsFemale: isTraining ? "" : "",
-    trainingParticipantsMale: isTraining ? "" : "",
-    trainingSeniorFemale: isTraining ? "" : "",
-    trainingSeniorMale: isTraining ? "" : "",
-    trainingIpFemale: isTraining ? "" : "",
-    trainingIpMale: isTraining ? "" : "",
-    trainingFourPsFemale: isTraining ? "" : "",
-    trainingFourPsMale: isTraining ? "" : "",
-    trainingPwdFemale: isTraining ? "" : "",
-    trainingPwdMale: isTraining ? "" : "",
-    trainingFirmsSucsHeisLgusCount: isTraining ? "" : "",
-    trainingFirmsAssociationsList: isTraining ? "" : "",
-    trainingTrainorAffiliation: isTraining ? "" : "",
-    trainingCostDost: isTraining ? "" : "",
-    trainingCostPartnerAgency: isTraining ? "" : "",
+      trainingProgram: isTraining ? "" : "",
+      trainingProvince: "PANGASINAN",
+      trainingStartDate: isTraining ? "" : "",
+      trainingEndDate: isTraining ? "" : "",
+      trainingVenueAddress: isTraining ? "" : "",
+      trainingVenueAddressMeta: null,
+      trainingParticipantsFemale: isTraining ? "" : "",
+      trainingParticipantsMale: isTraining ? "" : "",
+      trainingSeniorFemale: isTraining ? "" : "",
+      trainingSeniorMale: isTraining ? "" : "",
+      trainingIpFemale: isTraining ? "" : "",
+      trainingIpMale: isTraining ? "" : "",
+      trainingFourPsFemale: isTraining ? "" : "",
+      trainingFourPsMale: isTraining ? "" : "",
+      trainingPwdFemale: isTraining ? "" : "",
+      trainingPwdMale: isTraining ? "" : "",
+      trainingFirmsSucsHeisLgusCount: isTraining ? "" : "",
+      trainingFirmsAssociationsList: isTraining ? "" : "",
+      trainingTrainorAffiliation: isTraining ? "" : "",
+      trainingCostDost: isTraining ? "" : "",
+      trainingCostPartnerAgency: isTraining ? "" : "",
 
-    promoProject: isPromoLike ? "SSCP" : "",
-    promoActivityDate: isPromoLike ? "" : "",
-    promoTechnologyPromoted: isPromoLike ? "" : "",
-    promoTechnologyGenerator: isPromoLike ? "" : "",
-    promoModeOfPromotion: isPromoLike ? "Social Media" : "Social Media",
-    promoActivityTitle: isPromoLike ? "" : "",
-    promoActivityVenueAddress: isPromoLike ? "" : "",
-    promoActivityVenueMeta: null,
-    promoCustomerName: isPromoLike ? "" : "",
-    promoCustomerAddress: isPromoLike ? "" : "",
-    promoCustomerAddressMeta: null,
-    promoSex: isPromoLike ? "N/A" : "N/A",
-    promoStaffName: isPromoLike ? "" : "",
-    promoMeansVerification: isPromoLike ? "" : "",
-    promoPhotos: [],
+      promoProject: isPromoLike ? "SSCP" : "",
+      promoActivityDate: isPromoLike ? "" : "",
+      promoTechnologyPromoted: isPromoLike ? "" : "",
+      promoTechnologyGenerator: isPromoLike ? "" : "",
+      promoModeOfPromotion: isPromoLike ? "Social Media" : "Social Media",
+      promoActivityTitle: isPromoLike ? "" : "",
+      promoActivityVenueAddress: isPromoLike ? "" : "",
+      promoActivityVenueMeta: null,
+      promoCustomerName: isPromoLike ? "" : "",
+      promoCustomerAddress: isPromoLike ? "" : "",
+      promoCustomerAddressMeta: null,
+      promoSex: isPromoLike ? "N/A" : "N/A",
+      promoStaffName: isPromoLike ? "" : "",
+      promoMeansVerification: isPromoLike ? "" : "",
+      promoPhotos: [],
 
-    consultancyType: isTacs ? "" : "",
-    dateEngagement: isTacs ? "" : "",
-    expertInstitution: isTacs ? "" : "",
-    customerName: isTacs ? "" : "",
-    customerSex: isTacs ? "" : "",
-    customerAddress: isTacs ? "" : "",
-    customerAddressMeta: null,
-    meansVerification: isTacs ? "" : "",
-    noOfAdvice: isTacs ? "" : "",
-    tacsPhotos: [],
-  });
-};
+      consultancyType: isTacs ? "" : "",
+      dateEngagement: isTacs ? "" : "",
+      expertInstitution: isTacs ? "" : "",
+      customerName: isTacs ? "" : "",
+      customerSex: isTacs ? "" : "",
+      customerAddress: isTacs ? "" : "",
+      customerAddressMeta: null,
+      meansVerification: isTacs ? "" : "",
+      noOfAdvice: isTacs ? "" : "",
+      tacsPhotos: [],
+    });
+  };
 
   // ===== PROJECT CRUD =====
   const openAddProject = () => {
@@ -1191,105 +1191,105 @@ lguCommunity:
       customFields:
         typeof (p.customFields || p.custom_fields || {}) === "string"
           ? (() => {
-              try {
-                return JSON.parse(p.customFields || p.custom_fields || "{}");
-              } catch {
-                return {};
-              }
-            })()
+            try {
+              return JSON.parse(p.customFields || p.custom_fields || "{}");
+            } catch {
+              return {};
+            }
+          })()
           : p.customFields || p.custom_fields || {},
     });
 
     setShowAdd(true);
   };
 
-const saveProject = async () => {
-  if (!form.lguCommunity.trim()) return alert("Required: LGU / Community");
-  if (!form.address.trim()) return alert("Required: Venue/Address");
+  const saveProject = async () => {
+    if (!form.lguCommunity.trim()) return alert("Required: LGU / Community");
+    if (!form.address.trim()) return alert("Required: Venue/Address");
 
-  if (form.moaMouType && !form.moaMouTitle.trim()) {
-    return alert("Required: MOA/MOU Title");
-  }
+    if (form.moaMouType && !form.moaMouTitle.trim()) {
+      return alert("Required: MOA/MOU Title");
+    }
 
-  if (form.isSmartCity && !form.smartCityDate) {
-    return alert("Required: Smart City Recognition Date");
-  }
+    if (form.isSmartCity && !form.smartCityDate) {
+      return alert("Required: Smart City Recognition Date");
+    }
 
-  const base = {
-lguCommunity: form.lguCommunity.trim(),
-    address: form.address.trim(),
-    addressMeta: form.addressMeta || null,
-    moaMouType: (form.moaMouType || "").trim(),
-    moaMouTitle: (form.moaMouTitle || "").trim(),
-    partners: (form.partners || "").trim(),
-    staffName: (form.staffName || "").trim(),
-    isSmartCity: Boolean(form.isSmartCity),
-    smartCityDate: form.isSmartCity ? (form.smartCityDate || "") : "",
-    remarks: (form.remarks || "").trim(),
-    custom_fields: form.customFields || {},
-    customFields: form.customFields || {},
+    const base = {
+      lguCommunity: form.lguCommunity.trim(),
+      address: form.address.trim(),
+      addressMeta: form.addressMeta || null,
+      moaMouType: (form.moaMouType || "").trim(),
+      moaMouTitle: (form.moaMouTitle || "").trim(),
+      partners: (form.partners || "").trim(),
+      staffName: (form.staffName || "").trim(),
+      isSmartCity: Boolean(form.isSmartCity),
+      smartCityDate: form.isSmartCity ? (form.smartCityDate || "") : "",
+      remarks: (form.remarks || "").trim(),
+      custom_fields: form.customFields || {},
+      customFields: form.customFields || {},
+    };
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+
+    if (OFFLINE_MODE) {
+      const current = readLocalProjects();
+
+      if (!editProjectId) {
+        const newId = `local_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+        const next = [
+          ...current,
+          {
+            id: newId,
+            ...base,
+            sscProjects: [],
+            interventions: [],
+            createdAt: todayIso,
+          },
+        ];
+        writeLocalProjects(next);
+        setProjects(next);
+      } else {
+        const next = current.map((p) => {
+          if (String(p.id) !== String(editProjectId)) return p;
+          return {
+            ...p,
+            ...base,
+            id: p.id,
+            sscProjects: Array.isArray(p.sscProjects) ? p.sscProjects : [],
+            interventions: Array.isArray(p.interventions) ? p.interventions : [],
+            createdAt: p.createdAt || todayIso,
+          };
+        });
+        writeLocalProjects(next);
+        setProjects(next);
+      }
+
+      setShowAdd(false);
+      setEditProjectId(null);
+      resetForm();
+      return;
+    }
+
+    // ✅ Backend mode (keep for later integration)
+    try {
+      const payload = { ...base, createdAt: todayIso };
+
+      if (!editProjectId) {
+        await axios.post(`${API}/sscp`, payload);
+      } else {
+        await axios.put(`${API}/sscp/${editProjectId}`, payload);
+      }
+
+      await fetchProjects();
+      setShowAdd(false);
+      setEditProjectId(null);
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save LGU/Community.");
+    }
   };
-
-  const todayIso = new Date().toISOString().slice(0, 10);
-
-  if (OFFLINE_MODE) {
-    const current = readLocalProjects();
-
-    if (!editProjectId) {
-      const newId = `local_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-      const next = [
-        ...current,
-        {
-          id: newId,
-          ...base,
-          sscProjects: [],
-          interventions: [],
-          createdAt: todayIso,
-        },
-      ];
-      writeLocalProjects(next);
-      setProjects(next);
-    } else {
-      const next = current.map((p) => {
-        if (String(p.id) !== String(editProjectId)) return p;
-        return {
-          ...p,
-          ...base,
-          id: p.id,
-          sscProjects: Array.isArray(p.sscProjects) ? p.sscProjects : [],
-          interventions: Array.isArray(p.interventions) ? p.interventions : [],
-          createdAt: p.createdAt || todayIso,
-        };
-      });
-      writeLocalProjects(next);
-      setProjects(next);
-    }
-
-    setShowAdd(false);
-    setEditProjectId(null);
-    resetForm();
-    return;
-  }
-
-  // ✅ Backend mode (keep for later integration)
-  try {
-    const payload = { ...base, createdAt: todayIso };
-
-    if (!editProjectId) {
-      await axios.post(`${API}/sscp`, payload);
-    } else {
-      await axios.put(`${API}/sscp/${editProjectId}`, payload);
-    }
-
-    await fetchProjects();
-    setShowAdd(false);
-    setEditProjectId(null);
-    resetForm();
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save LGU/Community.");
-  }
-};
 
 
   const deleteProject = async (id) => {
@@ -1311,11 +1311,11 @@ lguCommunity: form.lguCommunity.trim(),
     }
   };
 
-  
-    /* =========================
-     ✅ SSC PROJECTS (Full fields) — per LGU/Community
-     - Uses "Approved Project Cost (in Peso)" for Total SSC Fund
-     ========================= */
+
+  /* =========================
+   ✅ SSC PROJECTS (Full fields) — per LGU/Community
+   - Uses "Approved Project Cost (in Peso)" for Total SSC Fund
+   ========================= */
   const getSscProjects = (p) => (Array.isArray(p?.sscProjects) ? p.sscProjects : []);
 
   const getSscTotal = (p) => {
@@ -1393,14 +1393,14 @@ lguCommunity: form.lguCommunity.trim(),
 
     const payload = {
       quarter: (() => {
-      const d = new Date(sscProjectForm.dateProjectApproval || "");
-      if (Number.isNaN(d.getTime())) return "";
-      const m = d.getMonth() + 1;
-      if (m <= 3) return "1";
-      if (m <= 6) return "2";
-      if (m <= 9) return "3";
-      return "4";
-    })(),
+        const d = new Date(sscProjectForm.dateProjectApproval || "");
+        if (Number.isNaN(d.getTime())) return "";
+        const m = d.getMonth() + 1;
+        if (m <= 3) return "1";
+        if (m <= 6) return "2";
+        if (m <= 9) return "3";
+        return "4";
+      })(),
       projectTitle: (sscProjectForm.projectTitle || "").trim(),
       dateProjectApproval: sscProjectForm.dateProjectApproval || "",
       approvedProjectCost: approvedCostNum,
@@ -1456,24 +1456,24 @@ lguCommunity: form.lguCommunity.trim(),
     // ✅ Backend mode placeholder
     try {
       if (sscProjectModal.mode === "add") {
- const res = await axios.post(`${API}/sscp/${sscProjectModal.lguId}/projects`, payload);
- const newId = res.data?.id;
- if (newId) {
- setSelectedSscProjectByLgu((prev) => ({ ...prev, [sscProjectModal.lguId]: newId }));
- }
- } else {
- await axios.put(`${API}/sscp-projects/${sscProjectModal.projectId}`, payload);
- setSelectedSscProjectByLgu((prev) => ({ ...prev, [sscProjectModal.lguId]: sscProjectModal.projectId }));
- }
+        const res = await axios.post(`${API}/sscp/${sscProjectModal.lguId}/projects`, payload);
+        const newId = res.data?.id;
+        if (newId) {
+          setSelectedSscProjectByLgu((prev) => ({ ...prev, [sscProjectModal.lguId]: newId }));
+        }
+      } else {
+        await axios.put(`${API}/sscp-projects/${sscProjectModal.projectId}`, payload);
+        setSelectedSscProjectByLgu((prev) => ({ ...prev, [sscProjectModal.lguId]: sscProjectModal.projectId }));
+      }
 
- await fetchProjects();
- closeSscProjectModal();
- } catch (err) {
- console.error(err);
- alert("Failed to save SSC Project.");
- }
+      await fetchProjects();
+      closeSscProjectModal();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save SSC Project.");
+    }
   };
-const deleteSscProject = async (lguId, projectId) => {
+  const deleteSscProject = async (lguId, projectId) => {
     if (!window.confirm("Delete this project entry?")) return;
 
     if (OFFLINE_MODE) {
@@ -1529,317 +1529,317 @@ const deleteSscProject = async (lguId, projectId) => {
   };
 
   const openInterventionDetails_Edit = (lguId, sscProjectId, entryId) => {
-  const p = projects.find((x) => String(x.id) === String(lguId));
-  const sp = getSscProjects(p).find((x) => String(x.id) === String(sscProjectId));
-  const entry = sp?.interventions?.find((x) => String(x.id) === String(entryId));
-  if (!p || !sp || !entry) return;
+    const p = projects.find((x) => String(x.id) === String(lguId));
+    const sp = getSscProjects(p).find((x) => String(x.id) === String(sscProjectId));
+    const entry = sp?.interventions?.find((x) => String(x.id) === String(entryId));
+    if (!p || !sp || !entry) return;
 
-  const type = entry.type || "";
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTrainingLike = isTraining || isPromoLike;
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
+    const type = entry.type || "";
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTrainingLike = isTraining || isPromoLike;
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
 
-  let parsedRows = null;
-  let parsedFreeText = null;
+    let parsedRows = null;
+    let parsedFreeText = null;
 
-  if (isTech) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
-        if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
-      }
-    } catch {}
-  }
-
-  let packagingQuarter = "";
-  let packagingProvince = "Pangasinan";
-  let packagingDateCompleted = entry.date || "";
-  let packagingTypeOfIntervention = "Label Design";
-  let packagingProductName = "";
-  let packagingSizeVariant = "";
-  let packagingMaterialsProvided = "";
-  let packagingCustomerName = "";
-  let packagingSex = "";
-  let packagingFirmInstitution = "";
-  let packagingAddress = entry.venue || "";
-  let packagingAddressMeta = null;
-  let packagingMeansVerification = "";
-  let packagingPhotos = [];
-  let packagingRemarks = entry.notes || "";
-
-  let trainingProgram = "";
-  let trainingProvince = "PANGASINAN";
-  let trainingStartDate = entry.date || "";
-  let trainingEndDate = "";
-  let trainingVenueAddress = entry.venue || "";
-  let trainingVenueAddressMeta = null;
-  let trainingNoOfFirms = entry.noOfFirms ?? "";
-  let trainingParticipantsFemale = "";
-  let trainingParticipantsMale = "";
-  let trainingSeniorFemale = "";
-  let trainingSeniorMale = "";
-  let trainingIpFemale = "";
-  let trainingIpMale = "";
-  let trainingFourPsFemale = "";
-  let trainingFourPsMale = "";
-  let trainingPwdFemale = "";
-  let trainingPwdMale = "";
-  let trainingFirmsSucsHeisLgusCount = "";
-  let trainingFirmsAssociationsList = "";
-  let trainingTrainorAffiliation = "";
-  let trainingProjectProgramUnit = "";
-  let trainingCostDost = "";
-  let trainingCostPartnerAgency = "";
-  let trainingRemarks = entry.notes || "";
-  let promoProject = "SSCP";
-  let promoActivityDate = entry.date || "";
-  let promoTechnologyPromoted = "";
-  let promoTechnologyGenerator = "";
-  let promoModeOfPromotion = "Social Media";
-  let promoActivityTitle = entry.title || "";
-  let promoActivityVenueAddress = entry.venue || "";
-  let promoActivityVenueMeta = null;
-  let promoCustomerName = "";
-  let promoCustomerAddress = "";
-  let promoCustomerAddressMeta = null;
-  let promoSex = "N/A";
-  let promoStaffName = "";
-  let promoMeansVerification = "";
-  let promoPhotos = [];
-  let tacsConsultancyType = "";
-  let tacsDateEngagement = "";
-  let tacsExpertInstitution = "";
-  let tacsCustomerName = "";
-  let tacsCustomerSex = "";
-  let tacsCustomerAddress = "";
-  let tacsCustomerAddressMeta = null;
-  let tacsMeansVerification = "";
-  let tacsNoOfAdvice = "";
-  let tacsPhotos = [];
-  let tacsRemarks = entry.notes || "";
-
-  if (type === "Training") {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        trainingProgram = obj.trainingProgram || "";
-        trainingProvince = obj.trainingProvince || "PANGASINAN";
-        trainingStartDate = obj.trainingStartDate || entry.date || "";
-        trainingEndDate = obj.trainingEndDate || "";
-        trainingVenueAddress = obj.trainingVenueAddress || entry.venue || "";
-        trainingVenueAddressMeta = obj.trainingVenueAddressMeta || null;
-        trainingNoOfFirms =
-          obj.trainingNoOfFirms === null || obj.trainingNoOfFirms === undefined
-            ? entry.noOfFirms ?? ""
-            : String(obj.trainingNoOfFirms);
-        trainingParticipantsFemale =
-          obj.trainingParticipantsFemale === null || obj.trainingParticipantsFemale === undefined
-            ? ""
-            : String(obj.trainingParticipantsFemale);
-        trainingParticipantsMale =
-          obj.trainingParticipantsMale === null || obj.trainingParticipantsMale === undefined
-            ? ""
-            : String(obj.trainingParticipantsMale);
-        trainingSeniorFemale = obj.trainingSeniorFemale === null || obj.trainingSeniorFemale === undefined ? "" : String(obj.trainingSeniorFemale);
-        trainingSeniorMale = obj.trainingSeniorMale === null || obj.trainingSeniorMale === undefined ? "" : String(obj.trainingSeniorMale);
-        trainingIpFemale = obj.trainingIpFemale === null || obj.trainingIpFemale === undefined ? "" : String(obj.trainingIpFemale);
-        trainingIpMale = obj.trainingIpMale === null || obj.trainingIpMale === undefined ? "" : String(obj.trainingIpMale);
-        trainingFourPsFemale = obj.trainingFourPsFemale === null || obj.trainingFourPsFemale === undefined ? "" : String(obj.trainingFourPsFemale);
-        trainingFourPsMale = obj.trainingFourPsMale === null || obj.trainingFourPsMale === undefined ? "" : String(obj.trainingFourPsMale);
-        trainingPwdFemale = obj.trainingPwdFemale === null || obj.trainingPwdFemale === undefined ? "" : String(obj.trainingPwdFemale);
-        trainingPwdMale = obj.trainingPwdMale === null || obj.trainingPwdMale === undefined ? "" : String(obj.trainingPwdMale);
-        trainingFirmsSucsHeisLgusCount = obj.trainingFirmsSucsHeisLgusCount === null || obj.trainingFirmsSucsHeisLgusCount === undefined ? "" : String(obj.trainingFirmsSucsHeisLgusCount);
-        trainingFirmsAssociationsList = obj.trainingFirmsAssociationsList || "";
-        trainingTrainorAffiliation = obj.trainingTrainorAffiliation || "";
-        trainingProjectProgramUnit = obj.projectProgramUnit || "";
-        trainingCostDost = obj.trainingCostDost === null || obj.trainingCostDost === undefined ? "" : String(obj.trainingCostDost);
-        trainingCostPartnerAgency = obj.trainingCostPartnerAgency === null || obj.trainingCostPartnerAgency === undefined ? "" : String(obj.trainingCostPartnerAgency);
-        trainingRemarks = typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
-      }
-    } catch {
-      trainingRemarks = entry.notes || "";
-      trainingProjectProgramUnit = "";
-    }
-  } else if (isPromoLike) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        promoProject = obj.project || "SSCP";
-        promoActivityDate = obj.activityDate || entry.date || "";
-        promoTechnologyPromoted = obj.technologyPromoted || "";
-        promoTechnologyGenerator = obj.technologyGenerator || "";
-        promoModeOfPromotion = obj.modeOfPromotion || "Social Media";
-        promoActivityTitle = obj.activityTitle || entry.title || "";
-        promoActivityVenueAddress = obj.activityVenueAddress || entry.venue || "";
-        promoActivityVenueMeta = obj.activityVenueMeta || null;
-        promoCustomerName = obj.customerParticipantName || "";
-        promoCustomerAddress = obj.customerParticipantAddress || "";
-        promoCustomerAddressMeta = obj.customerParticipantAddressMeta || null;
-        promoSex = obj.sex || "N/A";
-        promoStaffName = obj.staffName || "";
-        promoMeansVerification = obj.meansOfVerification || "";
-        promoPhotos = Array.isArray(obj.photos) ? obj.photos : [];
-        trainingProjectProgramUnit =
-          typeof obj.projectProgramUnit === "string" ? obj.projectProgramUnit : "";
-        trainingRemarks =
-          typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
-      }
-    } catch {
-      promoProject = "SSCP";
-      promoActivityDate = entry.date || "";
-      promoTechnologyPromoted = entry.title || "";
-      promoTechnologyGenerator = "";
-      promoModeOfPromotion = "Social Media";
-      promoActivityTitle = entry.title || "";
-      promoActivityVenueAddress = entry.venue || "";
-      promoActivityVenueMeta = null;
-      promoCustomerName = "";
-      promoCustomerAddress = "";
-      promoCustomerAddressMeta = null;
-      promoSex = "N/A";
-      promoStaffName = "";
-      promoMeansVerification = "";
-      promoPhotos = [];
-      trainingProjectProgramUnit = "";
-      trainingRemarks = entry.notes || "";
-    }
-  }
-
-  if (isPackaging) {
-    packagingQuarter =
-      entry?.packagingQuarter === null || entry?.packagingQuarter === undefined
-        ? ""
-        : String(entry.packagingQuarter || "");
-    packagingProvince = entry?.packagingProvince || "Pangasinan";
-    packagingDateCompleted =
-      entry?.packagingDateCompleted || entry?.date || "";
-    packagingTypeOfIntervention =
-      entry?.packagingTypeOfIntervention || "Label Design";
-    packagingProductName = entry?.packagingProductName || "";
-    packagingSizeVariant = entry?.packagingSizeVariant || "";
-    packagingMaterialsProvided = entry?.packagingMaterialsProvided || "";
-    packagingCustomerName = entry?.packagingCustomerName || "";
-    packagingSex = entry?.packagingSex || "";
-    packagingFirmInstitution = entry?.packagingFirmInstitution || "";
-    packagingAddress = entry?.packagingAddress || entry?.venue || "";
-    packagingAddressMeta = entry?.packagingAddressMeta || null;
-    packagingMeansVerification = entry?.packagingMeansVerification || "";
-    packagingPhotos = Array.isArray(entry?.packagingPhotos) ? entry.packagingPhotos : [];
-    packagingRemarks = entry?.packagingRemarks || "";
-
-    if (
-      !packagingQuarter &&
-      !packagingProductName &&
-      !packagingSizeVariant &&
-      !packagingMaterialsProvided &&
-      !packagingCustomerName &&
-      !packagingFirmInstitution &&
-      !packagingAddress &&
-      (entry?.notes || "").trim().startsWith("{")
-    ) {
+    if (isTech) {
       try {
         const obj = JSON.parse(entry?.notes || "");
         if (obj && typeof obj === "object") {
-          packagingQuarter =
-            obj.quarter === null || obj.quarter === undefined ? "" : String(obj.quarter);
-          packagingProvince = obj.province || "Pangasinan";
-          packagingDateCompleted =
-            obj.dateCompletedExecuted || obj.dateCompleted || entry.date || "";
-          packagingTypeOfIntervention =
-            obj.packagingType || obj.typeOfIntervention || "Label Design";
-          packagingProductName =
-            obj.packagingProductName || obj.productName || "";
-          packagingSizeVariant =
-            obj.sizeVariantMaterial || obj.sizeVariant || "";
-          packagingMaterialsProvided =
-            obj.noOfPackagingMaterialsProvided ||
-            obj.packagingMaterialsProvided ||
-            "";
-          packagingCustomerName =
-            obj.packagingCustomerName || obj.customerName || "";
-          packagingSex = obj.packagingSex || obj.sex || "";
-          packagingFirmInstitution =
-            obj.packagingFirmInstitution || obj.firmName || "";
-          packagingAddress =
-            obj.packagingAddress || obj.address || entry.venue || "";
-          packagingAddressMeta =
-            obj.packagingAddressMeta || obj.addressMeta || null;
-          packagingMeansVerification =
-            obj.packagingMeansVerification || obj.meansOfVerification || "";
-          packagingPhotos = Array.isArray(obj.packagingPhotos)
-            ? obj.packagingPhotos
-            : Array.isArray(obj.photos)
-            ? obj.photos
-            : [];
-          packagingRemarks =
-            obj.packagingNotesRemarks ||
-            obj.packagingRemarks ||
-            obj.remarks ||
-            "";
+          if (Array.isArray(obj.techRollOutRows)) parsedRows = obj.techRollOutRows;
+          if (typeof obj.freeText === "string") parsedFreeText = obj.freeText;
         }
-      } catch {}
+      } catch { }
     }
-  }
 
-  if (isTacs) {
-    try {
-      const obj = JSON.parse(entry?.notes || "");
-      if (obj && typeof obj === "object") {
-        tacsConsultancyType = obj.consultancyType || entry.title || "";
-        tacsDateEngagement = obj.dateEngagement || entry.date || "";
-        tacsExpertInstitution = obj.expertInstitution || "";
-        tacsCustomerName = obj.customerName || "";
-        tacsCustomerSex = obj.customerSex || "";
-        tacsCustomerAddress = obj.customerAddress || entry.venue || "";
-        tacsCustomerAddressMeta = obj.customerAddressMeta || null;
-        tacsMeansVerification = obj.meansVerification || "";
-        tacsNoOfAdvice =
-          obj.noOfAdvice === null || obj.noOfAdvice === undefined
-            ? ""
-            : String(obj.noOfAdvice);
-        tacsPhotos = Array.isArray(obj.tacsPhotos)
-          ? obj.tacsPhotos
-          : Array.isArray(obj.photos)
-          ? obj.photos
-          : [];
-        tacsRemarks = obj.remarks || "";
+    let packagingQuarter = "";
+    let packagingProvince = "Pangasinan";
+    let packagingDateCompleted = entry.date || "";
+    let packagingTypeOfIntervention = "Label Design";
+    let packagingProductName = "";
+    let packagingSizeVariant = "";
+    let packagingMaterialsProvided = "";
+    let packagingCustomerName = "";
+    let packagingSex = "";
+    let packagingFirmInstitution = "";
+    let packagingAddress = entry.venue || "";
+    let packagingAddressMeta = null;
+    let packagingMeansVerification = "";
+    let packagingPhotos = [];
+    let packagingRemarks = entry.notes || "";
+
+    let trainingProgram = "";
+    let trainingProvince = "PANGASINAN";
+    let trainingStartDate = entry.date || "";
+    let trainingEndDate = "";
+    let trainingVenueAddress = entry.venue || "";
+    let trainingVenueAddressMeta = null;
+    let trainingNoOfFirms = entry.noOfFirms ?? "";
+    let trainingParticipantsFemale = "";
+    let trainingParticipantsMale = "";
+    let trainingSeniorFemale = "";
+    let trainingSeniorMale = "";
+    let trainingIpFemale = "";
+    let trainingIpMale = "";
+    let trainingFourPsFemale = "";
+    let trainingFourPsMale = "";
+    let trainingPwdFemale = "";
+    let trainingPwdMale = "";
+    let trainingFirmsSucsHeisLgusCount = "";
+    let trainingFirmsAssociationsList = "";
+    let trainingTrainorAffiliation = "";
+    let trainingProjectProgramUnit = "";
+    let trainingCostDost = "";
+    let trainingCostPartnerAgency = "";
+    let trainingRemarks = entry.notes || "";
+    let promoProject = "SSCP";
+    let promoActivityDate = entry.date || "";
+    let promoTechnologyPromoted = "";
+    let promoTechnologyGenerator = "";
+    let promoModeOfPromotion = "Social Media";
+    let promoActivityTitle = entry.title || "";
+    let promoActivityVenueAddress = entry.venue || "";
+    let promoActivityVenueMeta = null;
+    let promoCustomerName = "";
+    let promoCustomerAddress = "";
+    let promoCustomerAddressMeta = null;
+    let promoSex = "N/A";
+    let promoStaffName = "";
+    let promoMeansVerification = "";
+    let promoPhotos = [];
+    let tacsConsultancyType = "";
+    let tacsDateEngagement = "";
+    let tacsExpertInstitution = "";
+    let tacsCustomerName = "";
+    let tacsCustomerSex = "";
+    let tacsCustomerAddress = "";
+    let tacsCustomerAddressMeta = null;
+    let tacsMeansVerification = "";
+    let tacsNoOfAdvice = "";
+    let tacsPhotos = [];
+    let tacsRemarks = entry.notes || "";
+
+    if (type === "Training") {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          trainingProgram = obj.trainingProgram || "";
+          trainingProvince = obj.trainingProvince || "PANGASINAN";
+          trainingStartDate = obj.trainingStartDate || entry.date || "";
+          trainingEndDate = obj.trainingEndDate || "";
+          trainingVenueAddress = obj.trainingVenueAddress || entry.venue || "";
+          trainingVenueAddressMeta = obj.trainingVenueAddressMeta || null;
+          trainingNoOfFirms =
+            obj.trainingNoOfFirms === null || obj.trainingNoOfFirms === undefined
+              ? entry.noOfFirms ?? ""
+              : String(obj.trainingNoOfFirms);
+          trainingParticipantsFemale =
+            obj.trainingParticipantsFemale === null || obj.trainingParticipantsFemale === undefined
+              ? ""
+              : String(obj.trainingParticipantsFemale);
+          trainingParticipantsMale =
+            obj.trainingParticipantsMale === null || obj.trainingParticipantsMale === undefined
+              ? ""
+              : String(obj.trainingParticipantsMale);
+          trainingSeniorFemale = obj.trainingSeniorFemale === null || obj.trainingSeniorFemale === undefined ? "" : String(obj.trainingSeniorFemale);
+          trainingSeniorMale = obj.trainingSeniorMale === null || obj.trainingSeniorMale === undefined ? "" : String(obj.trainingSeniorMale);
+          trainingIpFemale = obj.trainingIpFemale === null || obj.trainingIpFemale === undefined ? "" : String(obj.trainingIpFemale);
+          trainingIpMale = obj.trainingIpMale === null || obj.trainingIpMale === undefined ? "" : String(obj.trainingIpMale);
+          trainingFourPsFemale = obj.trainingFourPsFemale === null || obj.trainingFourPsFemale === undefined ? "" : String(obj.trainingFourPsFemale);
+          trainingFourPsMale = obj.trainingFourPsMale === null || obj.trainingFourPsMale === undefined ? "" : String(obj.trainingFourPsMale);
+          trainingPwdFemale = obj.trainingPwdFemale === null || obj.trainingPwdFemale === undefined ? "" : String(obj.trainingPwdFemale);
+          trainingPwdMale = obj.trainingPwdMale === null || obj.trainingPwdMale === undefined ? "" : String(obj.trainingPwdMale);
+          trainingFirmsSucsHeisLgusCount = obj.trainingFirmsSucsHeisLgusCount === null || obj.trainingFirmsSucsHeisLgusCount === undefined ? "" : String(obj.trainingFirmsSucsHeisLgusCount);
+          trainingFirmsAssociationsList = obj.trainingFirmsAssociationsList || "";
+          trainingTrainorAffiliation = obj.trainingTrainorAffiliation || "";
+          trainingProjectProgramUnit = obj.projectProgramUnit || "";
+          trainingCostDost = obj.trainingCostDost === null || obj.trainingCostDost === undefined ? "" : String(obj.trainingCostDost);
+          trainingCostPartnerAgency = obj.trainingCostPartnerAgency === null || obj.trainingCostPartnerAgency === undefined ? "" : String(obj.trainingCostPartnerAgency);
+          trainingRemarks = typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
+        }
+      } catch {
+        trainingRemarks = entry.notes || "";
+        trainingProjectProgramUnit = "";
       }
-    } catch {
-      tacsConsultancyType = entry.title || "";
-      tacsDateEngagement = entry.date || "";
-      tacsCustomerAddress = entry.venue || "";
-      tacsRemarks = entry.notes || "";
+    } else if (isPromoLike) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          promoProject = obj.project || "SSCP";
+          promoActivityDate = obj.activityDate || entry.date || "";
+          promoTechnologyPromoted = obj.technologyPromoted || "";
+          promoTechnologyGenerator = obj.technologyGenerator || "";
+          promoModeOfPromotion = obj.modeOfPromotion || "Social Media";
+          promoActivityTitle = obj.activityTitle || entry.title || "";
+          promoActivityVenueAddress = obj.activityVenueAddress || entry.venue || "";
+          promoActivityVenueMeta = obj.activityVenueMeta || null;
+          promoCustomerName = obj.customerParticipantName || "";
+          promoCustomerAddress = obj.customerParticipantAddress || "";
+          promoCustomerAddressMeta = obj.customerParticipantAddressMeta || null;
+          promoSex = obj.sex || "N/A";
+          promoStaffName = obj.staffName || "";
+          promoMeansVerification = obj.meansOfVerification || "";
+          promoPhotos = Array.isArray(obj.photos) ? obj.photos : [];
+          trainingProjectProgramUnit =
+            typeof obj.projectProgramUnit === "string" ? obj.projectProgramUnit : "";
+          trainingRemarks =
+            typeof obj.remarks === "string" ? obj.remarks : entry.notes || "";
+        }
+      } catch {
+        promoProject = "SSCP";
+        promoActivityDate = entry.date || "";
+        promoTechnologyPromoted = entry.title || "";
+        promoTechnologyGenerator = "";
+        promoModeOfPromotion = "Social Media";
+        promoActivityTitle = entry.title || "";
+        promoActivityVenueAddress = entry.venue || "";
+        promoActivityVenueMeta = null;
+        promoCustomerName = "";
+        promoCustomerAddress = "";
+        promoCustomerAddressMeta = null;
+        promoSex = "N/A";
+        promoStaffName = "";
+        promoMeansVerification = "";
+        promoPhotos = [];
+        trainingProjectProgramUnit = "";
+        trainingRemarks = entry.notes || "";
+      }
     }
-  }
 
-  setDetailFor({ lguId, sscProjectId, mode: "edit", entryId });
+    if (isPackaging) {
+      packagingQuarter =
+        entry?.packagingQuarter === null || entry?.packagingQuarter === undefined
+          ? ""
+          : String(entry.packagingQuarter || "");
+      packagingProvince = entry?.packagingProvince || "Pangasinan";
+      packagingDateCompleted =
+        entry?.packagingDateCompleted || entry?.date || "";
+      packagingTypeOfIntervention =
+        entry?.packagingTypeOfIntervention || "Label Design";
+      packagingProductName = entry?.packagingProductName || "";
+      packagingSizeVariant = entry?.packagingSizeVariant || "";
+      packagingMaterialsProvided = entry?.packagingMaterialsProvided || "";
+      packagingCustomerName = entry?.packagingCustomerName || "";
+      packagingSex = entry?.packagingSex || "";
+      packagingFirmInstitution = entry?.packagingFirmInstitution || "";
+      packagingAddress = entry?.packagingAddress || entry?.venue || "";
+      packagingAddressMeta = entry?.packagingAddressMeta || null;
+      packagingMeansVerification = entry?.packagingMeansVerification || "";
+      packagingPhotos = Array.isArray(entry?.packagingPhotos) ? entry.packagingPhotos : [];
+      packagingRemarks = entry?.packagingRemarks || "";
 
-  setDetailForm({
-    type,
-    title: entry.title || (isTrainingLike ? "" : type),
-    date: entry.date || "",
-    venue: entry.venue || "",
-    noOfFirms: entry.noOfFirms ?? "",
-    male: entry.male ?? "",
-    female: entry.female ?? "",
-    total: entry.total ?? "",
-    projectProgramUnit: trainingProjectProgramUnit,
-    notes: isTech
-      ? parsedFreeText ?? ""
-      : isTrainingLike
-      ? trainingRemarks
-      : isPackaging
-      ? packagingRemarks
-      : isTacs
-      ? tacsRemarks
-      : entry.notes || "",
-    techRows: isTech
-      ? Array.isArray(parsedRows) && parsedRows.length
-        ? parsedRows.map((row) => ({
+      if (
+        !packagingQuarter &&
+        !packagingProductName &&
+        !packagingSizeVariant &&
+        !packagingMaterialsProvided &&
+        !packagingCustomerName &&
+        !packagingFirmInstitution &&
+        !packagingAddress &&
+        (entry?.notes || "").trim().startsWith("{")
+      ) {
+        try {
+          const obj = JSON.parse(entry?.notes || "");
+          if (obj && typeof obj === "object") {
+            packagingQuarter =
+              obj.quarter === null || obj.quarter === undefined ? "" : String(obj.quarter);
+            packagingProvince = obj.province || "Pangasinan";
+            packagingDateCompleted =
+              obj.dateCompletedExecuted || obj.dateCompleted || entry.date || "";
+            packagingTypeOfIntervention =
+              obj.packagingType || obj.typeOfIntervention || "Label Design";
+            packagingProductName =
+              obj.packagingProductName || obj.productName || "";
+            packagingSizeVariant =
+              obj.sizeVariantMaterial || obj.sizeVariant || "";
+            packagingMaterialsProvided =
+              obj.noOfPackagingMaterialsProvided ||
+              obj.packagingMaterialsProvided ||
+              "";
+            packagingCustomerName =
+              obj.packagingCustomerName || obj.customerName || "";
+            packagingSex = obj.packagingSex || obj.sex || "";
+            packagingFirmInstitution =
+              obj.packagingFirmInstitution || obj.firmName || "";
+            packagingAddress =
+              obj.packagingAddress || obj.address || entry.venue || "";
+            packagingAddressMeta =
+              obj.packagingAddressMeta || obj.addressMeta || null;
+            packagingMeansVerification =
+              obj.packagingMeansVerification || obj.meansOfVerification || "";
+            packagingPhotos = Array.isArray(obj.packagingPhotos)
+              ? obj.packagingPhotos
+              : Array.isArray(obj.photos)
+                ? obj.photos
+                : [];
+            packagingRemarks =
+              obj.packagingNotesRemarks ||
+              obj.packagingRemarks ||
+              obj.remarks ||
+              "";
+          }
+        } catch { }
+      }
+    }
+
+    if (isTacs) {
+      try {
+        const obj = JSON.parse(entry?.notes || "");
+        if (obj && typeof obj === "object") {
+          tacsConsultancyType = obj.consultancyType || entry.title || "";
+          tacsDateEngagement = obj.dateEngagement || entry.date || "";
+          tacsExpertInstitution = obj.expertInstitution || "";
+          tacsCustomerName = obj.customerName || "";
+          tacsCustomerSex = obj.customerSex || "";
+          tacsCustomerAddress = obj.customerAddress || entry.venue || "";
+          tacsCustomerAddressMeta = obj.customerAddressMeta || null;
+          tacsMeansVerification = obj.meansVerification || "";
+          tacsNoOfAdvice =
+            obj.noOfAdvice === null || obj.noOfAdvice === undefined
+              ? ""
+              : String(obj.noOfAdvice);
+          tacsPhotos = Array.isArray(obj.tacsPhotos)
+            ? obj.tacsPhotos
+            : Array.isArray(obj.photos)
+              ? obj.photos
+              : [];
+          tacsRemarks = obj.remarks || "";
+        }
+      } catch {
+        tacsConsultancyType = entry.title || "";
+        tacsDateEngagement = entry.date || "";
+        tacsCustomerAddress = entry.venue || "";
+        tacsRemarks = entry.notes || "";
+      }
+    }
+
+    setDetailFor({ lguId, sscProjectId, mode: "edit", entryId });
+
+    setDetailForm({
+      type,
+      title: entry.title || (isTrainingLike ? "" : type),
+      date: entry.date || "",
+      venue: entry.venue || "",
+      noOfFirms: entry.noOfFirms ?? "",
+      male: entry.male ?? "",
+      female: entry.female ?? "",
+      total: entry.total ?? "",
+      projectProgramUnit: trainingProjectProgramUnit,
+      notes: isTech
+        ? parsedFreeText ?? ""
+        : isTrainingLike
+          ? trainingRemarks
+          : isPackaging
+            ? packagingRemarks
+            : isTacs
+              ? tacsRemarks
+              : entry.notes || "",
+      techRows: isTech
+        ? Array.isArray(parsedRows) && parsedRows.length
+          ? parsedRows.map((row) => ({
             quarter: row?.quarter || "",
             unitCenter: row?.unitCenter || "DOST-PANGASINAN",
             nameOfTechnologyTransferred:
@@ -1869,76 +1869,76 @@ const deleteSscProject = async (lguId, projectId) => {
               "",
             sex: row?.sex || "",
           }))
-        : makeDefaultTechRows()
-      : [],
+          : makeDefaultTechRows()
+        : [],
 
-    packagingQuarter: isPackaging ? packagingQuarter : "",
-    packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
-    packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
-    packagingTypeOfIntervention: isPackaging ? packagingTypeOfIntervention : "Label Design",
-    packagingProductName: isPackaging ? packagingProductName : "",
-    packagingSizeVariant: isPackaging ? packagingSizeVariant : "",
-    packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
-    packagingCustomerName: isPackaging ? packagingCustomerName : "",
-    packagingSex: isPackaging ? packagingSex : "",
-    packagingFirmInstitution: isPackaging ? packagingFirmInstitution : "",
-    packagingAddress: isPackaging ? packagingAddress : "",
-    packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
-    packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
-    packagingPhotos: isPackaging ? packagingPhotos : [],
+      packagingQuarter: isPackaging ? packagingQuarter : "",
+      packagingProvince: isPackaging ? packagingProvince : "Pangasinan",
+      packagingDateCompleted: isPackaging ? packagingDateCompleted : "",
+      packagingTypeOfIntervention: isPackaging ? packagingTypeOfIntervention : "Label Design",
+      packagingProductName: isPackaging ? packagingProductName : "",
+      packagingSizeVariant: isPackaging ? packagingSizeVariant : "",
+      packagingMaterialsProvided: isPackaging ? packagingMaterialsProvided : "",
+      packagingCustomerName: isPackaging ? packagingCustomerName : "",
+      packagingSex: isPackaging ? packagingSex : "",
+      packagingFirmInstitution: isPackaging ? packagingFirmInstitution : "",
+      packagingAddress: isPackaging ? packagingAddress : "",
+      packagingAddressMeta: isPackaging ? packagingAddressMeta : null,
+      packagingMeansVerification: isPackaging ? packagingMeansVerification : "",
+      packagingPhotos: isPackaging ? packagingPhotos : [],
 
-    trainingProgram,
-    trainingProvince,
-    trainingStartDate,
-    trainingEndDate,
-    trainingVenueAddress,
-    trainingVenueAddressMeta,
-    trainingParticipantsFemale,
-    trainingParticipantsMale,
-    trainingSeniorFemale,
-    trainingSeniorMale,
-    trainingIpFemale,
-    trainingIpMale,
-    trainingFourPsFemale,
-    trainingFourPsMale,
-    trainingPwdFemale,
-    trainingPwdMale,
-    trainingFirmsSucsHeisLgusCount,
-    trainingFirmsAssociationsList,
-    trainingTrainorAffiliation,
-    trainingCostDost,
-    trainingCostPartnerAgency,
+      trainingProgram,
+      trainingProvince,
+      trainingStartDate,
+      trainingEndDate,
+      trainingVenueAddress,
+      trainingVenueAddressMeta,
+      trainingParticipantsFemale,
+      trainingParticipantsMale,
+      trainingSeniorFemale,
+      trainingSeniorMale,
+      trainingIpFemale,
+      trainingIpMale,
+      trainingFourPsFemale,
+      trainingFourPsMale,
+      trainingPwdFemale,
+      trainingPwdMale,
+      trainingFirmsSucsHeisLgusCount,
+      trainingFirmsAssociationsList,
+      trainingTrainorAffiliation,
+      trainingCostDost,
+      trainingCostPartnerAgency,
 
-    promoProject: isTrainingLike && !isTraining ? promoProject : "",
-    promoActivityDate: isTrainingLike && !isTraining ? promoActivityDate : "",
-    promoTechnologyPromoted: isTrainingLike && !isTraining ? promoTechnologyPromoted : "",
-    promoTechnologyGenerator: isTrainingLike && !isTraining ? promoTechnologyGenerator : "",
-    promoModeOfPromotion: isTrainingLike && !isTraining ? promoModeOfPromotion : "Social Media",
-    promoActivityTitle: isTrainingLike && !isTraining ? promoActivityTitle : "",
-    promoActivityVenueAddress: isTrainingLike && !isTraining ? promoActivityVenueAddress : "",
-    promoActivityVenueMeta: isTrainingLike && !isTraining ? promoActivityVenueMeta : null,
-    promoCustomerName: isTrainingLike && !isTraining ? promoCustomerName : "",
-    promoCustomerAddress: isTrainingLike && !isTraining ? promoCustomerAddress : "",
-    promoCustomerAddressMeta: isTrainingLike && !isTraining ? promoCustomerAddressMeta : null,
-    promoSex: isTrainingLike && !isTraining ? promoSex : "N/A",
-    promoStaffName: isTrainingLike && !isTraining ? promoStaffName : "",
-    promoMeansVerification: isTrainingLike && !isTraining ? promoMeansVerification : "",
-    promoPhotos: isTrainingLike && !isTraining ? promoPhotos : [],
+      promoProject: isTrainingLike && !isTraining ? promoProject : "",
+      promoActivityDate: isTrainingLike && !isTraining ? promoActivityDate : "",
+      promoTechnologyPromoted: isTrainingLike && !isTraining ? promoTechnologyPromoted : "",
+      promoTechnologyGenerator: isTrainingLike && !isTraining ? promoTechnologyGenerator : "",
+      promoModeOfPromotion: isTrainingLike && !isTraining ? promoModeOfPromotion : "Social Media",
+      promoActivityTitle: isTrainingLike && !isTraining ? promoActivityTitle : "",
+      promoActivityVenueAddress: isTrainingLike && !isTraining ? promoActivityVenueAddress : "",
+      promoActivityVenueMeta: isTrainingLike && !isTraining ? promoActivityVenueMeta : null,
+      promoCustomerName: isTrainingLike && !isTraining ? promoCustomerName : "",
+      promoCustomerAddress: isTrainingLike && !isTraining ? promoCustomerAddress : "",
+      promoCustomerAddressMeta: isTrainingLike && !isTraining ? promoCustomerAddressMeta : null,
+      promoSex: isTrainingLike && !isTraining ? promoSex : "N/A",
+      promoStaffName: isTrainingLike && !isTraining ? promoStaffName : "",
+      promoMeansVerification: isTrainingLike && !isTraining ? promoMeansVerification : "",
+      promoPhotos: isTrainingLike && !isTraining ? promoPhotos : [],
 
-    consultancyType: isTacs ? tacsConsultancyType : "",
-    dateEngagement: isTacs ? tacsDateEngagement : "",
-    expertInstitution: isTacs ? tacsExpertInstitution : "",
-    customerName: isTacs ? tacsCustomerName : "",
-    customerSex: isTacs ? tacsCustomerSex : "",
-    customerAddress: isTacs ? tacsCustomerAddress : "",
-    customerAddressMeta: isTacs ? tacsCustomerAddressMeta : null,
-    meansVerification: isTacs ? tacsMeansVerification : "",
-    noOfAdvice: isTacs ? tacsNoOfAdvice : "",
-    tacsPhotos: isTacs ? tacsPhotos : [],
-  });
-};
+      consultancyType: isTacs ? tacsConsultancyType : "",
+      dateEngagement: isTacs ? tacsDateEngagement : "",
+      expertInstitution: isTacs ? tacsExpertInstitution : "",
+      customerName: isTacs ? tacsCustomerName : "",
+      customerSex: isTacs ? tacsCustomerSex : "",
+      customerAddress: isTacs ? tacsCustomerAddress : "",
+      customerAddressMeta: isTacs ? tacsCustomerAddressMeta : null,
+      meansVerification: isTacs ? tacsMeansVerification : "",
+      noOfAdvice: isTacs ? tacsNoOfAdvice : "",
+      tacsPhotos: isTacs ? tacsPhotos : [],
+    });
+  };
 
-    const deleteIntervention = async (lguId, sscProjectId, entryId) => {
+  const deleteIntervention = async (lguId, sscProjectId, entryId) => {
     if (!window.confirm("Delete this intervention entry?")) return;
 
     if (OFFLINE_MODE) {
@@ -1991,497 +1991,497 @@ const deleteSscProject = async (lguId, projectId) => {
     }
   };
 
-    const saveInterventionDetails = async () => {
-  if (!detailFor) return;
+  const saveInterventionDetails = async () => {
+    if (!detailFor) return;
 
-  const type = (detailForm.type || "").trim();
-  const isTech = type === "Tech Roll Out";
-  const isTraining = type === "Training";
-  const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
-  const isTrainingLike =
-    type === "Training" ||
-    type === "Tech Promo" ||
-    type === "S&T Promo";
-  const isTacs = type === "TACS";
-  const isPackaging = type === "Packaging & Labeling";
+    const type = (detailForm.type || "").trim();
+    const isTech = type === "Tech Roll Out";
+    const isTraining = type === "Training";
+    const isPromoLike = type === "Tech Promo" || type === "S&T Promo";
+    const isTrainingLike =
+      type === "Training" ||
+      type === "Tech Promo" ||
+      type === "S&T Promo";
+    const isTacs = type === "TACS";
+    const isPackaging = type === "Packaging & Labeling";
 
-  if (!type) return alert("Missing intervention type");
+    if (!type) return alert("Missing intervention type");
 
-  if (isTech) {
-    const rows = Array.isArray(detailForm.techRows) ? detailForm.techRows : [];
-    const firstRow = rows[0] || {};
-    const hasValidRow = rows.some(
-      (r) =>
-        (r?.nameOfTechnologyTransferred || "").trim() ||
-        (r?.activityTitle || "").trim() ||
-        (r?.institutionName || "").trim()
-    );
+    if (isTech) {
+      const rows = Array.isArray(detailForm.techRows) ? detailForm.techRows : [];
+      const firstRow = rows[0] || {};
+      const hasValidRow = rows.some(
+        (r) =>
+          (r?.nameOfTechnologyTransferred || "").trim() ||
+          (r?.activityTitle || "").trim() ||
+          (r?.institutionName || "").trim()
+      );
 
-    if (!hasValidRow) {
-      return alert("Required: at least one Tech Roll Out row");
+      if (!hasValidRow) {
+        return alert("Required: at least one Tech Roll Out row");
+      }
+
+      if (!(firstRow?.quarter || "").trim()) return alert("Required: Quarter");
+      if (!(firstRow?.unitCenter || "").trim()) return alert("Required: Unit/Center");
+      if (!(firstRow?.nameOfTechnologyTransferred || "").trim()) return alert("Required: Name of Knowledge/Technology Transferred");
+      if (!(firstRow?.technologyGenerator || "").trim()) return alert("Required: Technology Generator");
+      if (!(firstRow?.modeOfTransfer || "").trim()) return alert("Required: Mode of Transfer");
+      if (!(firstRow?.dateTransferred || "").trim()) return alert("Required: Date Transferred");
+      if (!(firstRow?.activityTitle || "").trim()) return alert("Required: Activity Title");
+      if (!(firstRow?.activityDate || "").trim()) return alert("Required: Activity Date");
+      if (!(firstRow?.institutionName || "").trim()) return alert("Required: Institution Name");
+      if (!(firstRow?.institutionAddress || "").trim()) return alert("Required: Institution Venue/Address");
+      if (!(firstRow?.classification || "").trim()) return alert("Required: Classification");
+      if (!(firstRow?.representativeName || "").trim()) return alert("Required: Representative Name");
     }
 
-    if (!(firstRow?.quarter || "").trim()) return alert("Required: Quarter");
-    if (!(firstRow?.unitCenter || "").trim()) return alert("Required: Unit/Center");
-    if (!(firstRow?.nameOfTechnologyTransferred || "").trim()) return alert("Required: Name of Knowledge/Technology Transferred");
-    if (!(firstRow?.technologyGenerator || "").trim()) return alert("Required: Technology Generator");
-    if (!(firstRow?.modeOfTransfer || "").trim()) return alert("Required: Mode of Transfer");
-    if (!(firstRow?.dateTransferred || "").trim()) return alert("Required: Date Transferred");
-    if (!(firstRow?.activityTitle || "").trim()) return alert("Required: Activity Title");
-    if (!(firstRow?.activityDate || "").trim()) return alert("Required: Activity Date");
-    if (!(firstRow?.institutionName || "").trim()) return alert("Required: Institution Name");
-    if (!(firstRow?.institutionAddress || "").trim()) return alert("Required: Institution Venue/Address");
-    if (!(firstRow?.classification || "").trim()) return alert("Required: Classification");
-    if (!(firstRow?.representativeName || "").trim()) return alert("Required: Representative Name");
-  }
+    if (isTraining && !(detailForm.title || "").trim()) {
+      return alert("Required: Training Title");
+    }
+    if (isTraining && !(detailForm.trainingStartDate || "").trim()) {
+      return alert("Required: Start Date");
+    }
+    if (isTraining && !(detailForm.trainingVenueAddress || "").trim()) {
+      return alert("Required: Venue/Address");
+    }
+    if (isPackaging && !(detailForm.packagingQuarter || "").trim()) {
+      return alert("Required: Quarter");
+    }
+    if (isPackaging && !(detailForm.packagingDateCompleted || "").trim()) {
+      return alert("Required: Date Completed/Executed");
+    }
+    if (isPackaging && !(detailForm.packagingTypeOfIntervention || "").trim()) {
+      return alert("Required: Type of Intervention");
+    }
+    if (isPackaging && !(detailForm.packagingSizeVariant || "").trim()) {
+      return alert("Required: Size/Variant of Label Design/Type of Packaging Material");
+    }
+    if (isPackaging && !(detailForm.packagingMaterialsProvided || "").trim()) {
+      return alert("Required: No. of Packaging Materials Provided");
+    }
+    if (isPackaging && !(detailForm.packagingCustomerName || "").trim()) {
+      return alert("Required: Name of Customer");
+    }
+    if (isPackaging && !(detailForm.packagingFirmInstitution || "").trim()) {
+      return alert("Required: Name of Firm/Institution");
+    }
+    if (isPackaging && !(detailForm.packagingAddress || "").trim()) {
+      return alert("Required: Venue/Address");
+    }
+    if (isPromoLike && !(detailForm.promoTechnologyPromoted || "").trim()) {
+      return alert(`Required: ${type} - Technology Promoted`);
+    }
+    if (isPromoLike && !(detailForm.promoTechnologyGenerator || "").trim()) {
+      return alert(`Required: ${type} - Technology Generator`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityTitle || "").trim()) {
+      return alert(`Required: ${type} - Activity Title`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityDate || "").trim()) {
+      return alert(`Required: ${type} - Activity Date`);
+    }
+    if (isPromoLike && !(detailForm.promoActivityVenueAddress || "").trim()) {
+      return alert(`Required: ${type} - Activity Venue/Address`);
+    }
+    if (isPromoLike && !(detailForm.promoCustomerName || "").trim()) {
+      return alert(`Required: ${type} - Name of Customer/Participant`);
+    }
+    if (isPromoLike && !(detailForm.promoCustomerAddress || "").trim()) {
+      return alert(`Required: ${type} - Customer/Participant Venue/Address`);
+    }
+    if (isPromoLike && !(detailForm.promoStaffName || "").trim()) {
+      return alert(`Required: ${type} - Name of Staff`);
+    }
+    if (isTacs && !(detailForm.consultancyType || "").trim()) {
+      return alert("Required: Type of Consultancy");
+    }
+    if (isTacs && !(detailForm.dateEngagement || "").trim()) {
+      return alert("Required: Date of Engagement");
+    }
+    if (isTacs && !(detailForm.customerName || "").trim()) {
+      return alert("Required: Name of Customer");
+    }
+    if (isTacs && !(detailForm.customerAddress || "").trim()) {
+      return alert("Required: Venue/Address of Customer");
+    }
+    if (
+      isTacs &&
+      (detailForm.noOfAdvice === "" || Number.isNaN(Number(detailForm.noOfAdvice)))
+    ) {
+      return alert("Required: No. of Advice / Recommendations");
+    }
 
-  if (isTraining && !(detailForm.title || "").trim()) {
-    return alert("Required: Training Title");
-  }
-  if (isTraining && !(detailForm.trainingStartDate || "").trim()) {
-    return alert("Required: Start Date");
-  }
-  if (isTraining && !(detailForm.trainingVenueAddress || "").trim()) {
-    return alert("Required: Venue/Address");
-  }
-  if (isPackaging && !(detailForm.packagingQuarter || "").trim()) {
-    return alert("Required: Quarter");
-  }
-  if (isPackaging && !(detailForm.packagingDateCompleted || "").trim()) {
-    return alert("Required: Date Completed/Executed");
-  }
-  if (isPackaging && !(detailForm.packagingTypeOfIntervention || "").trim()) {
-    return alert("Required: Type of Intervention");
-  }
-  if (isPackaging && !(detailForm.packagingSizeVariant || "").trim()) {
-    return alert("Required: Size/Variant of Label Design/Type of Packaging Material");
-  }
-  if (isPackaging && !(detailForm.packagingMaterialsProvided || "").trim()) {
-    return alert("Required: No. of Packaging Materials Provided");
-  }
-  if (isPackaging && !(detailForm.packagingCustomerName || "").trim()) {
-    return alert("Required: Name of Customer");
-  }
-  if (isPackaging && !(detailForm.packagingFirmInstitution || "").trim()) {
-    return alert("Required: Name of Firm/Institution");
-  }
-  if (isPackaging && !(detailForm.packagingAddress || "").trim()) {
-    return alert("Required: Venue/Address");
-  }
-  if (isPromoLike && !(detailForm.promoTechnologyPromoted || "").trim()) {
-    return alert(`Required: ${type} - Technology Promoted`);
-  }
-  if (isPromoLike && !(detailForm.promoTechnologyGenerator || "").trim()) {
-    return alert(`Required: ${type} - Technology Generator`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityTitle || "").trim()) {
-    return alert(`Required: ${type} - Activity Title`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityDate || "").trim()) {
-    return alert(`Required: ${type} - Activity Date`);
-  }
-  if (isPromoLike && !(detailForm.promoActivityVenueAddress || "").trim()) {
-    return alert(`Required: ${type} - Activity Venue/Address`);
-  }
-  if (isPromoLike && !(detailForm.promoCustomerName || "").trim()) {
-    return alert(`Required: ${type} - Name of Customer/Participant`);
-  }
-  if (isPromoLike && !(detailForm.promoCustomerAddress || "").trim()) {
-    return alert(`Required: ${type} - Customer/Participant Venue/Address`);
-  }
-  if (isPromoLike && !(detailForm.promoStaffName || "").trim()) {
-    return alert(`Required: ${type} - Name of Staff`);
-  }
-  if (isTacs && !(detailForm.consultancyType || "").trim()) {
-    return alert("Required: Type of Consultancy");
-  }
-  if (isTacs && !(detailForm.dateEngagement || "").trim()) {
-    return alert("Required: Date of Engagement");
-  }
-  if (isTacs && !(detailForm.customerName || "").trim()) {
-    return alert("Required: Name of Customer");
-  }
-  if (isTacs && !(detailForm.customerAddress || "").trim()) {
-    return alert("Required: Venue/Address of Customer");
-  }
-  if (
-    isTacs &&
-    (detailForm.noOfAdvice === "" || Number.isNaN(Number(detailForm.noOfAdvice)))
-  ) {
-    return alert("Required: No. of Advice / Recommendations");
-  }
+    const cleanTechRows = (rows) =>
+      (Array.isArray(rows) ? rows : []).map((r) => ({
+        quarter: (r.quarter || "").trim(),
+        unitCenter: (r.unitCenter || "DOST-PANGASINAN").trim(),
+        nameOfTechnologyTransferred: (r.nameOfTechnologyTransferred || "").trim(),
+        technologyGenerator: (r.technologyGenerator || "").trim(),
+        modeOfTransfer: (r.modeOfTransfer || "").trim(),
+        isDostDevelopedFunded: Boolean(r.isDostDevelopedFunded),
+        dateTransferred: r.dateTransferred || "",
+        activityTitle: (r.activityTitle || "").trim(),
+        activityDate: r.activityDate || "",
+        activityVenue: (r.activityVenue || "").trim(),
+        institutionName: (r.institutionName || "").trim(),
+        institutionAddress: (r.institutionAddress || "").trim(),
+        institutionAddressMeta: r.institutionAddressMeta || null,
+        classification: (r.classification || "").trim(),
+        representativeName: (r.representativeName || "").trim(),
+        representativeDesignation: (r.representativeDesignation || "").trim(),
+        sex: (r.sex || "").trim(),
+      }));
 
-  const cleanTechRows = (rows) =>
-    (Array.isArray(rows) ? rows : []).map((r) => ({
-      quarter: (r.quarter || "").trim(),
-      unitCenter: (r.unitCenter || "DOST-PANGASINAN").trim(),
-      nameOfTechnologyTransferred: (r.nameOfTechnologyTransferred || "").trim(),
-      technologyGenerator: (r.technologyGenerator || "").trim(),
-      modeOfTransfer: (r.modeOfTransfer || "").trim(),
-      isDostDevelopedFunded: Boolean(r.isDostDevelopedFunded),
-      dateTransferred: r.dateTransferred || "",
-      activityTitle: (r.activityTitle || "").trim(),
-      activityDate: r.activityDate || "",
-      activityVenue: (r.activityVenue || "").trim(),
-      institutionName: (r.institutionName || "").trim(),
-      institutionAddress: (r.institutionAddress || "").trim(),
-      institutionAddressMeta: r.institutionAddressMeta || null,
-      classification: (r.classification || "").trim(),
-      representativeName: (r.representativeName || "").trim(),
-      representativeDesignation: (r.representativeDesignation || "").trim(),
-      sex: (r.sex || "").trim(),
-    }));
-
-  const notesToSave = isTech
-    ? JSON.stringify({
+    const notesToSave = isTech
+      ? JSON.stringify({
         techRollOutRows: cleanTechRows(detailForm.techRows),
         freeText: (detailForm.notes || "").trim(),
       })
-    : isTraining
-    ? JSON.stringify({
-        trainingProgram: (detailForm.trainingProgram || "").trim(),
-        trainingProvince: (detailForm.trainingProvince || "PANGASINAN").trim(),
-        trainingStartDate: detailForm.trainingStartDate || "",
-        trainingEndDate: detailForm.trainingEndDate || "",
-        trainingVenueAddress: (detailForm.trainingVenueAddress || "").trim(),
-        trainingVenueAddressMeta: detailForm.trainingVenueAddressMeta || null,
-        trainingNoOfFirms: detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms),
-        trainingParticipantsFemale: toNumber(detailForm.trainingParticipantsFemale),
-        trainingParticipantsMale: toNumber(detailForm.trainingParticipantsMale),
-        trainingSeniorFemale: toNumber(detailForm.trainingSeniorFemale),
-        trainingSeniorMale: toNumber(detailForm.trainingSeniorMale),
-        trainingIpFemale: toNumber(detailForm.trainingIpFemale),
-        trainingIpMale: toNumber(detailForm.trainingIpMale),
-        trainingFourPsFemale: toNumber(detailForm.trainingFourPsFemale),
-        trainingFourPsMale: toNumber(detailForm.trainingFourPsMale),
-        trainingPwdFemale: toNumber(detailForm.trainingPwdFemale),
-        trainingPwdMale: toNumber(detailForm.trainingPwdMale),
-        trainingFirmsSucsHeisLgusCount:
-          detailForm.trainingFirmsSucsHeisLgusCount === ""
-            ? 0
-            : toNumber(detailForm.trainingFirmsSucsHeisLgusCount),
-        trainingFirmsAssociationsList: (detailForm.trainingFirmsAssociationsList || "").trim(),
-        trainingTrainorAffiliation: (detailForm.trainingTrainorAffiliation || "").trim(),
-        projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
-        trainingCostDost: toNumber(detailForm.trainingCostDost),
-        trainingCostPartnerAgency: toNumber(detailForm.trainingCostPartnerAgency),
-        totalFemale: trainingTotalFemale,
-        totalMale: trainingTotalMale,
-        totalParticipants: trainingTotalParticipants,
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : isPackaging
-    ? (detailForm.notes || "").trim()
-    : isPromoLike
-    ? JSON.stringify({
-        project: (detailForm.promoProject || "").trim(),
-        activityDate: detailForm.promoActivityDate || "",
-        technologyPromoted: (detailForm.promoTechnologyPromoted || "").trim(),
-        technologyGenerator: (detailForm.promoTechnologyGenerator || "").trim(),
-        modeOfPromotion: (detailForm.promoModeOfPromotion || "").trim(),
-        activityTitle: (detailForm.promoActivityTitle || "").trim(),
-        activityVenueAddress: (detailForm.promoActivityVenueAddress || "").trim(),
-        activityVenueMeta: detailForm.promoActivityVenueMeta || null,
-        customerParticipantName: (detailForm.promoCustomerName || "").trim(),
-        customerParticipantAddress: (detailForm.promoCustomerAddress || "").trim(),
-        customerParticipantAddressMeta: detailForm.promoCustomerAddressMeta || null,
-        sex: (detailForm.promoSex || "").trim(),
-        staffName: (detailForm.promoStaffName || "").trim(),
-        meansOfVerification: (detailForm.promoMeansVerification || "").trim(),
-        photos: Array.isArray(detailForm.promoPhotos) ? detailForm.promoPhotos : [],
-        projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : isTacs
-    ? JSON.stringify({
-        consultancyType: (detailForm.consultancyType || "").trim(),
-        dateEngagement: detailForm.dateEngagement || "",
-        expertInstitution: (detailForm.expertInstitution || "").trim(),
-        customerName: (detailForm.customerName || "").trim(),
-        customerSex: (detailForm.customerSex || "").trim(),
-        customerAddress: (detailForm.customerAddress || "").trim(),
-        customerAddressMeta: detailForm.customerAddressMeta || null,
-        meansVerification: (detailForm.meansVerification || "").trim(),
-        noOfAdvice: detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice),
-        tacsPhotos: Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [],
-        remarks: (detailForm.notes || "").trim(),
-      })
-    : (detailForm.notes || "").trim();
+      : isTraining
+        ? JSON.stringify({
+          trainingProgram: (detailForm.trainingProgram || "").trim(),
+          trainingProvince: (detailForm.trainingProvince || "PANGASINAN").trim(),
+          trainingStartDate: detailForm.trainingStartDate || "",
+          trainingEndDate: detailForm.trainingEndDate || "",
+          trainingVenueAddress: (detailForm.trainingVenueAddress || "").trim(),
+          trainingVenueAddressMeta: detailForm.trainingVenueAddressMeta || null,
+          trainingNoOfFirms: detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms),
+          trainingParticipantsFemale: toNumber(detailForm.trainingParticipantsFemale),
+          trainingParticipantsMale: toNumber(detailForm.trainingParticipantsMale),
+          trainingSeniorFemale: toNumber(detailForm.trainingSeniorFemale),
+          trainingSeniorMale: toNumber(detailForm.trainingSeniorMale),
+          trainingIpFemale: toNumber(detailForm.trainingIpFemale),
+          trainingIpMale: toNumber(detailForm.trainingIpMale),
+          trainingFourPsFemale: toNumber(detailForm.trainingFourPsFemale),
+          trainingFourPsMale: toNumber(detailForm.trainingFourPsMale),
+          trainingPwdFemale: toNumber(detailForm.trainingPwdFemale),
+          trainingPwdMale: toNumber(detailForm.trainingPwdMale),
+          trainingFirmsSucsHeisLgusCount:
+            detailForm.trainingFirmsSucsHeisLgusCount === ""
+              ? 0
+              : toNumber(detailForm.trainingFirmsSucsHeisLgusCount),
+          trainingFirmsAssociationsList: (detailForm.trainingFirmsAssociationsList || "").trim(),
+          trainingTrainorAffiliation: (detailForm.trainingTrainorAffiliation || "").trim(),
+          projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
+          trainingCostDost: toNumber(detailForm.trainingCostDost),
+          trainingCostPartnerAgency: toNumber(detailForm.trainingCostPartnerAgency),
+          totalFemale: trainingTotalFemale,
+          totalMale: trainingTotalMale,
+          totalParticipants: trainingTotalParticipants,
+          remarks: (detailForm.notes || "").trim(),
+        })
+        : isPackaging
+          ? (detailForm.notes || "").trim()
+          : isPromoLike
+            ? JSON.stringify({
+              project: (detailForm.promoProject || "").trim(),
+              activityDate: detailForm.promoActivityDate || "",
+              technologyPromoted: (detailForm.promoTechnologyPromoted || "").trim(),
+              technologyGenerator: (detailForm.promoTechnologyGenerator || "").trim(),
+              modeOfPromotion: (detailForm.promoModeOfPromotion || "").trim(),
+              activityTitle: (detailForm.promoActivityTitle || "").trim(),
+              activityVenueAddress: (detailForm.promoActivityVenueAddress || "").trim(),
+              activityVenueMeta: detailForm.promoActivityVenueMeta || null,
+              customerParticipantName: (detailForm.promoCustomerName || "").trim(),
+              customerParticipantAddress: (detailForm.promoCustomerAddress || "").trim(),
+              customerParticipantAddressMeta: detailForm.promoCustomerAddressMeta || null,
+              sex: (detailForm.promoSex || "").trim(),
+              staffName: (detailForm.promoStaffName || "").trim(),
+              meansOfVerification: (detailForm.promoMeansVerification || "").trim(),
+              photos: Array.isArray(detailForm.promoPhotos) ? detailForm.promoPhotos : [],
+              projectProgramUnit: (detailForm.projectProgramUnit || "").trim(),
+              remarks: (detailForm.notes || "").trim(),
+            })
+            : isTacs
+              ? JSON.stringify({
+                consultancyType: (detailForm.consultancyType || "").trim(),
+                dateEngagement: detailForm.dateEngagement || "",
+                expertInstitution: (detailForm.expertInstitution || "").trim(),
+                customerName: (detailForm.customerName || "").trim(),
+                customerSex: (detailForm.customerSex || "").trim(),
+                customerAddress: (detailForm.customerAddress || "").trim(),
+                customerAddressMeta: detailForm.customerAddressMeta || null,
+                meansVerification: (detailForm.meansVerification || "").trim(),
+                noOfAdvice: detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice),
+                tacsPhotos: Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [],
+                remarks: (detailForm.notes || "").trim(),
+              })
+              : (detailForm.notes || "").trim();
 
-  const male = toNumber(detailForm.male);
-  const female = toNumber(detailForm.female);
-  const totalAuto = male + female;
-  const total = detailForm.total !== "" ? toNumber(detailForm.total) : totalAuto;
+    const male = toNumber(detailForm.male);
+    const female = toNumber(detailForm.female);
+    const totalAuto = male + female;
+    const total = detailForm.total !== "" ? toNumber(detailForm.total) : totalAuto;
 
-  const cleanedTechRows = cleanTechRows(detailForm.techRows);
-  const primaryTechRow = cleanedTechRows[0] || makeDefaultTechRows()[0];
-  const primaryTechAddressMeta = primaryTechRow?.institutionAddressMeta || null;
+    const cleanedTechRows = cleanTechRows(detailForm.techRows);
+    const primaryTechRow = cleanedTechRows[0] || makeDefaultTechRows()[0];
+    const primaryTechAddressMeta = primaryTechRow?.institutionAddressMeta || null;
 
-  const payload = {
-    type,
-    title: isTech
-      ? (
+    const payload = {
+      type,
+      title: isTech
+        ? (
           cleanedTechRows.find(
             (r) => (r.nameOfTechnologyTransferred || "").trim()
           )?.nameOfTechnologyTransferred || type
         )
-      : isTraining
-      ? (detailForm.title || "").trim()
-      : isPackaging
-      ? (detailForm.packagingTypeOfIntervention || "").trim()
-      : isPromoLike
-      ? ((detailForm.promoActivityTitle || "").trim() || (detailForm.promoTechnologyPromoted || "").trim() || type)
-      : isTacs
-      ? (detailForm.consultancyType || "").trim()
-      : type,
-    date: isTech
-      ? (
+        : isTraining
+          ? (detailForm.title || "").trim()
+          : isPackaging
+            ? (detailForm.packagingTypeOfIntervention || "").trim()
+            : isPromoLike
+              ? ((detailForm.promoActivityTitle || "").trim() || (detailForm.promoTechnologyPromoted || "").trim() || type)
+              : isTacs
+                ? (detailForm.consultancyType || "").trim()
+                : type,
+      date: isTech
+        ? (
           cleanedTechRows.find((r) => r.dateTransferred)?.dateTransferred || ""
         )
-      : isTraining
-      ? detailForm.trainingStartDate || ""
-      : isPackaging
-      ? detailForm.packagingDateCompleted || ""
-      : isPromoLike
-      ? detailForm.promoActivityDate || ""
-      : isTacs
-      ? detailForm.dateEngagement || ""
-      : "",
-    venue: isTech
-      ? (
+        : isTraining
+          ? detailForm.trainingStartDate || ""
+          : isPackaging
+            ? detailForm.packagingDateCompleted || ""
+            : isPromoLike
+              ? detailForm.promoActivityDate || ""
+              : isTacs
+                ? detailForm.dateEngagement || ""
+                : "",
+      venue: isTech
+        ? (
           cleanedTechRows.find(
             (r) => (r.institutionAddress || "").trim()
           )?.institutionAddress || ""
         )
-      : isTraining
-      ? (detailForm.trainingVenueAddress || "").trim()
-      : isPackaging
-      ? (detailForm.packagingAddress || "").trim()
-      : isPromoLike
-      ? (detailForm.promoActivityVenueAddress || "").trim()
-      : isTacs
-      ? (detailForm.customerAddress || "").trim()
-      : "",
-    latitude: isTech
-      ? (primaryTechAddressMeta?.lat ?? null)
-      : isTraining
-      ? (detailForm.trainingVenueAddressMeta?.lat ?? null)
-      : isPackaging
-      ? (detailForm.packagingAddressMeta?.lat ?? null)
-      : isPromoLike
-      ? (detailForm.promoActivityVenueMeta?.lat ?? null)
-      : isTacs
-      ? (detailForm.customerAddressMeta?.lat ?? null)
-      : null,
-    longitude: isTech
-      ? (primaryTechAddressMeta?.lng ?? null)
-      : isTraining
-      ? (detailForm.trainingVenueAddressMeta?.lng ?? null)
-      : isPackaging
-      ? (detailForm.packagingAddressMeta?.lng ?? null)
-      : isPromoLike
-      ? (detailForm.promoActivityVenueMeta?.lng ?? null)
-      : isTacs
-      ? (detailForm.customerAddressMeta?.lng ?? null)
-      : null,
-    noOfFirms: isTraining
-      ? (detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms))
-      : isPromoLike
-      ? null
-      : null,
-    male: isTraining
-      ? trainingTotalMale
-      : isPromoLike
-      ? null
-      : null,
-    female: isTraining
-      ? trainingTotalFemale
-      : isPromoLike
-      ? null
-      : null,
-    total: isTraining
-      ? trainingTotalParticipants
-      : isPromoLike
-      ? null
-      : null,
-    notes: notesToSave,
+        : isTraining
+          ? (detailForm.trainingVenueAddress || "").trim()
+          : isPackaging
+            ? (detailForm.packagingAddress || "").trim()
+            : isPromoLike
+              ? (detailForm.promoActivityVenueAddress || "").trim()
+              : isTacs
+                ? (detailForm.customerAddress || "").trim()
+                : "",
+      latitude: isTech
+        ? (primaryTechAddressMeta?.lat ?? null)
+        : isTraining
+          ? (detailForm.trainingVenueAddressMeta?.lat ?? null)
+          : isPackaging
+            ? (detailForm.packagingAddressMeta?.lat ?? null)
+            : isPromoLike
+              ? (detailForm.promoActivityVenueMeta?.lat ?? null)
+              : isTacs
+                ? (detailForm.customerAddressMeta?.lat ?? null)
+                : null,
+      longitude: isTech
+        ? (primaryTechAddressMeta?.lng ?? null)
+        : isTraining
+          ? (detailForm.trainingVenueAddressMeta?.lng ?? null)
+          : isPackaging
+            ? (detailForm.packagingAddressMeta?.lng ?? null)
+            : isPromoLike
+              ? (detailForm.promoActivityVenueMeta?.lng ?? null)
+              : isTacs
+                ? (detailForm.customerAddressMeta?.lng ?? null)
+                : null,
+      noOfFirms: isTraining
+        ? (detailForm.noOfFirms === "" ? 0 : toNumber(detailForm.noOfFirms))
+        : isPromoLike
+          ? null
+          : null,
+      male: isTraining
+        ? trainingTotalMale
+        : isPromoLike
+          ? null
+          : null,
+      female: isTraining
+        ? trainingTotalFemale
+        : isPromoLike
+          ? null
+          : null,
+      total: isTraining
+        ? trainingTotalParticipants
+        : isPromoLike
+          ? null
+          : null,
+      notes: notesToSave,
 
-    packagingQuarter: isPackaging
-      ? (detailForm.packagingQuarter === "" ? null : Number(detailForm.packagingQuarter))
-      : null,
-    packagingProvince: isPackaging
-      ? (detailForm.packagingProvince || "Pangasinan").trim()
-      : null,
-    packagingDateCompleted: isPackaging ? detailForm.packagingDateCompleted || "" : null,
-    packagingTypeOfIntervention: isPackaging
-      ? (detailForm.packagingTypeOfIntervention || "").trim()
-      : null,
-    packagingProductName: isPackaging ? (detailForm.packagingProductName || "").trim() : null,
-    packagingSizeVariant: isPackaging ? (detailForm.packagingSizeVariant || "").trim() : null,
-    packagingMaterialsProvided: isPackaging
-      ? (detailForm.packagingMaterialsProvided || "").trim()
-      : null,
-    packagingCustomerName: isPackaging ? (detailForm.packagingCustomerName || "").trim() : null,
-    packagingSex: isPackaging ? (detailForm.packagingSex || "").trim() : null,
-    packagingFirmInstitution: isPackaging
-      ? (detailForm.packagingFirmInstitution || "").trim()
-      : null,
-    packagingAddress: isPackaging ? (detailForm.packagingAddress || "").trim() : null,
-    packagingAddressMeta: isPackaging ? detailForm.packagingAddressMeta || null : null,
-    packagingMeansVerification: isPackaging
-      ? (detailForm.packagingMeansVerification || "").trim()
-      : null,
-    packagingPhotos: isPackaging
-      ? (Array.isArray(detailForm.packagingPhotos) ? detailForm.packagingPhotos : [])
-      : [],
-    packagingRemarks: isPackaging ? (detailForm.notes || "").trim() : null,
+      packagingQuarter: isPackaging
+        ? (detailForm.packagingQuarter === "" ? null : Number(detailForm.packagingQuarter))
+        : null,
+      packagingProvince: isPackaging
+        ? (detailForm.packagingProvince || "Pangasinan").trim()
+        : null,
+      packagingDateCompleted: isPackaging ? detailForm.packagingDateCompleted || "" : null,
+      packagingTypeOfIntervention: isPackaging
+        ? (detailForm.packagingTypeOfIntervention || "").trim()
+        : null,
+      packagingProductName: isPackaging ? (detailForm.packagingProductName || "").trim() : null,
+      packagingSizeVariant: isPackaging ? (detailForm.packagingSizeVariant || "").trim() : null,
+      packagingMaterialsProvided: isPackaging
+        ? (detailForm.packagingMaterialsProvided || "").trim()
+        : null,
+      packagingCustomerName: isPackaging ? (detailForm.packagingCustomerName || "").trim() : null,
+      packagingSex: isPackaging ? (detailForm.packagingSex || "").trim() : null,
+      packagingFirmInstitution: isPackaging
+        ? (detailForm.packagingFirmInstitution || "").trim()
+        : null,
+      packagingAddress: isPackaging ? (detailForm.packagingAddress || "").trim() : null,
+      packagingAddressMeta: isPackaging ? detailForm.packagingAddressMeta || null : null,
+      packagingMeansVerification: isPackaging
+        ? (detailForm.packagingMeansVerification || "").trim()
+        : null,
+      packagingPhotos: isPackaging
+        ? (Array.isArray(detailForm.packagingPhotos) ? detailForm.packagingPhotos : [])
+        : [],
+      packagingRemarks: isPackaging ? (detailForm.notes || "").trim() : null,
 
-    techrollout_quarter: isTech
-      ? (primaryTechRow.quarter === "" ? null : Number(primaryTechRow.quarter))
-      : null,
-    techrollout_unit_center: isTech ? (primaryTechRow.unitCenter || "DOST-PANGASINAN").trim() : null,
-    techrollout_name_of_technology_transferred: isTech
-      ? (primaryTechRow.nameOfTechnologyTransferred || "").trim()
-      : null,
-    techrollout_technology_generator: isTech
-      ? (primaryTechRow.technologyGenerator || "").trim()
-      : null,
-    techrollout_mode_of_transfer: isTech
-      ? (primaryTechRow.modeOfTransfer || "").trim()
-      : null,
-    techrollout_is_dost_developed_funded: isTech
-      ? (primaryTechRow.isDostDevelopedFunded ? 1 : 0)
-      : 0,
-    techrollout_date_transferred: isTech ? primaryTechRow.dateTransferred || null : null,
-    techrollout_activity_title: isTech ? (primaryTechRow.activityTitle || "").trim() : null,
-    techrollout_activity_date: isTech ? primaryTechRow.activityDate || null : null,
-    techrollout_activity_venue: isTech ? (primaryTechRow.activityVenue || "").trim() : null,
-    techrollout_institution_name: isTech ? (primaryTechRow.institutionName || "").trim() : null,
-    techrollout_institution_address: isTech ? (primaryTechRow.institutionAddress || "").trim() : null,
-    techrollout_institution_address_meta: isTech ? primaryTechAddressMeta : null,
-    techrollout_classification: isTech ? (primaryTechRow.classification || "").trim() : null,
-    techrollout_representative_name: isTech ? (primaryTechRow.representativeName || "").trim() : null,
-    techrollout_representative_designation: isTech
-      ? (primaryTechRow.representativeDesignation || "").trim()
-      : null,
-    techrollout_sex: isTech ? (primaryTechRow.sex || "").trim() : null,
-    address_mode: isTech ? primaryTechAddressMeta?.mode || null : null,
-    address_manual_text: isTech ? primaryTechAddressMeta?.manualText || null : null,
-    address_display_text: isTech ? primaryTechAddressMeta?.displayText || null : null,
-    address_province: isTech ? primaryTechAddressMeta?.province || null : null,
-    address_municipality: isTech ? primaryTechAddressMeta?.municipality || null : null,
-    address_barangay: isTech ? primaryTechAddressMeta?.barangay || null : null,
-    address_lat: isTech ? (primaryTechAddressMeta?.lat ?? null) : null,
-    address_lng: isTech ? (primaryTechAddressMeta?.lng ?? null) : null,
+      techrollout_quarter: isTech
+        ? (primaryTechRow.quarter === "" ? null : Number(primaryTechRow.quarter))
+        : null,
+      techrollout_unit_center: isTech ? (primaryTechRow.unitCenter || "DOST-PANGASINAN").trim() : null,
+      techrollout_name_of_technology_transferred: isTech
+        ? (primaryTechRow.nameOfTechnologyTransferred || "").trim()
+        : null,
+      techrollout_technology_generator: isTech
+        ? (primaryTechRow.technologyGenerator || "").trim()
+        : null,
+      techrollout_mode_of_transfer: isTech
+        ? (primaryTechRow.modeOfTransfer || "").trim()
+        : null,
+      techrollout_is_dost_developed_funded: isTech
+        ? (primaryTechRow.isDostDevelopedFunded ? 1 : 0)
+        : 0,
+      techrollout_date_transferred: isTech ? primaryTechRow.dateTransferred || null : null,
+      techrollout_activity_title: isTech ? (primaryTechRow.activityTitle || "").trim() : null,
+      techrollout_activity_date: isTech ? primaryTechRow.activityDate || null : null,
+      techrollout_activity_venue: isTech ? (primaryTechRow.activityVenue || "").trim() : null,
+      techrollout_institution_name: isTech ? (primaryTechRow.institutionName || "").trim() : null,
+      techrollout_institution_address: isTech ? (primaryTechRow.institutionAddress || "").trim() : null,
+      techrollout_institution_address_meta: isTech ? primaryTechAddressMeta : null,
+      techrollout_classification: isTech ? (primaryTechRow.classification || "").trim() : null,
+      techrollout_representative_name: isTech ? (primaryTechRow.representativeName || "").trim() : null,
+      techrollout_representative_designation: isTech
+        ? (primaryTechRow.representativeDesignation || "").trim()
+        : null,
+      techrollout_sex: isTech ? (primaryTechRow.sex || "").trim() : null,
+      address_mode: isTech ? primaryTechAddressMeta?.mode || null : null,
+      address_manual_text: isTech ? primaryTechAddressMeta?.manualText || null : null,
+      address_display_text: isTech ? primaryTechAddressMeta?.displayText || null : null,
+      address_province: isTech ? primaryTechAddressMeta?.province || null : null,
+      address_municipality: isTech ? primaryTechAddressMeta?.municipality || null : null,
+      address_barangay: isTech ? primaryTechAddressMeta?.barangay || null : null,
+      address_lat: isTech ? (primaryTechAddressMeta?.lat ?? null) : null,
+      address_lng: isTech ? (primaryTechAddressMeta?.lng ?? null) : null,
 
-    technologiesPromotedTotal: isPromoLike ? 1 : 0,
-    promotionalActivitiesPressRelease: isPromoLike ? 1 : 0,
-    pwd: "",
-    fourPs: "",
-    ip: "",
-    seniors: "",
+      technologiesPromotedTotal: isPromoLike ? 1 : 0,
+      promotionalActivitiesPressRelease: isPromoLike ? 1 : 0,
+      pwd: "",
+      fourPs: "",
+      ip: "",
+      seniors: "",
 
-    tacsConsultancyType: isTacs ? (detailForm.consultancyType || "").trim() : "",
-    tacsDateEngagement: isTacs ? detailForm.dateEngagement || "" : "",
-    tacsExpertInstitution: isTacs ? (detailForm.expertInstitution || "").trim() : "",
-    tacsCustomerName: isTacs ? (detailForm.customerName || "").trim() : "",
-    tacsCustomerSex: isTacs ? (detailForm.customerSex || "").trim() : "",
-    tacsCustomerAddress: isTacs ? (detailForm.customerAddress || "").trim() : "",
-    tacsCustomerAddressMeta: isTacs ? detailForm.customerAddressMeta || null : null,
-    tacsMeansVerification: isTacs ? (detailForm.meansVerification || "").trim() : "",
-    tacsNoOfAdvice: isTacs ? (detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice)) : null,
-    tacsPhotos: isTacs
-      ? (Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [])
-      : [],
-    tacsRemarks: isTacs ? (detailForm.notes || "").trim() : "",
-  };
+      tacsConsultancyType: isTacs ? (detailForm.consultancyType || "").trim() : "",
+      tacsDateEngagement: isTacs ? detailForm.dateEngagement || "" : "",
+      tacsExpertInstitution: isTacs ? (detailForm.expertInstitution || "").trim() : "",
+      tacsCustomerName: isTacs ? (detailForm.customerName || "").trim() : "",
+      tacsCustomerSex: isTacs ? (detailForm.customerSex || "").trim() : "",
+      tacsCustomerAddress: isTacs ? (detailForm.customerAddress || "").trim() : "",
+      tacsCustomerAddressMeta: isTacs ? detailForm.customerAddressMeta || null : null,
+      tacsMeansVerification: isTacs ? (detailForm.meansVerification || "").trim() : "",
+      tacsNoOfAdvice: isTacs ? (detailForm.noOfAdvice === "" ? null : Number(detailForm.noOfAdvice)) : null,
+      tacsPhotos: isTacs
+        ? (Array.isArray(detailForm.tacsPhotos) ? detailForm.tacsPhotos : [])
+        : [],
+      tacsRemarks: isTacs ? (detailForm.notes || "").trim() : "",
+    };
 
 
-  if (OFFLINE_MODE) {
-    const current = readLocalProjects();
-    const lguId = detailFor.lguId;
-    const sscProjectId = detailFor.sscProjectId;
-    const key = sscKey(lguId, sscProjectId);
+    if (OFFLINE_MODE) {
+      const current = readLocalProjects();
+      const lguId = detailFor.lguId;
+      const sscProjectId = detailFor.sscProjectId;
+      const key = sscKey(lguId, sscProjectId);
 
-    const lguIdx = current.findIndex((p) => String(p.id) === String(lguId));
-    if (lguIdx < 0) {
-      alert("LGU/Community not found (offline).");
-      return;
-    }
-
-    const lgu = current[lguIdx];
-    const sscList = getSscProjects(lgu).map((x) => ({
-      ...x,
-      interventions: Array.isArray(x?.interventions) ? x.interventions : [],
-    }));
-
-    const projIdx = sscList.findIndex((x) => String(x.id) === String(sscProjectId));
-    if (projIdx < 0) {
-      alert("Project not found (offline).");
-      return;
-    }
-
-    const project = sscList[projIdx];
-    const list = Array.isArray(project.interventions) ? [...project.interventions] : [];
-
-    let savedId = detailFor.entryId || "";
-
-    if (detailFor.mode === "add") {
-      savedId = `local_it_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-      list.push({ id: savedId, ...payload });
-    } else {
-      const idx2 = list.findIndex((it) => String(it.id) === String(detailFor.entryId));
-      if (idx2 >= 0) {
-        list[idx2] = { ...list[idx2], ...payload, id: list[idx2].id };
-        savedId = list[idx2].id;
-      } else {
-        savedId = savedId || `local_it_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-        list.push({ id: savedId, ...payload });
+      const lguIdx = current.findIndex((p) => String(p.id) === String(lguId));
+      if (lguIdx < 0) {
+        alert("LGU/Community not found (offline).");
+        return;
       }
+
+      const lgu = current[lguIdx];
+      const sscList = getSscProjects(lgu).map((x) => ({
+        ...x,
+        interventions: Array.isArray(x?.interventions) ? x.interventions : [],
+      }));
+
+      const projIdx = sscList.findIndex((x) => String(x.id) === String(sscProjectId));
+      if (projIdx < 0) {
+        alert("Project not found (offline).");
+        return;
+      }
+
+      const project = sscList[projIdx];
+      const list = Array.isArray(project.interventions) ? [...project.interventions] : [];
+
+      let savedId = detailFor.entryId || "";
+
+      if (detailFor.mode === "add") {
+        savedId = `local_it_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+        list.push({ id: savedId, ...payload });
+      } else {
+        const idx2 = list.findIndex((it) => String(it.id) === String(detailFor.entryId));
+        if (idx2 >= 0) {
+          list[idx2] = { ...list[idx2], ...payload, id: list[idx2].id };
+          savedId = list[idx2].id;
+        } else {
+          savedId = savedId || `local_it_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+          list.push({ id: savedId, ...payload });
+        }
+      }
+
+      sscList[projIdx] = { ...project, interventions: list };
+
+      const next = [...current];
+      next[lguIdx] = { ...lgu, sscProjects: sscList };
+
+      writeLocalProjects(next);
+      setProjects(next);
+
+      setSelectedInterventionByProject((prev) => ({
+        ...prev,
+        [key]: savedId,
+      }));
+
+      setDetailFor(null);
+      resetDetailForm("");
+      return;
     }
 
-    sscList[projIdx] = { ...project, interventions: list };
+    try {
+      const key = sscKey(detailFor.lguId, detailFor.sscProjectId);
+      let savedId = detailFor.entryId || "";
 
-    const next = [...current];
-    next[lguIdx] = { ...lgu, sscProjects: sscList };
+      if (detailFor.mode === "add") {
+        const res = await axios.post(`${API}/sscp-projects/${detailFor.sscProjectId}/interventions`, payload);
+        savedId = res.data?.id || "";
+      } else {
+        await axios.put(`${API}/sscp-interventions/${detailFor.entryId}`, payload);
+      }
 
-    writeLocalProjects(next);
-    setProjects(next);
+      await fetchProjects();
 
-    setSelectedInterventionByProject((prev) => ({
-      ...prev,
-      [key]: savedId,
-    }));
+      if (savedId) {
+        setSelectedInterventionByProject((prev) => ({ ...prev, [key]: savedId }));
+      }
 
-    setDetailFor(null);
-    resetDetailForm("");
-    return;
-  }
-
-  try {
-    const key = sscKey(detailFor.lguId, detailFor.sscProjectId);
-    let savedId = detailFor.entryId || "";
-
-    if (detailFor.mode === "add") {
-      const res = await axios.post(`${API}/sscp-projects/${detailFor.sscProjectId}/interventions`, payload);
-      savedId = res.data?.id || "";
-    } else {
-      await axios.put(`${API}/sscp-interventions/${detailFor.entryId}`, payload);
- }
-
-    await fetchProjects();
-
-    if (savedId) {
-      setSelectedInterventionByProject((prev) => ({ ...prev, [key]: savedId }));
- }
-
-    setDetailFor(null);
-    resetDetailForm("");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save S&T Intervention.");
- }
-};
+      setDetailFor(null);
+      resetDetailForm("");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save S&T Intervention.");
+    }
+  };
 
 
   // ===== Map helpers =====
@@ -2606,7 +2606,7 @@ const deleteSscProject = async (lguId, projectId) => {
   const municipalityFilterOptions = useMemo(() => {
     return [...PANGASINAN_LGUS].sort((a, b) => a.localeCompare(b));
   }, []);
-const filteredProjects = useMemo(() => {
+  const filteredProjects = useMemo(() => {
     const q = debouncedTableSearchText;
 
     return projects.filter((p) => {
@@ -2661,7 +2661,7 @@ const filteredProjects = useMemo(() => {
 
   const pageWindowStart =
     Math.floor((Math.max(currentPage, 1) - 1) / PAGE_NUMBER_WINDOW) *
-      PAGE_NUMBER_WINDOW +
+    PAGE_NUMBER_WINDOW +
     1;
 
   // Keep the same SETUP/CEST-style pagination look: always show 10 number slots.
@@ -2693,7 +2693,7 @@ const filteredProjects = useMemo(() => {
     setTableSearchText("");
     setDebouncedTableSearchText("");
     setCurrentPage(1);
-};
+  };
 
   const escapeHtml = (value = "") =>
     String(value ?? "")
@@ -2999,7 +2999,7 @@ const filteredProjects = useMemo(() => {
           const layer = L.geoJSON(geo);
           const b = layer.getBounds();
           if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-        } catch {}
+        } catch { }
       };
 
       if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -3252,10 +3252,10 @@ const filteredProjects = useMemo(() => {
       mode === "manual"
         ? "Manual Venue/Address"
         : step === 1
-        ? "Pangasinan > Select Municipality/City"
-        : step === 2
-        ? `Pangasinan > ${municipality} > Select Barangay`
-        : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+          ? "Pangasinan > Select Municipality/City"
+          : step === 2
+            ? `Pangasinan > ${municipality} > Select Barangay`
+            : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
     const back = () => {
       if (mode === "manual") return onClose();
@@ -3292,29 +3292,29 @@ const filteredProjects = useMemo(() => {
       const meta =
         mode === "manual"
           ? {
-              mode: "manual",
-              venueName: venueName.trim(),
-              manualText: manualText.trim(),
-              addressOnlyText: manualText.trim(),
-              displayText,
-              province: "",
-              municipality: "",
-              barangay: "",
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            }
+            mode: "manual",
+            venueName: venueName.trim(),
+            manualText: manualText.trim(),
+            addressOnlyText: manualText.trim(),
+            displayText,
+            province: "",
+            municipality: "",
+            barangay: "",
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          }
           : {
-              mode: "hierarchical",
-              venueName: venueName.trim(),
-              province,
-              municipality,
-              barangay,
-              manualText: "",
-              addressOnlyText: baseAddressText,
-              displayText,
-              lat: coords?.lat || null,
-              lng: coords?.lng || null,
-            };
+            mode: "hierarchical",
+            venueName: venueName.trim(),
+            province,
+            municipality,
+            barangay,
+            manualText: "",
+            addressOnlyText: baseAddressText,
+            displayText,
+            lat: coords?.lat || null,
+            lng: coords?.lng || null,
+          };
 
       onSave(meta);
       onClose();
@@ -3647,73 +3647,73 @@ const filteredProjects = useMemo(() => {
   }
 
   const applyAddressMetaToForm = (meta) => {
-  setForm((prev) => ({
-    ...prev,
-    address: meta?.displayText || "",
-    addressMeta: meta || null,
-  }));
-};
+    setForm((prev) => ({
+      ...prev,
+      address: meta?.displayText || "",
+      addressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToSscProjectForm = (meta) => {
-  setSscProjectForm((prev) => ({
-    ...prev,
-    address: meta?.displayText || "",
-    addressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToSscProjectForm = (meta) => {
+    setSscProjectForm((prev) => ({
+      ...prev,
+      address: meta?.displayText || "",
+      addressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToDetailForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    customerAddress: meta?.displayText || "",
-    customerAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToDetailForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      customerAddress: meta?.displayText || "",
+      customerAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToTrainingForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    trainingVenueAddress: meta?.displayText || "",
-    venue: meta?.displayText || "",
-    trainingVenueAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToTrainingForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      trainingVenueAddress: meta?.displayText || "",
+      venue: meta?.displayText || "",
+      trainingVenueAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPromoVenue = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    promoActivityVenueAddress: meta?.displayText || "",
-    promoActivityVenueMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPromoVenue = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      promoActivityVenueAddress: meta?.displayText || "",
+      promoActivityVenueMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPromoCustomer = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    promoCustomerAddress: meta?.displayText || "",
-    promoCustomerAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPromoCustomer = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      promoCustomerAddress: meta?.displayText || "",
+      promoCustomerAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToPackagingForm = (meta) => {
-  setDetailForm((prev) => ({
-    ...prev,
-    packagingAddress: meta?.displayText || "",
-    packagingAddressMeta: meta || null,
-  }));
-};
+  const applyAddressMetaToPackagingForm = (meta) => {
+    setDetailForm((prev) => ({
+      ...prev,
+      packagingAddress: meta?.displayText || "",
+      packagingAddressMeta: meta || null,
+    }));
+  };
 
-const applyAddressMetaToTechInstitution = (idx, meta) => {
-  setDetailForm((prev) => {
-    const next = [...(prev.techRows || [])];
-    next[idx] = {
-      ...(next[idx] || {}),
-      institutionAddress: meta?.displayText || "",
-      institutionAddressMeta: meta || null,
-    };
-    return { ...prev, techRows: next };
-  });
-};
+  const applyAddressMetaToTechInstitution = (idx, meta) => {
+    setDetailForm((prev) => {
+      const next = [...(prev.techRows || [])];
+      next[idx] = {
+        ...(next[idx] || {}),
+        institutionAddress: meta?.displayText || "",
+        institutionAddressMeta: meta || null,
+      };
+      return { ...prev, techRows: next };
+    });
+  };
 
   function AddressViewModal({ project, onClose }) {
     if (!project) return null;
@@ -4650,40 +4650,40 @@ const applyAddressMetaToTechInstitution = (idx, meta) => {
   }, [addressViewForProjectId, projects]);
 
   const viewInterventionSums = useMemo(() => {
-  if (!viewProject) return { techPromoted: 0, pressRelease: 0, techAdopted: 0 };
-  const arr = Array.isArray(viewProject.interventions) ? viewProject.interventions : [];
-  return {
-    techPromoted: arr.reduce((sum, it) => sum + toNumber(it.technologiesPromotedTotal), 0),
-    pressRelease: arr.reduce((sum, it) => sum + toNumber(it.promotionalActivitiesPressRelease), 0),
-    techAdopted: arr.filter((it) => String(it.type || "").trim() === "Tech Roll Out").length,
+    if (!viewProject) return { techPromoted: 0, pressRelease: 0, techAdopted: 0 };
+    const arr = Array.isArray(viewProject.interventions) ? viewProject.interventions : [];
+    return {
+      techPromoted: arr.reduce((sum, it) => sum + toNumber(it.technologiesPromotedTotal), 0),
+      pressRelease: arr.reduce((sum, it) => sum + toNumber(it.promotionalActivitiesPressRelease), 0),
+      techAdopted: arr.filter((it) => String(it.type || "").trim() === "Tech Roll Out").length,
+    };
+  }, [viewProject]);
+
+  const viewStyles = {
+    value: {
+      fontWeight: 900,
+      fontSize: 16,
+      color: "#0f172a",
+      marginTop: 4,
+    },
+    boxValue: {
+      marginTop: 4,
+      border: "1px solid #cbd5e1",
+      background: "#f8fafc",
+      borderRadius: 10,
+      padding: "10px 12px",
+      fontWeight: 900,
+      fontSize: 16,
+      color: "#0f172a",
+    },
   };
-}, [viewProject]);
 
-const viewStyles = {
-  value: {
-    fontWeight: 900,
-    fontSize: 16,
-    color: "#0f172a",
-    marginTop: 4,
-  },
-  boxValue: {
-    marginTop: 4,
-    border: "1px solid #cbd5e1",
-    background: "#f8fafc",
-    borderRadius: 10,
-    padding: "10px 12px",
-    fontWeight: 900,
-    fontSize: 16,
-    color: "#0f172a",
-  },
-};
-
-return (
+  return (
     <div style={styles.page}>
       <div style={styles.titleBar}>
         <div>SSCP</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
-          
+
         </div>
       </div>
 
@@ -4985,7 +4985,7 @@ return (
 
                     <td style={styles.td}>
                       <div style={{ fontWeight: 900 }}>{p.lguCommunity || "—"}</div>
-</td>
+                    </td>
 
                     <td style={styles.td}>
                       <div style={{ display: "grid", gap: 8 }}>
@@ -5584,768 +5584,248 @@ return (
 
       {/* ===== INTERVENTION DETAILS MODAL ===== */}
       {detailFor && (
-  <div style={{ ...styles.modalBackdrop, zIndex: 2000 }} onClick={() => setDetailFor(null)}>
-    <div style={{ ...styles.detailsModal, position: "relative", zIndex: 2001 }} onClick={(e) => e.stopPropagation()}>
-      <div style={styles.modalHeader}>
-        <div>
-          {detailFor.mode === "edit" ? "Edit" : "Add"} {detailForm.type} Details
-          {detailProject ? (
-            <span style={{ opacity: 0.9, fontWeight: 800 }}>
-              {" "}
-              — {detailProject.lguCommunity}{detailSscProject?.title ? ` • ${detailSscProject.title}` : ""}
-            </span>
-          ) : null}
-        </div>
-        <button style={styles.closeX} onClick={() => setDetailFor(null)}>
-          ✕
-        </button>
-      </div>
-
-      <div style={styles.modalBody}>
-        <div style={{ maxWidth: 360 }}>
-          <div style={styles.label}>Intervention Type</div>
-          <input style={styles.input} value={detailForm.type} disabled />
-        </div>
-
-        {detailForm.type === "Training" ? (
-          <>
-            <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
-              Training Details
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Program / Training (optional)</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.trainingProgram}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingProgram: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Province</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.trainingProvince}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingProvince: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Start Date *</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.trainingStartDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingStartDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>End Date</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.trainingEndDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingEndDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Title *</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.title}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, title: e.target.value }))}
-                />
-              </div>              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Venue/Address *</div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("training");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.trainingVenueAddress))}
-                >
-                  <span style={{ opacity: detailForm.trainingVenueAddress ? 1 : 0.6 }}>
-                    {detailForm.trainingVenueAddress || "Click to select venue/address"}
+        <div style={{ ...styles.modalBackdrop, zIndex: 2000 }} onClick={() => setDetailFor(null)}>
+          <div style={{ ...styles.detailsModal, position: "relative", zIndex: 2001 }} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <div>
+                {detailFor.mode === "edit" ? "Edit" : "Add"} {detailForm.type} Details
+                {detailProject ? (
+                  <span style={{ opacity: 0.9, fontWeight: 800 }}>
+                    {" "}
+                    — {detailProject.lguCommunity}{detailSscProject?.title ? ` • ${detailSscProject.title}` : ""}
                   </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.trainingVenueAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Firms</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  value={detailForm.noOfFirms}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, noOfFirms: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Firms / SUCs / HEIs / LGUs</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  value={detailForm.trainingFirmsSucsHeisLgusCount}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsSucsHeisLgusCount: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}><div style={styles.label}>Participants Female</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingParticipantsFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Participants Male</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingParticipantsMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Senior Female</div><input style={styles.input} type="number" value={detailForm.trainingSeniorFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingSeniorFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>Senior Male</div><input style={styles.input} type="number" value={detailForm.trainingSeniorMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingSeniorMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>IPs Female</div><input style={styles.input} type="number" value={detailForm.trainingIpFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingIpFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>IPs Male</div><input style={styles.input} type="number" value={detailForm.trainingIpMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingIpMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>4Ps Female</div><input style={styles.input} type="number" value={detailForm.trainingFourPsFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingFourPsFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>4Ps Male</div><input style={styles.input} type="number" value={detailForm.trainingFourPsMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingFourPsMale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>PWD Female</div><input style={styles.input} type="number" value={detailForm.trainingPwdFemale} onChange={(e)=>setDetailForm((p)=>({...p,trainingPwdFemale:e.target.value}))} /></div>
-              <div style={styles.field}><div style={styles.label}>PWD Male</div><input style={styles.input} type="number" value={detailForm.trainingPwdMale} onChange={(e)=>setDetailForm((p)=>({...p,trainingPwdMale:e.target.value}))} /></div>
-
-              <div style={styles.field}><div style={styles.label}>Total Female</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalFemale} readOnly /></div>
-              <div style={styles.field}><div style={styles.label}>Total Male</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalMale} readOnly /></div>
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}><div style={styles.label}>Total Participants</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalParticipants} readOnly /></div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>List of Firms / Associations</div>
-                <textarea style={styles.textarea} value={detailForm.trainingFirmsAssociationsList} onChange={(e)=>setDetailForm((p)=>({...p,trainingFirmsAssociationsList:e.target.value}))} />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Name of Trainor / Affiliation</div>
-                <textarea style={styles.textarea} value={detailForm.trainingTrainorAffiliation} onChange={(e)=>setDetailForm((p)=>({...p,trainingTrainorAffiliation:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name Of Program / Project / Unit</div>
-                <input style={styles.input} value={detailForm.projectProgramUnit} onChange={(e)=>setDetailForm((p)=>({...p,projectProgramUnit:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>DOST Cost</div>
-                <input style={styles.input} type="number" value={detailForm.trainingCostDost} onChange={(e)=>setDetailForm((p)=>({...p,trainingCostDost:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Partner Agency Cost</div>
-                <input style={styles.input} type="number" value={detailForm.trainingCostPartnerAgency} onChange={(e)=>setDetailForm((p)=>({...p,trainingCostPartnerAgency:e.target.value}))} />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Total Cost</div>
-                <input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalCost} readOnly />
-              </div>
-            </div>
-          </>
-        ) : detailForm.type === "Packaging & Labeling" ? (
-          <>
-            <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
-              Packaging & Labeling Details
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Quarter <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingQuarter}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingQuarter: e.target.value }))}
-                >
-                  <option value="">--</option>
-                  <option value="1">1Q</option>
-                  <option value="2">2Q</option>
-                  <option value="3">3Q</option>
-                  <option value="4">4Q</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Province <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingProvince}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingProvince: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Date Completed/Executed <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.packagingDateCompleted}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingDateCompleted: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Intervention <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingTypeOfIntervention}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingTypeOfIntervention: e.target.value }))}
-                >
-                  <option value="Label Design">Label Design</option>
-                  <option value="Packaging Design">Packaging Design</option>
-                  <option value="Label Printing">Label Printing</option>
-                  <option value="Packaging Material">Packaging Material</option>
-                  <option value="Other Packaging Support">Other Packaging Support</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Size/Variant of Label Design/Type of Packaging Material <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingSizeVariant}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingSizeVariant: e.target.value }))}
-                  placeholder="e.g. 4x5.6 inches Sticker type"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Packaging Materials Provided <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingMaterialsProvided}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingMaterialsProvided: e.target.value }))}
-                  placeholder="e.g. N/A or quantity"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingCustomerName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingCustomerName: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.packagingSex}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingSex: e.target.value }))}
-                >
-                  <option value="">--</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Product Name</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingProductName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingProductName: e.target.value }))}
-                  placeholder="Optional product name"
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Firm/Institution <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.packagingFirmInstitution}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingFirmInstitution: e.target.value }))}
-                  placeholder="e.g. RiceBIS Bayambang Agriculture Cooperative"
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("packaging");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.packagingAddress))}
-                >
-                  <span style={{ opacity: detailForm.packagingAddress ? 1 : 0.6 }}>
-                    {detailForm.packagingAddress || "Click to select venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.packagingAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.packagingMeansVerification}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, packagingMeansVerification: e.target.value }))}
-                  placeholder="Design approval sheet / links / OR / AR / report / photos..."
-                />
-
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
-                  <button type="button" style={styles.tinyBtn} onClick={() => openLinkMaybe(detailForm.packagingMeansVerification)}>
-                    View Link
-                  </button>
-
-                  <button type="button" style={styles.tinyBtn} onClick={triggerAddPackagingPhotos}>
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPackagingPhotoViewerAt(0)}
-                    disabled={!packagingPhotoCount()}
-                  >
-                    Photos: {packagingPhotoCount()}
-                  </button>
-                </div>
-
-                <input
-                  ref={packagingPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickPackagingPhotos(e.target.files)}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
-              * After saving the entry, add the product names from the main table.
-            </div>
-          </>
-        ) : ["Tech Promo", "S&T Promo"].includes(detailForm.type) ? (
-          <>
-            <div
-              style={{
-                marginTop: 12,
-                fontSize: 12,
-                opacity: 0.8,
-                fontWeight: 900,
-                marginBottom: 10,
-              }}
-            >
-              Fields with <span style={{ color: "#dc2626" }}>*</span> are required. (Project is optional.)
-            </div>
-
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Project (optional)</div>
-                <input
-                  style={{ ...styles.input, background: "#f3f4f6", cursor: "not-allowed" }}
-                  value="SSCP"
-                  readOnly
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Activity Date <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.promoActivityDate}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityDate: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Technology Promoted <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoTechnologyPromoted}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyPromoted: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Technology Generator <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoTechnologyGenerator}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyGenerator: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Mode of Promotion <span style={{ color: "#dc2626" }}>*</span></div>
-                <select
-                  style={styles.input}
-                  value={detailForm.promoModeOfPromotion}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoModeOfPromotion: e.target.value }))}
-                >
-                  <option value="Social Media">Social Media</option>
-                  <option value="Press Release">Press Release</option>
-                  <option value="Radio">Radio</option>
-                  <option value="TV">TV</option>
-                  <option value="Print">Print</option>
-                  <option value="Forum / Event">Forum / Event</option>
-                  <option value="Exhibit">Exhibit</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Activity Title <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoActivityTitle}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityTitle: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Activity Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("promoVenue");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.promoActivityVenueAddress))}
-                >
-                  <span style={{ opacity: detailForm.promoActivityVenueAddress ? 1 : 0.6 }}>
-                    {detailForm.promoActivityVenueAddress || "Click to select activity venue/address"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.promoActivityVenueAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer/Participant <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoCustomerName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerName: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Customer/Participant Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoCustomerAddress}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerAddress: e.target.value }))}
-                />
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.promoSex}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoSex: e.target.value }))}
-                >
-                  <option value="N/A">N/A</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Staff <span style={{ color: "#dc2626" }}>*</span></div>
-                <input
-                  style={styles.input}
-                  value={detailForm.promoStaffName}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoStaffName: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.promoMeansVerification}
-                  onChange={(e) => setDetailForm((p) => ({ ...p, promoMeansVerification: e.target.value }))}
-                  placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    marginTop: 8,
-                  }}
-                >
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openLinkMaybe(detailForm.promoMeansVerification)}
-                  >
-                    View First Link
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={triggerAddPromoPhotos}
-                  >
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPromoPhotoViewerAt(0)}
-                    disabled={!promoPhotoCount()}
-                    title={!promoPhotoCount() ? "No photos yet" : "View saved photo(s)"}
-                  >
-                    Photos: {promoPhotoCount()}
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openPromoPhotoViewerAt(0)}
-                    disabled={!promoPhotoCount()}
-                  >
-                    View Photos
-                  </button>
-                </div>
-
-                {promoPhotoCount() > 0 ? (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {(detailForm.promoPhotos || []).map((photo, idx) => (
-                      <button
-                        key={`${photo?.name || "photo"}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openPromoPhotoViewerAt(idx)}
-                      >
-                        Photo {idx + 1}
-                      </button>
-                    ))}
-                  </div>
                 ) : null}
-
-                {extractLinks(detailForm.promoMeansVerification).length > 0 ? (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {extractLinks(detailForm.promoMeansVerification).map((url, idx) => (
-                      <button
-                        key={`${url}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openSpecificLink(url)}
-                        title={url}
-                      >
-                        Link {idx + 1}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-
-                <input
-                  ref={promoPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickPromoPhotos(e.target.files)}
-                />
               </div>
+              <button style={styles.closeX} onClick={() => setDetailFor(null)}>
+                ✕
+              </button>
             </div>
-          </>
-        ) : null}
-        {detailForm.type === "Tech Roll Out" ? (
-          <>
-            <div style={{ ...styles.grid, marginTop: 12 }}>
-              {(() => {
-                const r = (detailForm.techRows || [])[0] || makeDefaultTechRows()[0];
-                return (
-                  <>
 
+            <div style={styles.modalBody}>
+              <div style={{ maxWidth: 360 }}>
+                <div style={styles.label}>Intervention Type</div>
+                <input style={styles.input} value={detailForm.type} disabled />
+              </div>
+
+              {detailForm.type === "Training" ? (
+                <>
+                  <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
+                    Training Details
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
                     <div style={styles.field}>
-                      <div style={styles.label}>Unit/Center *</div>
+                      <div style={styles.label}>Program / Training (optional)</div>
                       <input
                         style={styles.input}
-                        value={r.unitCenter || ""}
-                        onChange={(e) => updateTechRow(0, "unitCenter", e.target.value)}
+                        value={detailForm.trainingProgram}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingProgram: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Name of Knowledge/Technology Transferred *</div>
+                      <div style={styles.label}>Province</div>
                       <input
                         style={styles.input}
-                        value={r.nameOfTechnologyTransferred || ""}
-                        onChange={(e) => updateTechRow(0, "nameOfTechnologyTransferred", e.target.value)}
+                        value={detailForm.trainingProvince}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingProvince: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Technology Generator *</div>
-                      <input
-                        style={styles.input}
-                        value={r.technologyGenerator || ""}
-                        onChange={(e) => updateTechRow(0, "technologyGenerator", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Mode of Transfer *</div>
-                      <select
-                        style={styles.input}
-                        value={r.modeOfTransfer || ""}
-                        onChange={(e) => updateTechRow(0, "modeOfTransfer", e.target.value)}
-                      >
-                        <option value="">-- Select --</option>
-                        <option value="Commercialization">Commercialization</option>
-                        <option value="Extension">Extension</option>
-                        <option value="Public Good">Public Good</option>
-                        <option value="Technology Adoption">Technology Adoption</option>
-                        <option value="Training">Training</option>
-                        <option value="Technical Assistance">Technical Assistance</option>
-                      </select>
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Date Transferred *</div>
+                      <div style={styles.label}>Start Date *</div>
                       <input
                         style={styles.input}
                         type="date"
-                        value={r.dateTransferred || ""}
-                        onChange={(e) => updateTechRow(0, "dateTransferred", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>DOST-developed/funded knowledge/technology</div>
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          padding: "2px 0 0",
-                          fontSize: 13,
-                          fontWeight: 700,
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={Boolean(r.isDostDevelopedFunded)}
-                          onChange={(e) => updateTechRow(0, "isDostDevelopedFunded", e.target.checked)}
-                          style={{ width: 16, height: 16, margin: 0 }}
-                        />
-                        <span>The transferred knowledge/technology is DOST-developed/funded</span>
-                      </label>
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Activity Title *</div>
-                      <input
-                        style={styles.input}
-                        value={r.activityTitle || ""}
-                        onChange={(e) => updateTechRow(0, "activityTitle", e.target.value)}
+                        value={detailForm.trainingStartDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingStartDate: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Activity Date *</div>
+                      <div style={styles.label}>End Date</div>
                       <input
                         style={styles.input}
                         type="date"
-                        value={r.activityDate || ""}
-                        onChange={(e) => updateTechRow(0, "activityDate", e.target.value)}
+                        value={detailForm.trainingEndDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingEndDate: e.target.value }))}
                       />
                     </div>
 
                     <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>Activity Venue</div>
-                      <input
-                        style={styles.input}
-                        value={r.activityVenue || ""}
-                        onChange={(e) => updateTechRow(0, "activityVenue", e.target.value)}
+                      <div style={styles.label}>Title *</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.title}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, title: e.target.value }))}
                       />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Institution Name *</div>
-                      <input
-                        style={styles.input}
-                        value={r.institutionName || ""}
-                        onChange={(e) => updateTechRow(0, "institutionName", e.target.value)}
-                      />
-                    </div>
-
-                    <div style={styles.field}>
-                      <div style={styles.label}>Classification *</div>
-                      <select
-                        style={styles.input}
-                        value={r.classification || ""}
-                        onChange={(e) => updateTechRow(0, "classification", e.target.value)}
-                      >
-                        <option value="">-- Select --</option>
-                        <option value="Individual">Individual</option>
-                        <option value="MSME/Firm">MSME/Firm</option>
-                        <option value="Academe">Academe</option>
-                        <option value="LGU">LGU</option>
-                        <option value="Cooperative/Association">Cooperative/Association</option>
-                        <option value="NGO">NGO</option>
-                        <option value="National Agency">National Agency</option>
-                      </select>
-                    </div>
-
-                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                      <div style={styles.label}>Institution Venue/Address *</div>
+                    </div>              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Venue/Address *</div>
                       <button
                         type="button"
                         onClick={() => {
-                          setAddressFlowTarget(`techInstitution:0`);
+                          setAddressFlowTarget("training");
                           setAddressFlowOpen(true);
                         }}
-                        style={styles.inputButton(Boolean(r.institutionAddress))}
+                        style={styles.inputButton(Boolean(detailForm.trainingVenueAddress))}
                       >
-                        <span style={{ opacity: r.institutionAddress ? 1 : 0.6 }}>
-                          {r.institutionAddress || "Click to select venue/address"}
+                        <span style={{ opacity: detailForm.trainingVenueAddress ? 1 : 0.6 }}>
+                          {detailForm.trainingVenueAddress || "Click to select venue/address"}
                         </span>
                         <span style={{ fontSize: 11, opacity: 0.65 }}>
-                          {r.institutionAddress ? "Change" : "Select"}
+                          {detailForm.trainingVenueAddress ? "Change" : "Select"}
                         </span>
                       </button>
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Representative Name *</div>
+                      <div style={styles.label}>No. of Firms</div>
                       <input
                         style={styles.input}
-                        value={r.representativeName || ""}
-                        onChange={(e) => updateTechRow(0, "representativeName", e.target.value)}
+                        type="number"
+                        value={detailForm.noOfFirms}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, noOfFirms: e.target.value }))}
                       />
                     </div>
 
                     <div style={styles.field}>
-                      <div style={styles.label}>Representative Designation</div>
+                      <div style={styles.label}>No. of Firms / SUCs / HEIs / LGUs</div>
                       <input
                         style={styles.input}
-                        value={r.representativeDesignation || ""}
-                        onChange={(e) => updateTechRow(0, "representativeDesignation", e.target.value)}
+                        type="number"
+                        value={detailForm.trainingFirmsSucsHeisLgusCount}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsSucsHeisLgusCount: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}><div style={styles.label}>Participants Female</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingParticipantsFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Participants Male</div><input style={styles.input} type="number" value={detailForm.trainingParticipantsMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingParticipantsMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Senior Female</div><input style={styles.input} type="number" value={detailForm.trainingSeniorFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingSeniorFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>Senior Male</div><input style={styles.input} type="number" value={detailForm.trainingSeniorMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingSeniorMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>IPs Female</div><input style={styles.input} type="number" value={detailForm.trainingIpFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingIpFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>IPs Male</div><input style={styles.input} type="number" value={detailForm.trainingIpMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingIpMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>4Ps Female</div><input style={styles.input} type="number" value={detailForm.trainingFourPsFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFourPsFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>4Ps Male</div><input style={styles.input} type="number" value={detailForm.trainingFourPsMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFourPsMale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>PWD Female</div><input style={styles.input} type="number" value={detailForm.trainingPwdFemale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingPwdFemale: e.target.value }))} /></div>
+                    <div style={styles.field}><div style={styles.label}>PWD Male</div><input style={styles.input} type="number" value={detailForm.trainingPwdMale} onChange={(e) => setDetailForm((p) => ({ ...p, trainingPwdMale: e.target.value }))} /></div>
+
+                    <div style={styles.field}><div style={styles.label}>Total Female</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalFemale} readOnly /></div>
+                    <div style={styles.field}><div style={styles.label}>Total Male</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalMale} readOnly /></div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}><div style={styles.label}>Total Participants</div><input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalParticipants} readOnly /></div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>List of Firms / Associations</div>
+                      <textarea style={styles.textarea} value={detailForm.trainingFirmsAssociationsList} onChange={(e) => setDetailForm((p) => ({ ...p, trainingFirmsAssociationsList: e.target.value }))} />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Name of Trainor / Affiliation</div>
+                      <textarea style={styles.textarea} value={detailForm.trainingTrainorAffiliation} onChange={(e) => setDetailForm((p) => ({ ...p, trainingTrainorAffiliation: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name Of Program / Project / Unit</div>
+                      <input style={styles.input} value={detailForm.projectProgramUnit} onChange={(e) => setDetailForm((p) => ({ ...p, projectProgramUnit: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>DOST Cost</div>
+                      <input style={styles.input} type="number" value={detailForm.trainingCostDost} onChange={(e) => setDetailForm((p) => ({ ...p, trainingCostDost: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Partner Agency Cost</div>
+                      <input style={styles.input} type="number" value={detailForm.trainingCostPartnerAgency} onChange={(e) => setDetailForm((p) => ({ ...p, trainingCostPartnerAgency: e.target.value }))} />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Total Cost</div>
+                      <input style={{ ...styles.input, background: "#f8fafc" }} value={trainingTotalCost} readOnly />
+                    </div>
+                  </div>
+                </>
+              ) : detailForm.type === "Packaging & Labeling" ? (
+                <>
+                  <div style={{ marginTop: 12, fontWeight: 900, fontSize: 13, color: "#0f172a" }}>
+                    Packaging & Labeling Details
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Quarter <span style={{ color: "#dc2626" }}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.packagingQuarter}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingQuarter: e.target.value }))}
+                      >
+                        <option value="">--</option>
+                        <option value="1">1Q</option>
+                        <option value="2">2Q</option>
+                        <option value="3">3Q</option>
+                        <option value="4">4Q</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Province <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingProvince}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingProvince: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Date Completed/Executed <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.packagingDateCompleted}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingDateCompleted: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Type of Intervention <span style={{ color: "#dc2626" }}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.packagingTypeOfIntervention}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingTypeOfIntervention: e.target.value }))}
+                      >
+                        <option value="Label Design">Label Design</option>
+                        <option value="Packaging Design">Packaging Design</option>
+                        <option value="Label Printing">Label Printing</option>
+                        <option value="Packaging Material">Packaging Material</option>
+                        <option value="Other Packaging Support">Other Packaging Support</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Size/Variant of Label Design/Type of Packaging Material <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingSizeVariant}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingSizeVariant: e.target.value }))}
+                        placeholder="e.g. 4x5.6 inches Sticker type"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Packaging Materials Provided <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingMaterialsProvided}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingMaterialsProvided: e.target.value }))}
+                        placeholder="e.g. N/A or quantity"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Customer <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingCustomerName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingCustomerName: e.target.value }))}
                       />
                     </div>
 
@@ -6353,271 +5833,791 @@ return (
                       <div style={styles.label}>Sex (M/F)</div>
                       <select
                         style={styles.input}
-                        value={r.sex || ""}
-                        onChange={(e) => updateTechRow(0, "sex", e.target.value)}
+                        value={detailForm.packagingSex}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingSex: e.target.value }))}
                       >
                         <option value="">--</option>
                         <option value="M">M</option>
                         <option value="F">F</option>
                       </select>
                     </div>
-                  </>
-                );
-              })()}
-            </div>
-          </>
-        ) : null}
 
-{detailForm.type === "TACS" ? (
-          <>
-            <div
-              style={{
-                marginTop: 12,
-                fontWeight: 900,
-                fontSize: 13,
-                color: "#0f172a",
-              }}
-            >
-              TACS Entry
-            </div>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Product Name</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingProductName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingProductName: e.target.value }))}
+                        placeholder="Optional product name"
+                      />
+                    </div>
 
-            <div style={{ ...styles.grid, marginTop: 10 }}>
-              <div style={styles.field}>
-                <div style={styles.label}>Type of Consultancy *</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.consultancyType}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      consultancyType: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">-- Select --</option>
-                  {TACS_CONSULTANCY_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Firm/Institution <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.packagingFirmInstitution}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingFirmInstitution: e.target.value }))}
+                        placeholder="e.g. RiceBIS Bayambang Agriculture Cooperative"
+                      />
+                    </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Date of Engagement *</div>
-                <input
-                  style={styles.input}
-                  type="date"
-                  value={detailForm.dateEngagement}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      dateEngagement: e.target.value,
-                    }))
-                  }
-                />
-              </div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("packaging");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.packagingAddress))}
+                      >
+                        <span style={{ opacity: detailForm.packagingAddress ? 1 : 0.6 }}>
+                          {detailForm.packagingAddress || "Click to select venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.packagingAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Expert / Institution</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.expertInstitution}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      expertInstitution: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. Engr. Arnold C. Santos"
-                />
-              </div>
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.packagingMeansVerification}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, packagingMeansVerification: e.target.value }))}
+                        placeholder="Design approval sheet / links / OR / AR / report / photos..."
+                      />
 
-              <div style={styles.field}>
-                <div style={styles.label}>Name of Customer *</div>
-                <input
-                  style={styles.input}
-                  value={detailForm.customerName}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      customerName: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. Mr. Oliver Caasi"
-                />
-              </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
+                        <button type="button" style={styles.tinyBtn} onClick={() => openLinkMaybe(detailForm.packagingMeansVerification)}>
+                          View Link
+                        </button>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Sex (M/F)</div>
-                <select
-                  style={styles.input}
-                  value={detailForm.customerSex}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      customerSex: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">--</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                </select>
-              </div>
+                        <button type="button" style={styles.tinyBtn} onClick={triggerAddPackagingPhotos}>
+                          Add Photos
+                        </button>
 
-              <div style={styles.field}>
-                <div style={styles.label}>Customer Venue/Address *</div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAddressFlowTarget("tacs");
-                    setAddressFlowOpen(true);
-                  }}
-                  style={styles.inputButton(Boolean(detailForm.customerAddress))}
-                >
-                  <span style={{ opacity: detailForm.customerAddress ? 1 : 0.6 }}>
-                    {detailForm.customerAddress || "Click to select venue/address of customer"}
-                  </span>
-                  <span style={{ fontSize: 11, opacity: 0.65 }}>
-                    {detailForm.customerAddress ? "Change" : "Select"}
-                  </span>
-                </button>
-              </div>
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPackagingPhotoViewerAt(0)}
+                          disabled={!packagingPhotoCount()}
+                        >
+                          Photos: {packagingPhotoCount()}
+                        </button>
+                      </div>
 
-              <div style={styles.field}>
-                <div style={styles.label}>No. of Advice/Recommendations *</div>
-                <input
-                  style={styles.input}
-                  type="number"
-                  min="0"
-                  value={detailForm.noOfAdvice}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      noOfAdvice: e.target.value,
-                    }))
-                  }
-                  placeholder="e.g. 1"
-                />
-              </div>
+                      <input
+                        ref={packagingPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickPackagingPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
 
-              <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                <div style={styles.label}>Means of Verification</div>
-                <textarea
-                  style={styles.textarea}
-                  value={detailForm.meansVerification}
-                  onChange={(e) =>
-                    setDetailForm((p) => ({
-                      ...p,
-                      meansVerification: e.target.value,
-                    }))
-                  }
-                  placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    marginTop: 8,
-                  }}
-                >
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openLinkMaybe(detailForm.meansVerification)}
-                  >
-                    View Link
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={triggerAddTacsPhotos}
-                  >
-                    Add Photos
-                  </button>
-
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => openTacsPhotoViewerAt(0)}
-                    disabled={!tacsPhotoCount()}
-                  >
-                    Photos: {tacsPhotoCount()}
-                  </button>
-                </div>
-
-                {tacsPhotoCount() > 0 ? (
+                  <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
+                    * After saving the entry, add the product names from the main table.
+                  </div>
+                </>
+              ) : ["Tech Promo", "S&T Promo"].includes(detailForm.type) ? (
+                <>
                   <div
                     style={{
-                      marginTop: 8,
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
+                      marginTop: 12,
+                      fontSize: 12,
+                      opacity: 0.8,
+                      fontWeight: 900,
+                      marginBottom: 10,
                     }}
                   >
-                    {(detailForm.tacsPhotos || []).map((photo, idx) => (
-                      <button
-                        key={`${photo?.name || "photo"}_${idx}`}
-                        type="button"
-                        style={styles.tinyBtn}
-                        onClick={() => openTacsPhotoViewerAt(idx)}
-                      >
-                        Photo {idx + 1}
-                      </button>
-                    ))}
+                    Fields with <span style={{ color: "#dc2626" }}>*</span> are required. (Project is optional.)
                   </div>
-                ) : null}
 
-                <input
-                  ref={tacsPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => onPickTacsPhotos(e.target.files)}
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Project (optional)</div>
+                      <input
+                        style={{ ...styles.input, background: "#f3f4f6", cursor: "not-allowed" }}
+                        value="SSCP"
+                        readOnly
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Activity Date <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.promoActivityDate}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityDate: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Technology Promoted <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoTechnologyPromoted}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyPromoted: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Technology Generator <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoTechnologyGenerator}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoTechnologyGenerator: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Mode of Promotion <span style={{ color: "#dc2626" }}>*</span></div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.promoModeOfPromotion}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoModeOfPromotion: e.target.value }))}
+                      >
+                        <option value="Social Media">Social Media</option>
+                        <option value="Press Release">Press Release</option>
+                        <option value="Radio">Radio</option>
+                        <option value="TV">TV</option>
+                        <option value="Print">Print</option>
+                        <option value="Forum / Event">Forum / Event</option>
+                        <option value="Exhibit">Exhibit</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Activity Title <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoActivityTitle}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoActivityTitle: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Activity Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("promoVenue");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.promoActivityVenueAddress))}
+                      >
+                        <span style={{ opacity: detailForm.promoActivityVenueAddress ? 1 : 0.6 }}>
+                          {detailForm.promoActivityVenueAddress || "Click to select activity venue/address"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.promoActivityVenueAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Customer/Participant <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoCustomerName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerName: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Customer/Participant Venue/Address <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoCustomerAddress}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoCustomerAddress: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Sex (M/F)</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.promoSex}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoSex: e.target.value }))}
+                      >
+                        <option value="N/A">N/A</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Staff <span style={{ color: "#dc2626" }}>*</span></div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.promoStaffName}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoStaffName: e.target.value }))}
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.promoMeansVerification}
+                        onChange={(e) => setDetailForm((p) => ({ ...p, promoMeansVerification: e.target.value }))}
+                        placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openLinkMaybe(detailForm.promoMeansVerification)}
+                        >
+                          View First Link
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={triggerAddPromoPhotos}
+                        >
+                          Add Photos
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPromoPhotoViewerAt(0)}
+                          disabled={!promoPhotoCount()}
+                          title={!promoPhotoCount() ? "No photos yet" : "View saved photo(s)"}
+                        >
+                          Photos: {promoPhotoCount()}
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openPromoPhotoViewerAt(0)}
+                          disabled={!promoPhotoCount()}
+                        >
+                          View Photos
+                        </button>
+                      </div>
+
+                      {promoPhotoCount() > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(detailForm.promoPhotos || []).map((photo, idx) => (
+                            <button
+                              key={`${photo?.name || "photo"}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openPromoPhotoViewerAt(idx)}
+                            >
+                              Photo {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      {extractLinks(detailForm.promoMeansVerification).length > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {extractLinks(detailForm.promoMeansVerification).map((url, idx) => (
+                            <button
+                              key={`${url}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openSpecificLink(url)}
+                              title={url}
+                            >
+                              Link {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <input
+                        ref={promoPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickPromoPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
+              {detailForm.type === "Tech Roll Out" ? (
+                <>
+                  <div style={{ ...styles.grid, marginTop: 12 }}>
+                    {(() => {
+                      const r = (detailForm.techRows || [])[0] || makeDefaultTechRows()[0];
+                      return (
+                        <>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Unit/Center *</div>
+                            <input
+                              style={styles.input}
+                              value={r.unitCenter || ""}
+                              onChange={(e) => updateTechRow(0, "unitCenter", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Name of Knowledge/Technology Transferred *</div>
+                            <input
+                              style={styles.input}
+                              value={r.nameOfTechnologyTransferred || ""}
+                              onChange={(e) => updateTechRow(0, "nameOfTechnologyTransferred", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Technology Generator *</div>
+                            <input
+                              style={styles.input}
+                              value={r.technologyGenerator || ""}
+                              onChange={(e) => updateTechRow(0, "technologyGenerator", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Mode of Transfer *</div>
+                            <select
+                              style={styles.input}
+                              value={r.modeOfTransfer || ""}
+                              onChange={(e) => updateTechRow(0, "modeOfTransfer", e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="Commercialization">Commercialization</option>
+                              <option value="Extension">Extension</option>
+                              <option value="Public Good">Public Good</option>
+                              <option value="Technology Adoption">Technology Adoption</option>
+                              <option value="Training">Training</option>
+                              <option value="Technical Assistance">Technical Assistance</option>
+                            </select>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Date Transferred *</div>
+                            <input
+                              style={styles.input}
+                              type="date"
+                              value={r.dateTransferred || ""}
+                              onChange={(e) => updateTechRow(0, "dateTransferred", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>DOST-developed/funded knowledge/technology</div>
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                padding: "2px 0 0",
+                                fontSize: 13,
+                                fontWeight: 700,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(r.isDostDevelopedFunded)}
+                                onChange={(e) => updateTechRow(0, "isDostDevelopedFunded", e.target.checked)}
+                                style={{ width: 16, height: 16, margin: 0 }}
+                              />
+                              <span>The transferred knowledge/technology is DOST-developed/funded</span>
+                            </label>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Activity Title *</div>
+                            <input
+                              style={styles.input}
+                              value={r.activityTitle || ""}
+                              onChange={(e) => updateTechRow(0, "activityTitle", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Activity Date *</div>
+                            <input
+                              style={styles.input}
+                              type="date"
+                              value={r.activityDate || ""}
+                              onChange={(e) => updateTechRow(0, "activityDate", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>Activity Venue</div>
+                            <input
+                              style={styles.input}
+                              value={r.activityVenue || ""}
+                              onChange={(e) => updateTechRow(0, "activityVenue", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Institution Name *</div>
+                            <input
+                              style={styles.input}
+                              value={r.institutionName || ""}
+                              onChange={(e) => updateTechRow(0, "institutionName", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Classification *</div>
+                            <select
+                              style={styles.input}
+                              value={r.classification || ""}
+                              onChange={(e) => updateTechRow(0, "classification", e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              <option value="Individual">Individual</option>
+                              <option value="MSME/Firm">MSME/Firm</option>
+                              <option value="Academe">Academe</option>
+                              <option value="LGU">LGU</option>
+                              <option value="Cooperative/Association">Cooperative/Association</option>
+                              <option value="NGO">NGO</option>
+                              <option value="National Agency">National Agency</option>
+                            </select>
+                          </div>
+
+                          <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                            <div style={styles.label}>Institution Venue/Address *</div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAddressFlowTarget(`techInstitution:0`);
+                                setAddressFlowOpen(true);
+                              }}
+                              style={styles.inputButton(Boolean(r.institutionAddress))}
+                            >
+                              <span style={{ opacity: r.institutionAddress ? 1 : 0.6 }}>
+                                {r.institutionAddress || "Click to select venue/address"}
+                              </span>
+                              <span style={{ fontSize: 11, opacity: 0.65 }}>
+                                {r.institutionAddress ? "Change" : "Select"}
+                              </span>
+                            </button>
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Representative Name *</div>
+                            <input
+                              style={styles.input}
+                              value={r.representativeName || ""}
+                              onChange={(e) => updateTechRow(0, "representativeName", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Representative Designation</div>
+                            <input
+                              style={styles.input}
+                              value={r.representativeDesignation || ""}
+                              onChange={(e) => updateTechRow(0, "representativeDesignation", e.target.value)}
+                            />
+                          </div>
+
+                          <div style={styles.field}>
+                            <div style={styles.label}>Sex (M/F)</div>
+                            <select
+                              style={styles.input}
+                              value={r.sex || ""}
+                              onChange={(e) => updateTechRow(0, "sex", e.target.value)}
+                            >
+                              <option value="">--</option>
+                              <option value="M">M</option>
+                              <option value="F">F</option>
+                            </select>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </>
+              ) : null}
+
+              {detailForm.type === "TACS" ? (
+                <>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      fontWeight: 900,
+                      fontSize: 13,
+                      color: "#0f172a",
+                    }}
+                  >
+                    TACS Entry
+                  </div>
+
+                  <div style={{ ...styles.grid, marginTop: 10 }}>
+                    <div style={styles.field}>
+                      <div style={styles.label}>Type of Consultancy *</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.consultancyType}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            consultancyType: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">-- Select --</option>
+                        {TACS_CONSULTANCY_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Date of Engagement *</div>
+                      <input
+                        style={styles.input}
+                        type="date"
+                        value={detailForm.dateEngagement}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            dateEngagement: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Expert / Institution</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.expertInstitution}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            expertInstitution: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. Engr. Arnold C. Santos"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Name of Customer *</div>
+                      <input
+                        style={styles.input}
+                        value={detailForm.customerName}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            customerName: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. Mr. Oliver Caasi"
+                      />
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Sex (M/F)</div>
+                      <select
+                        style={styles.input}
+                        value={detailForm.customerSex}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            customerSex: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">--</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                      </select>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>Customer Venue/Address *</div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressFlowTarget("tacs");
+                          setAddressFlowOpen(true);
+                        }}
+                        style={styles.inputButton(Boolean(detailForm.customerAddress))}
+                      >
+                        <span style={{ opacity: detailForm.customerAddress ? 1 : 0.6 }}>
+                          {detailForm.customerAddress || "Click to select venue/address of customer"}
+                        </span>
+                        <span style={{ fontSize: 11, opacity: 0.65 }}>
+                          {detailForm.customerAddress ? "Change" : "Select"}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div style={styles.field}>
+                      <div style={styles.label}>No. of Advice/Recommendations *</div>
+                      <input
+                        style={styles.input}
+                        type="number"
+                        min="0"
+                        value={detailForm.noOfAdvice}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            noOfAdvice: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g. 1"
+                      />
+                    </div>
+
+                    <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                      <div style={styles.label}>Means of Verification</div>
+                      <textarea
+                        style={styles.textarea}
+                        value={detailForm.meansVerification}
+                        onChange={(e) =>
+                          setDetailForm((p) => ({
+                            ...p,
+                            meansVerification: e.target.value,
+                          }))
+                        }
+                        placeholder="Attendance sheet / links to socmed posts / activity reports / photos..."
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          marginTop: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openLinkMaybe(detailForm.meansVerification)}
+                        >
+                          View Link
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={triggerAddTacsPhotos}
+                        >
+                          Add Photos
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.tinyBtn}
+                          onClick={() => openTacsPhotoViewerAt(0)}
+                          disabled={!tacsPhotoCount()}
+                        >
+                          Photos: {tacsPhotoCount()}
+                        </button>
+                      </div>
+
+                      {tacsPhotoCount() > 0 ? (
+                        <div
+                          style={{
+                            marginTop: 8,
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {(detailForm.tacsPhotos || []).map((photo, idx) => (
+                            <button
+                              key={`${photo?.name || "photo"}_${idx}`}
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={() => openTacsPhotoViewerAt(idx)}
+                            >
+                              Photo {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <input
+                        ref={tacsPhotoInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={(e) => onPickTacsPhotos(e.target.files)}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
+              <div style={{ ...styles.field, marginTop: 12 }}>
+                <div style={styles.label}>Notes / Remarks</div>
+                <textarea
+                  style={styles.textarea}
+                  value={detailForm.notes}
+                  onChange={(e) =>
+                    setDetailForm((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
-          </>
-        ) : null}
 
-        <div style={{ ...styles.field, marginTop: 12 }}>
-          <div style={styles.label}>Notes / Remarks</div>
-          <textarea
-            style={styles.textarea}
-            value={detailForm.notes}
-            onChange={(e) =>
-              setDetailForm((prev) => ({
-                ...prev,
-                notes: e.target.value,
-              }))
-            }
-          />
+            <div style={styles.modalFooter}>
+              <button
+                style={styles.btnGhost}
+                onClick={() => {
+                  setDetailFor(null);
+                  resetDetailForm("");
+                }}
+              >
+                Cancel
+              </button>
+              <button style={styles.btnDark} onClick={saveInterventionDetails}>
+                {detailFor.mode === "edit" ? "Update" : "Save"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div style={styles.modalFooter}>
-        <button
-          style={styles.btnGhost}
-          onClick={() => {
-            setDetailFor(null);
-            resetDetailForm("");
-          }}
-        >
-          Cancel
-        </button>
-        <button style={styles.btnDark} onClick={saveInterventionDetails}>
-          {detailFor.mode === "edit" ? "Update" : "Save"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {promoPhotoViewerIndex >= 0 && Array.isArray(detailForm.promoPhotos) && detailForm.promoPhotos[promoPhotoViewerIndex] ? (
         <div style={styles.photoViewerBackdrop} onClick={closePromoPhotoViewer}>
@@ -6898,7 +6898,7 @@ return (
                 </div>
               </div>
 
-                                          <div style={{ marginTop: 14 }}>
+              <div style={{ marginTop: 14 }}>
                 <div style={styles.label}>Projects + S&amp;T Interventions</div>
 
                 <div style={{ ...viewStyles.boxValue, fontSize: 13 }}>
@@ -6983,23 +6983,23 @@ return (
                 const projectCustomFields =
                   typeof (viewProject?.customFields || viewProject?.custom_fields || {}) === "string"
                     ? (() => {
-                        try {
-                          return JSON.parse(viewProject?.customFields || viewProject?.custom_fields || "{}");
-                        } catch {
-                          return {};
-                        }
-                      })()
+                      try {
+                        return JSON.parse(viewProject?.customFields || viewProject?.custom_fields || "{}");
+                      } catch {
+                        return {};
+                      }
+                    })()
                     : viewProject?.customFields || viewProject?.custom_fields || {};
 
                 const displayCustomFields =
                   sscpCustomFields.length > 0
                     ? sscpCustomFields
                     : Object.keys(projectCustomFields || {}).map((key) => ({
-                        key,
-                        fieldKey: key,
-                        fieldLabel: key,
-                        field_label: key,
-                      }));
+                      key,
+                      fieldKey: key,
+                      fieldLabel: key,
+                      field_label: key,
+                    }));
 
                 return displayCustomFields.length > 0 ? (
                   <div style={{ ...styles.grid, marginTop: 14 }}>
@@ -7068,7 +7068,7 @@ return (
 
             <div style={styles.modalBody}>
               <div style={styles.grid}>
-<div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+                <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
                   <div style={styles.label}>LGU / Community *</div>
                   <input
                     style={styles.input}
@@ -7428,18 +7428,18 @@ return (
             addressFlowTarget === "tacs"
               ? detailForm.customerAddressMeta
               : addressFlowTarget === "training"
-              ? detailForm.trainingVenueAddressMeta
-              : addressFlowTarget === "packaging"
-              ? detailForm.packagingAddressMeta
-              : addressFlowTarget === "promoVenue"
-              ? detailForm.promoActivityVenueMeta
-              : addressFlowTarget === "promoCustomer"
-              ? detailForm.promoCustomerAddressMeta
-              : String(addressFlowTarget).startsWith("techInstitution:")
-              ? detailForm.techRows?.[Number(String(addressFlowTarget).split(":")[1])]?.institutionAddressMeta || null
-              : addressFlowTarget === "sscProject"
-              ? sscProjectForm.addressMeta
-              : form.addressMeta
+                ? detailForm.trainingVenueAddressMeta
+                : addressFlowTarget === "packaging"
+                  ? detailForm.packagingAddressMeta
+                  : addressFlowTarget === "promoVenue"
+                    ? detailForm.promoActivityVenueMeta
+                    : addressFlowTarget === "promoCustomer"
+                      ? detailForm.promoCustomerAddressMeta
+                      : String(addressFlowTarget).startsWith("techInstitution:")
+                        ? detailForm.techRows?.[Number(String(addressFlowTarget).split(":")[1])]?.institutionAddressMeta || null
+                        : addressFlowTarget === "sscProject"
+                          ? sscProjectForm.addressMeta
+                          : form.addressMeta
           }
         />
       )}

@@ -41,7 +41,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const API_BASE_URL = API_BASE.replace(/\/$/, "");
-const ST_PROMO_API = `${API_BASE_URL}/api/st-promo`;
+const ST_PROMO_API = `${API_BASE_URL}/st-promo`;
 const BARANGAY_LOCAL_URL = "/data/pangasinan_barangays.json";
 const DEFAULT_CENTER = [15.9167, 120.3333];
 
@@ -471,7 +471,7 @@ function FitAndLockToPangasinan({ bounds, borderMode, selectedMuni, selectedDist
         const layer = L.geoJSON(geo);
         const b = layer.getBounds();
         if (b && b.isValid()) map.fitBounds(b.pad(0.05), { animate: true });
-      } catch {}
+      } catch { }
     };
 
     if (borderMode === "municipality" && selectedMuni && filteredGeo?.features?.length) {
@@ -621,7 +621,7 @@ function AddressFlowModal({
         const address = compactReverseAddress(data);
         if (address) setManualText(address);
       }
-    } catch {}
+    } catch { }
     finally {
       setCoordinateLoading(false);
     }
@@ -643,10 +643,10 @@ function AddressFlowModal({
     mode === "manual"
       ? "Manual Input"
       : step === 1
-      ? "Pangasinan > Select Municipality/City"
-      : step === 2
-      ? `Pangasinan > ${municipality} > Select Barangay`
-      : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
+        ? "Pangasinan > Select Municipality/City"
+        : step === 2
+          ? `Pangasinan > ${municipality} > Select Barangay`
+          : `Pangasinan > ${municipality} > ${barangay || "Barangay"} > Pin`;
 
   const back = () => {
     if (mode === "manual") return onClose();
@@ -683,31 +683,31 @@ function AddressFlowModal({
     const meta =
       mode === "manual"
         ? {
-            mode: "manual",
-            venue: venue.trim(),
-            venueName: venue.trim(),
-            manualText: manualText.trim(),
-            addressOnlyText,
-            displayText,
-            province: "",
-            municipality: detectMunicipalityFromAddressText(manualText),
-            barangay: "",
-            lat: coords?.lat || null,
-            lng: coords?.lng || null,
-          }
+          mode: "manual",
+          venue: venue.trim(),
+          venueName: venue.trim(),
+          manualText: manualText.trim(),
+          addressOnlyText,
+          displayText,
+          province: "",
+          municipality: detectMunicipalityFromAddressText(manualText),
+          barangay: "",
+          lat: coords?.lat || null,
+          lng: coords?.lng || null,
+        }
         : {
-            mode: "hierarchical",
-            venue: venue.trim(),
-            venueName: venue.trim(),
-            province,
-            municipality,
-            barangay,
-            manualText: "",
-            addressOnlyText,
-            displayText,
-            lat: coords?.lat || null,
-            lng: coords?.lng || null,
-          };
+          mode: "hierarchical",
+          venue: venue.trim(),
+          venueName: venue.trim(),
+          province,
+          municipality,
+          barangay,
+          manualText: "",
+          addressOnlyText,
+          displayText,
+          lat: coords?.lat || null,
+          lng: coords?.lng || null,
+        };
 
     onSave(meta);
     onClose();
@@ -1126,7 +1126,7 @@ export default function STPromo() {
 
     async function loadStPromoCustomFields() {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/table-management/config`);
+        const res = await axios.get(`${API_BASE_URL}/table-management/config`);
         const modules = Array.isArray(res.data) ? res.data : [];
 
         const mod = modules.find((m) => {
@@ -1170,13 +1170,13 @@ export default function STPromo() {
         const finalCustomFields = customFields.length
           ? customFields
           : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
+            {
+              fieldKey: "funding",
+              fieldLabel: "Funding",
+              fieldType: "Text",
+              sortOrder: 999,
+            },
+          ];
 
         if (!cancelled) setStPromoCustomFields(finalCustomFields);
       } catch (err) {
@@ -1559,23 +1559,23 @@ export default function STPromo() {
       municipality:
         form.entryMode === "ONSITE"
           ? (
+            form.municipality ||
+            detectMunicipalityFromAddressText(form.address) ||
+            form.addressMeta?.municipality ||
+            ""
+          )
+          : "",
+      district:
+        form.entryMode === "ONSITE"
+          ? (
+            form.district ||
+            getDistrictFromMunicipality(
               form.municipality ||
               detectMunicipalityFromAddressText(form.address) ||
               form.addressMeta?.municipality ||
               ""
             )
-          : "",
-      district:
-        form.entryMode === "ONSITE"
-          ? (
-              form.district ||
-              getDistrictFromMunicipality(
-                form.municipality ||
-                  detectMunicipalityFromAddressText(form.address) ||
-                  form.addressMeta?.municipality ||
-                  ""
-              )
-            )
+          )
           : "",
       staffName: (form.staffName || "").trim(),
       nameOfStaff: (form.staffName || "").trim(),
