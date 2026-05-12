@@ -1650,3 +1650,5 @@ CREATE TABLE `user_special_permissions` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-05-08  8:45:30
+-- Ensure user account password column can store hashed passwords
+ALTER TABLE `user_accounts` MODIFY `password` VARCHAR(255) NOT NULL;
