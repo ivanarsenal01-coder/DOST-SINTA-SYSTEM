@@ -2,7 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require("express");
 const mysql = require("mysql2");
-const { AsyncLocalStorage } = require("async_hooks");
+const { AsyncLocalStorage, AsyncResource } = require("async_hooks");
 const cors = require("cors");
 
 const app = express();
@@ -45,6 +45,14 @@ const poolQuery = db.query.bind(db);
 
 db.query = (...args) => {
   const txConn = transactionStorage.getStore();
+  
+  // Bind the callback to the current async context to prevent context loss
+  // inside mysql2's internal queues, which was causing transaction deadlocks.
+  const callbackIndex = args.findIndex(arg => typeof arg === 'function');
+  if (callbackIndex !== -1) {
+    args[callbackIndex] = AsyncResource.bind(args[callbackIndex]);
+  }
+
   if (txConn) return txConn.query(...args);
   return poolQuery(...args);
 };
