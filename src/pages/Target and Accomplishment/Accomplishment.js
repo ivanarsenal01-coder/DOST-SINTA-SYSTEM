@@ -115,7 +115,6 @@ export default function Setup() {
   // and only auto-centers once per open so scrolling stays freewheel.
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [yearDraft, setYearDraft] = useState(String(currentYear));
-  const [yearPickerAutoCentered, setYearPickerAutoCentered] = useState(false);
 
   const normalizeYear = (value) => {
     const n = Number(value);
@@ -209,53 +208,150 @@ export default function Setup() {
     return 4;
   };
 
-  const getQuarterForProject = (p) => {
-    const qFromDate = getQuarterFromDate(p?.dateApproved);
-    const qDb = Number(p?.quarter);
-    const q = qFromDate ?? (Number.isFinite(qDb) ? qDb : null) ?? 1;
+  const extractRowsFromApi = (raw) => {
+    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw?.rows)) return raw.rows;
+    if (Array.isArray(raw?.value)) return raw.value;
+    if (Array.isArray(raw?.result)) return raw.result;
+    if (Array.isArray(raw?.items)) return raw.items;
+    return [];
+  };
+
+  const getYearFromDate = (dateStr) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.getFullYear();
+  };
+
+  const getAutoQuarter = (dateStr, fallbackQuarter = 1) => {
+    const qFromDate = getQuarterFromDate(dateStr);
+    if (qFromDate) return qFromDate;
+
+    const q = Number(fallbackQuarter);
     return [1, 2, 3, 4].includes(q) ? q : 1;
   };
 
-  const normalizeRolloutEntry = (e) => ({
-    id: e?.id ?? Math.random().toString(36).slice(2),
-    nameOfTechnologyTransferred:
-      e?.nameOfTechnologyTransferred || e?.name_of_technology_transferred || "",
-    technologyGenerator: e?.technologyGenerator || e?.technology_generator || "",
-    modeOfTransfer: e?.modeOfTransfer || e?.mode_of_transfer || "",
-    isDostDevelopedFunded:
-      e?.isDostDevelopedFunded || e?.is_dost_developed_funded || "",
-    activityDate: e?.activityDate || e?.activity_date || "",
-    institutionName: e?.institutionName || e?.institution_name || "",
-    address: e?.address || "",
-    quarter:
-      e?.quarter ||
-      e?.report_quarter ||
-      getQuarterFromDate(e?.activityDate || e?.activity_date) ||
-      "",
-  });
+  const pickProjectDate = (p = {}) =>
+    p.dateProjectApproval ||
+    p.date_project_approval ||
+    p.dateApproved ||
+    p.date_approved ||
+    p.approvedDate ||
+    p.approved_date ||
+    p.createdAt ||
+    p.created_at ||
+    "";
 
-  const normalizePackagingLabelingEntry = (e) => ({
-    id: e?.id ?? Math.random().toString(36).slice(2),
-    quarter:
-      e?.quarter ||
-      e?.report_quarter ||
-      getQuarterFromDate(e?.dateCompleted || e?.date_completed) ||
-      "",
-    dateCompleted: e?.dateCompleted || e?.date_completed || "",
-    typeOfIntervention: e?.typeOfIntervention || e?.type_of_intervention || "",
-    firmName: e?.firmName || e?.firm_name || "",
-    customerName: e?.customerName || e?.customer_name || "",
-  });
+  const pickInterventionDate = (it = {}) =>
+    it.date ||
+    it.activityDate ||
+    it.activity_date ||
+    it.startDate ||
+    it.start_date ||
+    it.dateTransferred ||
+    it.date_transferred ||
+    it.techrolloutDateTransferred ||
+    it.techrollout_date_transferred ||
+    it.packagingDateCompleted ||
+    it.packaging_date_completed ||
+    it.createdAt ||
+    it.created_at ||
+    "";
+
+  const filterRowsByYear = (rows, year, getDateValue) => {
+    return (rows || []).filter((row) => {
+      const y = getYearFromDate(getDateValue(row));
+      return Number(y) === Number(year);
+    });
+  };
+
+  const getQuarterForProject = (p) => {
+    return getAutoQuarter(pickProjectDate(p), p?.quarter);
+  };
+
+  const normalizeRolloutEntry = (e) => {
+    const effectiveDate =
+      e?.activityDate ||
+      e?.activity_date ||
+      e?.dateTransferred ||
+      e?.date_transferred ||
+      e?.techrolloutDateTransferred ||
+      e?.techrollout_date_transferred ||
+      "";
+
+    return {
+      id: e?.id ?? Math.random().toString(36).slice(2),
+      nameOfTechnologyTransferred:
+        e?.nameOfTechnologyTransferred || e?.name_of_technology_transferred || "",
+      technologyGenerator: e?.technologyGenerator || e?.technology_generator || "",
+      modeOfTransfer: e?.modeOfTransfer || e?.mode_of_transfer || "",
+      isDostDevelopedFunded:
+        e?.isDostDevelopedFunded ?? e?.is_dost_developed_funded ?? "",
+      activityDate: effectiveDate,
+      institutionName: e?.institutionName || e?.institution_name || "",
+      address:
+        e?.address ||
+        e?.institutionAddress ||
+        e?.institution_address ||
+        e?.address_display_text ||
+        "",
+      quarter:
+        e?.quarter ||
+        e?.report_quarter ||
+        getQuarterFromDate(effectiveDate) ||
+        "",
+    };
+  };
+
+  const normalizePackagingLabelingEntry = (e) => {
+    const effectiveDate =
+      e?.dateCompleted ||
+      e?.date_completed ||
+      e?.packagingDateCompleted ||
+      e?.packaging_date_completed ||
+      e?.date ||
+      "";
+
+    return {
+      id: e?.id ?? Math.random().toString(36).slice(2),
+      quarter:
+        e?.quarter ||
+        e?.report_quarter ||
+        getQuarterFromDate(effectiveDate) ||
+        "",
+      dateCompleted: effectiveDate,
+      typeOfIntervention:
+        e?.typeOfIntervention ||
+        e?.type_of_intervention ||
+        e?.packagingTypeOfIntervention ||
+        e?.packaging_type_of_intervention ||
+        "",
+      firmName:
+        e?.firmName ||
+        e?.firm_name ||
+        e?.packagingFirmInstitution ||
+        e?.packaging_firm_institution ||
+        "",
+      customerName:
+        e?.customerName ||
+        e?.customer_name ||
+        e?.packagingCustomerName ||
+        e?.packaging_customer_name ||
+        "",
+    };
+  };
 
   const normalizeCalibrationEntry = (e) => ({
     id: e?.id ?? Math.random().toString(36).slice(2),
-    date: e?.date || "",
+    date: e?.date || e?.calibrationDate || e?.calibration_date || "",
     category: String(e?.category || "").trim().toUpperCase(),
     typeOfSample: e?.typeOfSample || e?.type_of_sample || "",
     noOfSample: toNumber(e?.noOfSample ?? e?.no_of_sample ?? 0),
     cost: toNumber(e?.cost ?? 0),
     feesCollected: toNumber(e?.feesCollected ?? e?.fees_collected ?? 0),
-    totalCustomers: toNumber(e?.totalCustomers ?? e?.total_customers ?? 0),
+    totalCustomers: toNumber(e?.totalCustomers ?? e?.total_customers ?? e?.total ?? 0),
   });
 
   const normalizeStPromoEntry = (e) => ({
@@ -266,12 +362,32 @@ export default function Setup() {
     totalEngagements: toNumber(e?.totalEngagements ?? e?.total_engagements ?? 0),
   });
 
+  const normalizeTechPromoEntry = (e) => ({
+    id: e?.id ?? Math.random().toString(36).slice(2),
+    activityDate:
+      e?.activityDate ||
+      e?.activity_date ||
+      e?.date ||
+      e?.createdAt ||
+      e?.created_at ||
+      "",
+    technologyPromoted:
+      e?.technologyPromoted ||
+      e?.technology_promoted ||
+      e?.nameOfTechnology ||
+      e?.name_of_technology ||
+      "",
+    activityTitle: e?.activityTitle || e?.activity_title || e?.title || "",
+    project: e?.project || e?.projectProgramUnit || e?.project_program_unit || "",
+  });
+
   const normalizeCestLikeProjects = (rows) => {
     return (rows || []).map((p) => ({
       id: Number(p.id),
       quarter: String(p.quarter || "1"),
       type: p.type || "",
       projectTitle: p.projectTitle || p.project_title || "",
+      dateProjectApproval: pickProjectDate(p),
       associationName: p.associationName || p.firmName || p.firm_name || "",
       address: p.address || "",
       projectProponent: p.projectProponent || p.cooperatorName || p.cooperator_name || "",
@@ -280,20 +396,61 @@ export default function Setup() {
       lguNumbersOfCommunities:
         p.lguNumbersOfCommunities ?? p.lgu_numbers_of_communities ?? "",
       pressRelease: Number(p.pressRelease ?? p.press_release ?? 0),
-      communitiesAssisted: Number(p.communitiesAssisted ?? 0),
-      technologiesDeployed: Number(p.technologiesDeployed ?? 0),
+      communitiesAssisted: Number(p.communitiesAssisted ?? p.communities_assisted ?? 0),
+      technologiesDeployed: Number(p.technologiesDeployed ?? p.technologies_deployed ?? 0),
       beneficiaries: Number(p.beneficiaries ?? 0),
-      startupsAssisted: p.startupsAssisted ?? "",
-      jobsGenerated: Number(p.jobsGenerated ?? 0),
+      startupsAssisted: p.startupsAssisted ?? p.startups_assisted ?? "",
+      jobsGenerated: Number(p.jobsGenerated ?? p.jobs_generated ?? 0),
+      smartCitiesEstablished: toNumber(
+        p.smartCitiesEstablished ??
+        p.smart_cities_established ??
+        p.noOfSmartCitiesEstablished ??
+        p.no_of_smart_cities_established ??
+        p.smartCityEstablished ??
+        p.smart_city_established ??
+        0
+      ),
+      communitiesLgusAssisted: toNumber(
+        p.communitiesLgusAssisted ??
+        p.communities_lgus_assisted ??
+        p.lguNumbersOfCommunities ??
+        p.lgu_numbers_of_communities ??
+        p.communitiesAssisted ??
+        p.communities_assisted ??
+        0
+      ),
+      mouMoa: toNumber(
+        p.mouMoa ??
+        p.mou_moa ??
+        p.mouMoaCount ??
+        p.mou_moa_count ??
+        p.moaMou ??
+        p.moa_mou ??
+        p.mouCount ??
+        p.mou_count ??
+        p.moaCount ??
+        p.moa_count ??
+        0
+      ),
       interventions: Array.isArray(p.interventions)
         ? p.interventions.map((it) => ({
           id: Number(it.id),
           type: it.type || "",
           title: it.title || "",
-          date: it.date || "",
-          total: Number(it.total ?? 0),
+          date: pickInterventionDate(it),
+          total: Number(
+            it.total ??
+            it.totalParticipants ??
+            it.total_participants ??
+            it.totalParticipantsReached ??
+            0
+          ),
           technologiesPromotedTotal: Number(
-            it.technologiesPromotedTotal ?? it.technologies_promoted_total ?? 0
+            it.technologiesPromotedTotal ??
+            it.technologies_promoted_total ??
+            it.technologyPromotedTotal ??
+            it.technology_promoted_total ??
+            0
           ),
           promotionalActivitiesPressRelease: Number(
             it.promotionalActivitiesPressRelease ??
@@ -521,14 +678,25 @@ export default function Setup() {
   const fetchTacsEntries = async (year = selectedYear) => {
     try {
       const res = await axios.get(`${API}/tacs`, { params: { year } });
-      const rows = Array.isArray(res.data) ? res.data : [];
-      const normalized = rows.map((e) => ({
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.dateOfEngagement ||
+        e?.date_of_engagement ||
+        e?.engagementDate ||
+        e?.engagement_date ||
+        e?.date ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      const normalized = filteredRows.map((e) => ({
         id: e?.id ?? Math.random().toString(36).slice(2),
         dateOfEngagement:
           e?.dateOfEngagement ||
           e?.date_of_engagement ||
           e?.engagementDate ||
           e?.engagement_date ||
+          e?.date ||
           "",
         adviceCount: toNumber(
           e?.adviceCount ??
@@ -606,7 +774,16 @@ export default function Setup() {
       qs.set("project", "ALL");
 
       const res = await axios.get(`${TECH_PROMO_API}/entries?${qs.toString()}`);
-      setTechPromoEntries(Array.isArray(res.data) ? res.data : []);
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.activityDate ||
+        e?.activity_date ||
+        e?.date ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      setTechPromoEntries(filteredRows.map(normalizeTechPromoEntry));
     } catch (e) {
       console.error("Failed to load Technology Promotion entries:", e);
       setTechPromoEntries([]);
@@ -616,8 +793,19 @@ export default function Setup() {
   const fetchTechRolloutEntries = async (year = selectedYear) => {
     try {
       const res = await axios.get(TECH_ROLLOUT_API, { params: { year } });
-      const rows = Array.isArray(res.data) ? res.data : [];
-      setTechRolloutEntries(rows.map(normalizeRolloutEntry));
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.activityDate ||
+        e?.activity_date ||
+        e?.dateTransferred ||
+        e?.date_transferred ||
+        e?.techrolloutDateTransferred ||
+        e?.techrollout_date_transferred ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      setTechRolloutEntries(filteredRows.map(normalizeRolloutEntry));
     } catch (e) {
       console.error("Failed to load Technology Rollout entries:", e);
       setTechRolloutEntries([]);
@@ -627,8 +815,18 @@ export default function Setup() {
   const fetchPackagingLabelingEntries = async (year = selectedYear) => {
     try {
       const res = await axios.get(PACKAGING_LABELING_API, { params: { year } });
-      const rows = Array.isArray(res.data) ? res.data : [];
-      setPackagingLabelingEntries(rows.map(normalizePackagingLabelingEntry));
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.dateCompleted ||
+        e?.date_completed ||
+        e?.packagingDateCompleted ||
+        e?.packaging_date_completed ||
+        e?.date ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      setPackagingLabelingEntries(filteredRows.map(normalizePackagingLabelingEntry));
     } catch (e) {
       console.error("Failed to load Packaging and Labeling entries:", e);
       setPackagingLabelingEntries([]);
@@ -638,8 +836,16 @@ export default function Setup() {
   const fetchCalibrationEntries = async (year = selectedYear) => {
     try {
       const res = await axios.get(CALIBRATION_API, { params: { year } });
-      const rows = Array.isArray(res.data) ? res.data : [];
-      setCalibrationEntries(rows.map(normalizeCalibrationEntry));
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.date ||
+        e?.calibrationDate ||
+        e?.calibration_date ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      setCalibrationEntries(filteredRows.map(normalizeCalibrationEntry));
     } catch (e) {
       console.error("Failed to load Calibration entries:", e);
       setCalibrationEntries([]);
@@ -649,8 +855,16 @@ export default function Setup() {
   const fetchStPromoEntries = async (year = selectedYear) => {
     try {
       const res = await axios.get(ST_PROMO_API, { params: { year } });
-      const rows = Array.isArray(res.data) ? res.data : [];
-      setStPromoEntries(rows.map(normalizeStPromoEntry));
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, (e) =>
+        e?.date ||
+        e?.activityDate ||
+        e?.activity_date ||
+        e?.createdAt ||
+        e?.created_at
+      );
+
+      setStPromoEntries(filteredRows.map(normalizeStPromoEntry));
     } catch (e) {
       console.error("Failed to load S&T Promo entries:", e);
       setStPromoEntries([]);
@@ -660,7 +874,10 @@ export default function Setup() {
   const fetchCestProjects = async (year = selectedYear) => {
     try {
       const res = await axios.get(CEST_API, { params: { year } });
-      setCestProjects(normalizeCestProjects(res.data));
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, pickProjectDate);
+
+      setCestProjects(normalizeCestProjects(filteredRows));
     } catch (e) {
       console.error("Failed to load CEST projects:", e);
       setCestProjects([]);
@@ -672,17 +889,10 @@ export default function Setup() {
   const fetchSscpProjects = async (year = selectedYear) => {
     try {
       const res = await axios.get(SSCP_API, { params: { year } });
-      const raw = res.data;
+      const rows = extractRowsFromApi(res.data);
+      const filteredRows = filterRowsByYear(rows, year, pickProjectDate);
 
-      const rows = Array.isArray(raw)
-        ? raw
-        : Array.isArray(raw?.value)
-          ? raw.value
-          : Array.isArray(raw?.data)
-            ? raw.data
-            : [];
-
-      setSscpProjects(normalizeSscpProjects(rows));
+      setSscpProjects(normalizeSscpProjects(filteredRows));
     } catch (e) {
       console.error("Failed to load SSCP projects:", e);
       setSscpProjects([]);
@@ -697,14 +907,24 @@ export default function Setup() {
         axios.get(`${DRRM_API}/collaborations`, { params: { year } }),
       ]);
 
+      const activities = extractRowsFromApi(activitiesRes.data);
+      const iecMaterials = extractRowsFromApi(iecRes.data);
+      const collaborations = extractRowsFromApi(collaborationsRes.data);
+
       setDrrmActivities(
-        (Array.isArray(activitiesRes.data) ? activitiesRes.data : []).map(normalizeDrrmActivity)
+        filterRowsByYear(activities, year, (e) =>
+          e?.dateStart || e?.date_start || e?.date || e?.createdAt || e?.created_at
+        ).map(normalizeDrrmActivity)
       );
       setDrrmIecMaterials(
-        (Array.isArray(iecRes.data) ? iecRes.data : []).map(normalizeDrrmIecMaterial)
+        filterRowsByYear(iecMaterials, year, (e) =>
+          e?.date || e?.date_used || e?.dateUsed || e?.createdAt || e?.created_at
+        ).map(normalizeDrrmIecMaterial)
       );
       setDrrmCollaborations(
-        (Array.isArray(collaborationsRes.data) ? collaborationsRes.data : []).map(normalizeDrrmCollaboration)
+        filterRowsByYear(collaborations, year, (e) =>
+          e?.date || e?.activity_date || e?.activityDate || e?.createdAt || e?.created_at
+        ).map(normalizeDrrmCollaboration)
       );
     } catch (e) {
       console.error("Failed to load DRRM entries:", e);
@@ -974,32 +1194,42 @@ export default function Setup() {
     const promotionalActivitiesPressRelease = blank();
 
     items.forEach((p) => {
-      const qq = Number(p?.quarter);
-      if (![1, 2, 3, 4].includes(qq)) return;
+      const projectDate = pickProjectDate(p);
+      const projectYear = getYearFromDate(projectDate);
+      if (Number(projectYear) !== Number(selectedYear)) return;
 
+      const projectQuarter = getAutoQuarter(projectDate, p?.quarter);
       const intvArr = Array.isArray(p.interventions) ? p.interventions : [];
 
-      const techRolloutCount = intvArr.filter(
-        (it) => String(it.type || "").trim() === "Tech Roll Out"
-      ).length;
+      addTo(communities, projectQuarter, toNumber(p.lguNumbersOfCommunities));
+      addTo(promotionalActivitiesPressRelease, projectQuarter, toNumber(p.pressRelease));
 
-      const sumTechPromoted = intvArr
-        .filter((it) => String(it.type || "").trim() === "Tech Promo")
-        .reduce(
-          (sum, it) => sum + toNumber(it.technologiesPromotedTotal),
-          0
-        );
+      intvArr.forEach((it) => {
+        const intvDate = pickInterventionDate(it);
+        const intvYear = getYearFromDate(intvDate);
+        if (Number(intvYear) !== Number(selectedYear)) return;
 
-      const trainingPeopleTotal = intvArr
-        .filter((it) => String(it.type || "").trim() === "Training")
-        .reduce((sum, it) => sum + toNumber(it.total), 0);
+        const intvQuarter = getAutoQuarter(intvDate, projectQuarter);
+        const type = String(it.type || "").trim();
 
-      addTo(communities, qq, toNumber(p.lguNumbersOfCommunities));
-      addTo(technologies, qq, techRolloutCount);
-      addTo(beneficiaries, qq, trainingPeopleTotal);
-      addTo(interventions, qq, intvArr.length);
-      addTo(technologiesPromoted, qq, sumTechPromoted);
-      addTo(promotionalActivitiesPressRelease, qq, toNumber(p.pressRelease));
+        addTo(interventions, intvQuarter, 1);
+
+        if (type === "Tech Roll Out") {
+          addTo(technologies, intvQuarter, 1);
+        }
+
+        if (type === "Training") {
+          addTo(beneficiaries, intvQuarter, toNumber(it.total));
+        }
+
+        if (type === "Tech Promo" || type === "S&T Promo") {
+          addTo(
+            technologiesPromoted,
+            intvQuarter,
+            toNumber(it.technologiesPromotedTotal) || 1
+          );
+        }
+      });
     });
 
     return {
@@ -1029,53 +1259,37 @@ export default function Setup() {
     const mouMoa = blank();
 
     items.forEach((p) => {
-      const qq = Number(p?.quarter);
-      if (![1, 2, 3, 4].includes(qq)) return;
+      const projectDate = pickProjectDate(p);
+      const projectYear = getYearFromDate(projectDate);
+      if (Number(projectYear) !== Number(selectedYear)) return;
 
+      const projectQuarter = getAutoQuarter(projectDate, p?.quarter);
       const intvArr = Array.isArray(p.interventions) ? p.interventions : [];
 
-      const techPromoTotal = intvArr
-        .filter((it) => String(it.type || "").trim() === "Tech Promo")
-        .reduce((sum, it) => sum + toNumber(it.technologiesPromotedTotal), 0);
+      addTo(smartCitiesEstablished, projectQuarter, toNumber(p.smartCitiesEstablished));
+      addTo(communitiesLgusAssisted, projectQuarter, toNumber(p.communitiesLgusAssisted));
+      addTo(mouMoa, projectQuarter, toNumber(p.mouMoa));
 
-      const techAdoptedCount = intvArr.filter(
-        (it) => String(it.type || "").trim() === "Tech Roll Out"
-      ).length;
+      intvArr.forEach((it) => {
+        const intvDate = pickInterventionDate(it);
+        const intvYear = getYearFromDate(intvDate);
+        if (Number(intvYear) !== Number(selectedYear)) return;
 
-      addTo(
-        smartCitiesEstablished,
-        qq,
-        toNumber(
-          p.smartCitiesEstablished ??
-          p.smart_cities_established ??
-          0
-        )
-      );
+        const intvQuarter = getAutoQuarter(intvDate, projectQuarter);
+        const type = String(it.type || "").trim();
 
-      addTo(
-        communitiesLgusAssisted,
-        qq,
-        toNumber(
-          p.lguNumbersOfCommunities ??
-          p.lgu_numbers_of_communities ??
-          0
-        )
-      );
+        if (type === "Tech Promo" || type === "S&T Promo") {
+          addTo(
+            technologiesPromoted,
+            intvQuarter,
+            toNumber(it.technologiesPromotedTotal) || 1
+          );
+        }
 
-      addTo(technologiesPromoted, qq, techPromoTotal);
-      addTo(technologiesAdopted, qq, techAdoptedCount);
-
-      addTo(
-        mouMoa,
-        qq,
-        toNumber(
-          p.mouMoa ??
-          p.mou_moa ??
-          p.mouMoaCount ??
-          p.mou_moa_count ??
-          0
-        )
-      );
+        if (type === "Tech Roll Out") {
+          addTo(technologiesAdopted, intvQuarter, 1);
+        }
+      });
     });
 
     return {
@@ -1087,8 +1301,8 @@ export default function Setup() {
     };
   };
 
-  const cestAccom = useMemo(() => buildCestLikeAccom(cestProjects), [cestProjects]);
-  const sscpAccom = useMemo(() => buildSscpAccom(sscpProjects), [sscpProjects]);
+  const cestAccom = useMemo(() => buildCestLikeAccom(cestProjects), [cestProjects, selectedYear]);
+  const sscpAccom = useMemo(() => buildSscpAccom(sscpProjects), [sscpProjects, selectedYear]);
 
   const drrmAccom = useMemo(() => {
     const blank = () => ({ q1: 0, q2: 0, q3: 0, q4: 0 });
@@ -1969,20 +2183,16 @@ export default function Setup() {
     const selectedYearRef = useRef(null);
 
     useEffect(() => {
-      if (!yearPickerOpen || yearPickerAutoCentered) return;
-
+      if (!yearPickerOpen) return;
       setYearDraft(String(safeYear));
-      setYearPickerAutoCentered(true);
-
       setTimeout(() => {
         selectedYearRef.current?.scrollIntoView({ block: "center", behavior: "auto" });
       }, 0);
-    }, [yearPickerOpen, yearPickerAutoCentered, safeYear]);
+    }, [yearPickerOpen, safeYear]);
 
     const applyDraftYear = () => {
       const year = normalizeYear(yearDraft);
       setSelectedYear(year);
-      setYearPickerAutoCentered(false);
       setYearPickerOpen(false);
     };
 
@@ -2001,7 +2211,6 @@ export default function Setup() {
           type="button"
           style={{ ...styles.yearInput, cursor: "pointer" }}
           onClick={() => {
-            setYearPickerAutoCentered(false);
             setYearPickerOpen(true);
           }}
           title="Open year picker"
@@ -2023,7 +2232,6 @@ export default function Setup() {
           style={styles.currentYearBtn}
           onClick={() => {
             setSelectedYear(currentYear);
-            setYearPickerAutoCentered(false);
             setYearPickerOpen(false);
           }}
         >
@@ -2083,8 +2291,7 @@ export default function Setup() {
                         }}
                         onClick={() => {
                           setSelectedYear(y);
-                          setYearPickerAutoCentered(false);
-                          setYearPickerOpen(false);
+                                        setYearPickerOpen(false);
                         }}
                       >
                         {y}

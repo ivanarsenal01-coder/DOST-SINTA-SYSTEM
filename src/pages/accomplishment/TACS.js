@@ -1,4 +1,4 @@
-// TACS.js (FULL UPDATED - AXIOS + DATABASE CONNECTED)
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
@@ -6,6 +6,13 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Document, Packer, Paragraph, TextRun, Table as DocxTable, TableRow, TableCell, WidthType, PageOrientation } from "docx";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import {
+  canAdd,
+  canEdit,
+  canDelete,
+  canExport,
+} from "../../usrmngment/utils/permissions";
 
 /* ✅ Leaflet + React-Leaflet */
 import "leaflet/dist/leaflet.css";
@@ -113,7 +120,119 @@ const PANGASINAN_DISTRICTS = [
   },
 ];
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function TACS() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "tacs");
+  const allowEdit = canEdit(user, "tacs");
+  const allowDelete = canDelete(user, "tacs");
+  const allowExport = canExport(user, "tacs");
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   // =========================
   // API
   // =========================
@@ -558,6 +677,11 @@ export default function TACS() {
   };
 
   const commitAddType = async () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add TACS consultancy types.");
+      return;
+    }
+
     const name = String(newTypeName || "").trim();
     if (!name) return alert("Please type a type of consultancy.");
 
@@ -648,11 +772,21 @@ export default function TACS() {
   };
 
   const openAddEntry = () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add TACS entries.");
+      return;
+    }
+
     resetForm();
     setEntryModal({ mode: "add" });
   };
 
   const openEditEntry = (entryId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit TACS entries.");
+      return;
+    }
+
     const e = entries.find((x) => x.id === entryId);
     if (!e) return;
 
@@ -675,7 +809,12 @@ export default function TACS() {
   };
 
   const deleteEntry = async (entryId) => {
-    if (!window.confirm("Delete this TACS entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete TACS entries.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this TACS entry?"))) return;
 
     try {
       await axios.delete(`${API}/tacs/${entryId}`);
@@ -769,6 +908,16 @@ export default function TACS() {
   };
 
   const saveEntry = async () => {
+    if (entryModal?.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit TACS entries.");
+      return;
+    }
+
+    if (entryModal?.mode !== "edit" && !allowAdd) {
+      alert("You do not have permission to add TACS entries.");
+      return;
+    }
+
     const err = validate();
     if (err) return alert(err);
 
@@ -955,6 +1104,11 @@ export default function TACS() {
   };
 
   const confirmExportModal = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to export TACS records.");
+      return;
+    }
+
     const rows = buildExportRows(exportModal.scope, exportModal.entryId);
     const columns = getTacsExportColumns();
     const baseName = exportModal.scope === "row" ? `tacs-entry-${exportModal.entryId || "row"}` : "tacs-table";
@@ -977,6 +1131,11 @@ export default function TACS() {
   };
 
   const confirmPrintModal = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print TACS records.");
+      return;
+    }
+
     const rows = buildExportRows(printModal.scope, printModal.entryId);
     const columns = getTacsExportColumns();
     const title = getExportTitle(printModal.scope);
@@ -1033,11 +1192,23 @@ export default function TACS() {
     setPrintModal((p) => ({ ...p, open: false }));
   };
 
-  const openExportModal = (scope = "bulk", entryId = null) =>
-    setExportModal((p) => ({ ...p, open: true, scope, entryId }));
+  const openExportModal = (scope = "bulk", entryId = null) => {
+    if (!allowExport) {
+      alert("You do not have permission to export TACS records.");
+      return;
+    }
 
-  const openPrintModal = (scope = "bulk", entryId = null) =>
+    setExportModal((p) => ({ ...p, open: true, scope, entryId }));
+  };
+
+  const openPrintModal = (scope = "bulk", entryId = null) => {
+    if (!allowExport) {
+      alert("You do not have permission to print TACS records.");
+      return;
+    }
+
     setPrintModal((p) => ({ ...p, open: true, scope, entryId }));
+  };
 
   // =========================
   // Map dashboard (pins: customer address coords)
@@ -2678,21 +2849,27 @@ export default function TACS() {
               <option value="without-coordinates">Without Coordinates</option>
             </select>
 
-            <button style={styles.toolbarBtn} onClick={() => openExportModal("bulk", null)}>
-              Export
-            </button>
+            {allowExport && (
+              <button style={styles.toolbarBtn} onClick={() => openExportModal("bulk", null)}>
+                Export
+              </button>
+            )}
 
-            <button style={styles.toolbarPrintBtn} onClick={() => openPrintModal("bulk", null)}>
-              Print
-            </button>
+            {allowExport && (
+              <button style={styles.toolbarPrintBtn} onClick={() => openPrintModal("bulk", null)}>
+                Print
+              </button>
+            )}
 
             <button style={styles.toolbarBtn} onClick={clearToolbarFilters}>
               Clear Filters
             </button>
 
-            <button style={styles.toolbarPrimaryBtn} onClick={openAddEntry}>
-              + Add Project
-            </button>
+            {allowAdd && (
+              <button style={styles.toolbarPrimaryBtn} onClick={openAddEntry}>
+                + Add Project
+              </button>
+            )}
           </div>
         </div>
 
@@ -2777,18 +2954,26 @@ export default function TACS() {
                         <button style={styles.tinyBtn} onClick={() => setViewEntryId(e.id)}>
                           View
                         </button>
-                        <button style={styles.tinyBtn} onClick={() => openEditEntry(e.id)}>
-                          Edit
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openExportModal("row", e.id)}>
-                          Export
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openPrintModal("row", e.id)}>
-                          Print
-                        </button>
-                        <button style={styles.dangerTiny} onClick={() => deleteEntry(e.id)}>
-                          Delete
-                        </button>
+                        {allowEdit && (
+                          <button style={styles.tinyBtn} onClick={() => openEditEntry(e.id)}>
+                            Edit
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openExportModal("row", e.id)}>
+                            Export
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openPrintModal("row", e.id)}>
+                            Print
+                          </button>
+                        )}
+                        {allowDelete && (
+                          <button style={styles.dangerTiny} onClick={() => deleteEntry(e.id)}>
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -2893,7 +3078,7 @@ export default function TACS() {
                         {t}
                       </option>
                     ))}
-                    <option value={TYPE_ADD}>+ Add type of consultancy...</option>
+                    {allowAdd && <option value={TYPE_ADD}>+ Add type of consultancy...</option>}
                   </select>
                 </div>
 
@@ -2993,9 +3178,11 @@ export default function TACS() {
                       View Link
                     </button>
 
-                    <button type="button" style={styles.tinyBtn} onClick={triggerAddPhotos}>
-                      Add Photos
-                    </button>
+                    {((entryModal?.mode === "edit" && allowEdit) || (entryModal?.mode !== "edit" && allowAdd)) && (
+                      <button type="button" style={styles.tinyBtn} onClick={triggerAddPhotos}>
+                        Add Photos
+                      </button>
+                    )}
 
                     <span style={styles.pill}>Photos: {photoCount(form)}</span>
                   </div>
@@ -3034,9 +3221,11 @@ export default function TACS() {
                             </div>
                             <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 900 }}>{p.type}</div>
                           </div>
-                          <button type="button" style={styles.dangerTiny} onClick={() => removePhotoAt(idx)}>
-                            Remove
-                          </button>
+                          {((entryModal?.mode === "edit" && allowEdit) || (entryModal?.mode !== "edit" && allowAdd)) && (
+                            <button type="button" style={styles.dangerTiny} onClick={() => removePhotoAt(idx)}>
+                              Remove
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -3289,16 +3478,18 @@ export default function TACS() {
               <button style={styles.btnGhost} onClick={() => setViewEntryId(null)}>
                 Close
               </button>
-              <button
-                style={styles.btnDark}
-                onClick={() => {
-                  const id = viewEntry.id;
-                  setViewEntryId(null);
-                  openEditEntry(id);
-                }}
-              >
-                Edit
-              </button>
+              {allowEdit && (
+                <button
+                  style={styles.btnDark}
+                  onClick={() => {
+                    const id = viewEntry.id;
+                    setViewEntryId(null);
+                    openEditEntry(id);
+                  }}
+                >
+                  Edit
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -3462,6 +3653,112 @@ export default function TACS() {
             <div style={styles.modalFooter}>
               <button style={styles.btnGhost} onClick={() => setPrintModal((p) => ({ ...p, open: false }))}>Cancel</button>
               <button style={styles.btnDark} onClick={confirmPrintModal}>Print</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

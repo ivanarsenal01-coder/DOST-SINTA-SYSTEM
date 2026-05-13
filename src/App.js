@@ -15,6 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import UserMgmt from "./pages/UserMgmt";
 import TableManagement from "./pages/TableManagement";
+import About from "./pages/About";
 
 // Target and Accomplishment pages
 import TargetSetting from "./pages/Target and Accomplishment/TargetSetting";
@@ -41,7 +42,7 @@ function App() {
         {/* Public Login Page */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Protected Pages */}
+        {/* Protected Layout */}
         <Route
           element={
             <ProtectedRoute>
@@ -51,48 +52,162 @@ function App() {
         >
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/user-mgmt" element={<UserMgmt />} />
-          <Route path="/table-management" element={<TableManagement />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute pageKey="dashboard" action="view">
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/target-setting" element={<TargetSetting />} />
-          <Route path="/accomplishment" element={<Accomplishment />} />
+          {/* Super Admin only via AuthContext.js */}
+          <Route
+            path="/user-mgmt"
+            element={
+              <ProtectedRoute pageKey="userManagement" action="view">
+                <UserMgmt />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/accomplishment/setup" element={<Setup />} />
-          <Route path="/accomplishment/cest" element={<CEST />} />
-          <Route path="/accomplishment/sscp" element={<SSCP />} />
+          {/* Super Admin only via AuthContext.js */}
+          <Route
+            path="/table-management"
+            element={
+              <ProtectedRoute pageKey="tableManagement" action="view">
+                <TableManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/about" element={<About />} />
+
+          <Route
+            path="/target-setting"
+            element={
+              <ProtectedRoute pageKey="targetSetting" action="view">
+                <TargetSetting />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/accomplishment"
+            element={
+              <ProtectedRoute pageKey="accomplishments" action="view">
+                <Accomplishment />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/accomplishment/setup"
+            element={
+              <ProtectedRoute pageKey="setup" action="view">
+                <Setup />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/accomplishment/cest"
+            element={
+              <ProtectedRoute pageKey="cest" action="view">
+                <CEST />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/accomplishment/sscp"
+            element={
+              <ProtectedRoute pageKey="sscp" action="view">
+                <SSCP />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/accomplishment/technology_training"
-            element={<TechnologyTraining />}
+            element={
+              <ProtectedRoute pageKey="techTraining" action="view">
+                <TechnologyTraining />
+              </ProtectedRoute>
+            }
           />
 
-          <Route path="/accomplishment/tacs" element={<TACS />} />
+          <Route
+            path="/accomplishment/tacs"
+            element={
+              <ProtectedRoute pageKey="tacs" action="view">
+                <TACS />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/accomplishment/packaging_and_labeling"
-            element={<PCL />}
+            element={
+              <ProtectedRoute pageKey="packaging" action="view">
+                <PCL />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/accomplishment/special_report"
-            element={<SpecialReport />}
+            element={
+              <ProtectedRoute pageKey="specialProject" action="view">
+                <SpecialReport />
+              </ProtectedRoute>
+            }
           />
 
-          <Route path="/accomplishment/promo" element={<Promo />} />
-          <Route path="/accomplishment/calibration" element={<Calibration />} />
+          <Route
+            path="/accomplishment/promo"
+            element={
+              <ProtectedRoute pageKey="stPromo" action="view">
+                <Promo />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/accomplishment/calibration"
+            element={
+              <ProtectedRoute pageKey="calibration" action="view">
+                <Calibration />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/accomplishment/technology_promotion"
-            element={<TechnologyPromotion />}
+            element={
+              <ProtectedRoute pageKey="techPromo" action="view">
+                <TechnologyPromotion />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/accomplishment/technology_rollout"
-            element={<TechnologyRollout />}
+            element={
+              <ProtectedRoute pageKey="techRollout" action="view">
+                <TechnologyRollout />
+              </ProtectedRoute>
+            }
           />
 
-          <Route path="/accomplishment/drrm" element={<DRRM />} />
+          <Route
+            path="/accomplishment/drrm"
+            element={
+              <ProtectedRoute pageKey="drrm" action="view">
+                <DRRM />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="*"

@@ -1,25 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import API_BASE from "../api";
 
-/*
-  TableManagement.js — UPDATED SAMPLE VISUAL UI ONLY
-
-  Added:
-  - Module grid without Dashboard
-  - Vertical accordion/cards
-  - Temporary table preview per module
-  - Dropdown value add/delete
-  - Form Field Builder
-  - Add/Edit modal field configuration
-  - Live Add Modal Preview based on selected module fields
-
-  How to use:
-  1. Save this as: src/pages/TableManagement.js
-  2. Add route in App.js if needed:
-     import TableManagement from "./pages/TableManagement";
-     <Route path="/table-management" element={<TableManagement />} />
-*/
-
 const MODULES = [
   "SETUP",
   "CEST",
@@ -1239,6 +1220,38 @@ function AddModalPreview({ moduleName, fields, dropdowns }) {
   );
 }
 
+
+function DeleteConfirmModal({ open, title, message, onCancel, onConfirm }) {
+  if (!open) return null;
+
+  return (
+    <div style={styles.deleteModalBackdrop} onClick={onCancel}>
+      <div style={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
+        <div style={styles.deleteModalHeader}>
+          <div>
+            <div style={styles.deleteModalTitle}>{title || "Confirm Delete"}</div>
+            <div style={styles.deleteModalSub}>This action needs your confirmation.</div>
+          </div>
+          <button type="button" style={styles.deleteModalClose} onClick={onCancel}>✕</button>
+        </div>
+
+        <div style={styles.deleteModalBody}>
+          <div style={styles.deleteIconCircle}>?</div>
+          <div>
+            <div style={styles.deleteMessage}>{message || "Are you sure you want to delete this?"}</div>
+            <div style={styles.deleteHelpText}>Please review before deleting. Click Cancel if this was accidental.</div>
+          </div>
+        </div>
+
+        <div style={styles.deleteModalFooter}>
+          <button type="button" style={styles.btnCancelDelete} onClick={onCancel}>Cancel</button>
+          <button type="button" style={styles.btnConfirmDelete} onClick={onConfirm}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TableManagement() {
   const [selectedModule, setSelectedModule] = useState("SETUP");
   const [selectedDrrmTable, setSelectedDrrmTable] = useState("Activities Table");
@@ -1261,8 +1274,24 @@ function TableManagement() {
     showEdit: true,
   });
   const [savedFieldRows, setSavedFieldRows] = useState({});
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
+  const openDeleteConfirm = ({ title, message, onConfirm }) => {
+    setDeleteConfirm({
+      open: true,
+      title: title || "Confirm Delete",
+      message: message || "Are you sure you want to delete this?",
+      onConfirm,
+    });
+  };
 
+  const closeDeleteConfirm = () => setDeleteConfirm(null);
+
+  const runDeleteConfirm = async () => {
+    const action = deleteConfirm?.onConfirm;
+    closeDeleteConfirm();
+    if (typeof action === "function") await action();
+  };
 
   async function reloadTableManagementData() {
     setIsLoadingConfig(true);
@@ -2190,7 +2219,7 @@ function TableManagement() {
                                 : "Save"}
                             </button>
 
-                            <button style={{ ...styles.smallBtn, ...styles.dangerBtn }} onClick={() => deleteField(field.id)}>
+                            <button style={{ ...styles.smallBtn, ...styles.dangerBtn }} onClick={() => openDeleteConfirm({ title: "Delete Field", message: `Are you sure you want to delete "${field.label}"?`, onConfirm: () => deleteField(field.id) })}>
                               Delete
                             </button>
                           </div>
@@ -2386,7 +2415,7 @@ function TableManagement() {
                               </button>
                               <button
                                 style={{ ...styles.smallBtn, ...styles.dangerBtn }}
-                                onClick={() => deleteDropdownList(dropdownName)}
+                                onClick={() => openDeleteConfirm({ title: "Delete Dropdown List", message: `Are you sure you want to delete "${dropdownName}"?`, onConfirm: () => deleteDropdownList(dropdownName) })}
                               >
                                 Delete List
                               </button>
@@ -2435,7 +2464,7 @@ function TableManagement() {
                     (config.dropdowns[activeDropdown] || []).map((option) => (
                       <div key={option} style={styles.optionItem}>
                         <span>{option}</span>
-                        <button style={{ ...styles.smallBtn, ...styles.dangerBtn }} onClick={() => deleteDropdownOption(option)}>
+                        <button style={{ ...styles.smallBtn, ...styles.dangerBtn }} onClick={() => openDeleteConfirm({ title: "Delete Dropdown Value", message: `Are you sure you want to delete "${option}"?`, onConfirm: () => deleteDropdownOption(option) })}>
                           Delete
                         </button>
                       </div>
@@ -2496,6 +2525,14 @@ function TableManagement() {
           <SimpleTable columns={visibleColumns} rows={config.sampleRows} />
         </SectionCard>
       </div>
+
+      <DeleteConfirmModal
+        open={deleteConfirm?.open}
+        title={deleteConfirm?.title}
+        message={deleteConfirm?.message}
+        onCancel={closeDeleteConfirm}
+        onConfirm={runDeleteConfirm}
+      />
     </div>
   );
 }
@@ -3048,9 +3085,9 @@ const styles = {
     whiteSpace: "nowrap",
   },
   dangerBtn: {
-    borderColor: "#fecaca",
-    color: "#b91c1c",
-    background: "#fff1f2",
+    borderColor: "#bfdbfe",
+    color: "#0b4ea2",
+    background: "#eff6ff",
   },
   saveFieldBtn: {
     border: "1px solid #bbf7d0",
@@ -3063,6 +3100,112 @@ const styles = {
     fontWeight: 800,
     cursor: "pointer",
     whiteSpace: "nowrap",
+  },
+  deleteModalBackdrop: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15, 23, 42, 0.45)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 18,
+    zIndex: 9999,
+  },
+  deleteModal: {
+    width: "min(460px, 100%)",
+    background: "#ffffff",
+    borderRadius: 18,
+    overflow: "hidden",
+    boxShadow: "0 24px 60px rgba(15, 23, 42, 0.35)",
+    border: "1px solid #bfdbfe",
+  },
+  deleteModalHeader: {
+    background: "linear-gradient(135deg, #0b4ea2 0%, #2563eb 100%)",
+    color: "#ffffff",
+    padding: "14px 16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  deleteModalTitle: {
+    fontSize: 16,
+    fontWeight: 900,
+  },
+  deleteModalSub: {
+    fontSize: 12,
+    opacity: 0.9,
+    fontWeight: 700,
+    marginTop: 2,
+  },
+  deleteModalClose: {
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.5)",
+    color: "#ffffff",
+    borderRadius: 10,
+    padding: "6px 10px",
+    cursor: "pointer",
+    fontWeight: 900,
+  },
+  deleteModalBody: {
+    padding: 18,
+    display: "flex",
+    gap: 14,
+    alignItems: "flex-start",
+  },
+  deleteIconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: "50%",
+    background: "#dbeafe",
+    color: "#0b4ea2",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 950,
+    fontSize: 22,
+    flex: "0 0 auto",
+    border: "1px solid #bfdbfe",
+  },
+  deleteMessage: {
+    fontSize: 15,
+    fontWeight: 900,
+    color: "#0f172a",
+    lineHeight: 1.35,
+  },
+  deleteHelpText: {
+    fontSize: 12,
+    color: "#64748b",
+    fontWeight: 700,
+    marginTop: 6,
+    lineHeight: 1.35,
+  },
+  deleteModalFooter: {
+    padding: 16,
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: 10,
+    borderTop: "1px solid #e2e8f0",
+    background: "#f8fafc",
+  },
+  btnCancelDelete: {
+    border: "1px solid #cbd5e1",
+    background: "#ffffff",
+    color: "#0f172a",
+    borderRadius: 12,
+    padding: "10px 14px",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+  btnConfirmDelete: {
+    border: "1px solid #0b4ea2",
+    background: "#0b4ea2",
+    color: "#ffffff",
+    borderRadius: 12,
+    padding: "10px 14px",
+    fontWeight: 900,
+    cursor: "pointer",
+    boxShadow: "0 10px 20px rgba(11, 78, 162, 0.22)",
   },
   modalPreviewShell: {
     background: "rgba(15, 23, 42, 0.08)",

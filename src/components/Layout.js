@@ -21,7 +21,7 @@ const pageMeta = [
   },
   {
     path: "/accomplishment/setup",
-    title: "Setup",
+    title: "SETUP",
     subtitle: "SETUP accomplishment records",
   },
   {
@@ -75,7 +75,7 @@ const pageMeta = [
     subtitle: "Calibration service records",
   },
   {
-    path: "/accomplishment/DRRM",
+    path: "/accomplishment/drrm",
     title: "DRRM",
     subtitle: "Disaster Risk Reduction and Management records",
   },
@@ -84,13 +84,27 @@ const pageMeta = [
     title: "User Management",
     subtitle: "Manage user accounts and access",
   },
+  {
+    path: "/table-management",
+    title: "Table Management",
+    subtitle: "Manage system dropdowns and table fields",
+  },
+   {
+    path: "/about",
+    title: "About",
+    subtitle: "Information about the application",
+  },
 ];
 
 function getPageMeta(pathname) {
+  const normalizedPathname = String(pathname || "").toLowerCase();
+
   for (const item of pageMeta) {
+    const itemPath = String(item.path || "").toLowerCase();
+
     if (item.exact) {
-      if (pathname === item.path) return item;
-    } else if (pathname.startsWith(item.path)) {
+      if (normalizedPathname === itemPath) return item;
+    } else if (normalizedPathname.startsWith(itemPath)) {
       return item;
     }
   }

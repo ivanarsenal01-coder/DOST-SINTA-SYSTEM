@@ -16,6 +16,8 @@ import {
 import * as XLSX from "xlsx";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import { canAdd, canEdit, canDelete, canExport } from "../../usrmngment/utils/permissions";
 
 /* Leaflet marker icons */
 L.Icon.Default.mergeOptions({
@@ -655,7 +657,119 @@ function ListCell({ items }) {
   return <div style={{ display: "grid", gap: 4 }}>{arr.map((v, i) => <div key={i} style={{ fontWeight: 800, textAlign: "left" }}>{String(v)}</div>)}</div>;
 }
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function DRRM() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "drrm");
+  const allowEdit = canEdit(user, "drrm");
+  const allowDelete = canDelete(user, "drrm");
+  const allowExport = canExport(user, "drrm");
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   const [act, setAct] = useState([]);
   const [iec, setIec] = useState([]);
   const [col, setCol] = useState([]);
@@ -678,9 +792,9 @@ export default function DRRM() {
   const [msOpen, setMsOpen] = useState(null);
   const [msTarget, setMsTarget] = useState(null);
 
-  const emptyAct = { title: "", sectors: [], dateMode: "single", dateStart: "", dateEnd: "", venueMeta: null, venueText: "", org: "", male: "", female: "", partners: [], mov: "", staffName: "", remarks: "" };
-  const emptyIec = { titles: [], sources: [], date: "", male: "", female: "", mov: "", staffName: "", remarks: "" };
-  const emptyCol = { title: "", stakeholders: [], date: "", mov: "", staffName: "", remarks: "" };
+  const emptyAct = { title: "", sectors: [], dateMode: "single", dateStart: "", dateEnd: "", venueMeta: null, venueText: "", org: "", male: "", female: "", partners: [], mov: "", movPhotos: [], staffName: "", remarks: "" };
+  const emptyIec = { titles: [], sources: [], date: "", male: "", female: "", mov: "", movPhotos: [], staffName: "", remarks: "" };
+  const emptyCol = { title: "", stakeholders: [], date: "", mov: "", movPhotos: [], staffName: "", remarks: "" };
 
   const [fAct, setFAct] = useState(emptyAct);
   const [fIec, setFIec] = useState(emptyIec);
@@ -885,6 +999,11 @@ export default function DRRM() {
   const colRows = useMemo(() => paged(colF, fc.page), [colF, fc.page]);
 
   const exportXlsx = (filename, rows) => {
+    if (!allowExport) {
+      window.alert("You do not have permission to export DRRM records.");
+      return;
+    }
+
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
@@ -894,6 +1013,11 @@ export default function DRRM() {
   const safeFileName = (s) => String(s || "entry").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim().slice(0, 80);
 
   const printTable = (title, cols, rows) => {
+    if (!allowExport) {
+      window.alert("You do not have permission to print DRRM records.");
+      return;
+    }
+
     const w = window.open("", "_blank");
     if (!w) return window.alert("Pop-up blocked. Allow pop-ups to print.");
     const esc = (s) => String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -918,6 +1042,11 @@ export default function DRRM() {
   const exportRowCol = (e) => exportXlsx(`DRRM_Collab_${safeFileName(e.title)}.xlsx`, colExportRows([e]));
 
   const openAdd = (kind) => {
+    if (!allowAdd) {
+      window.alert("You do not have permission to add DRRM entries.");
+      return;
+    }
+
     if (kind === "act") setFAct(emptyAct);
     if (kind === "iec") setFIec(emptyIec);
     if (kind === "col") setFCol(emptyCol);
@@ -925,17 +1054,22 @@ export default function DRRM() {
   };
 
   const openEdit = (kind, id) => {
+    if (!allowEdit) {
+      window.alert("You do not have permission to edit DRRM entries.");
+      return;
+    }
+
     if (kind === "act") {
       const e = act.find((x) => x.id === id); if (!e) return;
-      setFAct({ title: e.title || "", sectors: Array.isArray(e.sectors) ? e.sectors : [], dateMode: e.dateEnd ? "range" : "single", dateStart: e.dateStart || e.date || "", dateEnd: e.dateEnd || "", venueMeta: e.venueMeta || null, venueText: e.venueText || e.venueMeta?.displayText || "", org: e.org || "", male: e.male ?? "", female: e.female ?? "", partners: Array.isArray(e.partners) ? e.partners : Array.isArray(e.stakeholders) ? e.stakeholders : [], mov: e.mov || "", staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFAct({ title: e.title || "", sectors: Array.isArray(e.sectors) ? e.sectors : [], dateMode: e.dateEnd ? "range" : "single", dateStart: e.dateStart || e.date || "", dateEnd: e.dateEnd || "", venueMeta: e.venueMeta || null, venueText: e.venueText || e.venueMeta?.displayText || "", org: e.org || "", male: e.male ?? "", female: e.female ?? "", partners: Array.isArray(e.partners) ? e.partners : Array.isArray(e.stakeholders) ? e.stakeholders : [], mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
     }
     if (kind === "iec") {
       const e = iec.find((x) => x.id === id); if (!e) return;
-      setFIec({ titles: Array.isArray(e.titles) ? e.titles : [], sources: Array.isArray(e.sources) ? e.sources : [], date: e.date || "", male: e.male ?? "", female: e.female ?? "", mov: e.mov || "", staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFIec({ titles: Array.isArray(e.titles) ? e.titles : [], sources: Array.isArray(e.sources) ? e.sources : [], date: e.date || "", male: e.male ?? "", female: e.female ?? "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
     }
     if (kind === "col") {
       const e = col.find((x) => x.id === id); if (!e) return;
-      setFCol({ title: e.title || "", stakeholders: Array.isArray(e.stakeholders) ? e.stakeholders : [], date: e.date || "", mov: e.mov || "", staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFCol({ title: e.title || "", stakeholders: Array.isArray(e.stakeholders) ? e.stakeholders : [], date: e.date || "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
     }
     setModal({ kind, mode: "edit", id });
   };
@@ -943,7 +1077,12 @@ export default function DRRM() {
   const openView = (kind, id) => setModal({ kind, mode: "view", id });
 
   const del = async (kind, id) => {
-    if (!window.confirm("Delete this entry?")) return;
+    if (!allowDelete) {
+      window.alert("You do not have permission to delete DRRM entries.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this entry?"))) return;
     try {
       const endpoint = endpointForKind(kind);
       await axios.delete(`${DRRM_API}/${endpoint}/${id}`);
@@ -980,6 +1119,11 @@ export default function DRRM() {
 
   const onAddOpt = async (val) => {
     if (!addOpt) return;
+
+    if (!allowAdd && !allowEdit) {
+      window.alert("You do not have permission to add DRRM dropdown values.");
+      return;
+    }
     const categoryMap = { actSectors: "sector", iecTitles: "iec_title", iecSources: "iec_source", stakeholders: "stakeholder" };
     const category = categoryMap[addOpt.listKey];
     try {
@@ -997,6 +1141,16 @@ export default function DRRM() {
 
   const saveEntry = async () => {
     if (!modal) return;
+
+    if (modal.mode === "edit" && !allowEdit) {
+      window.alert("You do not have permission to edit DRRM entries.");
+      return;
+    }
+
+    if (modal.mode === "add" && !allowAdd) {
+      window.alert("You do not have permission to add DRRM entries.");
+      return;
+    }
     try {
       if (modal.kind === "act") {
         if (!fAct.title.trim()) return window.alert("Required: Title of Activity");
@@ -1004,7 +1158,7 @@ export default function DRRM() {
         if (!fAct.dateStart) return window.alert("Required: Date Conducted (start)");
         if (fAct.dateMode === "range" && !fAct.dateEnd) return window.alert("Required: End date");
         if (!fAct.venueText.trim()) return window.alert("Required: Venue/Address");
-        const payload = { title: fAct.title.trim(), sectors: uniq(fAct.sectors), dateStart: fAct.dateStart, dateEnd: fAct.dateMode === "range" ? fAct.dateEnd : "", venueText: fAct.venueText.trim(), venueMeta: fAct.venueMeta || null, org: fAct.org.trim(), male: toNum(fAct.male), female: toNum(fAct.female), total: toNum(fAct.male) + toNum(fAct.female), partners: uniq(fAct.partners || []), mov: fAct.mov.trim(), staffName: fAct.staffName.trim(), remarks: fAct.remarks.trim() };
+        const payload = { title: fAct.title.trim(), sectors: uniq(fAct.sectors), dateStart: fAct.dateStart, dateEnd: fAct.dateMode === "range" ? fAct.dateEnd : "", venueText: fAct.venueText.trim(), venueMeta: fAct.venueMeta || null, org: fAct.org.trim(), male: toNum(fAct.male), female: toNum(fAct.female), total: toNum(fAct.male) + toNum(fAct.female), partners: uniq(fAct.partners || []), mov: fAct.mov.trim(), movPhotos: Array.isArray(fAct.movPhotos) ? fAct.movPhotos : [], staffName: fAct.staffName.trim(), remarks: fAct.remarks.trim() };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/activities/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/activities`, payload);
         await loadDrrmData(); setModal(null); return;
@@ -1013,7 +1167,7 @@ export default function DRRM() {
         if (!Array.isArray(fIec.titles) || fIec.titles.length === 0) return window.alert("Required: Title of IEC Material");
         if (!Array.isArray(fIec.sources) || fIec.sources.length === 0) return window.alert("Required: Source");
         if (!fIec.date) return window.alert("Required: Date");
-        const payload = { titles: uniq(fIec.titles), sources: uniq(fIec.sources), date: fIec.date, male: toNum(fIec.male), female: toNum(fIec.female), total: toNum(fIec.male) + toNum(fIec.female), mov: fIec.mov.trim(), staffName: fIec.staffName.trim(), remarks: fIec.remarks.trim() };
+        const payload = { titles: uniq(fIec.titles), sources: uniq(fIec.sources), date: fIec.date, male: toNum(fIec.male), female: toNum(fIec.female), total: toNum(fIec.male) + toNum(fIec.female), mov: fIec.mov.trim(), movPhotos: Array.isArray(fIec.movPhotos) ? fIec.movPhotos : [], staffName: fIec.staffName.trim(), remarks: fIec.remarks.trim() };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/iec-materials/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/iec-materials`, payload);
         await loadDrrmData(); setModal(null); return;
@@ -1022,7 +1176,7 @@ export default function DRRM() {
         if (!fCol.title.trim()) return window.alert("Required: Title of Activity");
         if (!Array.isArray(fCol.stakeholders) || fCol.stakeholders.length === 0) return window.alert("Required: Name of Stakeholder/s");
         if (!fCol.date) return window.alert("Required: Date");
-        const payload = { title: fCol.title.trim(), stakeholders: uniq(fCol.stakeholders), date: fCol.date, mov: fCol.mov.trim(), staffName: fCol.staffName.trim(), remarks: fCol.remarks.trim() };
+        const payload = { title: fCol.title.trim(), stakeholders: uniq(fCol.stakeholders), date: fCol.date, mov: fCol.mov.trim(), movPhotos: Array.isArray(fCol.movPhotos) ? fCol.movPhotos : [], staffName: fCol.staffName.trim(), remarks: fCol.remarks.trim() };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/collaborations/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/collaborations`, payload);
         await loadDrrmData(); setModal(null);
@@ -1042,6 +1196,11 @@ export default function DRRM() {
   }, [modal, act, iec, col]);
 
   const setPscpQ = async (which, qKey, v) => {
+    if (!allowEdit) {
+      window.alert("You do not have permission to edit DRRM indicators.");
+      return;
+    }
+
     const next = { ...pscp, [which]: { ...pscp[which], [qKey]: v } };
     setPscp(next);
     try { await axios.put(`${DRRM_API}/pscp/${PSCP_YEAR}`, next); } catch (err) { console.error("DRRM PSCP save error:", err); }
@@ -1251,15 +1410,15 @@ export default function DRRM() {
             <select style={S.selPill} value={fa.m} onChange={(e) => setFa((p) => ({ ...p, m: e.target.value }))}><option value="">All Months</option>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
             <select style={S.selPill} value={fa.sort} onChange={(e) => setFa((p) => ({ ...p, sort: e.target.value }))}><option value="newest">Sort: Newest</option><option value="oldest">Sort: Oldest</option></select>
             <button style={S.tbtn} onClick={() => setFa({ search: "", y: "", q: "", m: "", sort: "newest", page: 1 })}>Clear Filters</button>
-            <button style={S.tbtn} onClick={() => exportXlsx("DRRM_Activities.xlsx", actExportRows(actF))}>Export</button>
-            <button style={S.btnP} onClick={() => printRows("DRRM — Activities", actExportRows(actF))}>Print</button>
-            <button style={S.btn} onClick={() => openAdd("act")}>+ Add Entry</button>
+            {allowExport && <button style={S.tbtn} onClick={() => exportXlsx("DRRM_Activities.xlsx", actExportRows(actF))}>Export</button>}
+            {allowExport && <button style={S.btnP} onClick={() => printRows("DRRM — Activities", actExportRows(actF))}>Print</button>}
+            {allowAdd && <button style={S.btn} onClick={() => openAdd("act")}>+ Add Entry</button>}
           </div>
         </div>
         <div style={S.tableWrap}>
           <table style={{ ...S.table, minWidth: 1900 }}>
             <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF ACTIVITY ON DRR and CC Learning and Development</th><th style={S.th} rowSpan={2}>TYPE OF SECTOR-SPECIFIC LEARNING AND DEVELOPMENT INTERVENTION*</th><th style={S.th} rowSpan={2}>DATE CONDUCTED</th><th style={S.th} rowSpan={2}>VENUE/ADDRESS</th><th style={S.th} rowSpan={2}>NAME OF CO-ORGANIZER</th><th style={S.th} colSpan={3}>NO. OF PARTICIPANT**</th><th style={S.th} rowSpan={2}>PARTNERS</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th><th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
-            <tbody>{actRows.length === 0 ? <tr><td style={S.tdC} colSpan={14}>No entries yet. Click “+ Add Entry”.</td></tr> : actRows.map((e, idx) => { const no = (fa.page - 1) * PAGE_SIZE + idx + 1; const hasCoords = Number.isFinite(Number(e?.venueMeta?.lat)) && Number.isFinite(Number(e?.venueMeta?.lng)); return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}>{e.title}</td><td style={S.td}><ListCell items={e.sectors || []} /></td><td style={S.tdC}>{formatActDate(e)}</td><td style={S.td}><div style={{ display: "grid", gap: 6 }}><div>{venueText(e)}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{hasCoords ? <><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Map</button><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Directions</button></> : null}</div></div></td><td style={S.td}>{e.org || "—"}</td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><ListCell items={e.partners || []} /></td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{actMonth(e) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button><button style={S.tbtn} onClick={() => openEdit("act", e.id)}>Edit</button><button style={S.tbtn} onClick={() => printRows("DRRM — Activity (1 entry)", actExportRows([e]))}>Print</button></div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => exportRowAct(e)}>Export</button><button style={S.danger} onClick={() => del("act", e.id)}>Delete</button></div></div></td></tr>; })}</tbody>
+            <tbody>{actRows.length === 0 ? <tr><td style={S.tdC} colSpan={14}>No entries yet. Click “+ Add Entry”.</td></tr> : actRows.map((e, idx) => { const no = (fa.page - 1) * PAGE_SIZE + idx + 1; const hasCoords = Number.isFinite(Number(e?.venueMeta?.lat)) && Number.isFinite(Number(e?.venueMeta?.lng)); return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}>{e.title}</td><td style={S.td}><ListCell items={e.sectors || []} /></td><td style={S.tdC}>{formatActDate(e)}</td><td style={S.td}><div style={{ display: "grid", gap: 6 }}><div>{venueText(e)}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{hasCoords ? <><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Map</button><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Directions</button></> : null}</div></div></td><td style={S.td}>{e.org || "—"}</td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><ListCell items={e.partners || []} /></td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{actMonth(e) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("act", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — Activity (1 entry)", actExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowAct(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("act", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
           </table>
         </div>
         <Pagination total={actF.length} page={fa.page} onPage={(p) => setFa((x) => ({ ...x, page: p }))} />
@@ -1276,15 +1435,15 @@ export default function DRRM() {
             <select style={S.selPill} value={fi.m} onChange={(e) => setFi((p) => ({ ...p, m: e.target.value }))}><option value="">All Months</option>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</select>
             <select style={S.selPill} value={fi.sort} onChange={(e) => setFi((p) => ({ ...p, sort: e.target.value }))}><option value="newest">Sort: Newest</option><option value="oldest">Sort: Oldest</option></select>
             <button style={S.tbtn} onClick={() => setFi({ search: "", y: "", q: "", m: "", sort: "newest", page: 1 })}>Clear Filters</button>
-            <button style={S.tbtn} onClick={() => exportXlsx("DRRM_IEC_Materials.xlsx", iecExportRows(iecF))}>Export</button>
-            <button style={S.btnP} onClick={() => printRows("DRRM — IEC Materials", iecExportRows(iecF))}>Print</button>
-            <button style={S.btn} onClick={() => openAdd("iec")}>+ Add Entry</button>
+            {allowExport && <button style={S.tbtn} onClick={() => exportXlsx("DRRM_IEC_Materials.xlsx", iecExportRows(iecF))}>Export</button>}
+            {allowExport && <button style={S.btnP} onClick={() => printRows("DRRM — IEC Materials", iecExportRows(iecF))}>Print</button>}
+            {allowAdd && <button style={S.btn} onClick={() => openAdd("iec")}>+ Add Entry</button>}
           </div>
         </div>
         <div style={S.tableWrap}>
           <table style={{ ...S.table, minWidth: 1420 }}>
             <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF IEC MATERIAL</th><th style={S.th} rowSpan={2}>SOURCE</th><th style={S.th} colSpan={3}>NO. OF BENEFICIARY*</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th><th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
-            <tbody>{iecRows.length === 0 ? <tr><td style={S.tdC} colSpan={10}>No entries yet. Click “+ Add Entry”.</td></tr> : iecRows.map((e, idx) => { const no = (fi.page - 1) * PAGE_SIZE + idx + 1; return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}><ListCell items={e.titles || []} /></td><td style={S.td}><ListCell items={e.sources || []} /></td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{mName(e.date) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("iec", e.id)}>View</button><button style={S.tbtn} onClick={() => openEdit("iec", e.id)}>Edit</button><button style={S.tbtn} onClick={() => printRows("DRRM — IEC (1 entry)", iecExportRows([e]))}>Print</button></div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => exportRowIec(e)}>Export</button><button style={S.danger} onClick={() => del("iec", e.id)}>Delete</button></div></div></td></tr>; })}</tbody>
+            <tbody>{iecRows.length === 0 ? <tr><td style={S.tdC} colSpan={10}>No entries yet. Click “+ Add Entry”.</td></tr> : iecRows.map((e, idx) => { const no = (fi.page - 1) * PAGE_SIZE + idx + 1; return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}><ListCell items={e.titles || []} /></td><td style={S.td}><ListCell items={e.sources || []} /></td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{mName(e.date) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("iec", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("iec", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — IEC (1 entry)", iecExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowIec(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("iec", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
           </table>
         </div>
         <Pagination total={iecF.length} page={fi.page} onPage={(p) => setFi((x) => ({ ...x, page: p }))} />
@@ -1298,12 +1457,12 @@ export default function DRRM() {
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}><div style={{ fontWeight: 900 }}>Percentage of LGUs engaged in DRR and CC Learning and Development</div><div style={{ fontWeight: 900, fontSize: 22 }}>{lguEngagement.pct}%</div></div>
           <div style={{ fontSize: 12, opacity: 0.75 }}>Covered LGUs: <b>{lguEngagement.count}</b> / {lguEngagement.total} (based on current Activities filters)</div>
           <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, minWidth: 760 }}><thead><tr><th style={{ ...S.th, textAlign: "left" }}>Public Service Continuity Plan</th><th style={S.th}>Q1</th><th style={S.th}>Q2</th><th style={S.th}>Q3</th><th style={S.th}>Q4</th></tr></thead><tbody>{["crafted", "implemented"].map((which) => <tr key={which}><td style={S.td}><b>{which === "crafted" ? "Crafted/Updated" : "Implemented/Deployed"}</b></td>{["q1", "q2", "q3", "q4"].map((qk) => <td key={`${which}${qk}`} style={S.tdC}><select style={{ ...S.selPill, minWidth: 120 }} value={pscp[which]?.[qk] || ""} onChange={(e) => setPscpQ(which, qk, e.target.value)}><option value="">—</option><option value="YES">YES</option><option value="NO">NO</option></select></td>)}</tr>)}</tbody></table>
+            <table style={{ ...S.table, minWidth: 760 }}><thead><tr><th style={{ ...S.th, textAlign: "left" }}>Public Service Continuity Plan</th><th style={S.th}>Q1</th><th style={S.th}>Q2</th><th style={S.th}>Q3</th><th style={S.th}>Q4</th></tr></thead><tbody>{["crafted", "implemented"].map((which) => <tr key={which}><td style={S.td}><b>{which === "crafted" ? "Crafted/Updated" : "Implemented/Deployed"}</b></td>{["q1", "q2", "q3", "q4"].map((qk) => <td key={`${which}${qk}`} style={S.tdC}><select style={{ ...S.selPill, minWidth: 120, opacity: allowEdit ? 1 : 0.6, cursor: allowEdit ? "pointer" : "not-allowed" }} value={pscp[which]?.[qk] || ""} onChange={(e) => setPscpQ(which, qk, e.target.value)} disabled={!allowEdit}><option value="">—</option><option value="YES">YES</option><option value="NO">NO</option></select></td>)}</tr>)}</tbody></table>
           </div>
         </div>
       </div>
 
-      <Modal open={!!modal && (modal.mode === "add" || modal.mode === "edit")} title={<div>{modal?.mode === "edit" ? "Edit Entry" : "Add Entry"}</div>} onClose={() => setModal(null)} footer={<><button style={S.btn} onClick={() => setModal(null)}>Cancel</button><button style={S.btnP} onClick={saveEntry}>{modal?.mode === "edit" ? "Update" : "Save"}</button></>}>
+      <Modal open={!!modal && (modal.mode === "add" || modal.mode === "edit")} title={<div>{modal?.mode === "edit" ? "Edit Entry" : "Add Entry"}</div>} onClose={() => setModal(null)} footer={<><button style={S.btn} onClick={() => setModal(null)}>Cancel</button>{((modal?.mode === "edit" && allowEdit) || (modal?.mode === "add" && allowAdd)) && <button style={S.btnP} onClick={saveEntry}>{modal?.mode === "edit" ? "Update" : "Save"}</button>}</>}>
         {modal?.kind === "act" ? <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Title of Activity *</div><textarea style={S.ta} value={fAct.title} onChange={(e) => setFAct((p) => ({ ...p, title: e.target.value }))} /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Type of sector-specific learning and development intervention *</div><button type="button" style={{ ...S.in, background: "#f8fafc", cursor: "pointer", textAlign: "left" }} onClick={() => openMulti("actSectors")}>{fAct.sectors?.length ? fAct.sectors.join(", ") : "Click to select (multi-select)"}</button></div>
@@ -1315,7 +1474,12 @@ export default function DRRM() {
           <div><div style={S.l}>Participants (Male)</div><input style={S.in} type="number" value={fAct.male} onChange={(e) => setFAct((p) => ({ ...p, male: e.target.value }))} /></div>
           <div><div style={S.l}>Participants (Female)</div><input style={S.in} type="number" value={fAct.female} onChange={(e) => setFAct((p) => ({ ...p, female: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Total (auto): <b>{toNum(fAct.male) + toNum(fAct.female)}</b></div></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Partners</div><button type="button" style={{ ...S.in, background: "#f8fafc", cursor: "pointer", textAlign: "left" }} onClick={() => openMulti("actPartners")}>{fAct.partners?.length ? fAct.partners.join(", ") : "Click to select partners"}</button></div>
-          <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Means of Verification</div><textarea style={S.ta} value={fAct.mov} onChange={(e) => setFAct((p) => ({ ...p, mov: e.target.value }))} placeholder="Paste links here (auto-detected)..." /></div>
+          <UnifiedMOVSection
+            value={fAct.mov || ""}
+            photos={fAct.movPhotos || []}
+            onValueChange={(value) => setFAct((p) => ({ ...p, mov: value }))}
+            onPhotosChange={(photos) => setFAct((p) => ({ ...p, movPhotos: photos }))}
+          />
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Name of Staff</div><input style={S.in} value={fAct.staffName} onChange={(e) => setFAct((p) => ({ ...p, staffName: e.target.value }))} placeholder="Optional" /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Remarks (optional)</div><textarea style={S.ta} value={fAct.remarks} onChange={(e) => setFAct((p) => ({ ...p, remarks: e.target.value }))} /></div>
         </div> : null}
@@ -1326,7 +1490,12 @@ export default function DRRM() {
           <div><div style={S.l}>Date (for Month/Quarter) *</div><input style={S.in} type="date" value={fIec.date} onChange={(e) => setFIec((p) => ({ ...p, date: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Quarter: <b>{qLabel(qFromDate(fIec.date))}</b> • Month: <b>{mName(fIec.date) || "—"}</b></div></div>
           <div><div style={S.l}>Beneficiary (Male)</div><input style={S.in} type="number" value={fIec.male} onChange={(e) => setFIec((p) => ({ ...p, male: e.target.value }))} /></div>
           <div><div style={S.l}>Beneficiary (Female)</div><input style={S.in} type="number" value={fIec.female} onChange={(e) => setFIec((p) => ({ ...p, female: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Total (auto): <b>{toNum(fIec.male) + toNum(fIec.female)}</b></div></div>
-          <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Means of Verification</div><textarea style={S.ta} value={fIec.mov} onChange={(e) => setFIec((p) => ({ ...p, mov: e.target.value }))} placeholder="Paste links here (auto-detected)..." /></div>
+          <UnifiedMOVSection
+            value={fIec.mov || ""}
+            photos={fIec.movPhotos || []}
+            onValueChange={(value) => setFIec((p) => ({ ...p, mov: value }))}
+            onPhotosChange={(photos) => setFIec((p) => ({ ...p, movPhotos: photos }))}
+          />
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Name of Staff</div><input style={S.in} value={fIec.staffName} onChange={(e) => setFIec((p) => ({ ...p, staffName: e.target.value }))} placeholder="Optional" /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Remarks (optional)</div><textarea style={S.ta} value={fIec.remarks} onChange={(e) => setFIec((p) => ({ ...p, remarks: e.target.value }))} /></div>
         </div> : null}
@@ -1335,19 +1504,130 @@ export default function DRRM() {
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Title of Activity *</div><textarea style={S.ta} value={fCol.title} onChange={(e) => setFCol((p) => ({ ...p, title: e.target.value }))} /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Name of Stakeholder/s *</div><button type="button" style={{ ...S.in, background: "#f8fafc", cursor: "pointer", textAlign: "left" }} onClick={() => openMulti("stakeholders")}>{fCol.stakeholders?.length ? fCol.stakeholders.join(", ") : "Click to select (multi-select)"}</button></div>
           <div><div style={S.l}>Date (for Quarter) *</div><input style={S.in} type="date" value={fCol.date} onChange={(e) => setFCol((p) => ({ ...p, date: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Quarter: <b>{qLabel(qFromDate(fCol.date))}</b></div></div>
-          <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Means of Verification</div><textarea style={S.ta} value={fCol.mov} onChange={(e) => setFCol((p) => ({ ...p, mov: e.target.value }))} placeholder="Paste links here (auto-detected)..." /></div>
+          <UnifiedMOVSection
+            value={fCol.mov || ""}
+            photos={fCol.movPhotos || []}
+            onValueChange={(value) => setFCol((p) => ({ ...p, mov: value }))}
+            onPhotosChange={(photos) => setFCol((p) => ({ ...p, movPhotos: photos }))}
+          />
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Name of Staff</div><input style={S.in} value={fCol.staffName} onChange={(e) => setFCol((p) => ({ ...p, staffName: e.target.value }))} placeholder="Optional" /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Remarks (optional)</div><textarea style={S.ta} value={fCol.remarks} onChange={(e) => setFCol((p) => ({ ...p, remarks: e.target.value }))} /></div>
         </div> : null}
       </Modal>
 
-      <Modal open={!!modal && modal.mode === "view" && !!viewEntry} title={<div><div>View Entry — {modal?.kind === "act" ? String(viewEntry?.title || "Activity") : modal?.kind === "iec" ? String((viewEntry?.titles || [])[0] || "IEC Material") : String(viewEntry?.title || "Collaboration")}</div><div style={{ fontSize: 12, opacity: 0.9, fontWeight: 800 }}>{modal?.kind === "act" ? "Activities" : modal?.kind === "iec" ? "IEC Materials" : "Collaboration"}</div></div>} onClose={() => setModal(null)} width={1100} footer={<><button style={S.btn} onClick={() => setModal(null)}>Close</button><button style={S.btnP} onClick={() => { const k = modal.kind; const id = modal.id; setModal(null); openEdit(k, id); }}>Edit</button></>}>
+      <Modal open={!!modal && modal.mode === "view" && !!viewEntry} title={<div><div>View Entry — {modal?.kind === "act" ? String(viewEntry?.title || "Activity") : modal?.kind === "iec" ? String((viewEntry?.titles || [])[0] || "IEC Material") : String(viewEntry?.title || "Collaboration")}</div><div style={{ fontSize: 12, opacity: 0.9, fontWeight: 800 }}>{modal?.kind === "act" ? "Activities" : modal?.kind === "iec" ? "IEC Materials" : "Collaboration"}</div></div>} onClose={() => setModal(null)} width={1100} footer={<><button style={S.btn} onClick={() => setModal(null)}>Close</button>{allowEdit && <button style={S.btnP} onClick={() => { const k = modal.kind; const id = modal.id; setModal(null); openEdit(k, id); }}>Edit</button>}</>}>
         {viewEntry ? <ViewEntryBody kind={modal.kind} entry={viewEntry} /> : null}
       </Modal>
 
       <VenueFlowModal open={venueOpen} initialMeta={fAct.venueMeta} onClose={() => setVenueOpen(false)} onSave={(meta) => setFAct((p) => ({ ...p, venueMeta: meta, venueText: meta?.displayText || "" }))} />
       <MultiSelectModal open={!!msOpen} title={msOpen?.title || "Multi-select"} options={msOpen?.options || []} selected={msOpen?.selected || []} onConfirm={confirmMulti} onClose={() => setMsOpen(null)} onAddNew={openAddOptionForCurrentMulti} />
       <AddOptionModal open={!!addOpt} title={addOpt?.title || "Add option"} placeholder={addOpt?.placeholder || "Type..."} onCancel={() => setAddOpt(null)} onAdd={onAddOpt} />
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

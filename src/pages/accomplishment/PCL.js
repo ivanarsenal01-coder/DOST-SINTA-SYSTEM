@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import {
+  canAdd,
+  canEdit,
+  canDelete,
+  canExport,
+} from "../../usrmngment/utils/permissions";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -230,7 +237,119 @@ const sortPackagingRecordsByLinkedIntervention = (list) => {
   });
 };
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function PackagingAndLabeling() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "packaging") || canAdd(user, "pcl");
+  const allowEdit = canEdit(user, "packaging") || canEdit(user, "pcl");
+  const allowDelete = canDelete(user, "packaging") || canDelete(user, "pcl");
+  const allowExport = canExport(user, "packaging") || canExport(user, "pcl");
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
 
@@ -1881,6 +2000,11 @@ export default function PackagingAndLabeling() {
   };
 
   const openPrintPopupRow = (recordId) => {
+    if (!allowExport) {
+      alert("You do not have permission to print Packaging and Labeling records.");
+      return;
+    }
+
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1893,6 +2017,11 @@ export default function PackagingAndLabeling() {
   };
 
   const openPrintPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print Packaging and Labeling records.");
+      return;
+    }
+
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1905,6 +2034,11 @@ export default function PackagingAndLabeling() {
   };
 
   const confirmPrint = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print Packaging and Labeling records.");
+      return;
+    }
+
     const scope = printModal.scope;
     const layoutKey = printModal.layout;
     const preset = printModal.preset;
@@ -1929,6 +2063,11 @@ export default function PackagingAndLabeling() {
 
   // ===== Export popup =====
   const openExportPopupRow = (recordId) => {
+    if (!allowExport) {
+      alert("You do not have permission to export Packaging and Labeling records.");
+      return;
+    }
+
     setExportModal({
       open: true,
       scope: "row",
@@ -1942,6 +2081,11 @@ export default function PackagingAndLabeling() {
   };
 
   const openExportPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to export Packaging and Labeling records.");
+      return;
+    }
+
     setExportModal({
       open: true,
       scope: "bulk",
@@ -1955,6 +2099,11 @@ export default function PackagingAndLabeling() {
   };
 
   const confirmExport = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to export Packaging and Labeling records.");
+      return;
+    }
+
     const rows =
       exportModal.scope === "row"
         ? [getRecordById(exportModal.recordId)].filter(Boolean)
@@ -2106,12 +2255,22 @@ export default function PackagingAndLabeling() {
   };
   // ===== MAIN RECORD CRUD =====
   const openAddRecord = () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add Packaging and Labeling entries.");
+      return;
+    }
+
     setEditRecordId(null);
     resetForm();
     setShowAdd(true);
   };
 
   const openEditRecord = (id) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit Packaging and Labeling entries.");
+      return;
+    }
+
     const r = records.find((x) => String(x.id) === String(id));
     if (!r) return;
 
@@ -2138,6 +2297,16 @@ export default function PackagingAndLabeling() {
   };
 
   const saveRecord = async () => {
+    if (editRecordId && !allowEdit) {
+      alert("You do not have permission to edit Packaging and Labeling entries.");
+      return;
+    }
+
+    if (!editRecordId && !allowAdd) {
+      alert("You do not have permission to add Packaging and Labeling entries.");
+      return;
+    }
+
     if (!form.dateCompleted)
       return alert("Required: Date Completed/Executed");
     if (!form.typeOfIntervention.trim())
@@ -2201,7 +2370,12 @@ export default function PackagingAndLabeling() {
   };
 
   const deleteRecord = async (id) => {
-    if (!window.confirm("Delete this entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete Packaging and Labeling entries.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this entry?"))) return;
 
     try {
       await axios.delete(`${API}/${id}`);
@@ -2214,11 +2388,21 @@ export default function PackagingAndLabeling() {
 
   // ===== PRODUCT CRUD =====
   const openProductModal_Add = (recordId) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add products.");
+      return;
+    }
+
     resetProductForm();
     setProductModalFor({ recordId, mode: "add" });
   };
 
   const openProductModal_Edit = (recordId, productId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit products.");
+      return;
+    }
+
     const record = records.find((x) => x.id === recordId);
     const product = record?.products?.find((x) => x.id === productId);
     if (!record || !product) return;
@@ -2229,6 +2413,16 @@ export default function PackagingAndLabeling() {
 
   const saveProduct = async () => {
     if (!productModalFor) return;
+
+    if (productModalFor.mode === "add" && !allowAdd) {
+      alert("You do not have permission to add products.");
+      return;
+    }
+
+    if (productModalFor.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit products.");
+      return;
+    }
     if (!productForm.productName.trim()) return alert("Required: Product Name");
 
     try {
@@ -2256,7 +2450,12 @@ export default function PackagingAndLabeling() {
   };
 
   const deleteProduct = async (recordId, productId) => {
-    if (!window.confirm("Delete this product?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete products.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this product?"))) return;
 
     try {
       await axios.delete(`${API}/products/${productId}`);
@@ -3523,16 +3722,18 @@ export default function PackagingAndLabeling() {
             <button type="button" style={styles.btnGhost} onClick={onClose}>
               Close
             </button>
-            <button
-              type="button"
-              style={styles.btnDark}
-              onClick={() => {
-                onClose();
-                openEditRecord(record.id);
-              }}
-            >
-              Edit
-            </button>
+            {allowEdit && (
+              <button
+                type="button"
+                style={styles.btnDark}
+                onClick={() => {
+                  onClose();
+                  openEditRecord(record.id);
+                }}
+              >
+                Edit
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -4353,17 +4554,23 @@ export default function PackagingAndLabeling() {
               Clear Filters
             </button>
 
-            <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk} disabled={filteredRecords.length === 0}>
-              Export
-            </button>
+            {allowExport && (
+              <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk} disabled={filteredRecords.length === 0}>
+                Export
+              </button>
+            )}
 
-            <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk} disabled={filteredRecords.length === 0}>
-              Print
-            </button>
+            {allowExport && (
+              <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk} disabled={filteredRecords.length === 0}>
+                Print
+              </button>
+            )}
 
-            <button type="button" style={styles.addBtn} onClick={openAddRecord}>
-              + Add Entry
-            </button>
+            {allowAdd && (
+              <button type="button" style={styles.addBtn} onClick={openAddRecord}>
+                + Add Entry
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -4452,9 +4659,15 @@ export default function PackagingAndLabeling() {
                         )}
 
                         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-                          <button type="button" style={styles.pillBtn} onClick={() => openProductModal_Add(r.id)}>+ Add</button>
-                          <button type="button" style={styles.tinyBtn} disabled={!selectedProductId} onClick={() => openProductModal_Edit(r.id, selectedProductId)}>Edit</button>
-                          <button type="button" style={styles.dangerTiny} disabled={!selectedProductId} onClick={() => deleteProduct(r.id, selectedProductId)}>Delete</button>
+                          {allowAdd && (
+                            <button type="button" style={styles.pillBtn} onClick={() => openProductModal_Add(r.id)}>+ Add</button>
+                          )}
+                          {allowEdit && (
+                            <button type="button" style={styles.tinyBtn} disabled={!selectedProductId} onClick={() => openProductModal_Edit(r.id, selectedProductId)}>Edit</button>
+                          )}
+                          {allowDelete && (
+                            <button type="button" style={styles.dangerTiny} disabled={!selectedProductId} onClick={() => deleteProduct(r.id, selectedProductId)}>Delete</button>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -4501,10 +4714,18 @@ export default function PackagingAndLabeling() {
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
                         <button type="button" style={styles.tinyBtn} onClick={() => { setViewMode("list"); setViewRecordId(r.id); }}>View</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openEditRecord(r.id)}>Edit</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>
-                        <button type="button" style={styles.dangerBtn} onClick={() => deleteRecord(r.id)}>Delete</button>
+                        {allowEdit && (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openEditRecord(r.id)}>Edit</button>
+                        )}
+                        {allowExport && (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>
+                        )}
+                        {allowExport && (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>
+                        )}
+                        {allowDelete && (
+                          <button type="button" style={styles.dangerBtn} onClick={() => deleteRecord(r.id)}>Delete</button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -4599,7 +4820,9 @@ export default function PackagingAndLabeling() {
 
             <div style={styles.modalFooter}>
               <button type="button" style={styles.btnGhost} onClick={() => { setProductModalFor(null); resetProductForm(); }}>Cancel</button>
-              <button type="button" style={styles.btnDark} onClick={saveProduct}>{productModalFor.mode === "edit" ? "Update" : "Save"}</button>
+              {((productModalFor.mode === "add" && allowAdd) || (productModalFor.mode === "edit" && allowEdit)) && (
+                <button type="button" style={styles.btnDark} onClick={saveProduct}>{productModalFor.mode === "edit" ? "Update" : "Save"}</button>
+              )}
             </div>
           </div>
         </div>
@@ -4744,7 +4967,9 @@ export default function PackagingAndLabeling() {
 
             <div style={styles.modalFooter}>
               <button type="button" style={styles.btnGhost} onClick={() => { setShowAdd(false); setEditRecordId(null); resetForm(); }}>Cancel</button>
-              <button type="button" style={styles.btnDark} onClick={saveRecord}>{editRecordId ? "Update Entry" : "Save Entry"}</button>
+              {((editRecordId && allowEdit) || (!editRecordId && allowAdd)) && (
+                <button type="button" style={styles.btnDark} onClick={saveRecord}>{editRecordId ? "Update Entry" : "Save Entry"}</button>
+              )}
             </div>
           </div>
 
@@ -4829,7 +5054,9 @@ export default function PackagingAndLabeling() {
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
             <button type="button" style={styles.btnGhost} onClick={() => setPrintModal((p) => ({ ...p, open: false }))}>Cancel</button>
-            <button type="button" style={styles.btnDark} onClick={confirmPrint}>Print Now</button>
+            {allowExport && (
+              <button type="button" style={styles.btnDark} onClick={confirmPrint}>Print Now</button>
+            )}
           </div>
         </div>
       </PopupModal>
@@ -4954,12 +5181,120 @@ export default function PackagingAndLabeling() {
             >
               Cancel
             </button>
-            <button type="button" style={styles.btnDark} onClick={confirmExport}>
-              Export Now
-            </button>
+            {allowExport && (
+              <button type="button" style={styles.btnDark} onClick={confirmExport}>
+                Export Now
+              </button>
+            )}
           </div>
         </div>
       </PopupModal>
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

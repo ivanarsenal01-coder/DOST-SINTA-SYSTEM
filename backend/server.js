@@ -2,6 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require("express");
 const mysql = require("mysql2");
+const crypto = require("crypto");
 const { AsyncLocalStorage, AsyncResource } = require("async_hooks");
 const cors = require("cors");
 
@@ -244,6 +245,9 @@ const normalizeTechnologyPromotionEntry = (row, photos = []) => ({
   customerAddress: row.customer_address || "",
   sex: row.sex || "N/A",
   meansOfVerification: row.means_of_verification || "",
+  means_of_verification: row.means_of_verification || "",
+  movPhotos: parseJsonSafe(row.mov_photos) || [],
+  mov_photos: parseJsonSafe(row.mov_photos) || [],
   staffName: row.staff_name || "",
   nameOfStaff: row.staff_name || "",
   custom_fields: parseJsonSafe(row.custom_fields) || {},
@@ -1201,6 +1205,10 @@ const normalizeTechnologyTrainingEntry = (row) => ({
   staffName: row.name_of_staff || row.staff_name || "",
   nameOfStaff: row.name_of_staff || row.staff_name || "",
   name_of_staff: row.name_of_staff || row.staff_name || "",
+  meansOfVerification: row.means_of_verification || row.meansOfVerification || "",
+  means_of_verification: row.means_of_verification || row.meansOfVerification || "",
+  movPhotos: Array.isArray(parseJsonSafe(row.photos)) ? parseJsonSafe(row.photos) : [],
+  photos: Array.isArray(parseJsonSafe(row.photos)) ? parseJsonSafe(row.photos) : [],
   custom_fields: parseJsonSafe(row.custom_fields) || {},
   customFields: parseJsonSafe(row.custom_fields) || {},
 
@@ -1785,13 +1793,27 @@ const normalizeTargetSettingRows = (rows = []) =>
   (rows || []).map((r) => ({
     id: Number(r.id),
     moduleName: r.module_name,
+    module_name: r.module_name,
+    year: Number(r.year || 2026),
+    targetYear: Number(r.year || 2026),
+    target_year: Number(r.year || 2026),
+
     kpiKey: r.kpi_key,
+    kpi_key: r.kpi_key,
+
     kpiLabel: r.kpi_label,
+    kpi_label: r.kpi_label,
     kpi: r.kpi_label,
+
     annualTarget:
       r.annual_target === null || r.annual_target === undefined
         ? ""
         : String(Number(r.annual_target)),
+    annual_target:
+      r.annual_target === null || r.annual_target === undefined
+        ? ""
+        : String(Number(r.annual_target)),
+
     t1:
       r.q1_target === null || r.q1_target === undefined
         ? ""
@@ -1805,6 +1827,23 @@ const normalizeTargetSettingRows = (rows = []) =>
         ? ""
         : String(Number(r.q3_target)),
     t4:
+      r.q4_target === null || r.q4_target === undefined
+        ? ""
+        : String(Number(r.q4_target)),
+
+    q1_target:
+      r.q1_target === null || r.q1_target === undefined
+        ? ""
+        : String(Number(r.q1_target)),
+    q2_target:
+      r.q2_target === null || r.q2_target === undefined
+        ? ""
+        : String(Number(r.q2_target)),
+    q3_target:
+      r.q3_target === null || r.q3_target === undefined
+        ? ""
+        : String(Number(r.q3_target)),
+    q4_target:
       r.q4_target === null || r.q4_target === undefined
         ? ""
         : String(Number(r.q4_target)),
@@ -1829,8 +1868,9 @@ const TARGET_SETTINGS_DEFAULTS = {
   ],
 };
 
-const ensureTargetSettingsDefaults = (moduleName, callback) => {
+const ensureTargetSettingsDefaults = (moduleName, year = 2026, callback) => {
   const normalizedModuleName = String(moduleName || "").trim().toLowerCase();
+  const targetYear = Number(year || 2026);
   const defaults = TARGET_SETTINGS_DEFAULTS[normalizedModuleName] || [];
 
   if (!normalizedModuleName || !defaults.length) {
@@ -1850,6 +1890,7 @@ const ensureTargetSettingsDefaults = (moduleName, callback) => {
       `
         INSERT INTO target_settings (
           module_name,
+          year,
           kpi_key,
           kpi_label,
           annual_target,
@@ -1857,11 +1898,11 @@ const ensureTargetSettingsDefaults = (moduleName, callback) => {
           q2_target,
           q3_target,
           q4_target
-        ) VALUES (?, ?, ?, 0, 0, 0, 0, 0)
+        ) VALUES (?, ?, ?, ?, 0, 0, 0, 0, 0)
         ON DUPLICATE KEY UPDATE
           kpi_label = VALUES(kpi_label)
       `,
-      [normalizedModuleName, row.kpi_key, row.kpi_label],
+      [normalizedModuleName, targetYear, row.kpi_key, row.kpi_label],
       (err) => {
         if (err) return callback(err);
         insertNext();
@@ -2843,6 +2884,12 @@ const mapCestJoinedRowsToProjects = (rows = []) => {
         ),
         sex: pickFirst(row.sex, ""),
         processSystem: pickFirst(row.processSystem, row.process_system, ""),
+        meansOfVerification: pickFirst(row.meansOfVerification, row.means_of_verification, ""),
+        means_of_verification: pickFirst(row.means_of_verification, row.meansOfVerification, ""),
+        meansOfVerificationPhotos: parseJsonSafe(row.means_of_verification_photos) || [],
+        means_of_verification_photos: parseJsonSafe(row.means_of_verification_photos) || [],
+        movPhotos: parseJsonSafe(row.means_of_verification_photos) || [],
+        mov_photos: parseJsonSafe(row.means_of_verification_photos) || [],
         pressRelease: Number(
           pickFirst(row.pressRelease, row.press_release, 0)
         ),
@@ -3638,6 +3685,12 @@ app.get("/cest/:id", (req, res) => {
       ),
       sex: pickFirst(p0.sex, ""),
       processSystem: pickFirst(p0.processSystem, p0.process_system, ""),
+      meansOfVerification: pickFirst(p0.meansOfVerification, p0.means_of_verification, ""),
+      means_of_verification: pickFirst(p0.means_of_verification, p0.meansOfVerification, ""),
+      meansOfVerificationPhotos: parseJsonSafe(p0.means_of_verification_photos) || [],
+      means_of_verification_photos: parseJsonSafe(p0.means_of_verification_photos) || [],
+      movPhotos: parseJsonSafe(p0.means_of_verification_photos) || [],
+      mov_photos: parseJsonSafe(p0.means_of_verification_photos) || [],
       pressRelease: Number(
         pickFirst(p0.pressRelease, p0.press_release, 0)
       ),
@@ -4044,9 +4097,11 @@ app.post("/cest", (req, res) => {
       number_of_moa,
       startupsAssisted,
       jobsGenerated,
-      custom_fields
+      custom_fields,
+      means_of_verification,
+      means_of_verification_photos
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -4081,6 +4136,14 @@ app.post("/cest", (req, res) => {
       String(startupsAssisted || "").trim(),
       toNumOrZero(jobsGenerated),
       JSON.stringify(customFields || {}),
+      toNullIfEmpty(b.meansOfVerification ?? b.means_of_verification),
+      mapTacsAddressMeta(
+        b.meansOfVerificationPhotos ??
+        b.means_of_verification_photos ??
+        b.movPhotos ??
+        b.mov_photos ??
+        []
+      ),
     ],
     (err, result) => {
       if (err) {
@@ -4185,7 +4248,9 @@ app.put("/cest/:id", (req, res) => {
       number_of_moa=?,
       startupsAssisted=?,
       jobsGenerated=?,
-      custom_fields=?
+      custom_fields=?,
+      means_of_verification=?,
+      means_of_verification_photos=?
     WHERE id=?
   `;
 
@@ -4221,6 +4286,14 @@ app.put("/cest/:id", (req, res) => {
       String(startupsAssisted || "").trim(),
       toNumOrZero(jobsGenerated),
       JSON.stringify(customFields || {}),
+      toNullIfEmpty(b.meansOfVerification ?? b.means_of_verification),
+      mapTacsAddressMeta(
+        b.meansOfVerificationPhotos ??
+        b.means_of_verification_photos ??
+        b.movPhotos ??
+        b.mov_photos ??
+        []
+      ),
 
       req.params.id,
     ],
@@ -4568,7 +4641,7 @@ app.post("/cest/:id/interventions", (req, res) => {
       packaging_photos,
       packaging_remarks
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (${Array(97).fill("?").join(", ")})
   `;
 
   db.beginTransaction((txErr) => {
@@ -6966,8 +7039,10 @@ app.post("/technology-training/entries", (req, res) => {
       cost_dost,
       cost_partner_agency,
       name_of_staff,
+      means_of_verification,
+      photos,
       custom_fields
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -7018,6 +7093,8 @@ app.post("/technology-training/entries", (req, res) => {
       toNumOrZero(body.costDost),
       toNumOrZero(body.costPartnerAgency),
       toNullIfEmpty(body.staffName || body.nameOfStaff || body.name_of_staff || body.staff_name),
+      toNullIfEmpty(body.meansOfVerification || body.means_of_verification || body.mov || ""),
+      JSON.stringify(body.photos || body.movPhotos || body.mov_photos || []),
       JSON.stringify(body.custom_fields || body.customFields || {}),
     ],
     (err, result) => {
@@ -7087,6 +7164,8 @@ app.put("/technology-training/entries/:id", (req, res) => {
       cost_dost = ?,
       cost_partner_agency = ?,
       name_of_staff = ?,
+      means_of_verification = ?,
+      photos = ?,
       custom_fields = ?
     WHERE id = ?
   `;
@@ -7139,6 +7218,8 @@ app.put("/technology-training/entries/:id", (req, res) => {
       toNumOrZero(body.costDost),
       toNumOrZero(body.costPartnerAgency),
       toNullIfEmpty(body.staffName || body.nameOfStaff || body.name_of_staff || body.staff_name),
+      toNullIfEmpty(body.meansOfVerification || body.means_of_verification || body.mov || ""),
+      JSON.stringify(body.photos || body.movPhotos || body.mov_photos || []),
       JSON.stringify(body.custom_fields || body.customFields || {}),
       entryId,
     ],
@@ -7269,6 +7350,11 @@ const normalizeTechnologyRolloutEntry = (row) => ({
   nameOfStaff: row.name_of_staff || "",
   staffName: row.name_of_staff || "",
   name_of_staff: row.name_of_staff || "",
+  meansOfVerification: row.means_of_verification || "",
+  means_of_verification: row.means_of_verification || "",
+  movPhotos: parseJsonSafe(row.mov_photos) || [],
+  mov_photos: parseJsonSafe(row.mov_photos) || [],
+  photos: parseJsonSafe(row.mov_photos) || [],
   custom_fields: parseJsonSafe(row.custom_fields) || {},
   customFields: parseJsonSafe(row.custom_fields) || {},
   created_at: row.created_at,
@@ -7356,6 +7442,18 @@ const mapTechnologyRolloutPayload = (body = {}) => {
     sex: toNullIfEmpty(body.sex),
     name_of_staff: toNullIfEmpty(
       body.nameOfStaff || body.name_of_staff || body.staffName || body.staff_name
+    ),
+    means_of_verification: toNullIfEmpty(
+      body.meansOfVerification || body.means_of_verification
+    ),
+    mov_photos: JSON.stringify(
+      Array.isArray(body.movPhotos)
+        ? body.movPhotos
+        : Array.isArray(body.mov_photos)
+          ? body.mov_photos
+          : Array.isArray(body.photos)
+            ? body.photos
+            : []
     ),
     custom_fields: JSON.stringify(body.custom_fields || body.customFields || {}),
   };
@@ -7688,8 +7786,10 @@ app.post("/technology-rollout", (req, res) => {
       representative_designation,
       sex,
       name_of_staff,
+      means_of_verification,
+      mov_photos,
       custom_fields
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -7720,6 +7820,8 @@ app.post("/technology-rollout", (req, res) => {
       p.representative_designation,
       p.sex,
       p.name_of_staff,
+      p.means_of_verification,
+      p.mov_photos,
       p.custom_fields,
     ],
     (err, result) => {
@@ -7789,6 +7891,8 @@ app.put("/technology-rollout/:id", (req, res) => {
       representative_designation = ?,
       sex = ?,
       name_of_staff = ?,
+      means_of_verification = ?,
+      mov_photos = ?,
       custom_fields = ?
     WHERE id = ?
   `;
@@ -7821,6 +7925,8 @@ app.put("/technology-rollout/:id", (req, res) => {
       p.representative_designation,
       p.sex,
       p.name_of_staff,
+      p.means_of_verification,
+      p.mov_photos,
       p.custom_fields,
       entryId,
     ],
@@ -8031,6 +8137,12 @@ app.get("/projects", (req, res) => {
               funded: row.funded ?? "N",
               amount: Number(row.amount ?? 0),
               remarks: row.remarks ?? "",
+              meansOfVerification: row.means_of_verification ?? "",
+              means_of_verification: row.means_of_verification ?? "",
+              meansOfVerificationPhotos:
+                parseJsonSafe(row.means_of_verification_photos) || [],
+              means_of_verification_photos:
+                parseJsonSafe(row.means_of_verification_photos) || [],
               status: row.stpms_status ?? "",
               stpms_status: row.stpms_status ?? "",
               type: row.phase ?? "",
@@ -8178,6 +8290,12 @@ app.get("/projects/:id", (req, res) => {
       funded: row0.funded ?? "N",
       amount: Number(row0.amount ?? 0),
       remarks: row0.remarks ?? "",
+      meansOfVerification: row0.means_of_verification ?? "",
+      means_of_verification: row0.means_of_verification ?? "",
+      meansOfVerificationPhotos:
+        parseJsonSafe(row0.means_of_verification_photos) || [],
+      means_of_verification_photos:
+        parseJsonSafe(row0.means_of_verification_photos) || [],
       stpms_status: row0.stpms_status ?? "",
       status: row0.stpms_status ?? "",
       phase: row0.phase ?? "",
@@ -8267,6 +8385,8 @@ app.post("/projects", (req, res) => {
       funded,
       amount,
       remarks,
+      means_of_verification,
+      means_of_verification_photos,
       stpms_status,
       phase,
       date_approved,
@@ -8279,7 +8399,7 @@ app.post("/projects", (req, res) => {
       address_lng,
       custom_fields
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -8298,6 +8418,12 @@ app.post("/projects", (req, res) => {
       b.funded ?? "N",
       toNumOrZero(b.amount),
       b.remarks ?? "",
+      toNullIfEmpty(b.meansOfVerification ?? b.means_of_verification),
+      mapTacsAddressMeta(
+        b.meansOfVerificationPhotos ??
+          b.means_of_verification_photos ??
+          []
+      ),
       b.stpms_status ?? b.status ?? "",
       b.phase ?? b.type ?? "",
       toNullIfEmpty(b.date_approved ?? b.dateApproved),
@@ -8341,6 +8467,8 @@ app.put("/projects/:id", (req, res) => {
       funded=?,
       amount=?,
       remarks=?,
+      means_of_verification=?,
+      means_of_verification_photos=?,
       stpms_status=?,
       phase=?,
       date_approved=?,
@@ -8371,6 +8499,12 @@ app.put("/projects/:id", (req, res) => {
       b.funded ?? "N",
       toNumOrZero(b.amount),
       b.remarks ?? "",
+      toNullIfEmpty(b.meansOfVerification ?? b.means_of_verification),
+      mapTacsAddressMeta(
+        b.meansOfVerificationPhotos ??
+          b.means_of_verification_photos ??
+          []
+      ),
       b.stpms_status ?? b.status ?? "",
       b.phase ?? b.type ?? "",
       toNullIfEmpty(b.date_approved ?? b.dateApproved),
@@ -9114,20 +9248,20 @@ app.delete("/projects/:id/other-indicators", (req, res) => {
     }
   );
 });
-
 // ===========================
 // TARGET SETTINGS ROUTES
 // ===========================
-app.get("/target-settings/:moduleName", (req, res) => {
+const getTargetSettingsHandler = (req, res) => {
   const moduleName = String(req.params.moduleName || "").trim().toLowerCase();
+  const year = Number(req.query.year || new Date().getFullYear());
 
   if (!moduleName) {
     return res.status(400).json({ message: "moduleName is required" });
   }
 
-  ensureTargetSettingsDefaults(moduleName, (seedErr) => {
+  ensureTargetSettingsDefaults(moduleName, year, (seedErr) => {
     if (seedErr) {
-      console.error("SEED /target-settings/:moduleName ERROR:", seedErr);
+      console.error("SEED target-settings ERROR:", seedErr);
       return res.status(500).json({ message: seedErr.message });
     }
 
@@ -9135,13 +9269,13 @@ app.get("/target-settings/:moduleName", (req, res) => {
       `
       SELECT *
       FROM target_settings
-      WHERE module_name = ?
+      WHERE module_name = ? AND year = ?
       ORDER BY id ASC, kpi_label ASC
       `,
-      [moduleName],
+      [moduleName, year],
       (err, rows) => {
         if (err) {
-          console.error("GET /target-settings/:moduleName ERROR:", err);
+          console.error("GET target-settings ERROR:", err);
           return res.status(500).json({ message: err.message });
         }
 
@@ -9149,10 +9283,19 @@ app.get("/target-settings/:moduleName", (req, res) => {
       }
     );
   });
-});
+};
 
-app.put("/target-settings/:moduleName", (req, res) => {
+const putTargetSettingsHandler = (req, res) => {
   const moduleName = String(req.params.moduleName || "").trim().toLowerCase();
+
+  const year = Number(
+    req.body?.year ||
+      req.body?.targetYear ||
+      req.body?.target_year ||
+      req.query.year ||
+      new Date().getFullYear()
+  );
+
   const rawRows = Array.isArray(req.body?.rows)
     ? req.body.rows
     : Array.isArray(req.body)
@@ -9167,6 +9310,7 @@ app.put("/target-settings/:moduleName", (req, res) => {
     .map((r = {}, index) => ({
       sort_index: index,
       module_name: moduleName,
+      year,
       kpi_key: String(r.kpiKey ?? r.kpi_key ?? r.key ?? "").trim(),
       kpi_label: String(r.kpiLabel ?? r.kpi_label ?? r.kpi ?? "").trim(),
       annual_target: toNumOrZero(r.annualTarget ?? r.annual_target ?? 0),
@@ -9181,74 +9325,135 @@ app.put("/target-settings/:moduleName", (req, res) => {
   const seen = new Set();
 
   for (const row of normalizedRows) {
-    const dedupeKey = `${row.module_name}::${row.kpi_key}`;
+    const dedupeKey = `${row.module_name}::${row.year}::${row.kpi_key}`;
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
     dedupedRows.push(row);
   }
 
-  console.log("[TARGET SETTINGS UPSERT] module:", moduleName);
-  console.log("[TARGET SETTINGS UPSERT] raw row count:", rawRows.length);
-  console.log("[TARGET SETTINGS UPSERT] normalized row count:", dedupedRows.length);
-  console.log("[TARGET SETTINGS UPSERT] keys:", dedupedRows.map((r) => r.kpi_key));
+  console.log("[TARGET SETTINGS SAVE] module:", moduleName);
+  console.log("[TARGET SETTINGS SAVE] year:", year);
+  console.log("[TARGET SETTINGS SAVE] raw row count:", rawRows.length);
+  console.log("[TARGET SETTINGS SAVE] normalized row count:", dedupedRows.length);
+  console.log("[TARGET SETTINGS SAVE] keys:", dedupedRows.map((r) => r.kpi_key));
 
-  if (!dedupedRows.length) {
-    return res.json({
-      success: true,
-      message: "No target settings to save",
-      savedCount: 0,
-      savedKeys: [],
-    });
-  }
-
-  const upsertSql = `
-    INSERT INTO target_settings (
-      module_name,
-      kpi_key,
-      kpi_label,
-      annual_target,
-      q1_target,
-      q2_target,
-      q3_target,
-      q4_target
-    ) VALUES ?
-    ON DUPLICATE KEY UPDATE
-      kpi_label = VALUES(kpi_label),
-      annual_target = VALUES(annual_target),
-      q1_target = VALUES(q1_target),
-      q2_target = VALUES(q2_target),
-      q3_target = VALUES(q3_target),
-      q4_target = VALUES(q4_target)
-  `;
-
-  const values = dedupedRows.map((row) => [
-    row.module_name,
-    row.kpi_key,
-    row.kpi_label,
-    row.annual_target,
-    row.q1_target,
-    row.q2_target,
-    row.q3_target,
-    row.q4_target,
-  ]);
-
-  db.query(upsertSql, [values], (err) => {
-    if (err) {
-      console.error("UPSERT target settings ERROR:", err);
-      return res.status(500).json({ message: err.message });
+  db.beginTransaction((txErr) => {
+    if (txErr) {
+      console.error("TARGET SETTINGS transaction error:", txErr);
+      return res.status(500).json({ message: txErr.message });
     }
 
-    res.json({
-      success: true,
-      message: "Target settings saved successfully",
-      savedCount: dedupedRows.length,
-      savedKeys: dedupedRows.map((r) => r.kpi_key),
-    });
+    db.query(
+      "DELETE FROM target_settings WHERE module_name = ? AND year = ?",
+      [moduleName, year],
+      (deleteErr) => {
+        if (deleteErr) {
+          return db.rollback(() => {
+            console.error("DELETE target settings ERROR:", deleteErr);
+            res.status(500).json({ message: deleteErr.message });
+          });
+        }
+
+        if (!dedupedRows.length) {
+          return db.commit((commitErr) => {
+            if (commitErr) {
+              return db.rollback(() => {
+                console.error("COMMIT clear target settings ERROR:", commitErr);
+                res.status(500).json({ message: commitErr.message });
+              });
+            }
+
+            return res.json({
+              success: true,
+              year,
+              message: `Target settings cleared for ${year}`,
+              savedCount: 0,
+              savedKeys: [],
+            });
+          });
+        }
+
+        const insertSql = `
+          INSERT INTO target_settings (
+            module_name,
+            year,
+            kpi_key,
+            kpi_label,
+            annual_target,
+            q1_target,
+            q2_target,
+            q3_target,
+            q4_target
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        let index = 0;
+
+        const insertNext = () => {
+          if (index >= dedupedRows.length) {
+            return db.commit((commitErr) => {
+              if (commitErr) {
+                return db.rollback(() => {
+                  console.error("COMMIT target settings ERROR:", commitErr);
+                  res.status(500).json({ message: commitErr.message });
+                });
+              }
+
+              return res.json({
+                success: true,
+                year,
+                message: `Target settings saved for ${year}`,
+                savedCount: dedupedRows.length,
+                savedKeys: dedupedRows.map((r) => r.kpi_key),
+              });
+            });
+          }
+
+          const row = dedupedRows[index++];
+
+          db.query(
+            insertSql,
+            [
+              row.module_name,
+              row.year,
+              row.kpi_key,
+              row.kpi_label,
+              row.annual_target,
+              row.q1_target,
+              row.q2_target,
+              row.q3_target,
+              row.q4_target,
+            ],
+            (insertErr) => {
+              if (insertErr) {
+                return db.rollback(() => {
+                  console.error("INSERT target setting ERROR:", insertErr);
+                  console.error("FAILED ROW:", row);
+
+                  res.status(500).json({
+                    message: insertErr.message,
+                    failedRow: row,
+                    savedCount: index - 1,
+                  });
+                });
+              }
+
+              insertNext();
+            }
+          );
+        };
+
+        insertNext();
+      }
+    );
   });
-});
+};
 
+app.get("/target-settings/:moduleName", getTargetSettingsHandler);
+app.put("/target-settings/:moduleName", putTargetSettingsHandler);
 
-
+app.get("/api/target-settings/:moduleName", getTargetSettingsHandler);
+app.put("/api/target-settings/:moduleName", putTargetSettingsHandler);
 
 
 const quarterFromDate = (value) => {
@@ -11588,6 +11793,10 @@ const normalizeSscpLguRow = (row = {}) => ({
   isSmartCity: Boolean(row.is_smart_city),
   smartCityDate: sscpLguDateOnly(row.smart_city_date),
   remarks: row.remarks || "",
+  meansOfVerification: row.means_of_verification || "",
+  means_of_verification: row.means_of_verification || "",
+  movPhotos: sscpLguJsonParse(row.mov_photos, []) || [],
+  mov_photos: sscpLguJsonParse(row.mov_photos, []) || [],
   createdAt: sscpLguDateOnly(row.created_at),
   created_at: row.created_at,
   updated_at: row.updated_at,
@@ -11613,6 +11822,10 @@ const normalizeSscpProjectRow = (row = {}) => ({
   projectProponent: row.project_proponent || "",
   sex: row.sex || "",
   processSystem: row.process_system || "",
+  meansOfVerification: row.means_of_verification || "",
+  means_of_verification: row.means_of_verification || "",
+  movPhotos: sscpLguJsonParse(row.mov_photos, []) || [],
+  mov_photos: sscpLguJsonParse(row.mov_photos, []) || [],
   createdAt: sscpLguDateOnly(row.created_at),
   created_at: row.created_at,
   updated_at: row.updated_at,
@@ -11812,8 +12025,11 @@ app.post("/sscp", (req, res) => {
       partners,
       is_smart_city,
       smart_city_date,
-      remarks
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      remarks,
+      means_of_verification,
+      mov_photos,
+      custom_fields
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -11834,6 +12050,8 @@ app.post("/sscp", (req, res) => {
       b.isSmartCity || b.is_smart_city ? 1 : 0,
       b.isSmartCity || b.is_smart_city ? sscpLguToNull(b.smartCityDate || b.smart_city_date) : null,
       sscpLguToNull(b.remarks),
+      sscpLguToNull(b.meansOfVerification || b.means_of_verification),
+      JSON.stringify(b.movPhotos || b.mov_photos || []),
       JSON.stringify(customFields || {}),
     ],
     (err, result) => {
@@ -11870,6 +12088,8 @@ app.put("/sscp/:id", (req, res, next) => {
       is_smart_city = ?,
       smart_city_date = ?,
       remarks = ?,
+      means_of_verification = ?,
+      mov_photos = ?,
       custom_fields = ?
     WHERE id = ?
   `;
@@ -11892,6 +12112,8 @@ app.put("/sscp/:id", (req, res, next) => {
       b.isSmartCity || b.is_smart_city ? 1 : 0,
       b.isSmartCity || b.is_smart_city ? sscpLguToNull(b.smartCityDate || b.smart_city_date) : null,
       sscpLguToNull(b.remarks),
+      sscpLguToNull(b.meansOfVerification || b.means_of_verification),
+      JSON.stringify(b.movPhotos || b.mov_photos || []),
       JSON.stringify(customFields || {}),
       req.params.id,
     ],
@@ -11941,8 +12163,10 @@ app.post("/sscp/:lguId/projects", (req, res) => {
       address_lng,
       project_proponent,
       sex,
-      process_system
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      process_system,
+      means_of_verification,
+      mov_photos
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -11965,6 +12189,8 @@ app.post("/sscp/:lguId/projects", (req, res) => {
       sscpLguToNull(b.projectProponent || b.project_proponent),
       sscpLguToNull(b.sex),
       sscpLguToNull(b.processSystem || b.process_system),
+      sscpLguToNull(b.meansOfVerification || b.means_of_verification),
+      JSON.stringify(b.movPhotos || b.mov_photos || []),
     ],
     (err, result) => {
       if (err) {
@@ -11997,7 +12223,9 @@ app.put("/sscp-projects/:projectId", (req, res) => {
       address_lng = ?,
       project_proponent = ?,
       sex = ?,
-      process_system = ?
+      process_system = ?,
+      means_of_verification = ?,
+      mov_photos = ?
     WHERE id = ?
   `;
 
@@ -12020,6 +12248,8 @@ app.put("/sscp-projects/:projectId", (req, res) => {
       sscpLguToNull(b.projectProponent || b.project_proponent),
       sscpLguToNull(b.sex),
       sscpLguToNull(b.processSystem || b.process_system),
+      sscpLguToNull(b.meansOfVerification || b.means_of_verification),
+      JSON.stringify(b.movPhotos || b.mov_photos || []),
       req.params.projectId,
     ],
     (err, result) => {
@@ -15062,6 +15292,8 @@ const mapCalibrationPayload = (body = {}) => {
     sc: toNumOrZero(body.sc),
     fourPs: toNumOrZero(pickFirst(body.fourPs, body.four_ps, 0)),
     nameOfStaff: toNullIfEmpty(String(pickFirst(body.nameOfStaff, body.name_of_staff, body.staffName, body.staff_name, "")).trim()),
+    meansOfVerification: toNullIfEmpty(String(pickFirst(body.meansOfVerification, body.means_of_verification, "")).trim()),
+    photos: pickFirst(body.photos, body.movPhotos, body.mov_photos, []),
     remarks: toNullIfEmpty(String(pickFirst(body.remarks, "")).trim()),
     custom_fields: pickFirst(body.custom_fields, body.customFields, {}),
   };
@@ -15120,6 +15352,10 @@ const normalizeCalibrationRow = (row = {}) => ({
   nameOfStaff: row.nameOfStaff || "",
   name_of_staff: row.nameOfStaff || "",
   staffName: row.nameOfStaff || "",
+  meansOfVerification: row.means_of_verification || "",
+  means_of_verification: row.means_of_verification || "",
+  photos: parseCalibrationJson(row.photos, []) || [],
+  movPhotos: parseCalibrationJson(row.photos, []) || [],
   remarks: row.remarks || "",
   custom_fields: parseCalibrationJson(row.custom_fields, {}) || {},
   customFields: parseCalibrationJson(row.custom_fields, {}) || {},
@@ -15153,6 +15389,8 @@ const buildCalibrationInsertValues = (payload = {}) => [
   payload.sc,
   payload.fourPs,
   payload.nameOfStaff,
+  payload.meansOfVerification,
+  stringifyCalibrationJson(payload.photos || []),
   payload.remarks,
   stringifyCalibrationJson(payload.custom_fields || {}),
 ];
@@ -15389,6 +15627,9 @@ const CALIBRATION_SELECT_COLUMNS = `
   ip,
   sc,
   fourPs,
+  nameOfStaff,
+  means_of_verification,
+  photos,
   remarks,
   created_at,
   updated_at
@@ -15809,6 +16050,8 @@ app.get("/calibration/:id", (req, res) => {
         sc,
         fourPs,
         nameOfStaff,
+        means_of_verification,
+        photos,
         remarks,
         custom_fields,
         created_at,
@@ -15874,9 +16117,11 @@ app.post("/calibration", (req, res) => {
       sc,
       fourPs,
       nameOfStaff,
+      means_of_verification,
+      photos,
       remarks,
       custom_fields
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const insertPayload = (candidatePayload, hasRetriedDuplicate = false) => {
@@ -15946,6 +16191,8 @@ app.put("/calibration/:id", (req, res) => {
       sc = ?,
       fourPs = ?,
       nameOfStaff = ?,
+      means_of_verification = ?,
+      photos = ?,
       remarks = ?,
       custom_fields = ?
     WHERE id = ?
@@ -15975,6 +16222,8 @@ app.put("/calibration/:id", (req, res) => {
     payload.sc,
     payload.fourPs,
     payload.nameOfStaff,
+    payload.meansOfVerification,
+    stringifyCalibrationJson(payload.photos || []),
     payload.remarks,
     stringifyCalibrationJson(payload.custom_fields || {}),
     req.params.id,
@@ -16056,6 +16305,9 @@ const normalizeStPromoRow = (row = {}) => ({
   share: Number(row.share || 0),
   totalEngagements: Number(row.totalEngagements || 0),
   meansOfVerification: row.meansOfVerification || "",
+  movPhotos: parseJsonSafe(row.mov_photos) || parseJsonSafe(row.photos) || [],
+  mov_photos: parseJsonSafe(row.mov_photos) || parseJsonSafe(row.photos) || [],
+  photos: parseJsonSafe(row.mov_photos) || parseJsonSafe(row.photos) || [],
   address: row.address || "",
   addressMeta: parseJsonSafe(row.addressMeta),
   municipality: row.municipality || "",
@@ -16116,6 +16368,15 @@ const buildStPromoPayload = (body = {}, forcedId = null) => {
         )
         : 0,
     meansOfVerification: String(body.meansOfVerification || "").trim(),
+    mov_photos: JSON.stringify(
+      Array.isArray(body.movPhotos)
+        ? body.movPhotos
+        : Array.isArray(body.mov_photos)
+          ? body.mov_photos
+          : Array.isArray(body.photos)
+            ? body.photos
+            : []
+    ),
     address: entryMode === "ONSITE" ? String(body.address || "").trim() : "",
     addressMeta:
       entryMode === "ONSITE" && parsedAddressMeta
@@ -16342,6 +16603,7 @@ app.post("/st-promo", (req, res) => {
       share,
       totalEngagements,
       meansOfVerification,
+      mov_photos,
       address,
       addressMeta,
       municipality,
@@ -16350,7 +16612,7 @@ app.post("/st-promo", (req, res) => {
       staffName,
       remarks,
       custom_fields
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -16374,6 +16636,7 @@ app.post("/st-promo", (req, res) => {
       payload.share,
       payload.totalEngagements,
       payload.meansOfVerification,
+      payload.mov_photos,
       payload.address,
       payload.addressMeta,
       payload.municipality,
@@ -16430,6 +16693,7 @@ app.put("/st-promo/:id", (req, res) => {
       share = ?,
       totalEngagements = ?,
       meansOfVerification = ?,
+      mov_photos = ?,
       address = ?,
       addressMeta = ?,
       municipality = ?,
@@ -16461,6 +16725,7 @@ app.put("/st-promo/:id", (req, res) => {
       payload.share,
       payload.totalEngagements,
       payload.meansOfVerification,
+      payload.mov_photos,
       payload.address,
       payload.addressMeta,
       payload.municipality,
@@ -17020,6 +17285,71 @@ const parseUserJsonSafe = (value, fallback = null) => {
   }
 };
 
+const hashPassword = (plainPassword = "") => {
+  const password = String(plainPassword || "");
+  if (!password) return "";
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
+
+  return `scrypt:${salt}:${hash}`;
+};
+
+const verifyPassword = (plainPassword = "", storedPassword = "") => {
+  const password = String(plainPassword || "");
+  const stored = String(storedPassword || "");
+
+  if (!password || !stored) return false;
+
+  // Backward compatibility: old plain-text passwords still work.
+  // Once the password is changed/reset, it will be saved as scrypt hash.
+  if (!stored.startsWith("scrypt:")) {
+    return password === stored;
+  }
+
+  const parts = stored.split(":");
+  if (parts.length !== 3) return false;
+
+  const [, salt, originalHash] = parts;
+  const testHash = crypto.scryptSync(password, salt, 64).toString("hex");
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(originalHash, "hex"),
+      Buffer.from(testHash, "hex")
+    );
+  } catch {
+    return false;
+  }
+};
+
+const validatePasswordStrength = (password = "", { required = false } = {}) => {
+  const value = String(password || "");
+
+  if (!value) {
+    return required ? "Password is required." : "";
+  }
+
+  if (value.length < 8) {
+    return "Password must be at least 8 characters.";
+  }
+
+  if (!/[A-Z]/.test(value)) {
+    return "Password must contain at least 1 uppercase letter.";
+  }
+
+  if (!/[a-z]/.test(value)) {
+    return "Password must contain at least 1 lowercase letter.";
+  }
+
+  if (!/[0-9]/.test(value)) {
+    return "Password must contain at least 1 number.";
+  }
+
+  return "";
+};
+
+
 const formatUserDate = (value) => {
   if (!value) return "Never";
   const d = new Date(value);
@@ -17280,11 +17610,9 @@ app.post("/login", (req, res) => {
       SELECT *
       FROM user_accounts
       WHERE LOWER(username) = LOWER(?)
-        AND password = ?
-        AND status = 'active'
       LIMIT 1
     `,
-    [username, password],
+    [username],
     (err, rows) => {
       if (err) {
         console.error("POST /login ERROR:", err);
@@ -17296,14 +17624,34 @@ app.post("/login", (req, res) => {
 
       const userRow = rows?.[0];
 
-      if (!userRow) {
+      if (!userRow || !verifyPassword(password, userRow.password)) {
         return res.status(401).json({
           success: false,
           message: "Invalid username or password.",
         });
       }
 
-      db.query(
+      if (userRow.status !== "active") {
+        return res.status(403).json({
+          success: false,
+          message: "Account is inactive.",
+        });
+      }
+
+      // Upgrade old plain-text password to hashed format after successful login.
+      const upgradePlainPassword = (next) => {
+        if (String(userRow.password || "").startsWith("scrypt:")) return next();
+        db.query(
+          "UPDATE user_accounts SET password = ? WHERE id = ?",
+          [hashPassword(password), userRow.id],
+          (upgradeErr) => {
+            if (upgradeErr) console.error("POST /login password upgrade ERROR:", upgradeErr);
+            next();
+          }
+        );
+      };
+
+      upgradePlainPassword(() => db.query(
         "UPDATE user_accounts SET last_login = NOW() WHERE id = ?",
         [userRow.id],
         (updateErr) => {
@@ -17326,7 +17674,7 @@ app.post("/login", (req, res) => {
             });
           });
         }
-      );
+      ));
     }
   );
 });
@@ -17408,13 +17756,20 @@ app.post("/users", (req, res) => {
     .trim();
 
   const username = String(b.username || "").trim();
-  const password = String(b.password || "1234").trim() || "1234";
+  const password = String(b.password || "").trim();
 
   if (!fullName || !username) {
     return res.status(400).json({
       message: "Full name and username are required.",
     });
   }
+
+  const passwordError = validatePasswordStrength(password, { required: true });
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError });
+  }
+
+  const passwordHash = hashPassword(password);
 
   const insertSql = [
     "INSERT INTO user_accounts (",
@@ -17433,7 +17788,7 @@ app.post("/users", (req, res) => {
       suffix || null,
       fullName,
       username,
-      password,
+      passwordHash,
       toNullIfEmpty(b.email),
       toNullIfEmpty(b.contactNumber ?? b.contact_number),
       role,
@@ -17513,6 +17868,8 @@ app.put("/users/:id", (req, res) => {
     .trim();
 
   const username = String(b.username || "").trim();
+  const newPassword = String(b.password || "").trim();
+  const hasNewPassword = newPassword.length > 0;
 
   if (!fullName || !username) {
     return res.status(400).json({
@@ -17520,33 +17877,43 @@ app.put("/users/:id", (req, res) => {
     });
   }
 
+  const passwordError = validatePasswordStrength(newPassword, { required: false });
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError });
+  }
+
   const updateSql = [
     "UPDATE user_accounts SET",
     "first_name=?, middle_name=?, last_name=?, suffix=?, full_name=?, username=?,",
     "email=?, contact_number=?, role=?, status=?, position=?, office=?,",
     "can_manage_dropdowns=?, avatar_json=?",
+    hasNewPassword ? ", password=?" : "",
     "WHERE id=?"
   ].join(" ");
 
+  const updateValues = [
+    firstName || null,
+    middleName || null,
+    lastName || null,
+    suffix || null,
+    fullName,
+    username,
+    toNullIfEmpty(b.email),
+    toNullIfEmpty(b.contactNumber ?? b.contact_number),
+    role,
+    status,
+    toNullIfEmpty(b.position),
+    toNullIfEmpty(b.office),
+    b.canManageDropdowns || role !== "staff" ? 1 : 0,
+    b.avatar ? JSON.stringify(b.avatar) : null,
+  ];
+
+  if (hasNewPassword) updateValues.push(hashPassword(newPassword));
+  updateValues.push(userId);
+
   db.query(
     updateSql,
-    [
-      firstName || null,
-      middleName || null,
-      lastName || null,
-      suffix || null,
-      fullName,
-      username,
-      toNullIfEmpty(b.email),
-      toNullIfEmpty(b.contactNumber ?? b.contact_number),
-      role,
-      status,
-      toNullIfEmpty(b.position),
-      toNullIfEmpty(b.office),
-      b.canManageDropdowns || role !== "staff" ? 1 : 0,
-      b.avatar ? JSON.stringify(b.avatar) : null,
-      userId,
-    ],
+    updateValues,
     (err, result) => {
       if (err) {
         console.error("PUT /users/:id UPDATE ERROR:", err);
@@ -17635,15 +18002,22 @@ app.put("/users/:id/permissions", (req, res) => {
 // RESET USER PASSWORD
 app.put("/users/:id/reset-password", (req, res) => {
   const userId = Number(req.params.id);
-  const password = String(req.body?.password || "1234").trim() || "1234";
+  const password = String(req.body?.password || "").trim();
 
   if (!Number.isFinite(userId) || userId <= 0) {
     return res.status(400).json({ message: "Invalid user id." });
   }
 
+  const passwordError = validatePasswordStrength(password, { required: true });
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError });
+  }
+
+  const passwordHash = hashPassword(password);
+
   db.query(
     "UPDATE user_accounts SET password=? WHERE id=?",
-    [password, userId],
+    [passwordHash, userId],
     (err, result) => {
       if (err) {
         console.error("PUT /users/:id/reset-password ERROR:", err);
@@ -17889,7 +18263,12 @@ const buildSpecialProjectPayload = (body = {}) => {
         ? Number(String(body.projectCost).replace(/,/g, ""))
         : 0,
 
-    means_of_verification: toNullIfEmpty(body.meansOfVerification),
+    means_of_verification: toNullIfEmpty(body.meansOfVerification || body.means_of_verification),
+    mov_photos: JSON.stringify(
+      Array.isArray(body.movPhotos || body.mov_photos)
+        ? (body.movPhotos || body.mov_photos)
+        : []
+    ),
     staff_name: toNullIfEmpty(body.staffName || body.staff_name),
     snt_interventions: JSON.stringify(Array.isArray(body.sntInterventions || body.snt_interventions) ? (body.sntInterventions || body.snt_interventions) : []),
     custom_fields: JSON.stringify(body.custom_fields || body.customFields || {}),
@@ -17946,11 +18325,12 @@ app.post("/special-projects", (req, res) => {
       date_project_approved,
       project_cost,
       means_of_verification,
+      mov_photos,
       staff_name,
       snt_interventions,
       custom_fields
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
@@ -17969,6 +18349,7 @@ app.post("/special-projects", (req, res) => {
     payload.date_project_approved,
     payload.project_cost,
     payload.means_of_verification,
+    payload.mov_photos,
     payload.staff_name,
     payload.snt_interventions,
     payload.custom_fields,
@@ -18034,6 +18415,7 @@ app.put("/special-projects/:id", (req, res) => {
       date_project_approved = ?,
       project_cost = ?,
       means_of_verification = ?,
+      mov_photos = ?,
       staff_name = ?,
       snt_interventions = ?,
       custom_fields = ?
@@ -18056,6 +18438,7 @@ app.put("/special-projects/:id", (req, res) => {
     payload.date_project_approved,
     payload.project_cost,
     payload.means_of_verification,
+    payload.mov_photos,
     payload.staff_name,
     payload.snt_interventions,
     payload.custom_fields,
@@ -18138,6 +18521,21 @@ const drrmNull = (value) => {
   return value;
 };
 
+const drrmPhotoJson = (value) => {
+  if (Array.isArray(value)) return JSON.stringify(value);
+  if (typeof value === "string") return value;
+  return JSON.stringify([]);
+};
+
+const drrmMovPhotosFromBody = (body = {}) =>
+  drrmPhotoJson(
+    body.movPhotos ??
+      body.mov_photos ??
+      body.meansOfVerificationPhotos ??
+      body.means_of_verification_photos ??
+      []
+  );
+
 const drrmArray = (value) => {
   if (Array.isArray(value)) return value.map((v) => String(v || "").trim()).filter(Boolean);
   if (typeof value === "string") {
@@ -18176,6 +18574,7 @@ const drrmActivityPayload = (body = {}) => {
     female,
     total: male + female,
     means_of_verification: drrmNull(body.mov || body.means_of_verification),
+    mov_photos: drrmMovPhotosFromBody(body),
     remarks: drrmNull(body.remarks),
   };
 };
@@ -18192,6 +18591,7 @@ const drrmIecPayload = (body = {}) => {
     female,
     total: male + female,
     means_of_verification: drrmNull(body.mov || body.means_of_verification),
+    mov_photos: drrmMovPhotosFromBody(body),
     remarks: drrmNull(body.remarks),
   };
 };
@@ -18201,6 +18601,7 @@ const drrmCollabPayload = (body = {}) => ({
   stakeholders: drrmArray(body.stakeholders),
   activity_date: drrmNull(body.date || body.activity_date),
   means_of_verification: drrmNull(body.mov || body.means_of_verification),
+  mov_photos: drrmMovPhotosFromBody(body),
   remarks: drrmNull(body.remarks),
 });
 
@@ -18236,6 +18637,8 @@ const normalizeDrrmActivity = (row) => ({
   female: drrmNum(row.female),
   total: drrmNum(row.total),
   mov: row.means_of_verification || "",
+  movPhotos: drrmJson(row.mov_photos, []) || [],
+  mov_photos: drrmJson(row.mov_photos, []) || [],
   remarks: row.remarks || "",
   custom_fields: drrmJson(row.custom_fields, {}) || {},
   customFields: drrmJson(row.custom_fields, {}) || {},
@@ -18252,6 +18655,8 @@ const normalizeDrrmIec = (row) => ({
   female: drrmNum(row.female),
   total: drrmNum(row.total),
   mov: row.means_of_verification || "",
+  movPhotos: drrmJson(row.mov_photos, []) || [],
+  mov_photos: drrmJson(row.mov_photos, []) || [],
   remarks: row.remarks || "",
   custom_fields: drrmJson(row.custom_fields, {}) || {},
   customFields: drrmJson(row.custom_fields, {}) || {},
@@ -18265,6 +18670,8 @@ const normalizeDrrmCollab = (row) => ({
   stakeholders: drrmSplit(row.stakeholders),
   date: drrmDateOnly(row.activity_date),
   mov: row.means_of_verification || "",
+  movPhotos: drrmJson(row.mov_photos, []) || [],
+  mov_photos: drrmJson(row.mov_photos, []) || [],
   remarks: row.remarks || "",
   custom_fields: drrmJson(row.custom_fields, {}) || {},
   customFields: drrmJson(row.custom_fields, {}) || {},
@@ -18376,16 +18783,16 @@ app.post("/drrm/activities", (req, res) => {
         venue_text, venue_mode, venue_manual_text, venue_display_text,
         venue_province, venue_municipality, venue_barangay, venue_lat, venue_lng,
         co_organizer, male, female, total,
-        means_of_verification, remarks, custom_fields
+        means_of_verification, mov_photos, remarks, custom_fields
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       p.title, p.date_start, p.date_end,
       p.venue_text, p.venue_mode, p.venue_manual_text, p.venue_display_text,
       p.venue_province, p.venue_municipality, p.venue_barangay, p.venue_lat, p.venue_lng,
       p.co_organizer, p.male, p.female, p.total,
-      p.means_of_verification, p.remarks,
+      p.means_of_verification, p.mov_photos, p.remarks,
       JSON.stringify(p.custom_fields || {}),
     ],
     (err, result) => {
@@ -18416,7 +18823,7 @@ app.put("/drrm/activities/:id", (req, res) => {
         venue_text = ?, venue_mode = ?, venue_manual_text = ?, venue_display_text = ?,
         venue_province = ?, venue_municipality = ?, venue_barangay = ?, venue_lat = ?, venue_lng = ?,
         co_organizer = ?, male = ?, female = ?, total = ?,
-        means_of_verification = ?, remarks = ?, custom_fields = ?
+        means_of_verification = ?, mov_photos = ?, remarks = ?, custom_fields = ?
       WHERE id = ?
     `,
     [
@@ -18424,7 +18831,7 @@ app.put("/drrm/activities/:id", (req, res) => {
       p.venue_text, p.venue_mode, p.venue_manual_text, p.venue_display_text,
       p.venue_province, p.venue_municipality, p.venue_barangay, p.venue_lat, p.venue_lng,
       p.co_organizer, p.male, p.female, p.total,
-      p.means_of_verification, p.remarks,
+      p.means_of_verification, p.mov_photos, p.remarks,
       JSON.stringify(p.custom_fields || {}),
       id,
     ],
@@ -18482,11 +18889,11 @@ app.post("/drrm/iec-materials", (req, res) => {
   db.query(
     `
       INSERT INTO drrm_iec_materials (
-        date_used, male, female, total, means_of_verification, remarks, custom_fields
+        date_used, male, female, total, means_of_verification, mov_photos, remarks, custom_fields
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `,
-    [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.remarks, JSON.stringify(p.custom_fields || {})],
+    [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.mov_photos, p.remarks, JSON.stringify(p.custom_fields || {})],
     (err, result) => {
       if (err) return sendDrrmError(res, "POST /drrm/iec-materials INSERT ERROR:", err);
 
@@ -18514,10 +18921,10 @@ app.put("/drrm/iec-materials/:id", (req, res) => {
   db.query(
     `
       UPDATE drrm_iec_materials
-      SET date_used = ?, male = ?, female = ?, total = ?, means_of_verification = ?, remarks = ?, custom_fields = ?
+      SET date_used = ?, male = ?, female = ?, total = ?, means_of_verification = ?, mov_photos = ?, remarks = ?, custom_fields = ?
       WHERE id = ?
     `,
-    [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.remarks, JSON.stringify(p.custom_fields || {}), id],
+    [p.date_used, p.male, p.female, p.total, p.means_of_verification, p.mov_photos, p.remarks, JSON.stringify(p.custom_fields || {}), id],
     (err) => {
       if (err) return sendDrrmError(res, "PUT /drrm/iec-materials UPDATE ERROR:", err);
 
@@ -18577,11 +18984,11 @@ app.post("/drrm/collaborations", (req, res) => {
   db.query(
     `
       INSERT INTO drrm_collaborations (
-        title, activity_date, means_of_verification, remarks
+        title, activity_date, means_of_verification, mov_photos, remarks
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?)
     `,
-    [p.title, p.activity_date, p.means_of_verification, p.remarks],
+    [p.title, p.activity_date, p.means_of_verification, p.mov_photos, p.remarks],
     (err, result) => {
       if (err) return sendDrrmError(res, "POST /drrm/collaborations INSERT ERROR:", err);
 
@@ -18611,10 +19018,10 @@ app.put("/drrm/collaborations/:id", (req, res) => {
   db.query(
     `
       UPDATE drrm_collaborations
-      SET title = ?, activity_date = ?, means_of_verification = ?, remarks = ?
+      SET title = ?, activity_date = ?, means_of_verification = ?, mov_photos = ?, remarks = ?
       WHERE id = ?
     `,
-    [p.title, p.activity_date, p.means_of_verification, p.remarks, id],
+    [p.title, p.activity_date, p.means_of_verification, p.mov_photos, p.remarks, id],
     (err) => {
       if (err) return sendDrrmError(res, "PUT /drrm/collaborations UPDATE ERROR:", err);
 

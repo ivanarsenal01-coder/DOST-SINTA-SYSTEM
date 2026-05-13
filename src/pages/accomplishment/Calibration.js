@@ -15,6 +15,13 @@ import {
   WidthType,
   PageOrientation,
 } from "docx";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import {
+  canAdd,
+  canEdit,
+  canDelete,
+  canExport,
+} from "../../usrmngment/utils/permissions";
 
 /* =========================
    Leaflet + React-Leaflet
@@ -109,6 +116,8 @@ const EMPTY_FORM = {
   sc: "",
   fourPs: "",
   nameOfStaff: "",
+  meansOfVerification: "",
+  movPhotos: [],
   remarks: "",
   customFields: {},
 };
@@ -674,9 +683,162 @@ function AddressFlowModal({
 
 
 
+
+
+function extractMovLinks(text) {
+  const matches = String(text || "").match(/https?:\/\/[^\s]+/gi) || [];
+  return Array.from(new Set(matches));
+}
+
+function openMovFirstLink(text) {
+  const links = extractMovLinks(text);
+  if (!links.length) return alert("No URL found in Means of Verification.");
+  window.open(links[0], "_blank", "noopener,noreferrer");
+}
+
+function openMovLink(url) {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function movFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pickMovPhotos(currentPhotos = [], onChange) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+    const converted = [];
+    for (const file of files) {
+      converted.push({ name: file.name, type: file.type, dataUrl: await movFileToDataUrl(file) });
+    }
+    if (converted.length) onChange([...(Array.isArray(currentPhotos) ? currentPhotos : []), ...converted]);
+  };
+  input.click();
+}
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Calibration() {
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
+
+  const { user } = useAuth();
+  const allowAdd = canAdd(user, "calibration");
+  const allowEdit = canEdit(user, "calibration");
+  const allowDelete = canDelete(user, "calibration");
+  const allowExport = canExport(user, "calibration");
 
   const [entries, setEntries] = useState([]);
   const [calibrationCustomFields, setCalibrationCustomFields] = useState([]);
@@ -1055,11 +1217,21 @@ export default function Calibration() {
   }
 
   function openAddEntry() {
+    if (!allowAdd) {
+      alert("You do not have permission to add Calibration entries.");
+      return;
+    }
+
     resetForm();
     setShowAdd(true);
   }
 
   function openEditEntry(entry) {
+    if (!allowEdit) {
+      alert("You do not have permission to edit Calibration entries.");
+      return;
+    }
+
     setEditingId(entry.id);
     setForm({
       ...EMPTY_FORM,
@@ -1347,6 +1519,16 @@ export default function Calibration() {
   }
 
   async function saveEntry() {
+    if (editingId && !allowEdit) {
+      alert("You do not have permission to edit Calibration entries.");
+      return;
+    }
+
+    if (!editingId && !allowAdd) {
+      alert("You do not have permission to add Calibration entries.");
+      return;
+    }
+
     if (!validateForm()) return;
 
     let payload = {
@@ -1426,7 +1608,12 @@ export default function Calibration() {
   }
 
   async function deleteEntry(id) {
-    if (!window.confirm("Delete this calibration entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete Calibration entries.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this calibration entry?"))) return;
 
     try {
       await axios.delete(`${CALIBRATION_API_URL}/${id}`);
@@ -1663,22 +1850,47 @@ export default function Calibration() {
   };
 
   const openCALIBRATIONPrintPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to print Calibration records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "row", entryId, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCALIBRATIONPrintPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print Calibration records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "bulk", entryId: null, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCALIBRATIONExportPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to export Calibration records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "row", entryId, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCALIBRATIONExportPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to export Calibration records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "bulk", entryId: null, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const confirmCALIBRATIONPrint = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to print Calibration records.");
+      return;
+    }
+
     const sourceRows = await getCALIBRATIONRowsForOutput(printModal.scope, printModal.entryId);
     const objectRows = buildCALIBRATIONObjectRowsForOutput(sourceRows);
     const titleLabel = printModal.scope === "row"
@@ -1689,6 +1901,11 @@ export default function Calibration() {
   };
 
   const confirmCALIBRATIONExport = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to export Calibration records.");
+      return;
+    }
+
     const sourceRows = await getCALIBRATIONRowsForOutput(exportModal.scope, exportModal.entryId);
     const objectRows = buildCALIBRATIONObjectRowsForOutput(sourceRows);
     const baseName = exportModal.scope === "row"
@@ -1702,20 +1919,40 @@ export default function Calibration() {
   };
 
   function exportFilteredEntries() {
+    if (!allowExport) {
+      alert("You do not have permission to export Calibration records.");
+      return;
+    }
+
     if (!filteredEntries.length) return alert("No rows to export.");
     exportEntriesCSV(filteredEntries, "Calibration_Filtered.csv");
   }
 
   function printFilteredEntries() {
+    if (!allowExport) {
+      alert("You do not have permission to print Calibration records.");
+      return;
+    }
+
     printEntries(filteredEntries, "Calibration Filtered Report");
   }
 
   function exportSingleEntry(entry) {
+    if (!allowExport) {
+      alert("You do not have permission to export Calibration records.");
+      return;
+    }
+
     if (!entry) return;
     exportEntriesCSV([entry], `Calibration_${entry?.date || "entry"}.csv`);
   }
 
   function printSingleEntry(entry) {
+    if (!allowExport) {
+      alert("You do not have permission to print Calibration records.");
+      return;
+    }
+
     if (!entry) return;
     printEntries([entry], `Calibration Entry — ${entry?.date || "Record"}`);
   }
@@ -2609,17 +2846,23 @@ export default function Calibration() {
                     Clear Filters
                   </button>
 
-                  <button type="button" style={styles.toolbarBtn} onClick={openCALIBRATIONExportPopupBulk}>
-                    Export
-                  </button>
+                  {allowExport && (
+                    <button type="button" style={styles.toolbarBtn} onClick={openCALIBRATIONExportPopupBulk}>
+                      Export
+                    </button>
+                  )}
 
-                  <button type="button" style={{ ...styles.toolbarBtn, background: "#0b5ed7", borderColor: "#0b5ed7", color: "#fff" }} onClick={openCALIBRATIONPrintPopupBulk}>
-                    Print
-                  </button>
+                  {allowExport && (
+                    <button type="button" style={{ ...styles.toolbarBtn, background: "#0b5ed7", borderColor: "#0b5ed7", color: "#fff" }} onClick={openCALIBRATIONPrintPopupBulk}>
+                      Print
+                    </button>
+                  )}
 
-                  <button type="button" style={styles.toolbarAddBtn} onClick={openAddEntry}>
-                    Add Entry
-                  </button>
+                  {allowAdd && (
+                    <button type="button" style={styles.toolbarAddBtn} onClick={openAddEntry}>
+                      Add Entry
+                    </button>
+                  )}
                 </div>
 
               </div>
@@ -2705,10 +2948,18 @@ export default function Calibration() {
                     <td style={styles.tdCenter}>{toNumber(e.fourPs)}</td>
                     <td style={styles.tdCenter}>
                       <button type="button" style={styles.tinyBtn} onClick={() => setShowViewId(e.id)}>View</button>
-                      <button type="button" style={styles.tinyBtn} onClick={() => openEditEntry(e)}>Edit</button>
-                      <button type="button" style={styles.tinyBtn} onClick={() => openCALIBRATIONPrintPopupRow(e.id)}>Print</button>
-                      <button type="button" style={styles.tinyBtn} onClick={() => openCALIBRATIONExportPopupRow(e.id)}>Export</button>
-                      <button type="button" style={styles.dangerTiny} onClick={() => deleteEntry(e.id)}>Delete</button>
+                      {allowEdit && (
+                        <button type="button" style={styles.tinyBtn} onClick={() => openEditEntry(e)}>Edit</button>
+                      )}
+                      {allowExport && (
+                        <button type="button" style={styles.tinyBtn} onClick={() => openCALIBRATIONPrintPopupRow(e.id)}>Print</button>
+                      )}
+                      {allowExport && (
+                        <button type="button" style={styles.tinyBtn} onClick={() => openCALIBRATIONExportPopupRow(e.id)}>Export</button>
+                      )}
+                      {allowDelete && (
+                        <button type="button" style={styles.dangerTiny} onClick={() => deleteEntry(e.id)}>Delete</button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -3258,6 +3509,38 @@ export default function Calibration() {
                 {renderCalibrationCustomInputs()}
 
                 <div style={{ ...styles.field, gridColumn: "1 / span 2" }}>
+                  <div style={styles.label}>Means of Verification</div>
+                  <textarea
+                    style={styles.textarea}
+                    value={form.meansOfVerification || ""}
+                    onChange={(e) => updateForm("meansOfVerification", e.target.value)}
+                    placeholder="Attendance sheet / links / activity reports / photos..."
+                  />
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                    <button type="button" style={styles.tinyBtn} onClick={() => openMovFirstLink(form.meansOfVerification)}>View First Link</button>
+                    <button type="button" style={styles.tinyBtn} onClick={() => pickMovPhotos(form.movPhotos, (photos) => updateForm("movPhotos", photos))}>Add Photos</button>
+                    <span style={{ fontSize: 12, fontWeight: 900 }}>Photos: {Array.isArray(form.movPhotos) ? form.movPhotos.length : 0}</span>
+                  </div>
+                  {extractMovLinks(form.meansOfVerification).length > 0 ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                      {extractMovLinks(form.meansOfVerification).map((url, idx) => (
+                        <button type="button" key={url} style={styles.tinyBtn} onClick={() => openMovLink(url)}>Link {idx + 1}</button>
+                      ))}
+                    </div>
+                  ) : null}
+                  {Array.isArray(form.movPhotos) && form.movPhotos.length > 0 ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                      {form.movPhotos.map((photo, idx) => (
+                        <div key={`${photo.name || "photo"}_${idx}`} style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid #e2e8f0", borderRadius: 8, padding: 6 }}>
+                          <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 6 }} />
+                          <button type="button" style={styles.dangerTiny} onClick={() => updateForm("movPhotos", form.movPhotos.filter((_, i) => i !== idx))}>Remove</button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+
+                <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
                   <div style={styles.label}>Remarks</div>
                   <textarea style={styles.textarea} value={form.remarks} onChange={(e) => updateForm("remarks", e.target.value)} />
                 </div>
@@ -3266,9 +3549,11 @@ export default function Calibration() {
 
             <div style={styles.modalFooter}>
               <button type="button" style={styles.pillBtn} onClick={resetForm}>Clear</button>
-              <button type="button" style={styles.btnDark} onClick={saveEntry}>
-                {editingId ? "Update Entry" : "Save Entry"}
-              </button>
+              {(editingId ? allowEdit : allowAdd) && (
+                <button type="button" style={styles.btnDark} onClick={saveEntry}>
+                  {editingId ? "Update Entry" : "Save Entry"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -3374,6 +3659,112 @@ export default function Calibration() {
           </div>
         </div>
       )}
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -32,7 +33,174 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+
+
+function extractMovLinks(text) {
+  const matches = String(text || "").match(/https?:\/\/[^\s]+/gi) || [];
+  return Array.from(new Set(matches));
+}
+
+function openMovFirstLink(text) {
+  const links = extractMovLinks(text);
+  if (!links.length) return alert("No URL found in Means of Verification.");
+  window.open(links[0], "_blank", "noopener,noreferrer");
+}
+
+function openMovLink(url) {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function movFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pickMovPhotos(currentPhotos = [], onChange) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+    const converted = [];
+    for (const file of files) {
+      converted.push({ name: file.name, type: file.type, dataUrl: await movFileToDataUrl(file) });
+    }
+    if (converted.length) onChange([...(Array.isArray(currentPhotos) ? currentPhotos : []), ...converted]);
+  };
+  input.click();
+}
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function TechnologyTraining() {
+  const { hasPageAccess } = useAuth();
+
+  const canTechTraining = (action) =>
+    [
+      "technologyTraining",
+      "techTraining",
+      "technology_training",
+      "tech_training",
+    ].some((pageKey) => hasPageAccess?.(pageKey, action));
+
+  const canAdd = canTechTraining("add");
+  const canEdit = canTechTraining("edit");
+  const canDelete = canTechTraining("delete");
+  const canExport = canTechTraining("export");
+
+  const denyPrivilege = (actionLabel = "perform this action") => {
+    alert(`You don't have privilege to ${actionLabel}.`);
+  };
+
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   // =========================
   // API
   // =========================
@@ -284,6 +452,36 @@ export default function TechnologyTraining() {
   const isSyncedFromIntervention = (e) =>
     e?.interventionId !== null && e?.interventionId !== undefined && e?.interventionId !== "";
 
+  const parseTrainingPhotos = (value) => {
+    if (Array.isArray(value)) return value;
+    if (!value) return [];
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const normalizeTrainingEntryFromApi = (row = {}) => ({
+    ...row,
+    meansOfVerification:
+      row.meansOfVerification ||
+      row.means_of_verification ||
+      row.mov ||
+      "",
+    means_of_verification:
+      row.means_of_verification ||
+      row.meansOfVerification ||
+      row.mov ||
+      "",
+    movPhotos: parseTrainingPhotos(row.movPhotos || row.photos || row.mov_photos),
+    photos: parseTrainingPhotos(row.photos || row.movPhotos || row.mov_photos),
+  });
+
   // =========================
   // Defaults
   // =========================
@@ -341,6 +539,8 @@ export default function TechnologyTraining() {
     costDost: "",
     costPartnerAgency: "",
     staffName: "",
+    meansOfVerification: "",
+    movPhotos: [],
     customFields: {},
   });
 
@@ -437,7 +637,12 @@ export default function TechnologyTraining() {
       "staffName",
       "staff_name",
       "nameOfStaff",
-      "name_of_staff"
+      "name_of_staff",
+      "meansOfVerification",
+      "means_of_verification",
+      "movPhotos",
+      "mov_photos",
+      "photos"
     ]);
 
     async function loadTechTrainingCustomFields() {
@@ -560,7 +765,7 @@ export default function TechnologyTraining() {
         ) || 1
       );
 
-      setEntries(rows);
+      setEntries(rows.map(normalizeTrainingEntryFromApi));
       setServerTotalRows(total);
       setServerTotalPages(totalPages);
       setCurrentPage(requestedPage);
@@ -775,6 +980,7 @@ export default function TechnologyTraining() {
   };
 
   const exportFilteredToCSV = () => {
+    if (!canExport) return denyPrivilege("export Technology Training records");
     const rows = filteredEntries.map((e, i) => ({
       No: i + 1,
       Province: e.province || "",
@@ -851,7 +1057,7 @@ export default function TechnologyTraining() {
   // =========================
   const escapeHtml = (value = "") => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   const downloadBlob = (blob, filename) => { const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); };
-  const trainingColumns = ["No.", "Program", "Province", "Date", "Venue/Address", "Coordinates", "Title", "No. of Firms", "Female", "Male", "Total Participants", "Name of Staff", "Trainor/Affiliation", "Program/Project/Unit", "DOST Cost", "Partner Cost", "Total Cost"];
+  const trainingColumns = ["No.", "Program", "Province", "Date", "Venue/Address", "Coordinates", "Title", "No. of Firms", "Female", "Male", "Total Participants", "Name of Staff", "Trainor/Affiliation", "Program/Project/Unit", "Means of Verification", "MOV Photos", "DOST Cost", "Partner Cost", "Total Cost"];
   const buildTrainingRows = (scope = "bulk", entryId = null) => {
     const source = scope === "row" && entryId ? filteredEntries.filter((e) => e.id === entryId) : filteredEntries;
     return source.map((e, i) => {
@@ -871,17 +1077,32 @@ export default function TechnologyTraining() {
         "Name of Staff": enriched?.staffName || enriched?.nameOfStaff || "",
         "Trainor/Affiliation": enriched?.trainorAffiliation || "",
         "Program/Project/Unit": enriched?.programProjectUnit || "",
+        "Means of Verification": enriched?.meansOfVerification || enriched?.means_of_verification || "",
+        "MOV Photos": Array.isArray(enriched?.movPhotos || enriched?.photos) ? (enriched?.movPhotos || enriched?.photos).length : 0,
         "DOST Cost": enriched?.costDost || "",
         "Partner Cost": enriched?.costPartnerAgency || "",
         "Total Cost": enriched?.costTotal || 0,
       };
     });
   };
-  const openPrintPopupRow = (entryId) => setPrintModal((p) => ({ ...p, open: true, scope: "row", entryId, layout: "FORM" }));
-  const openPrintPopupBulk = () => setPrintModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, layout: "FORM" }));
-  const openExportPopupRow = (entryId) => setExportModal((p) => ({ ...p, open: true, scope: "row", entryId, format: "excel" }));
-  const openExportPopupBulk = () => setExportModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, format: "excel" }));
+  const openPrintPopupRow = (entryId) => {
+    if (!canExport) return denyPrivilege("print this Technology Training entry");
+    setPrintModal((p) => ({ ...p, open: true, scope: "row", entryId, layout: "FORM" }));
+  };
+  const openPrintPopupBulk = () => {
+    if (!canExport) return denyPrivilege("print Technology Training records");
+    setPrintModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, layout: "FORM" }));
+  };
+  const openExportPopupRow = (entryId) => {
+    if (!canExport) return denyPrivilege("export this Technology Training entry");
+    setExportModal((p) => ({ ...p, open: true, scope: "row", entryId, format: "excel" }));
+  };
+  const openExportPopupBulk = () => {
+    if (!canExport) return denyPrivilege("export Technology Training records");
+    setExportModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, format: "excel" }));
+  };
   const confirmExport = async () => {
+    if (!canExport) return denyPrivilege("export Technology Training records");
     const rows = buildTrainingRows(exportModal.scope, exportModal.entryId);
     const base = exportModal.scope === "row" ? `technology_training_${exportModal.entryId || "row"}` : "technology_training_filtered";
     if (exportModal.format === "csv") {
@@ -902,6 +1123,7 @@ export default function TechnologyTraining() {
     setExportModal((p) => ({ ...p, open: false }));
   };
   const confirmPrint = () => {
+    if (!canExport) return denyPrivilege("print Technology Training records");
     const rows = buildTrainingRows(printModal.scope, printModal.entryId);
     const body = printModal.layout === "TABLE" ? `<table><thead><tr>${trainingColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${trainingColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${trainingColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>` : `${rows.length ? rows.map((r) => `<div class="card">${trainingColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`}`;
     const win = window.open("", "_blank", "width=1200,height=900"); if (!win) return alert("Popup blocked. Please allow popups for printing.");
@@ -1151,6 +1373,16 @@ export default function TechnologyTraining() {
       justifyContent: "space-between",
       alignItems: "center",
       gap: 12,
+      fontFamily,
+    },
+    closeX: {
+      background: "transparent",
+      border: "1px solid rgba(255,255,255,0.6)",
+      color: "white",
+      borderRadius: 10,
+      padding: "6px 10px",
+      cursor: "pointer",
+      fontWeight: 900,
       fontFamily,
     },
     modalBody: { padding: 16, maxHeight: "70vh", overflow: "auto" },
@@ -1550,11 +1782,15 @@ export default function TechnologyTraining() {
   // Program add flow
   // =========================
   const handleProgramChange = (val) => {
-    if (val === PROGRAM_ADD) return setProgramModalOpen(true);
+    if (val === PROGRAM_ADD) {
+      if (!canAdd) return denyPrivilege("add a program/training option");
+      return setProgramModalOpen(true);
+    }
     setEntryForm((prev) => ({ ...prev, program: val }));
   };
 
   const commitAddProgram = async () => {
+    if (!canAdd) return denyPrivilege("add a program/training option");
     const name = String(newProgramName || "").trim();
     if (!name) return alert("Please type a program/training name.");
 
@@ -1611,17 +1847,21 @@ export default function TechnologyTraining() {
       costDost: "",
       costPartnerAgency: "",
       staffName: "",
+      meansOfVerification: "",
+      movPhotos: [],
       customFields: {},
     });
     setNewProgramName("");
   };
 
   const openAddEntry = () => {
+    if (!canAdd) return denyPrivilege("add a Technology Training entry");
     resetEntryForm();
     setEntryModal({ mode: "add" });
   };
 
   const openEditEntry = (entryId) => {
+    if (!canEdit) return denyPrivilege("edit this Technology Training entry");
     const e = entries.find((x) => x.id === entryId);
     if (!e) return;
 
@@ -1658,6 +1898,16 @@ export default function TechnologyTraining() {
       costDost: e.costDost ?? "",
       costPartnerAgency: e.costPartnerAgency ?? "",
       staffName: e.staffName || e.nameOfStaff || e.staff_name || "",
+      meansOfVerification:
+        e.meansOfVerification ||
+        e.means_of_verification ||
+        e.mov ||
+        "",
+      movPhotos: Array.isArray(e.movPhotos)
+        ? e.movPhotos
+        : Array.isArray(e.photos)
+          ? e.photos
+          : [],
       customFields: parseTechTrainingCustomFields(e.customFields || e.custom_fields),
     });
 
@@ -1665,10 +1915,11 @@ export default function TechnologyTraining() {
   };
 
   const deleteEntry = async (entryId) => {
-    if (!window.confirm("Delete this entry?")) return;
+    if (!canDelete) return denyPrivilege("delete this Technology Training entry");
+    if (!(await requestDeleteConfirm("Delete this entry?"))) return;
 
     try {
-      await axios.delete(`${API_BASE}/entries/${entryId}`);
+      await axios.delete(`${TRAINING_API}/entries/${entryId}`);
       await fetchEntries(currentPage);
     } catch (err) {
       console.error(err);
@@ -1684,6 +1935,8 @@ export default function TechnologyTraining() {
   };
 
   const saveEntry = async () => {
+    if (entryModal?.mode === "edit" && !canEdit) return denyPrivilege("update this Technology Training entry");
+    if (entryModal?.mode === "add" && !canAdd) return denyPrivilege("save a new Technology Training entry");
     const err = validateEntry();
     if (err) return alert(err);
 
@@ -1736,6 +1989,10 @@ export default function TechnologyTraining() {
       staffName: String(entryForm.staffName || "").trim(),
       nameOfStaff: String(entryForm.staffName || "").trim(),
       name_of_staff: String(entryForm.staffName || "").trim(),
+      meansOfVerification: String(entryForm.meansOfVerification || "").trim(),
+      means_of_verification: String(entryForm.meansOfVerification || "").trim(),
+      movPhotos: Array.isArray(entryForm.movPhotos) ? entryForm.movPhotos : [],
+      photos: Array.isArray(entryForm.movPhotos) ? entryForm.movPhotos : [],
       custom_fields: entryForm.customFields || {},
       customFields: entryForm.customFields || {},
     };
@@ -2932,17 +3189,23 @@ export default function TechnologyTraining() {
               Clear Filters
             </button>
 
-            <button style={styles.toolbarBtn} onClick={openExportPopupBulk}>
-              Export
-            </button>
+            {canExport ? (
+              <button style={styles.toolbarBtn} onClick={openExportPopupBulk}>
+                Export
+              </button>
+            ) : null}
 
-            <button style={styles.btnDark} onClick={openPrintPopupBulk}>
-              Print
-            </button>
+            {canExport ? (
+              <button style={styles.btnDark} onClick={openPrintPopupBulk}>
+                Print
+              </button>
+            ) : null}
 
-            <button style={styles.toolbarPrimaryBtn} onClick={openAddEntry}>
-              + Add Project
-            </button>
+            {canAdd ? (
+              <button style={styles.toolbarPrimaryBtn} onClick={openAddEntry}>
+                + Add Project
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -3044,44 +3307,55 @@ export default function TechnologyTraining() {
                         <button style={styles.tinyBtn} onClick={() => setViewEntryId(e.id)}>
                           View
                         </button>
-                        <button style={styles.tinyBtn} onClick={() => openPrintPopupRow(e.id)}>
-                          Print
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openExportPopupRow(e.id)}>
-                          Export
-                        </button>
-                        <button
-                          style={{
-                            ...styles.tinyBtn,
-                            opacity: e.syncedFromIntervention ? 0.6 : 1,
-                            cursor: e.syncedFromIntervention ? "not-allowed" : "pointer",
-                          }}
-                          onClick={() => {
-                            if (e.syncedFromIntervention) {
-                              alert("This entry is synced from S&T Intervention. Edit it from the source module.");
-                              return;
-                            }
-                            openEditEntry(e.id);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          style={{
-                            ...styles.dangerTiny,
-                            opacity: e.syncedFromIntervention ? 0.6 : 1,
-                            cursor: e.syncedFromIntervention ? "not-allowed" : "pointer",
-                          }}
-                          onClick={() => {
-                            if (e.syncedFromIntervention) {
-                              alert("This entry is synced from S&T Intervention. Delete it from the source module.");
-                              return;
-                            }
-                            deleteEntry(e.id);
-                          }}
-                        >
-                          Delete
-                        </button>
+                        {canExport ? (
+                          <button style={styles.tinyBtn} onClick={() => openPrintPopupRow(e.id)}>
+                            Print
+                          </button>
+                        ) : null}
+
+                        {canExport ? (
+                          <button style={styles.tinyBtn} onClick={() => openExportPopupRow(e.id)}>
+                            Export
+                          </button>
+                        ) : null}
+
+                        {canEdit ? (
+                          <button
+                            style={{
+                              ...styles.tinyBtn,
+                              opacity: e.syncedFromIntervention ? 0.6 : 1,
+                              cursor: e.syncedFromIntervention ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => {
+                              if (e.syncedFromIntervention) {
+                                alert("This entry is synced from S&T Intervention. Edit it from the source module.");
+                                return;
+                              }
+                              openEditEntry(e.id);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        ) : null}
+
+                        {canDelete ? (
+                          <button
+                            style={{
+                              ...styles.dangerTiny,
+                              opacity: e.syncedFromIntervention ? 0.6 : 1,
+                              cursor: e.syncedFromIntervention ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => {
+                              if (e.syncedFromIntervention) {
+                                alert("This entry is synced from S&T Intervention. Delete it from the source module.");
+                                return;
+                              }
+                              deleteEntry(e.id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
@@ -3535,6 +3809,23 @@ export default function TechnologyTraining() {
                   />
                 </div>
 
+                <UnifiedMOVSection
+                  value={entryForm.meansOfVerification || ""}
+                  photos={entryForm.movPhotos || []}
+                  onValueChange={(value) =>
+                    setEntryForm((prev) => ({
+                      ...prev,
+                      meansOfVerification: value,
+                    }))
+                  }
+                  onPhotosChange={(photos) =>
+                    setEntryForm((prev) => ({
+                      ...prev,
+                      movPhotos: photos,
+                    }))
+                  }
+                />
+
                 <div style={styles.field}>
                   <div style={styles.label}>DOST Cost</div>
                   <input
@@ -3581,9 +3872,11 @@ export default function TechnologyTraining() {
               <button style={styles.btnGhost} onClick={() => setEntryModal(null)}>
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveEntry}>
-                {entryModal.mode === "edit" ? "Update" : "Save"}
-              </button>
+              {(entryModal.mode === "edit" ? canEdit : canAdd) ? (
+                <button style={styles.btnDark} onClick={saveEntry}>
+                  {entryModal.mode === "edit" ? "Update" : "Save"}
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -3638,9 +3931,11 @@ export default function TechnologyTraining() {
               <button style={styles.btnGhost} onClick={() => setProgramModalOpen(false)}>
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={commitAddProgram}>
-                Add
-              </button>
+              {canAdd ? (
+                <button style={styles.btnDark} onClick={commitAddProgram}>
+                  Add
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -3847,6 +4142,56 @@ export default function TechnologyTraining() {
                       <div style={{ fontWeight: 800 }}>{venueCoordText(viewEntry)}</div>
                     </div>
                   </div>
+
+                  <div>
+                    <div style={styles.label}>Means of Verification</div>
+                    <div
+                      style={{
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 8,
+                        background: "#f8fafc",
+                        padding: "8px 10px",
+                        fontWeight: 800,
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {viewEntry.meansOfVerification || viewEntry.means_of_verification || "—"}
+                    </div>
+
+                    {extractMovLinks(viewEntry.meansOfVerification || viewEntry.means_of_verification).length > 0 ? (
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                        {extractMovLinks(viewEntry.meansOfVerification || viewEntry.means_of_verification).map((url, idx) => (
+                          <button key={`${url}_${idx}`} type="button" style={styles.tinyBtn} onClick={() => openMovLink(url)}>
+                            Link {idx + 1}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {Array.isArray(viewEntry.movPhotos || viewEntry.photos) && (viewEntry.movPhotos || viewEntry.photos).length ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 10, marginTop: 10 }}>
+                        {(viewEntry.movPhotos || viewEntry.photos).map((photo, idx) => (
+                          <button
+                            key={`${photo.name || "photo"}_${idx}`}
+                            type="button"
+                            style={{ border: "1px solid #cbd5e1", borderRadius: 10, background: "#fff", padding: 8, cursor: "pointer", textAlign: "left" }}
+                            onClick={() => window.open(photo.dataUrl || photo.url, "_blank", "noopener,noreferrer")}
+                          >
+                            <img
+                              src={photo.dataUrl || photo.url}
+                              alt={photo.name || `Photo ${idx + 1}`}
+                              style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0" }}
+                            />
+                            <div style={{ marginTop: 6, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {photo.name || `Photo ${idx + 1}`}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ marginTop: 8, fontSize: 12, fontWeight: 800, color: "#64748b" }}>Photos: 0</div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div style={styles.tableWrap}>
@@ -3873,6 +4218,8 @@ export default function TechnologyTraining() {
                         <th style={styles.th}>DOST COST</th>
                         <th style={styles.th}>PARTNER AGENCY COST</th>
                         <th style={styles.th}>TOTAL COST</th>
+                        <th style={styles.th}>MEANS OF VERIFICATION</th>
+                        <th style={styles.th}>MOV PHOTOS</th>
                         <th style={styles.th}>PROGRAM</th>
                       </tr>
                     </thead>
@@ -3936,6 +4283,8 @@ export default function TechnologyTraining() {
                         <td style={styles.tdCenter}>{peso(viewEntry.costDost)}</td>
                         <td style={styles.tdCenter}>{peso(viewEntry.costPartnerAgency)}</td>
                         <td style={styles.tdCenter}>{peso(viewEntry.costTotal)}</td>
+                        <td style={styles.td}>{viewEntry.meansOfVerification || viewEntry.means_of_verification || "—"}</td>
+                        <td style={styles.tdCenter}>{Array.isArray(viewEntry.movPhotos || viewEntry.photos) ? (viewEntry.movPhotos || viewEntry.photos).length : 0}</td>
                         <td style={styles.tdCenter}>
                           {String(viewEntry.program || "").trim() ? viewEntry.program : "—"}
                         </td>
@@ -3950,23 +4299,25 @@ export default function TechnologyTraining() {
               <button style={styles.btnGhost} onClick={() => setViewEntryId(null)}>
                 Close
               </button>
-              <button
-                style={{
-                  ...styles.btnDark,
-                  opacity: viewEntry.syncedFromIntervention ? 0.6 : 1,
-                  cursor: viewEntry.syncedFromIntervention ? "not-allowed" : "pointer",
-                }}
-                onClick={() => {
-                  if (viewEntry.syncedFromIntervention) {
-                    alert("This entry is synced from S&T Intervention. Edit it from the source module.");
-                    return;
-                  }
-                  setViewEntryId(null);
-                  openEditEntry(viewEntry.id);
-                }}
-              >
-                Edit
-              </button>
+              {canEdit ? (
+                <button
+                  style={{
+                    ...styles.btnDark,
+                    opacity: viewEntry.syncedFromIntervention ? 0.6 : 1,
+                    cursor: viewEntry.syncedFromIntervention ? "not-allowed" : "pointer",
+                  }}
+                  onClick={() => {
+                    if (viewEntry.syncedFromIntervention) {
+                      alert("This entry is synced from S&T Intervention. Edit it from the source module.");
+                      return;
+                    }
+                    setViewEntryId(null);
+                    openEditEntry(viewEntry.id);
+                  }}
+                >
+                  Edit
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -3992,6 +4343,112 @@ export default function TechnologyTraining() {
             <div style={styles.modalHeader}><div>{exportModal.scope === "row" ? "Export (This Row)" : "Export (Filtered Rows)"}</div><button style={styles.closeX} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>✕</button></div>
             <div style={styles.modalBody}><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{["excel", "csv", "pdf", "docx"].map((f) => <button key={f} type="button" style={exportModal.format === f ? styles.btnDark : styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, format: f }))}>{f.toUpperCase()}</button>)}</div></div>
             <div style={styles.modalFooter}><button style={styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>Cancel</button><button style={styles.btnDark} onClick={confirmExport}>Export Now</button></div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

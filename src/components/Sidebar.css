@@ -527,3 +527,49 @@ aside.sidebar.collapsed {
 .sidebar .logo-sub {
   display: none !important;
 }
+
+/* =========================================================
+   LOGIN PAGE LOGO FIX
+   Dinagdag lang ito. Walang tinanggal sa existing CSS.
+   ========================================================= */
+
+.dost-login-logo-wrap {
+  width: 135px !important;
+  height: 120px !important;
+  margin-top: -18px !important;
+  margin-bottom: 2px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.dost-login-logo {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.dost-login-subtitle {
+  width: min(330px, 100%) !important;
+  margin: -2px 0 28px !important;
+  color: #183154 !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+}
+
+@media (max-width: 520px) {
+  .dost-login-logo-wrap {
+    width: 122px !important;
+    height: 110px !important;
+    margin-top: -14px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .dost-login-subtitle {
+    width: 100% !important;
+    margin-bottom: 24px !important;
+    font-size: 10.5px !important;
+  }
+}

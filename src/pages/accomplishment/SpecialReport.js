@@ -1,4 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import {
+  canAdd,
+  canEdit,
+  canDelete,
+  canExport,
+} from "../../usrmngment/utils/permissions";
 import axios from "axios";
 import API_BASE from "../../api";
 import * as XLSX from "xlsx";
@@ -172,7 +179,124 @@ const PANGASINAN_DISTRICTS = [
   },
 ];
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function SpecialProject() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "specialProject");
+  const allowEdit = canEdit(user, "specialProject");
+  const allowDelete = canDelete(user, "specialProject");
+  const allowExport = canExport(user, "specialProject");
+
+  const deny = (message) => {
+    alert(message);
+    return false;
+  };
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   const STORAGE_KEY = "special_project_records_v1";
   const SPECIAL_PROJECT_OPTIONS_KEY = "special_project_dropdown_options_v1";
   const DEFAULT_SPECIAL_PROJECT_OPTIONS = [
@@ -353,6 +477,21 @@ export default function SpecialProject() {
     return match ? match[0] : "";
   };
 
+  const normalizeMovPhotos = (value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === "object") return [];
+    try {
+      const parsed = JSON.parse(value || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const getMovPhotos = (record = {}) =>
+    normalizeMovPhotos(record.movPhotos ?? record.mov_photos ?? record.photos);
+
   const openVerificationLink = (text) => {
     const url = extractFirstUrl(text);
     if (!url) {
@@ -375,6 +514,7 @@ export default function SpecialProject() {
       "DATE PROJECT APPROVED",
       "PROJECT COST",
       "MEANS OF VERIFICATION",
+      "MOV PHOTO COUNT",
       "NAME OF STAFF",
       "QUARTER",
     ];
@@ -399,6 +539,7 @@ export default function SpecialProject() {
           r?.dateProjectApproved || "",
           toNumber(r?.projectCost),
           r?.meansOfVerification || "",
+          getMovPhotos(r).length,
           r?.staffName || "",
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ]
@@ -424,6 +565,7 @@ export default function SpecialProject() {
       "DATE PROJECT APPROVED": r?.dateProjectApproved || "",
       "PROJECT COST": toNumber(r?.projectCost),
       "MEANS OF VERIFICATION": r?.meansOfVerification || "",
+      "MOV PHOTO COUNT": getMovPhotos(r).length,
       "NAME OF STAFF": r?.staffName || "",
       QUARTER: r?.quarter ? `${String(r.quarter)}Q` : "",
     }));
@@ -528,6 +670,7 @@ export default function SpecialProject() {
         ["Date Project Approved", r?.dateProjectApproved || "—"],
         ["Project Cost", `PHP ${formatCurrency(r?.projectCost)}`],
         ["Means of Verification", r?.meansOfVerification || "—"],
+        ["MOV Photo Count", getMovPhotos(r).length],
         ["Name of Staff", r?.staffName || "—"],
       ];
 
@@ -700,6 +843,7 @@ export default function SpecialProject() {
         <div class="field"><div class="label">Date Project Approved</div><div class="value">${escapeHtml(record?.dateProjectApproved || "—")}</div></div>
         <div class="field"><div class="label">Project Cost</div><div class="value">PHP ${escapeHtml(formatCurrency(record?.projectCost))}</div></div>
         <div class="field full"><div class="label">Means of Verification</div><div class="value">${escapeHtml(record?.meansOfVerification || "—")}</div></div>
+        <div class="field"><div class="label">MOV Photo Count</div><div class="value">${getMovPhotos(record).length}</div></div>
         <div class="field full"><div class="label">Name of Staff</div><div class="value">${escapeHtml(record?.staffName || "—")}</div></div>
       </div>
     `;
@@ -713,6 +857,7 @@ export default function SpecialProject() {
           <tr><th>Special Project</th><td colspan="3">${escapeHtml(record?.specialProject || "—")}</td></tr>
           <tr><th>Date Project Approved</th><td>${escapeHtml(record?.dateProjectApproved || "—")}</td><th>Project Cost</th><td>PHP ${escapeHtml(formatCurrency(record?.projectCost))}</td></tr>
           <tr><th>Means of Verification</th><td colspan="3">${escapeHtml(record?.meansOfVerification || "—")}</td></tr>
+          <tr><th>MOV Photo Count</th><td colspan="3">${getMovPhotos(record).length}</td></tr>
           <tr><th>Name of Staff</th><td colspan="3">${escapeHtml(record?.staffName || "—")}</td></tr>
         </tbody>
       </table>
@@ -727,6 +872,7 @@ export default function SpecialProject() {
         <div><b>Date Project Approved:</b> ${escapeHtml(record?.dateProjectApproved || "—")}</div>
         <div><b>Project Cost:</b> PHP ${escapeHtml(formatCurrency(record?.projectCost))}</div>
         <div><b>Means of Verification:</b> ${escapeHtml(record?.meansOfVerification || "—")}</div>
+        <div><b>MOV Photo Count:</b> ${getMovPhotos(record).length}</div>
         <div><b>Name of Staff:</b> ${escapeHtml(record?.staffName || "—")}</div>
         <div><b>Quarter:</b> ${escapeHtml(record?.quarter ? `${record.quarter}Q` : "—")}</div>
       </div>
@@ -909,6 +1055,7 @@ export default function SpecialProject() {
     address: "",
     addressMeta: null,
     meansOfVerification: "",
+    movPhotos: [],
     staffName: "",
     customFields: {},
   });
@@ -925,7 +1072,16 @@ export default function SpecialProject() {
   const fetchRecords = async () => {
     try {
       const res = await axios.get(`${API_BASE}/special-projects`);
-      setRecords(Array.isArray(res.data) ? res.data : []);
+      const rows = Array.isArray(res.data) ? res.data : [];
+      setRecords(rows.map((row) => {
+        const photos = normalizeMovPhotos(row.movPhotos ?? row.mov_photos ?? row.photos);
+        return {
+          ...row,
+          movPhotos: photos,
+          mov_photos: photos,
+          photos,
+        };
+      }));
     } catch (err) {
       console.error(err);
       setRecords([]);
@@ -1116,6 +1272,7 @@ export default function SpecialProject() {
       address: "",
       addressMeta: null,
       meansOfVerification: "",
+      movPhotos: [],
       staffName: "",
       customFields: {},
     });
@@ -1224,9 +1381,18 @@ export default function SpecialProject() {
     return it?.title || type || "—";
   };
 
-  const openInterventionPicker = (recordId) => setPickForId(recordId);
-  const openInterventionDetails_Add = (recordId, type) => { setPickForId(null); resetDetailForm(type); setDetailFor({ recordId, mode: "add" }); };
+  const openInterventionPicker = (recordId) => {
+    if (!allowAdd) return deny("You do not have permission to add Special Project interventions.");
+    setPickForId(recordId);
+  };
+  const openInterventionDetails_Add = (recordId, type) => {
+    if (!allowAdd) return deny("You do not have permission to add Special Project interventions.");
+    setPickForId(null);
+    resetDetailForm(type);
+    setDetailFor({ recordId, mode: "add" });
+  };
   const openInterventionDetails_Edit = (recordId, entryId) => {
+    if (!allowEdit) return deny("You do not have permission to edit Special Project interventions.");
     const record = getRecordById(recordId);
     const entry = (record?.sntInterventions || []).find((x) => x.id === entryId);
     if (!record || !entry) return;
@@ -1240,6 +1406,8 @@ export default function SpecialProject() {
 
   const saveInterventionDetails = () => {
     if (!detailFor) return;
+    if (detailFor.mode === "add" && !allowAdd) return deny("You do not have permission to add Special Project interventions.");
+    if (detailFor.mode === "edit" && !allowEdit) return deny("You do not have permission to edit Special Project interventions.");
     const type = (detailForm.type || "").trim();
     const isTech = type === "Tech Roll Out";
     const isTraining = type === "Training";
@@ -1262,8 +1430,9 @@ export default function SpecialProject() {
     resetDetailForm();
   };
 
-  const deleteIntervention = (recordId, entryId) => {
-    if (!window.confirm("Delete this intervention entry?")) return;
+  const deleteIntervention = async (recordId, entryId) => {
+    if (!allowDelete) return deny("You do not have permission to delete Special Project interventions.");
+    if (!(await requestDeleteConfirm("Delete this intervention entry?"))) return;
     saveRecords(records.map((r) => r.id === recordId ? { ...r, sntInterventions: (r.sntInterventions || []).filter((x) => x.id !== entryId) } : r));
     setSelectedSntIds((prev) => {
       const next = { ...prev };
@@ -1284,13 +1453,14 @@ export default function SpecialProject() {
     openInterventionDetails_Edit(recordId, selected.id);
   };
 
-  const deleteSelectedSntEntry = (recordId) => {
+  const deleteSelectedSntEntry = async (recordId) => {
     const selected = getSelectedSntEntry(recordId);
     if (!selected) return;
     deleteIntervention(recordId, selected.id);
   };
 
   const openPrintPopupRow = (recordId) => {
+    if (!allowExport) return deny("You do not have permission to print Special Project records.");
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1303,6 +1473,7 @@ export default function SpecialProject() {
   };
 
   const openPrintPopupBulk = () => {
+    if (!allowExport) return deny("You do not have permission to print Special Project records.");
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1315,6 +1486,7 @@ export default function SpecialProject() {
   };
 
   const confirmPrint = () => {
+    if (!allowExport) return deny("You do not have permission to print Special Project records.");
     const rows =
       printModal.scope === "row"
         ? [getRecordById(printModal.recordId)].filter(Boolean)
@@ -1339,6 +1511,7 @@ export default function SpecialProject() {
   };
 
   const openExportPopupRow = (recordId) => {
+    if (!allowExport) return deny("You do not have permission to export Special Project records.");
     setExportModal({
       open: true,
       scope: "row",
@@ -1352,6 +1525,7 @@ export default function SpecialProject() {
   };
 
   const openExportPopupBulk = () => {
+    if (!allowExport) return deny("You do not have permission to export Special Project records.");
     setExportModal({
       open: true,
       scope: "bulk",
@@ -1365,6 +1539,7 @@ export default function SpecialProject() {
   };
 
   const confirmExport = async () => {
+    if (!allowExport) return deny("You do not have permission to export Special Project records.");
     const rows =
       exportModal.scope === "row"
         ? [getRecordById(exportModal.recordId)].filter(Boolean)
@@ -1404,6 +1579,7 @@ export default function SpecialProject() {
   };
 
   const openAddRecord = () => {
+    if (!allowAdd) return deny("You do not have permission to add Special Project records.");
     setEditRecordId(null);
     resetForm();
     setShowAdd(true);
@@ -1415,6 +1591,7 @@ export default function SpecialProject() {
   };
 
   const openEditRecord = (id) => {
+    if (!allowEdit) return deny("You do not have permission to edit Special Project records.");
     const r = records.find((x) => x.id === id);
     if (!r) return;
 
@@ -1429,6 +1606,7 @@ export default function SpecialProject() {
       address: r.address || "",
       addressMeta: r.addressMeta || null,
       meansOfVerification: r.meansOfVerification || "",
+      movPhotos: getMovPhotos(r),
       staffName: r.staffName || "",
       customFields: r.customFields || r.custom_fields || {},
     });
@@ -1542,6 +1720,8 @@ export default function SpecialProject() {
     );
   };
   const saveRecord = async () => {
+    if (!editRecordId && !allowAdd) return deny("You do not have permission to add Special Project records.");
+    if (editRecordId && !allowEdit) return deny("You do not have permission to edit Special Project records.");
     if (!form.specialProject.trim()) return alert("Required: Special Project");
     if (!form.projectTitle.trim()) return alert("Required: Project Title");
     if (String(form.projectCost).trim() === "") return alert("Required: Project Cost");
@@ -1563,6 +1743,10 @@ export default function SpecialProject() {
       address: form.address.trim(),
       addressMeta: form.addressMeta || null,
       meansOfVerification: (form.meansOfVerification || "").trim(),
+      means_of_verification: (form.meansOfVerification || "").trim(),
+      movPhotos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
+      mov_photos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
+      photos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
       staffName: (form.staffName || "").trim(),
       custom_fields: form.customFields || {},
       customFields: form.customFields || {},
@@ -1588,7 +1772,8 @@ export default function SpecialProject() {
   };
 
   const deleteRecord = async (id) => {
-    if (!window.confirm("Delete this record?")) return;
+    if (!allowDelete) return deny("You do not have permission to delete Special Project records.");
+    if (!(await requestDeleteConfirm("Delete this record?"))) return;
 
     try {
       await axios.delete(`${API_BASE}/special-projects/${id}`);
@@ -2759,7 +2944,7 @@ export default function SpecialProject() {
       <div style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ fontWeight: 900, fontSize: 16 }}>S&amp;T Interventions</div>
-          <button type="button" style={styles.btnDark} onClick={() => openInterventionPicker(record.id)}>+ Add S&amp;T Intervention</button>
+          {allowAdd && (<button type="button" style={styles.btnDark} onClick={() => openInterventionPicker(record.id)}>+ Add S&amp;T Intervention</button>)}
         </div>
         <div style={styles.viewTableWrap}>
           <table style={{ ...styles.viewTable, minWidth: 760 }}>
@@ -2784,8 +2969,12 @@ export default function SpecialProject() {
                     <td style={styles.viewTd}>{it.venue || "—"}</td>
                     <td style={styles.viewTdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openInterventionDetails_Edit(record.id, it.id)}>View / Edit</button>
-                        <button type="button" style={styles.dangerBtn} onClick={() => deleteIntervention(record.id, it.id)}>Delete</button>
+                        {allowEdit ? (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openInterventionDetails_Edit(record.id, it.id)}>View / Edit</button>
+                        ) : (
+                          <button type="button" style={styles.tinyBtn} disabled>View Only</button>
+                        )}
+                        {allowDelete && (<button type="button" style={styles.dangerBtn} onClick={() => deleteIntervention(record.id, it.id)}>Delete</button>)}
                       </div>
                     </td>
                   </tr>
@@ -3134,17 +3323,23 @@ export default function SpecialProject() {
               Clear Filters
             </button>
 
-            <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk} disabled={filteredRecords.length === 0}>
-              Export
-            </button>
+            {allowExport && (
+              <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk} disabled={filteredRecords.length === 0}>
+                Export
+              </button>
+            )}
 
-            <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk} disabled={filteredRecords.length === 0}>
-              Print
-            </button>
+            {allowExport && (
+              <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk} disabled={filteredRecords.length === 0}>
+                Print
+              </button>
+            )}
 
-            <button type="button" style={styles.addBtn} onClick={openAddRecord}>
-              + Add Project
-            </button>
+            {allowAdd && (
+              <button type="button" style={styles.addBtn} onClick={openAddRecord}>
+                + Add Project
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -3252,7 +3447,8 @@ export default function SpecialProject() {
                       )}
 
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 10 }}>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openInterventionPicker(r.id)}>+ Add</button>
+                        {allowAdd && (<button type="button" style={styles.tinyBtn} onClick={() => openInterventionPicker(r.id)}>+ Add</button>)}
+                        {allowEdit && (
                         <button
                           type="button"
                           style={{ ...styles.tinyBtn, opacity: getSelectedSntEntry(r.id) ? 1 : 0.45, cursor: getSelectedSntEntry(r.id) ? "pointer" : "not-allowed" }}
@@ -3261,6 +3457,8 @@ export default function SpecialProject() {
                         >
                           Edit
                         </button>
+                        )}
+                        {allowDelete && (
                         <button
                           type="button"
                           style={{ ...styles.dangerBtn, opacity: getSelectedSntEntry(r.id) ? 1 : 0.45, cursor: getSelectedSntEntry(r.id) ? "pointer" : "not-allowed" }}
@@ -3269,12 +3467,16 @@ export default function SpecialProject() {
                         >
                           Delete
                         </button>
+                        )}
                       </div>
                     </td>
 
                     <td style={styles.td}>
                       <div style={{ display: "grid", gap: 8 }}>
                         <div>{r.meansOfVerification || "—"}</div>
+                        <div style={{ fontSize: 11, fontWeight: 900, color: "#334155" }}>
+                          Photos: {getMovPhotos(r).length}
+                        </div>
                         {hasMovUrl ? (
                           <div>
                             <button type="button" style={styles.tinyBtn} onClick={() => openVerificationLink(r.meansOfVerification)}>
@@ -3288,10 +3490,10 @@ export default function SpecialProject() {
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
                         <button type="button" style={styles.tinyBtn} onClick={() => openViewRecord(r.id, "list")}>View</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openEditRecord(r.id)}>Edit</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>
-                        <button type="button" style={styles.dangerBtn} onClick={() => deleteRecord(r.id)}>Delete</button>
+                        {allowEdit && (<button type="button" style={styles.tinyBtn} onClick={() => openEditRecord(r.id)}>Edit</button>)}
+                        {allowExport && (<button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>)}
+                        {allowExport && (<button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>)}
+                        {allowDelete && (<button type="button" style={styles.dangerBtn} onClick={() => deleteRecord(r.id)}>Delete</button>)}
                       </div>
                     </td>
                   </tr>
@@ -3413,15 +3615,12 @@ export default function SpecialProject() {
                   ) : null}
                 </div>
 
-                <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
-                  <div style={styles.label}>Means of Verification</div>
-                  <input
-                    style={styles.input}
-                    value={form.meansOfVerification}
-                    onChange={(e) => setForm({ ...form, meansOfVerification: e.target.value })}
-                    placeholder="Text or URL"
-                  />
-                </div>
+                <UnifiedMOVSection
+                  value={form.meansOfVerification}
+                  photos={Array.isArray(form.movPhotos) ? form.movPhotos : []}
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, meansOfVerification: value }))}
+                  onPhotosChange={(photos) => setForm((prev) => ({ ...prev, movPhotos: photos }))}
+                />
 
                 <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
                   <div style={styles.label}>Name of Staff</div>
@@ -3524,6 +3723,21 @@ export default function SpecialProject() {
                 <div><b>Date Approved:</b> {viewRecord.dateProjectApproved || "—"}</div>
                 <div><b>Project Cost:</b> PHP {formatCurrency(viewRecord.projectCost)}</div>
                 <div><b>Means of Verification:</b> {viewRecord.meansOfVerification || "—"}</div>
+                <div>
+                  <b>MOV Photos:</b> {getMovPhotos(viewRecord).length}
+                  {getMovPhotos(viewRecord).length ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                      {getMovPhotos(viewRecord).map((photo, idx) => (
+                        <img
+                          key={`${photo.name || "mov-photo"}_${idx}`}
+                          src={photo.dataUrl || photo.url}
+                          alt={photo.name || `MOV Photo ${idx + 1}`}
+                          style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 8, border: "1px solid #cbd5e1" }}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
                 <div><b>Name of Staff:</b> {viewRecord.staffName || "—"}</div>
                 {renderSpecialProjectCustomViewFields(viewRecord)}
                 <div><b>Quarter:</b> {viewRecord.quarter ? `${viewRecord.quarter}Q` : "—"}</div>
@@ -3571,6 +3785,24 @@ export default function SpecialProject() {
                     <tr>
                       <td style={styles.viewTd}><b>Means of Verification</b></td>
                       <td style={styles.viewTd}>{viewRecord.meansOfVerification || "—"}</td>
+                    </tr>
+                    <tr>
+                      <td style={styles.viewTd}><b>MOV Photos</b></td>
+                      <td style={styles.viewTd}>
+                        {getMovPhotos(viewRecord).length}
+                        {getMovPhotos(viewRecord).length ? (
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                            {getMovPhotos(viewRecord).map((photo, idx) => (
+                              <img
+                                key={`${photo.name || "mov-photo"}_${idx}`}
+                                src={photo.dataUrl || photo.url}
+                                alt={photo.name || `MOV Photo ${idx + 1}`}
+                                style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 8, border: "1px solid #cbd5e1" }}
+                              />
+                            ))}
+                          </div>
+                        ) : null}
+                      </td>
                     </tr>
                     <tr>
                       <td style={styles.viewTd}><b>Name of Staff</b></td>
@@ -3633,6 +3865,7 @@ export default function SpecialProject() {
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {allowEdit && (
                 <button
                   type="button"
                   style={styles.btnGhost}
@@ -3643,6 +3876,7 @@ export default function SpecialProject() {
                 >
                   Edit
                 </button>
+                )}
                 <button
                   type="button"
                   style={styles.btnDark}
@@ -3832,6 +4066,112 @@ export default function SpecialProject() {
           </div>
         </div>
       </PopupModal>
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

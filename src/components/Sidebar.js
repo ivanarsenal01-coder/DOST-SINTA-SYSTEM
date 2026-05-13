@@ -39,6 +39,14 @@ const icons = {
       />
     </svg>
   ),
+  info: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm-1-10h2V7h-2v2Z"
+        fill="currentColor"
+      />
+    </svg>
+  ),
   chevron: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -51,6 +59,13 @@ const icons = {
     </svg>
   ),
 };
+
+function normalizeRole(role = "") {
+  return String(role || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+}
 
 export default function Sidebar({ open, onClose }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -71,10 +86,15 @@ export default function Sidebar({ open, onClose }) {
   const user = auth?.user || null;
   const logout = auth?.logout;
 
-  const isAdmin = user?.role === "admin";
-  const isSuperAdmin = user?.role === "superadmin";
-  const isStaff = user?.role === "staff";
+  const cleanRole = normalizeRole(user?.role);
+
+  const isAdmin = cleanRole === "admin";
+  const isSuperAdmin = cleanRole === "superadmin";
+  const isStaff = cleanRole === "staff";
+
   const canSeeManagementDropdown = isSuperAdmin || isAdmin;
+  const canSeeUserManagement = isSuperAdmin || isAdmin;
+  const canSeeTableManagement = isSuperAdmin;
 
   useEffect(() => {
     if (location.pathname.startsWith("/accomplishment/")) {
@@ -295,7 +315,6 @@ export default function Sidebar({ open, onClose }) {
 
               {accOpen && !collapsed && (
                 <div className="nav-sub">
-                  
                   <NavLink
                     to="/accomplishment/setup"
                     className={({ isActive }) =>
@@ -434,36 +453,19 @@ export default function Sidebar({ open, onClose }) {
                 <div className="flyout">
                   <div className="flyout-title">Accomplishment</div>
 
-                  
-                  <NavLink
-                    to="/accomplishment/setup"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/setup" className="flyout-item" onClick={closeAll}>
                     SETUP
                   </NavLink>
 
-                  <NavLink
-                    to="/accomplishment/cest"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/cest" className="flyout-item" onClick={closeAll}>
                     CEST
                   </NavLink>
 
-                  <NavLink
-                    to="/accomplishment/sscp"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/sscp" className="flyout-item" onClick={closeAll}>
                     SSCP
                   </NavLink>
 
-                  <NavLink
-                    to="/accomplishment/drrm"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/drrm" className="flyout-item" onClick={closeAll}>
                     DRRM
                   </NavLink>
 
@@ -491,19 +493,11 @@ export default function Sidebar({ open, onClose }) {
                     Packaging &amp; Labeling
                   </NavLink>
 
-                  <NavLink
-                    to="/accomplishment/promo"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/promo" className="flyout-item" onClick={closeAll}>
                     S&amp;T PROMO
                   </NavLink>
 
-                  <NavLink
-                    to="/accomplishment/tacs"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
+                  <NavLink to="/accomplishment/tacs" className="flyout-item" onClick={closeAll}>
                     TACS
                   </NavLink>
 
@@ -559,27 +553,31 @@ export default function Sidebar({ open, onClose }) {
 
                 {mgmtOpen && !collapsed && (
                   <div className="nav-sub">
-                    <NavLink
-                      to="/user-mgmt"
-                      className={({ isActive }) =>
-                        `nav-sub-item ${isActive ? "active" : ""}`
-                      }
-                      onClick={closeAll}
-                    >
-                      <span className="dot" />
-                      <span>User Management</span>
-                    </NavLink>
+                    {canSeeUserManagement ? (
+                      <NavLink
+                        to="/user-mgmt"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>User Management</span>
+                      </NavLink>
+                    ) : null}
 
-                    <NavLink
-                      to="/table-management"
-                      className={({ isActive }) =>
-                        `nav-sub-item ${isActive ? "active" : ""}`
-                      }
-                      onClick={closeAll}
-                    >
-                      <span className="dot" />
-                      <span>Table Management</span>
-                    </NavLink>
+                    {canSeeTableManagement ? (
+                      <NavLink
+                        to="/table-management"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Table Management</span>
+                      </NavLink>
+                    ) : null}
                   </div>
                 )}
 
@@ -587,34 +585,34 @@ export default function Sidebar({ open, onClose }) {
                   <div className="flyout">
                     <div className="flyout-title">Management</div>
 
-                    <NavLink
-                      to="/user-mgmt"
-                      className="flyout-item"
-                      onClick={closeAll}
-                    >
-                      User Management
-                    </NavLink>
+                    {canSeeUserManagement ? (
+                      <NavLink to="/user-mgmt" className="flyout-item" onClick={closeAll}>
+                        User Management
+                      </NavLink>
+                    ) : null}
 
-                    <NavLink
-                      to="/table-management"
-                      className="flyout-item"
-                      onClick={closeAll}
-                    >
-                      Table Management
-                    </NavLink>
+                    {canSeeTableManagement ? (
+                      <NavLink
+                        to="/table-management"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Table Management
+                      </NavLink>
+                    ) : null}
                   </div>
                 )}
               </div>
-            ) : (
-              <NavLink
-                to="/user-mgmt"
-                className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
-                onClick={closeAll}
-              >
-                <Icon>{icons.users}</Icon>
-                {!collapsed && <span className="nav-label">User Management</span>}
-              </NavLink>
-            )}
+            ) : null}
+
+            <NavLink
+              to="/about"
+              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+              onClick={closeAll}
+            >
+              <Icon>{icons.info}</Icon>
+              {!collapsed && <span className="nav-label">About Us</span>}
+            </NavLink>
           </nav>
 
           <div className="sidebar-footer">

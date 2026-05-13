@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -190,6 +191,18 @@ const parseTechRolloutCustomFields = (value) => {
   }
 };
 
+const parseTechRolloutPhotos = (value) => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "object") return [];
+  try {
+    const parsed = JSON.parse(value || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 const cleanTechRolloutCustomLabel = (value) =>
   String(value || "")
     .replace(/^#+/, "")
@@ -216,6 +229,8 @@ const emptyForm = {
   representativeDesignation: "",
   sex: "",
   nameOfStaff: "",
+  meansOfVerification: "",
+  movPhotos: [],
   customFields: {},
 };
 
@@ -325,6 +340,8 @@ const mapDbRowToUi = (row) => ({
 
   sex: row.sex || "",
   nameOfStaff: row.name_of_staff || row.nameOfStaff || row.staffName || row.staff_name || "",
+  meansOfVerification: row.means_of_verification || row.meansOfVerification || "",
+  movPhotos: parseTechRolloutPhotos(row.movPhotos ?? row.mov_photos ?? row.photos),
   staffName: row.name_of_staff || row.nameOfStaff || row.staffName || row.staff_name || "",
   customFields: parseTechRolloutCustomFields(row.customFields || row.custom_fields),
   custom_fields: parseTechRolloutCustomFields(row.custom_fields || row.customFields),
@@ -359,6 +376,8 @@ const mapUiToApiPayload = (form) => {
     (form.representativeDesignation || "").trim() || null;
   const sex = (form.sex || "").trim() || null;
   const nameOfStaff = (form.nameOfStaff || "").trim() || null;
+  const meansOfVerification = (form.meansOfVerification || "").trim();
+  const movPhotos = Array.isArray(form.movPhotos) ? form.movPhotos : [];
 
   const addressMode = form.institutionAddressMeta?.mode || null;
   const addressManualText = form.institutionAddressMeta?.manualText || null;
@@ -455,6 +474,13 @@ const mapUiToApiPayload = (form) => {
     name_of_staff: nameOfStaff,
     staffName: nameOfStaff,
     staff_name: nameOfStaff,
+
+    meansOfVerification,
+    means_of_verification: meansOfVerification,
+    movPhotos,
+    mov_photos: movPhotos,
+    photos: movPhotos,
+
     custom_fields: form.customFields || {},
     customFields: form.customFields || {},
   };
@@ -472,7 +498,173 @@ const isRolloutSyncedFromIntervention = (row) => {
 };
 
 
+
+
+function extractMovLinks(text) {
+  const matches = String(text || "").match(/https?:\/\/[^\s]+/gi) || [];
+  return Array.from(new Set(matches));
+}
+
+function openMovFirstLink(text) {
+  const links = extractMovLinks(text);
+  if (!links.length) return alert("No URL found in Means of Verification.");
+  window.open(links[0], "_blank", "noopener,noreferrer");
+}
+
+function openMovLink(url) {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function movFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pickMovPhotos(currentPhotos = [], onChange) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+    const converted = [];
+    for (const file of files) {
+      converted.push({ name: file.name, type: file.type, dataUrl: await movFileToDataUrl(file) });
+    }
+    if (converted.length) onChange([...(Array.isArray(currentPhotos) ? currentPhotos : []), ...converted]);
+  };
+  input.click();
+}
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function TechnologyRollout() {
+  const { hasPageAccess } = useAuth();
+
+  const canTechRollout = (action) =>
+    [
+      "technologyRollout",
+      "techRollout",
+      "technology_rollout",
+      "tech_rollout",
+    ].some((pageKey) => hasPageAccess?.(pageKey, action));
+
+  const canAdd = canTechRollout("add");
+  const canEdit = canTechRollout("edit");
+  const canDelete = canTechRollout("delete");
+  const canExport = canTechRollout("export");
+
+  const denyPrivilege = (actionLabel = "perform this action") => {
+    alert(`You don't have privilege to ${actionLabel}.`);
+  };
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
 
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
@@ -1584,6 +1776,7 @@ export default function TechnologyRollout() {
 
   // ===== Print / Export popup actions =====
   const openPrintPopupRow = (recordId) => {
+    if (!canExport) return denyPrivilege("print this Technology Rollout entry");
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1596,6 +1789,7 @@ export default function TechnologyRollout() {
   };
 
   const openPrintPopupBulk = () => {
+    if (!canExport) return denyPrivilege("print Technology Rollout records");
     setPrintModal((p) => ({
       ...p,
       open: true,
@@ -1608,6 +1802,7 @@ export default function TechnologyRollout() {
   };
 
   const confirmPrint = () => {
+    if (!canExport) return denyPrivilege("print Technology Rollout records");
     const rows =
       printModal.scope === "row"
         ? [getRecordById(printModal.recordId)].filter(Boolean)
@@ -1632,6 +1827,7 @@ export default function TechnologyRollout() {
   };
 
   const openExportPopupRow = (recordId) => {
+    if (!canExport) return denyPrivilege("export this Technology Rollout entry");
     setExportModal({
       open: true,
       scope: "row",
@@ -1645,6 +1841,7 @@ export default function TechnologyRollout() {
   };
 
   const openExportPopupBulk = () => {
+    if (!canExport) return denyPrivilege("export Technology Rollout records");
     setExportModal({
       open: true,
       scope: "bulk",
@@ -1658,6 +1855,7 @@ export default function TechnologyRollout() {
   };
 
   const confirmExport = async () => {
+    if (!canExport) return denyPrivilege("export Technology Rollout records");
     const rows =
       exportModal.scope === "row"
         ? [getRecordById(exportModal.recordId)].filter(Boolean)
@@ -1772,12 +1970,14 @@ export default function TechnologyRollout() {
   };
   // ===== MAIN CRUD =====
   const openAddRecord = () => {
+    if (!canAdd) return denyPrivilege("add a Technology Rollout entry");
     setEditRecordId(null);
     resetForm();
     setShowAdd(true);
   };
 
   const openEditRecord = (id) => {
+    if (!canEdit) return denyPrivilege("edit this Technology Rollout entry");
     const r = records.find((x) => x.id === id);
     if (!r) return;
 
@@ -1801,12 +2001,16 @@ export default function TechnologyRollout() {
       representativeDesignation: r.representativeDesignation || "",
       sex: r.sex || "",
       nameOfStaff: r.nameOfStaff || r.staffName || "",
+      meansOfVerification: r.meansOfVerification || r.means_of_verification || "",
+      movPhotos: parseTechRolloutPhotos(r.movPhotos ?? r.mov_photos ?? r.photos),
       customFields: parseTechRolloutCustomFields(r.customFields || r.custom_fields),
     });
     setShowAdd(true);
   };
 
   const saveRecord = async () => {
+    if (editRecordId && !canEdit) return denyPrivilege("update this Technology Rollout entry");
+    if (!editRecordId && !canAdd) return denyPrivilege("save a new Technology Rollout entry");
     if (!form.nameOfTechnologyTransferred.trim())
       return alert("Required: Name of Knowledge/Technology Transferred");
     if (!form.technologyGenerator.trim())
@@ -1867,7 +2071,8 @@ export default function TechnologyRollout() {
   };
 
   const deleteRecord = async (id) => {
-    if (!window.confirm("Delete this record?")) return;
+    if (!canDelete) return denyPrivilege("delete this Technology Rollout entry");
+    if (!(await requestDeleteConfirm("Delete this record?"))) return;
 
     try {
       await axios.delete(`${API_BASE_URL}/${id}`);
@@ -3330,17 +3535,23 @@ export default function TechnologyRollout() {
               Clear Filters
             </button>
 
-            <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk}>
-              Export
-            </button>
+            {canExport ? (
+              <button type="button" style={styles.btnGhost} onClick={openExportPopupBulk}>
+                Export
+              </button>
+            ) : null}
 
-            <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk}>
-              Print
-            </button>
+            {canExport ? (
+              <button type="button" style={styles.btnDark} onClick={openPrintPopupBulk}>
+                Print
+              </button>
+            ) : null}
 
-            <button type="button" style={styles.addBtn} onClick={openAddRecord}>
-              + Add Entry
-            </button>
+            {canAdd ? (
+              <button type="button" style={styles.addBtn} onClick={openAddRecord}>
+                + Add Entry
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -3448,42 +3659,53 @@ export default function TechnologyRollout() {
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
                         <button type="button" style={styles.tinyBtn} onClick={() => { setViewMode("list"); setViewRecordId(r.id); }}>View</button>
-                        <button
-                          type="button"
-                          style={{
-                            ...styles.tinyBtn,
-                            opacity: r.syncedFromIntervention ? 0.6 : 1,
-                            cursor: r.syncedFromIntervention ? "not-allowed" : "pointer",
-                          }}
-                          onClick={() => {
-                            if (r.syncedFromIntervention) {
-                              alert("This entry is synced from S&T Intervention. Edit it from the source module.");
-                              return;
-                            }
-                            openEditRecord(r.id);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>
-                        <button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>
-                        <button
-                          type="button"
-                          style={{
-                            ...styles.dangerBtn,
-                            opacity: r.syncedFromIntervention ? 0.6 : 1,
-                            cursor: r.syncedFromIntervention ? "not-allowed" : "pointer",
-                          }}
-                          onClick={() => {
-                            if (r.syncedFromIntervention) {
-                              alert("This entry is synced from S&T Intervention. Delete it from the source module.");
-                              return;
-                            }
-                            deleteRecord(r.id);
-                          }}
-                        >
-                          Delete
-                        </button>
+                        {canEdit ? (
+                          <button
+                            type="button"
+                            style={{
+                              ...styles.tinyBtn,
+                              opacity: r.syncedFromIntervention ? 0.6 : 1,
+                              cursor: r.syncedFromIntervention ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => {
+                              if (r.syncedFromIntervention) {
+                                alert("This entry is synced from S&T Intervention. Edit it from the source module.");
+                                return;
+                              }
+                              openEditRecord(r.id);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        ) : null}
+
+                        {canExport ? (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openPrintPopupRow(r.id)}>Print</button>
+                        ) : null}
+
+                        {canExport ? (
+                          <button type="button" style={styles.tinyBtn} onClick={() => openExportPopupRow(r.id)}>Export</button>
+                        ) : null}
+
+                        {canDelete ? (
+                          <button
+                            type="button"
+                            style={{
+                              ...styles.dangerBtn,
+                              opacity: r.syncedFromIntervention ? 0.6 : 1,
+                              cursor: r.syncedFromIntervention ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => {
+                              if (r.syncedFromIntervention) {
+                                alert("This entry is synced from S&T Intervention. Delete it from the source module.");
+                                return;
+                              }
+                              deleteRecord(r.id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
@@ -3697,6 +3919,51 @@ export default function TechnologyRollout() {
                   >
                     Directions
                   </button>
+                </div>
+
+                <div style={styles.viewSection}>
+                  <div style={styles.viewSectionTitle}>Means of Verification</div>
+                  <div style={styles.viewWideBox}>{viewRecord.meansOfVerification || "—"}</div>
+
+                  {extractMovLinks(viewRecord.meansOfVerification).length ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: -2 }}>
+                      {extractMovLinks(viewRecord.meansOfVerification).map((url, idx) => (
+                        <button
+                          type="button"
+                          key={`${url}_${idx}`}
+                          style={styles.viewMiniBtn}
+                          onClick={() => openMovLink(url)}
+                        >
+                          Link {idx + 1}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>
+                      Photos: {Array.isArray(viewRecord.movPhotos) ? viewRecord.movPhotos.length : 0}
+                    </span>
+                  </div>
+
+                  {Array.isArray(viewRecord.movPhotos) && viewRecord.movPhotos.length ? (
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      {viewRecord.movPhotos.map((photo, idx) => {
+                        const src = photo?.dataUrl || photo?.url || photo?.file_data || photo?.photo_data || "";
+                        if (!src) return null;
+                        return (
+                          <img
+                            key={`${photo?.name || photo?.fileName || "mov"}_${idx}`}
+                            src={src}
+                            alt={photo?.name || `MOV Photo ${idx + 1}`}
+                            title={photo?.name || `MOV Photo ${idx + 1}`}
+                            style={{ width: 74, height: 74, objectFit: "cover", borderRadius: 10, border: "1px solid #cbd5e1", cursor: "pointer" }}
+                            onClick={() => window.open(src, "_blank", "noopener,noreferrer")}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div style={styles.viewSection}>
@@ -3929,11 +4196,24 @@ export default function TechnologyRollout() {
 
                 {renderTechRolloutCustomInputs()}
               </div>
+
+                <UnifiedMOVSection
+                  value={form.meansOfVerification || ""}
+                  photos={form.movPhotos || []}
+                  onValueChange={(value) => setForm((prev) => ({ ...prev, meansOfVerification: value }))}
+                  onPhotosChange={(photos) => setForm((prev) => ({ ...prev, movPhotos: photos }))}
+                  label="Means of Verification"
+                />
+
             </div>
 
             <div style={styles.modalFooter}>
               <button type="button" style={styles.btnGhost} onClick={() => { setShowAdd(false); setEditRecordId(null); resetForm(); }}>Cancel</button>
-              <button type="button" style={styles.btnDark} onClick={saveRecord} disabled={isSaving}>{isSaving ? "Saving..." : editRecordId ? "Update Record" : "Save Record"}</button>
+              {(editRecordId ? canEdit : canAdd) ? (
+                <button type="button" style={styles.btnDark} onClick={saveRecord} disabled={isSaving}>
+                  {isSaving ? "Saving..." : editRecordId ? "Update Record" : "Save Record"}
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -4071,6 +4351,112 @@ export default function TechnologyRollout() {
           </div>
         </div>
       </PopupModal>
+
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

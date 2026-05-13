@@ -1,45 +1,108 @@
-// src/utils/permissions.js
-
 export const PAGE_KEYS = {
   dashboard: "dashboard",
   targetSetting: "targetSetting",
+  accomplishments: "accomplishments",
   userManagement: "userManagement",
   tableManagement: "tableManagement",
 
   setup: "setup",
   cest: "cest",
   sscp: "sscp",
-  technologyTraining: "technologyTraining",
-  tacs: "tacs",
-  pcl: "pcl",
-  specialReport: "specialReport",
-  promo: "promo",
+  drrm: "drrm",
+  specialProject: "specialProject",
   calibration: "calibration",
-
-  // optional / future modules
-  sillag: "sillag",
-  DRRM: "DRRM",
+  packaging: "packaging",
+  stPromo: "stPromo",
+  tacs: "tacs",
+  techPromo: "techPromo",
+  techRollout: "techRollout",
+  techTraining: "techTraining",
 };
 
+export const LEGACY_PAGE_KEY_MAP = {
+  technologyTraining: "techTraining",
+  training: "techTraining",
+  pcl: "packaging",
+  packagingLabeling: "packaging",
+  promo: "stPromo",
+  rollout: "techRollout",
+  technologyRollout: "techRollout",
+  sillag: "drrm",
+  DRRM: "drrm",
+  specialReport: "specialProject",
+
+  userMgmt: "userManagement",
+  userManagement: "userManagement",
+  tableMgmt: "tableManagement",
+  tableManagement: "tableManagement",
+};
+
+const SUPER_ADMIN_ONLY_PAGE_KEYS = new Set([
+  "tableManagement",
+]);
+
+const ADMIN_ALLOWED_PAGE_KEYS = new Set([
+  "userManagement",
+]);
+
+export function normalizeRole(role = "") {
+  return String(role || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+}
+
+export function normalizePageKey(pageKey) {
+  return LEGACY_PAGE_KEY_MAP[pageKey] || pageKey;
+}
+
 export function isSuperAdmin(user) {
-  return String(user?.role || "").toLowerCase() === "superadmin";
+  return normalizeRole(user?.role) === "superadmin";
 }
 
 export function isAdmin(user) {
-  return String(user?.role || "").toLowerCase() === "admin";
+  return normalizeRole(user?.role) === "admin";
 }
 
 export function isStaff(user) {
-  return String(user?.role || "").toLowerCase() === "staff";
+  return normalizeRole(user?.role) === "staff";
+}
+
+export function isSuperAdminOnlyPage(pageKey) {
+  const normalizedKey = normalizePageKey(pageKey);
+  return SUPER_ADMIN_ONLY_PAGE_KEYS.has(normalizedKey);
+}
+
+export function isAdminAllowedPage(pageKey) {
+  const normalizedKey = normalizePageKey(pageKey);
+  return ADMIN_ALLOWED_PAGE_KEYS.has(normalizedKey);
+}
+
+export function getPagePermission(user, pageKey) {
+  if (!user) return {};
+
+  const normalizedKey = normalizePageKey(pageKey);
+  const pages = user?.permissions?.pages || user?.permissions || {};
+
+  return pages?.[normalizedKey] || pages?.[pageKey] || {};
 }
 
 export function canAccess(user, pageKey, action = "view") {
   if (!user) return false;
 
+  const normalizedKey = normalizePageKey(pageKey);
+
+  if (isSuperAdminOnlyPage(normalizedKey)) {
+    return isSuperAdmin(user);
+  }
+
   if (isSuperAdmin(user)) return true;
 
-  const perms = user?.permissions?.pages?.[pageKey];
+  if (isAdminAllowedPage(normalizedKey) && isAdmin(user)) {
+    return true;
+  }
 
+  const perms = getPagePermission(user, normalizedKey);
   return Boolean(perms?.[action]);
 }
 
@@ -65,28 +128,22 @@ export function canExport(user, pageKey) {
 
 export function canManageUsers(user) {
   if (!user) return false;
-  if (isSuperAdmin(user)) return true;
-
-  return Boolean(
-    user?.permissions?.special?.manageUsers ||
-      user?.specialPermissions?.manageUsers
-  );
+  return isSuperAdmin(user) || isAdmin(user);
 }
 
 export function canManageDropdowns(user) {
   if (!user) return false;
-  if (isSuperAdmin(user)) return true;
-
-  return Boolean(
-    user?.permissions?.special?.manageDropdowns ||
-      user?.specialPermissions?.manageDropdowns
-  );
+  return isSuperAdmin(user);
 }
 
 export function summarizeEditableModules(user) {
   const pages = user?.permissions?.pages || {};
 
   return Object.entries(pages)
-    .filter(([, value]) => value?.add || value?.edit || value?.delete)
+    .filter(([key, value]) => {
+      if (isSuperAdminOnlyPage(key) && !isSuperAdmin(user)) return false;
+      if (isAdminAllowedPage(key) && isAdmin(user)) return true;
+      return value?.add || value?.edit || value?.delete;
+    })
     .map(([key]) => key);
 }

@@ -1,4 +1,3 @@
-// Setup.js (FULL) ✅ fixed buttons + address modal front + addressMeta payload
 
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
@@ -18,6 +17,13 @@ import {
 } from "docx";
 import "./setup.css";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import {
+  canAdd,
+  canEdit,
+  canDelete,
+  canExport,
+} from "../../usrmngment/utils/permissions";
 
 /* ✅ Leaflet + React-Leaflet */
 import "leaflet/dist/leaflet.css";
@@ -54,6 +60,146 @@ function escapeHtml(value = "") {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+
+function extractMovLinks(text) {
+  const value = String(text || "").trim();
+  if (!value) return [];
+  const matches = value.match(/https?:\/\/[^\s]+/gi) || [];
+  return Array.from(new Set(matches));
+}
+
+function separateMovLinks(text) {
+  return String(text || "")
+    .replace(/(https?:\/\/\S+)/gi, "\n$1")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
+function normalizeMovPhotos(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  try {
+    const parsed = typeof value === "string" ? JSON.parse(value) : value;
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function movFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function BlueDeleteConfirmModal({ open, title, message, subMessage, onCancel, onConfirm, loading }) {
+  if (!open) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(15, 23, 42, 0.45)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 50000,
+        padding: 16,
+      }}
+      onClick={loading ? undefined : onCancel}
+    >
+      <div
+        style={{
+          width: "min(430px, 100%)",
+          background: "#fff",
+          borderRadius: 14,
+          overflow: "hidden",
+          boxShadow: "0 18px 45px rgba(15, 23, 42, 0.28)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            background: "#0b4ea2",
+            color: "#fff",
+            padding: "13px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+            fontWeight: 900,
+          }}
+        >
+          <div>{title || "Confirm Delete"}</div>
+          <button
+            type="button"
+            onClick={loading ? undefined : onCancel}
+            style={{
+              border: "1px solid rgba(255,255,255,0.65)",
+              background: "#fff",
+              color: "#0f172a",
+              borderRadius: 10,
+              width: 34,
+              height: 34,
+              cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: 900,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div style={{ padding: "16px 18px", borderBottom: "1px solid #e2e8f0" }}>
+          <div style={{ fontWeight: 900, fontSize: 15, color: "#0f172a", marginBottom: 6 }}>
+            {message || "Are you sure you want to delete this?"}
+          </div>
+          <div style={{ fontSize: 13, color: "#475569", fontWeight: 700 }}>
+            {subMessage || "This action cannot be undone."}
+          </div>
+        </div>
+
+        <div style={{ padding: 14, display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <button
+            type="button"
+            onClick={loading ? undefined : onCancel}
+            style={{
+              background: "#fff",
+              border: "1px solid #cbd5e1",
+              color: "#0f172a",
+              padding: "9px 13px",
+              borderRadius: 10,
+              fontWeight: 900,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={loading ? undefined : onConfirm}
+            style={{
+              background: "#0b4ea2",
+              border: "1px solid #0b4ea2",
+              color: "#fff",
+              padding: "9px 13px",
+              borderRadius: 10,
+              fontWeight: 900,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  );
 }
 
 const TECH_ROLLOUT_API = `${API}/technology-rollout`;
@@ -908,6 +1054,7 @@ function ViewProjectModal({
   project,
   onClose,
   styles,
+  allowEdit = false,
   getOI,
   sumOI,
   blankQuarterObj,
@@ -1058,13 +1205,15 @@ function ViewProjectModal({
                     value={dateApprovedInput || ""}
                     onChange={(e) => setDateApprovedInput(e.target.value)}
                   />
-                  <button
-                    type="button"
-                    style={styles.tinyBtn}
-                    onClick={() => onSaveDateApproved(project.id, dateApprovedInput || "")}
-                  >
-                    Save Date
-                  </button>
+                  {allowEdit && (
+                    <button
+                      type="button"
+                      style={styles.tinyBtn}
+                      onClick={() => onSaveDateApproved(project.id, dateApprovedInput || "")}
+                    >
+                      Save Date
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1333,6 +1482,8 @@ function AddEditProjectModal({
   getDistrictFromMunicipality,
   setAddressFlowOpen,
   setAddressFlowTarget,
+  onOpenMovPhotos,
+  onOpenMovLink,
 }) {
   if (!open) return null;
 
@@ -1689,6 +1840,123 @@ function AddEditProjectModal({
                 </div>
               </div>
             )}
+
+            <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
+              <div style={styles.label}>Means of Verification</div>
+              <textarea
+                style={styles.textarea}
+                value={form.meansOfVerification || ""}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, meansOfVerification: e.target.value }))
+                }
+                placeholder="Attendance sheet / activity reports / links / photos..."
+              />
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <button
+                  type="button"
+                  style={styles.tinyBtn}
+                  onClick={() => onOpenMovLink?.(form.meansOfVerification)}
+                >
+                  View First Link
+                </button>
+
+                <label style={{ ...styles.tinyBtn, display: "inline-flex", alignItems: "center" }}>
+                  Add Photos
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files || []);
+                      const converted = [];
+                      for (const file of files) {
+                        if (!String(file.type || "").startsWith("image/")) continue;
+                        const dataUrl = await movFileToDataUrl(file);
+                        converted.push({ name: file.name, type: file.type, dataUrl });
+                      }
+                      if (converted.length) {
+                        setForm((p) => ({
+                          ...p,
+                          meansOfVerificationPhotos: [
+                            ...(Array.isArray(p.meansOfVerificationPhotos) ? p.meansOfVerificationPhotos : []),
+                            ...converted,
+                          ],
+                        }));
+                      }
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+
+                <span style={{ fontSize: 12, fontWeight: 900, color: "#334155" }}>
+                  Photos: {(form.meansOfVerificationPhotos || []).length}
+                </span>
+              </div>
+
+              {extractMovLinks(form.meansOfVerification).length > 0 ? (
+                <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {extractMovLinks(form.meansOfVerification).map((url, idx) => (
+                    <button
+                      key={`${url}_${idx}`}
+                      type="button"
+                      style={styles.linkChip || styles.tinyBtn}
+                      onClick={() => window.open(url, "_blank", "noopener,noreferrer")}
+                      title={url}
+                    >
+                      Link {idx + 1}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {Array.isArray(form.meansOfVerificationPhotos) && form.meansOfVerificationPhotos.length > 0 ? (
+                <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+                  {form.meansOfVerificationPhotos.map((photo, idx) => (
+                    <div
+                      key={`${photo.name || "photo"}_${idx}`}
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "center",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: 10,
+                        padding: 8,
+                      }}
+                    >
+                      <img
+                        src={photo.dataUrl || photo.url}
+                        alt={photo.name || `Photo ${idx + 1}`}
+                        style={styles.photoThumb || { width: 54, height: 54, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }}
+                        onClick={() => onOpenMovPhotos?.(form.meansOfVerificationPhotos, idx, "Means of Verification Photos")}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {photo.name || `Photo ${idx + 1}`}
+                        </div>
+                        <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 900 }}>
+                          {photo.type || "image"}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        style={styles.dangerTiny}
+                        onClick={() =>
+                          setForm((p) => ({
+                            ...p,
+                            meansOfVerificationPhotos: (p.meansOfVerificationPhotos || []).filter((_, i) => i !== idx),
+                          }))
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
             <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
               <div style={styles.label}>Remarks</div>
               <textarea
@@ -1726,16 +1994,57 @@ function ReportModal({
 }) {
   if (!open) return null;
 
-  const setQ = (key, q, v) => {
-    setReportForm((p) => ({
-      ...p,
-      [key]: { ...(p[key] || {}), [q]: v },
+  const MONTH_GROUPS = [
+    { q: "q1", label: "Q1", months: ["jan", "feb", "mar"], labels: ["JAN", "FEB", "MAR"] },
+    { q: "q2", label: "Q2", months: ["apr", "may", "jun"], labels: ["APR", "MAY", "JUN"] },
+    { q: "q3", label: "Q3", months: ["jul", "aug", "sep"], labels: ["JUL", "AUG", "SEP"] },
+    { q: "q4", label: "Q4", months: ["oct", "nov", "dec"], labels: ["OCT", "NOV", "DEC"] },
+  ];
+
+  const INDICATOR_ROWS = [
+    ["jobsGenerated", "No. of Jobs Generated"],
+    ["jobsIncreasePct", "% increase in jobs generated"],
+    ["productivityPct", "% improvement in productivity"],
+    ["grossSales", "Amount of gross sales generated (in Php'000)"],
+  ];
+
+  const toReportNumber = (value) => {
+    if (value === "" || value === null || value === undefined) return 0;
+    const n = Number(String(value).replace(/,/g, ""));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const getQuarterTotal = (key, group) => {
+    const row = reportForm?.[key] || {};
+    const monthlyTotal = group.months.reduce(
+      (sum, monthKey) => sum + toReportNumber(row[monthKey]),
+      0
+    );
+
+    // Backward-compatible display for old saved records that only have q1-q4 values.
+    if (monthlyTotal === 0 && row[group.q] !== "" && row[group.q] !== undefined && row[group.q] !== null) {
+      return toReportNumber(row[group.q]);
+    }
+
+    return monthlyTotal;
+  };
+
+  const setMonth = (key, monthKey, value) => {
+    setReportForm((prev) => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || {}),
+        [monthKey]: value,
+      },
     }));
   };
 
   return (
     <div style={styles.modalBackdrop} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div
+        style={{ ...styles.modal, width: "min(1180px, 100%)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div style={styles.modalHeader}>
           <div>
             Other Indicators Report{" "}
@@ -1747,38 +2056,65 @@ function ReportModal({
         </div>
 
         <div style={styles.modalBody}>
-          <table style={styles.rptTable}>
-            <thead>
-              <tr>
-                <th style={styles.rptTh}>Indicator</th>
-                <th style={styles.rptTh}>Q1</th>
-                <th style={styles.rptTh}>Q2</th>
-                <th style={styles.rptTh}>Q3</th>
-                <th style={styles.rptTh}>Q4</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["jobsGenerated", "No. of Jobs Generated"],
-                ["jobsIncreasePct", "% increase in jobs generated"],
-                ["productivityPct", "% improvement in productivity"],
-                ["grossSales", "Amount of gross sales generated (in Php'000)"],
-              ].map(([k, label]) => (
-                <tr key={k}>
-                  <td style={styles.rptTdLeft}>{label}</td>
-                  {["q1", "q2", "q3", "q4"].map((q) => (
-                    <td key={q} style={styles.rptTd}>
-                      <input
-                        style={styles.rptInput}
-                        value={reportForm?.[k]?.[q] ?? ""}
-                        onChange={(e) => setQ(k, q, e.target.value)}
-                      />
-                    </td>
+          <div style={{ overflowX: "auto", width: "100%" }}>
+            <table style={{ ...styles.rptTable, minWidth: 1080 }}>
+              <thead>
+                <tr>
+                  <th style={{ ...styles.rptTh, minWidth: 280 }}>Indicator</th>
+                  {MONTH_GROUPS.map((group) => (
+                    <React.Fragment key={group.q}>
+                      {group.labels.map((monthLabel) => (
+                        <th key={`${group.q}-${monthLabel}`} style={{ ...styles.rptTh, minWidth: 62 }}>
+                          {monthLabel}
+                        </th>
+                      ))}
+                      <th style={{ ...styles.rptTh, minWidth: 82, background: "#f8fafc", fontSize: 18 }}>
+                        {group.label}
+                      </th>
+                    </React.Fragment>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {INDICATOR_ROWS.map(([key, label]) => (
+                  <tr key={key}>
+                    <td style={styles.rptTdLeft}>{label}</td>
+                    {MONTH_GROUPS.map((group) => (
+                      <React.Fragment key={`${key}-${group.q}`}>
+                        {group.months.map((monthKey) => (
+                          <td key={`${key}-${monthKey}`} style={{ ...styles.rptTd, padding: 5 }}>
+                            <input
+                              type="number"
+                              style={{ ...styles.rptInput, width: 54 }}
+                              value={reportForm?.[key]?.[monthKey] ?? ""}
+                              onChange={(e) => setMonth(key, monthKey, e.target.value)}
+                            />
+                          </td>
+                        ))}
+                        <td style={{ ...styles.rptTd, background: "#f8fafc", fontWeight: 900 }}>
+                          <input
+                            type="number"
+                            readOnly
+                            style={{
+                              ...styles.rptInput,
+                              width: 68,
+                              background: "#fff",
+                              fontWeight: 900,
+                              cursor: "default",
+                            }}
+                            value={getQuarterTotal(key, group) || ""}
+                          />
+                        </td>
+                      </React.Fragment>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ marginTop: 8, fontSize: 12, fontWeight: 800, color: "#475569" }}>
+            Note: Input values are monthly. Q1, Q2, Q3, and Q4 are automatic totals only.
+          </div>
         </div>
 
         <div style={styles.modalFooter}>
@@ -1795,6 +2131,13 @@ function ReportModal({
 }
 
 export default function Setup() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "setup");
+  const allowEdit = canEdit(user, "setup");
+  const allowDelete = canDelete(user, "setup");
+  const allowExport = canExport(user, "setup");
+
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
 
@@ -1850,16 +2193,38 @@ export default function Setup() {
   const [viewAllIntvProjectId, setViewAllIntvProjectId] = useState(null);
 
   const [reportForProjectId, setReportForProjectId] = useState(null);
+  const emptyMonthlyOI = () => ({
+    jan: "",
+    feb: "",
+    mar: "",
+    q1: "",
+    apr: "",
+    may: "",
+    jun: "",
+    q2: "",
+    jul: "",
+    aug: "",
+    sep: "",
+    q3: "",
+    oct: "",
+    nov: "",
+    dec: "",
+    q4: "",
+  });
+
   const [reportForm, setReportForm] = useState({
-    jobsGenerated: { q1: "", q2: "", q3: "", q4: "" },
-    jobsIncreasePct: { q1: "", q2: "", q3: "", q4: "" },
-    productivityPct: { q1: "", q2: "", q3: "", q4: "" },
-    grossSales: { q1: "", q2: "", q3: "", q4: "" },
+    jobsGenerated: emptyMonthlyOI(),
+    jobsIncreasePct: emptyMonthlyOI(),
+    productivityPct: emptyMonthlyOI(),
+    grossSales: emptyMonthlyOI(),
   });
 
   const [addressFlowOpen, setAddressFlowOpen] = useState(false);
   const [addressFlowTarget, setAddressFlowTarget] = useState("project");
   const [addressViewForProjectId, setAddressViewForProjectId] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, title: "Confirm Delete", message: "Are you sure you want to delete this?", subMessage: "This action cannot be undone.", onConfirm: null });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [movPhotoViewer, setMovPhotoViewer] = useState(null);
   const [customTacsConsultancyOptions, setCustomTacsConsultancyOptions] =
     useState([]);
   const [newTacsType, setNewTacsType] = useState("");
@@ -1883,6 +2248,8 @@ export default function Setup() {
     dateApproved: "",
     nameOfStaff: "",
     remarks: "",
+    meansOfVerification: "",
+    meansOfVerificationPhotos: [],
     addressMeta: null,
     customFields: {},
   });
@@ -2192,6 +2559,53 @@ export default function Setup() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+  const openDeleteConfirm = ({ title = "Confirm Delete", message = "Are you sure you want to delete this?", subMessage = "This action cannot be undone.", onConfirm }) => {
+    setDeleteConfirm({ open: true, title, message, subMessage, onConfirm });
+  };
+
+  const closeDeleteConfirm = () => {
+    if (deleteLoading) return;
+    setDeleteConfirm((prev) => ({ ...prev, open: false, onConfirm: null }));
+  };
+
+  const confirmDeleteAction = async () => {
+    if (typeof deleteConfirm.onConfirm !== "function") return closeDeleteConfirm();
+    setDeleteLoading(true);
+    try {
+      await deleteConfirm.onConfirm();
+      setDeleteConfirm((prev) => ({ ...prev, open: false, onConfirm: null }));
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const openMovLinkMaybe = (text) => {
+    const links = extractMovLinks(text);
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const openMovPhotos = (photos = [], startIndex = 0, title = "Photos") => {
+    const list = Array.isArray(photos) ? photos : [];
+    if (!list.length) return alert("No photos saved.");
+    setMovPhotoViewer({ photos: list, index: startIndex, title });
+  };
+
+  const nextMovPhoto = () => {
+    setMovPhotoViewer((prev) => {
+      if (!prev?.photos?.length) return prev;
+      return { ...prev, index: (prev.index + 1) % prev.photos.length };
+    });
+  };
+
+  const prevMovPhoto = () => {
+    setMovPhotoViewer((prev) => {
+      if (!prev?.photos?.length) return prev;
+      return { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length };
+    });
+  };
+
   const getDistrictFromMunicipality = (municipalityName) => {
     const muni = String(municipalityName || "")
       .trim()
@@ -2330,6 +2744,8 @@ export default function Setup() {
           amount: Number(p.amount ?? 0),
           nameOfStaff: p.nameOfStaff ?? p.name_of_staff ?? "",
           remarks: p.remarks ?? "",
+          meansOfVerification: p.meansOfVerification ?? p.means_of_verification ?? p.meansVerification ?? "",
+          meansOfVerificationPhotos: normalizeMovPhotos(p.meansOfVerificationPhotos ?? p.means_of_verification_photos ?? p.movPhotos ?? p.mov_photos),
           createdAt: p.createdAt ?? p.created_at ?? null,
 
           status: p.status ?? p.stpms_status ?? "",
@@ -2580,18 +2996,30 @@ export default function Setup() {
       dateApproved: "",
       nameOfStaff: "",
       remarks: "",
+      meansOfVerification: "",
+      meansOfVerificationPhotos: [],
       addressMeta: null,
       customFields: {},
     });
   };
 
   const openAddProject = () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SETUP projects.");
+      return;
+    }
+
     setEditProjectId(null);
     resetForm();
     setShowAdd(true);
   };
 
   const openEditProject = (id) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SETUP projects.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === id);
     if (!p) return;
 
@@ -2619,6 +3047,8 @@ export default function Setup() {
       dateApproved: p.dateApproved || "",
       nameOfStaff: p.nameOfStaff || p.name_of_staff || "",
       remarks: p.remarks || "",
+      meansOfVerification: p.meansOfVerification || p.means_of_verification || p.meansVerification || "",
+      meansOfVerificationPhotos: normalizeMovPhotos(p.meansOfVerificationPhotos || p.means_of_verification_photos || p.movPhotos || p.mov_photos),
       addressMeta: p.addressMeta || null,
       customFields: p.customFields || p.custom_fields || {},
     });
@@ -2627,6 +3057,16 @@ export default function Setup() {
   };
 
   const saveProject = async () => {
+    if (editProjectId && !allowEdit) {
+      alert("You do not have permission to edit SETUP projects.");
+      return;
+    }
+
+    if (!editProjectId && !allowAdd) {
+      alert("You do not have permission to add SETUP projects.");
+      return;
+    }
+
     if (!form.projectTitle.trim()) return alert("Required: Project Title");
     if (!form.firmName.trim()) return alert("Required: Name of Firm");
     if (!form.cooperatorName.trim())
@@ -2664,6 +3104,10 @@ export default function Setup() {
       name_of_staff: (form.nameOfStaff || "").trim(),
       nameOfStaff: (form.nameOfStaff || "").trim(),
       remarks: (form.remarks || "").trim(),
+      meansOfVerification: (form.meansOfVerification || "").trim(),
+      means_of_verification: (form.meansOfVerification || "").trim(),
+      meansOfVerificationPhotos: form.meansOfVerificationPhotos || [],
+      means_of_verification_photos: form.meansOfVerificationPhotos || [],
       stpms_status: (form.status || "").trim(),
       phase: (form.type || "").trim(),
       date_approved: form.dateApproved || null,
@@ -2701,6 +3145,11 @@ export default function Setup() {
   };
 
   const saveProjectDateApproved = async (projectId, dateApproved) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SETUP projects.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === projectId);
     if (!p) return;
 
@@ -2723,6 +3172,10 @@ export default function Setup() {
       name_of_staff: p.nameOfStaff || "",
       nameOfStaff: p.nameOfStaff || "",
       remarks: p.remarks || "",
+      meansOfVerification: p.meansOfVerification || "",
+      means_of_verification: p.meansOfVerification || "",
+      meansOfVerificationPhotos: p.meansOfVerificationPhotos || [],
+      means_of_verification_photos: p.meansOfVerificationPhotos || [],
       stpms_status: p.status || "",
       phase: p.type || "",
       date_approved: dateApproved || null,
@@ -2741,16 +3194,27 @@ export default function Setup() {
     }
   };
 
-  const deleteProject = async (id) => {
-    if (!window.confirm("Delete this project?")) return;
-    try {
-      await axios.delete(`${API}/projects/${id}`);
-      persistProjectAddressMeta(id, null);
-      await fetchProjects();
-    } catch (e) {
-      console.error(e);
-      alert("Failed to delete project.");
+  const deleteProject = (id) => {
+    if (!allowDelete) {
+      alert("You do not have permission to delete SETUP projects.");
+      return;
     }
+
+    openDeleteConfirm({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this?",
+      subMessage: "Delete this project?",
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API}/projects/${id}`);
+          persistProjectAddressMeta(id, null);
+          await fetchProjects();
+        } catch (e) {
+          console.error(e);
+          alert("Failed to delete project.");
+        }
+      },
+    });
   };
 
   const fetchCustomTacsConsultancyOptions = async () => {
@@ -2801,7 +3265,7 @@ export default function Setup() {
     }
   };
 
-  const deleteCustomTacsConsultancyType = async (name) => {
+  const deleteCustomTacsConsultancyType = (name) => {
     const cleanName = String(name || "").trim();
     if (!cleanName) return;
 
@@ -2810,30 +3274,42 @@ export default function Setup() {
     );
     if (isDefault) return alert("Default options cannot be deleted.");
 
-    if (!window.confirm(`Delete "${cleanName}"?`)) return;
+    openDeleteConfirm({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this?",
+      subMessage: `Delete "${cleanName}"?`,
+      onConfirm: async () => {
+        try {
+          await axios.delete(
+            `${API}/tacs-consultancy-types/${encodeURIComponent(cleanName)}`
+          );
 
-    try {
-      await axios.delete(
-        `${API}/tacs-consultancy-types/${encodeURIComponent(cleanName)}`
-      );
+          await fetchCustomTacsConsultancyOptions();
 
-      await fetchCustomTacsConsultancyOptions();
-
-      setDetailForm((prev) => ({
-        ...prev,
-        consultancyType:
-          String(prev.consultancyType || "").toLowerCase() ===
-            cleanName.toLowerCase()
-            ? ""
-            : prev.consultancyType,
-      }));
-    } catch (e) {
-      console.error(e);
-      alert("Failed to delete consultancy type.");
-    }
+          setDetailForm((prev) => ({
+            ...prev,
+            consultancyType:
+              String(prev.consultancyType || "").toLowerCase() ===
+                cleanName.toLowerCase()
+                ? ""
+                : prev.consultancyType,
+          }));
+        } catch (e) {
+          console.error(e);
+          alert("Failed to delete consultancy type.");
+        }
+      },
+    });
   };
 
-  const openInterventionPicker = (projectId) => setPickForId(projectId);
+  const openInterventionPicker = (projectId) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SETUP interventions.");
+      return;
+    }
+
+    setPickForId(projectId);
+  };
 
   const resetDetailForm = (type = "") => {
     const isTech = type === "Tech Roll Out";
@@ -2902,12 +3378,22 @@ export default function Setup() {
   };
 
   const openInterventionDetails_Add = (projectId, type) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SETUP interventions.");
+      return;
+    }
+
     setPickForId(null);
     resetDetailForm(type);
     setDetailFor({ projectId, mode: "add" });
   };
 
   const openInterventionDetails_Edit = (projectId, entryId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SETUP interventions.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === projectId);
     const entry = p?.interventions?.find((x) => x.id === entryId);
     if (!p || !entry) return;
@@ -3461,22 +3947,32 @@ export default function Setup() {
     });
   };
 
-  const deleteIntervention = async (projectId, entryId) => {
-    if (!window.confirm("Delete this intervention entry?")) return;
-
-    try {
-      await axios.delete(`${API}/interventions/${entryId}`);
-      await fetchProjects();
-
-      setSelectedInterventionByProject((prev) => {
-        if (prev[projectId] !== entryId) return prev;
-        const { [projectId]: _, ...rest } = prev;
-        return rest;
-      });
-    } catch (e) {
-      console.error(e);
-      alert("Failed to delete intervention.");
+  const deleteIntervention = (projectId, entryId) => {
+    if (!allowDelete) {
+      alert("You do not have permission to delete SETUP interventions.");
+      return;
     }
+
+    openDeleteConfirm({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this?",
+      subMessage: "Delete this intervention entry?",
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API}/interventions/${entryId}`);
+          await fetchProjects();
+
+          setSelectedInterventionByProject((prev) => {
+            if (prev[projectId] !== entryId) return prev;
+            const { [projectId]: _, ...rest } = prev;
+            return rest;
+          });
+        } catch (e) {
+          console.error(e);
+          alert("Failed to delete intervention.");
+        }
+      },
+    });
   };
 
 
@@ -3628,6 +4124,16 @@ export default function Setup() {
 
   const saveInterventionDetails = async () => {
     if (!detailFor) return;
+
+    if (detailFor.mode === "add" && !allowAdd) {
+      alert("You do not have permission to add SETUP interventions.");
+      return;
+    }
+
+    if (detailFor.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit SETUP interventions.");
+      return;
+    }
 
     const type = (detailForm.type || "").trim();
     const isTech = type === "Tech Roll Out";
@@ -4002,79 +4508,161 @@ export default function Setup() {
   };
 
   const openAddReport = (projectId) => {
+    const hasExistingReport = hasAnyOI(projectId);
+
+    if (hasExistingReport && !allowEdit) {
+      alert("You do not have permission to edit SETUP reports.");
+      return;
+    }
+
+    if (!hasExistingReport && !allowAdd) {
+      alert("You do not have permission to add SETUP reports.");
+      return;
+    }
+
     const { jobsGenerated, jobsIncreasePct, productivityPct, grossSales } =
       getOI(projectId);
 
+    const fillMonthlyOI = (row = {}) => ({
+      ...emptyMonthlyOI(),
+      jan: row.jan ? String(row.jan) : "",
+      feb: row.feb ? String(row.feb) : "",
+      mar: row.mar ? String(row.mar) : "",
+      q1: row.q1 ? String(row.q1) : "",
+      apr: row.apr ? String(row.apr) : "",
+      may: row.may ? String(row.may) : "",
+      jun: row.jun ? String(row.jun) : "",
+      q2: row.q2 ? String(row.q2) : "",
+      jul: row.jul ? String(row.jul) : "",
+      aug: row.aug ? String(row.aug) : "",
+      sep: row.sep ? String(row.sep) : "",
+      q3: row.q3 ? String(row.q3) : "",
+      oct: row.oct ? String(row.oct) : "",
+      nov: row.nov ? String(row.nov) : "",
+      dec: row.dec ? String(row.dec) : "",
+      q4: row.q4 ? String(row.q4) : "",
+    });
+
     setReportForProjectId(projectId);
     setReportForm({
-      jobsGenerated: {
-        q1: jobsGenerated.q1 ? String(jobsGenerated.q1) : "",
-        q2: jobsGenerated.q2 ? String(jobsGenerated.q2) : "",
-        q3: jobsGenerated.q3 ? String(jobsGenerated.q3) : "",
-        q4: jobsGenerated.q4 ? String(jobsGenerated.q4) : "",
-      },
-      jobsIncreasePct: {
-        q1: jobsIncreasePct.q1 ? String(jobsIncreasePct.q1) : "",
-        q2: jobsIncreasePct.q2 ? String(jobsIncreasePct.q2) : "",
-        q3: jobsIncreasePct.q3 ? String(jobsIncreasePct.q3) : "",
-        q4: jobsIncreasePct.q4 ? String(jobsIncreasePct.q4) : "",
-      },
-      productivityPct: {
-        q1: productivityPct.q1 ? String(productivityPct.q1) : "",
-        q2: productivityPct.q2 ? String(productivityPct.q2) : "",
-        q3: productivityPct.q3 ? String(productivityPct.q3) : "",
-        q4: productivityPct.q4 ? String(productivityPct.q4) : "",
-      },
-      grossSales: {
-        q1: grossSales.q1 ? String(grossSales.q1) : "",
-        q2: grossSales.q2 ? String(grossSales.q2) : "",
-        q3: grossSales.q3 ? String(grossSales.q3) : "",
-        q4: grossSales.q4 ? String(grossSales.q4) : "",
-      },
+      jobsGenerated: fillMonthlyOI(jobsGenerated),
+      jobsIncreasePct: fillMonthlyOI(jobsIncreasePct),
+      productivityPct: fillMonthlyOI(productivityPct),
+      grossSales: fillMonthlyOI(grossSales),
     });
   };
 
-  const deleteOtherIndicators = async (projectId) => {
-    if (!window.confirm("Delete Other Indicators report for this project?"))
+  const deleteOtherIndicators = (projectId) => {
+    if (!allowDelete) {
+      alert("You do not have permission to delete SETUP reports.");
       return;
-
-    try {
-      await axios.delete(`${API}/projects/${projectId}/other-indicators`);
-      setOtherIndicatorsByProject((prev) => ({
-        ...prev,
-        [projectId]: mapDbOI(null),
-      }));
-    } catch (e) {
-      console.error(e);
-      alert("Failed to delete Other Indicators (DB).");
     }
+
+    openDeleteConfirm({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this?",
+      subMessage: "Delete Other Indicators report for this project?",
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API}/projects/${projectId}/other-indicators`);
+          setOtherIndicatorsByProject((prev) => ({
+            ...prev,
+            [projectId]: mapDbOI(null),
+          }));
+        } catch (e) {
+          console.error(e);
+          alert("Failed to delete Other Indicators (DB).");
+        }
+      },
+    });
   };
 
   const saveReport = async () => {
     if (!reportForProjectId) return;
 
-    const cleanQuarter = (obj) => ({
-      q1: obj.q1 === "" ? 0 : toNumber(obj.q1),
-      q2: obj.q2 === "" ? 0 : toNumber(obj.q2),
-      q3: obj.q3 === "" ? 0 : toNumber(obj.q3),
-      q4: obj.q4 === "" ? 0 : toNumber(obj.q4),
-    });
+    const hasExistingReport = hasAnyOI(reportForProjectId);
+    if (hasExistingReport && !allowEdit) {
+      alert("You do not have permission to edit SETUP reports.");
+      return;
+    }
 
-    const payload = {
-      jobsGenerated: cleanQuarter(reportForm.jobsGenerated),
-      jobsIncreasePct: cleanQuarter(reportForm.jobsIncreasePct),
-      productivityPct: cleanQuarter(reportForm.productivityPct),
-      grossSales: cleanQuarter(reportForm.grossSales),
+    if (!hasExistingReport && !allowAdd) {
+      alert("You do not have permission to add SETUP reports.");
+      return;
+    }
+
+    const monthGroups = {
+      q1: ["jan", "feb", "mar"],
+      q2: ["apr", "may", "jun"],
+      q3: ["jul", "aug", "sep"],
+      q4: ["oct", "nov", "dec"],
+    };
+
+    const cleanMonthly = (row = {}) => {
+      const next = { ...emptyMonthlyOI() };
+
+      Object.values(monthGroups)
+        .flat()
+        .forEach((monthKey) => {
+          next[monthKey] = row[monthKey] === "" ? 0 : toNumber(row[monthKey]);
+        });
+
+      Object.entries(monthGroups).forEach(([quarterKey, monthKeys]) => {
+        const monthlyTotal = monthKeys.reduce(
+          (sum, monthKey) => sum + toNumber(next[monthKey]),
+          0
+        );
+
+        // Backward-compatible: if no monthly values were entered but an old Q value exists, keep it.
+        next[quarterKey] = monthlyTotal || (row[quarterKey] === "" ? 0 : toNumber(row[quarterKey]));
+      });
+
+      return next;
+    };
+
+    const monthlyPayload = {
+      jobsGenerated: cleanMonthly(reportForm.jobsGenerated),
+      jobsIncreasePct: cleanMonthly(reportForm.jobsIncreasePct),
+      productivityPct: cleanMonthly(reportForm.productivityPct),
+      grossSales: cleanMonthly(reportForm.grossSales),
+    };
+
+    // Keep API payload quarter-based so the existing database/backend route will still work.
+    const apiPayload = {
+      jobsGenerated: {
+        q1: monthlyPayload.jobsGenerated.q1,
+        q2: monthlyPayload.jobsGenerated.q2,
+        q3: monthlyPayload.jobsGenerated.q3,
+        q4: monthlyPayload.jobsGenerated.q4,
+      },
+      jobsIncreasePct: {
+        q1: monthlyPayload.jobsIncreasePct.q1,
+        q2: monthlyPayload.jobsIncreasePct.q2,
+        q3: monthlyPayload.jobsIncreasePct.q3,
+        q4: monthlyPayload.jobsIncreasePct.q4,
+      },
+      productivityPct: {
+        q1: monthlyPayload.productivityPct.q1,
+        q2: monthlyPayload.productivityPct.q2,
+        q3: monthlyPayload.productivityPct.q3,
+        q4: monthlyPayload.productivityPct.q4,
+      },
+      grossSales: {
+        q1: monthlyPayload.grossSales.q1,
+        q2: monthlyPayload.grossSales.q2,
+        q3: monthlyPayload.grossSales.q3,
+        q4: monthlyPayload.grossSales.q4,
+      },
     };
 
     try {
       await axios.put(
         `${API}/projects/${reportForProjectId}/other-indicators`,
-        payload
+        apiPayload
       );
       setOtherIndicatorsByProject((prev) => ({
         ...prev,
-        [reportForProjectId]: payload,
+        [reportForProjectId]: monthlyPayload,
       }));
       setReportForProjectId(null);
     } catch (e) {
@@ -4535,6 +5123,11 @@ export default function Setup() {
   };
 
   const exportProjects = (rows = paginatedProjects, filename = "SETUP_Export.xlsx") => {
+    if (!allowExport) {
+      alert("You do not have permission to export SETUP records.");
+      return;
+    }
+
     const data = buildProjectExportRows(rows);
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
@@ -4543,6 +5136,11 @@ export default function Setup() {
   };
 
   const printProjects = (rows = paginatedProjects, title = "SETUP Report") => {
+    if (!allowExport) {
+      alert("You do not have permission to print SETUP records.");
+      return;
+    }
+
     const data = buildProjectExportRows(rows);
     const htmlRows = data
       .map(
@@ -4775,22 +5373,47 @@ export default function Setup() {
   };
 
   const openSETUPPrintPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to print SETUP records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "row", entryId, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openSETUPPrintPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print SETUP records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "bulk", entryId: null, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openSETUPExportPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to export SETUP records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "row", entryId, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openSETUPExportPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to export SETUP records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "bulk", entryId: null, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const confirmSETUPPrint = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to print SETUP records.");
+      return;
+    }
+
     const sourceRows = await getSETUPRowsForOutput(printModal.scope, printModal.entryId);
     const objectRows = buildSETUPObjectRowsForOutput(sourceRows);
     const titleLabel = printModal.scope === "row"
@@ -4801,6 +5424,11 @@ export default function Setup() {
   };
 
   const confirmSETUPExport = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to export SETUP records.");
+      return;
+    }
+
     const sourceRows = await getSETUPRowsForOutput(exportModal.scope, exportModal.entryId);
     const objectRows = buildSETUPObjectRowsForOutput(sourceRows);
     const baseName = exportModal.scope === "row"
@@ -5222,6 +5850,27 @@ export default function Setup() {
       fontSize: 11,
       fontFamily,
       whiteSpace: "nowrap",
+    },
+    linkChip: {
+      border: "1px solid #cbd5e1",
+      background: "#eff6ff",
+      color: "#0b4ea2",
+      padding: "6px 10px",
+      borderRadius: 999,
+      cursor: "pointer",
+      fontWeight: 900,
+      fontSize: 11,
+      fontFamily,
+      whiteSpace: "nowrap",
+    },
+    photoThumb: {
+      width: 54,
+      height: 54,
+      objectFit: "cover",
+      borderRadius: 8,
+      border: "1px solid #e2e8f0",
+      cursor: "pointer",
+      background: "#f8fafc",
     },
     dangerBtn: {
       padding: "6px 10px",
@@ -5919,17 +6568,23 @@ export default function Setup() {
             Clear Filters
           </button>
 
-          <button type="button" style={styles.addBtn} onClick={openSETUPExportPopupBulk}>
-            Export
-          </button>
+          {allowExport && (
+            <>
+              <button type="button" style={styles.addBtn} onClick={openSETUPExportPopupBulk}>
+                Export
+              </button>
 
-          <button type="button" style={styles.tablePrintBtn} onClick={openSETUPPrintPopupBulk}>
-            Print
-          </button>
+              <button type="button" style={styles.tablePrintBtn} onClick={openSETUPPrintPopupBulk}>
+                Print
+              </button>
+            </>
+          )}
 
-          <button type="button" style={styles.addBtn} onClick={openAddProject}>
-            + Add Project
-          </button>
+          {allowAdd && (
+            <button type="button" style={styles.addBtn} onClick={openAddProject}>
+              + Add Project
+            </button>
+          )}
         </div>
       </div>
 
@@ -6098,50 +6753,56 @@ export default function Setup() {
                             flexWrap: "wrap",
                           }}
                         >
-                          <button
-                            type="button"
-                            style={styles.pillBtn}
-                            onClick={(e) => {
-                              stop(e);
-                              openInterventionPicker(p.id);
-                            }}
-                          >
-                            + Add
-                          </button>
+                          {allowAdd && (
+                            <button
+                              type="button"
+                              style={styles.pillBtn}
+                              onClick={(e) => {
+                                stop(e);
+                                openInterventionPicker(p.id);
+                              }}
+                            >
+                              + Add
+                            </button>
+                          )}
 
-                          <button
-                            type="button"
-                            style={styles.tinyBtn}
-                            disabled={!selectedId}
-                            onClick={(e) => {
-                              stop(e);
-                              openInterventionDetails_Edit(p.id, selectedId);
-                            }}
-                            title={
-                              !selectedId
-                                ? "Select an intervention first"
-                                : "Edit selected"
-                            }
-                          >
-                            Edit
-                          </button>
+                          {allowEdit && (
+                            <button
+                              type="button"
+                              style={styles.tinyBtn}
+                              disabled={!selectedId}
+                              onClick={(e) => {
+                                stop(e);
+                                openInterventionDetails_Edit(p.id, selectedId);
+                              }}
+                              title={
+                                !selectedId
+                                  ? "Select an intervention first"
+                                  : "Edit selected"
+                              }
+                            >
+                              Edit
+                            </button>
+                          )}
 
-                          <button
-                            type="button"
-                            style={styles.dangerTiny}
-                            disabled={!selectedId}
-                            onClick={(e) => {
-                              stop(e);
-                              deleteIntervention(p.id, selectedId);
-                            }}
-                            title={
-                              !selectedId
-                                ? "Select an intervention first"
-                                : "Delete selected"
-                            }
-                          >
-                            Delete
-                          </button>
+                          {allowDelete && (
+                            <button
+                              type="button"
+                              style={styles.dangerTiny}
+                              disabled={!selectedId}
+                              onClick={(e) => {
+                                stop(e);
+                                deleteIntervention(p.id, selectedId);
+                              }}
+                              title={
+                                !selectedId
+                                  ? "Select an intervention first"
+                                  : "Delete selected"
+                              }
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -6197,40 +6858,46 @@ export default function Setup() {
                             flexWrap: "wrap",
                           }}
                         >
-                          <button
-                            type="button"
-                            style={styles.pillBtn}
-                            onClick={(e) => {
-                              stop(e);
-                              openAddReport(p.id);
-                            }}
-                          >
-                            + Add Report
-                          </button>
-                          <button
-                            type="button"
-                            style={styles.tinyBtn}
-                            disabled={!canEditOI}
-                            onClick={(e) => {
-                              stop(e);
-                              openAddReport(p.id);
-                            }}
-                            title={!canEditOI ? "No report yet" : "Edit report"}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            style={styles.dangerTiny}
-                            disabled={!canEditOI}
-                            onClick={(e) => {
-                              stop(e);
-                              deleteOtherIndicators(p.id);
-                            }}
-                            title={!canEditOI ? "No report yet" : "Delete report"}
-                          >
-                            Delete
-                          </button>
+                          {allowAdd && !canEditOI && (
+                            <button
+                              type="button"
+                              style={styles.pillBtn}
+                              onClick={(e) => {
+                                stop(e);
+                                openAddReport(p.id);
+                              }}
+                            >
+                              + Add Report
+                            </button>
+                          )}
+                          {allowEdit && canEditOI && (
+                            <button
+                              type="button"
+                              style={styles.tinyBtn}
+                              disabled={!canEditOI}
+                              onClick={(e) => {
+                                stop(e);
+                                openAddReport(p.id);
+                              }}
+                              title={!canEditOI ? "No report yet" : "Edit report"}
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {allowDelete && (
+                            <button
+                              type="button"
+                              style={styles.dangerTiny}
+                              disabled={!canEditOI}
+                              onClick={(e) => {
+                                stop(e);
+                                deleteOtherIndicators(p.id);
+                              }}
+                              title={!canEditOI ? "No report yet" : "Delete report"}
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -6258,46 +6925,54 @@ export default function Setup() {
                         >
                           View
                         </button>
-                        <button
-                          type="button"
-                          style={styles.tinyBtn}
-                          onClick={(e) => {
-                            stop(e);
-                            openEditProject(p.id);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          style={styles.tinyBtn}
-                          onClick={(e) => {
-                            stop(e);
-                            printProjects([p], `SETUP Project - ${p.firmName || p.projectTitle || "Record"}`);
-                          }}
-                        >
-                          Print
-                        </button>
-                        <button
-                          type="button"
-                          style={styles.tinyBtn}
-                          onClick={(e) => {
-                            stop(e);
-                            exportProjects([p], `SETUP_Project_${p.id || "record"}.xlsx`);
-                          }}
-                        >
-                          Export
-                        </button>
-                        <button
-                          type="button"
-                          style={styles.dangerBtn}
-                          onClick={(e) => {
-                            stop(e);
-                            deleteProject(p.id);
-                          }}
-                        >
-                          Delete
-                        </button>
+                        {allowEdit && (
+                          <button
+                            type="button"
+                            style={styles.tinyBtn}
+                            onClick={(e) => {
+                              stop(e);
+                              openEditProject(p.id);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {allowExport && (
+                          <>
+                            <button
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={(e) => {
+                                stop(e);
+                                printProjects([p], `SETUP Project - ${p.firmName || p.projectTitle || "Record"}`);
+                              }}
+                            >
+                              Print
+                            </button>
+                            <button
+                              type="button"
+                              style={styles.tinyBtn}
+                              onClick={(e) => {
+                                stop(e);
+                                exportProjects([p], `SETUP_Project_${p.id || "record"}.xlsx`);
+                              }}
+                            >
+                              Export
+                            </button>
+                          </>
+                        )}
+                        {allowDelete && (
+                          <button
+                            type="button"
+                            style={styles.dangerBtn}
+                            onClick={(e) => {
+                              stop(e);
+                              deleteProject(p.id);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -6399,6 +7074,7 @@ export default function Setup() {
           project={viewProject}
           onClose={() => setViewProjectId(null)}
           styles={styles}
+          allowEdit={allowEdit}
           getOI={getOI}
           sumOI={sumOI}
           blankQuarterObj={blankQuarterObj}
@@ -6482,6 +7158,8 @@ export default function Setup() {
         getDistrictFromMunicipality={getDistrictFromMunicipality}
         setAddressFlowOpen={setAddressFlowOpen}
         setAddressFlowTarget={setAddressFlowTarget}
+        onOpenMovPhotos={openMovPhotos}
+        onOpenMovLink={openMovLinkMaybe}
       />
 
       {addressFlowOpen && (
@@ -8321,6 +8999,58 @@ export default function Setup() {
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+      <BlueDeleteConfirmModal
+        open={deleteConfirm.open}
+        title={deleteConfirm.title}
+        message={deleteConfirm.message}
+        subMessage={deleteConfirm.subMessage}
+        loading={deleteLoading}
+        onCancel={closeDeleteConfirm}
+        onConfirm={confirmDeleteAction}
+      />
+
+      {movPhotoViewer && (
+        <div
+          style={{ ...styles.modalBackdrop, zIndex: 52000 }}
+          onClick={() => setMovPhotoViewer(null)}
+        >
+          <div
+            style={{ ...styles.modal, width: "min(980px, 100%)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={styles.modalHeader}>
+              <div>
+                {movPhotoViewer.title || "Photos"} — {(movPhotoViewer.index || 0) + 1}/
+                {movPhotoViewer.photos.length}
+              </div>
+              <button type="button" style={styles.btnGhost} onClick={() => setMovPhotoViewer(null)}>
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <img
+                  src={movPhotoViewer.photos[movPhotoViewer.index]?.dataUrl || movPhotoViewer.photos[movPhotoViewer.index]?.url}
+                  alt={movPhotoViewer.photos[movPhotoViewer.index]?.name || "Photo"}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "60vh",
+                    borderRadius: 12,
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                <button type="button" style={styles.tinyBtn} onClick={prevMovPhoto}>◀ Prev</button>
+                <button type="button" style={styles.tinyBtn} onClick={nextMovPhoto}>Next ▶</button>
+              </div>
             </div>
           </div>
         </div>

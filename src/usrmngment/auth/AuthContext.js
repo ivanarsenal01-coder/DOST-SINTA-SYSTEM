@@ -11,6 +11,27 @@ const AuthContext = createContext(null);
 
 const AUTH_API_BASE = API_BASE.replace(/\/$/, "");
 
+function normalizeRole(role = "") {
+  return String(role || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+}
+
+function normalizePageKey(pageKey = "") {
+  return String(pageKey || "").trim();
+}
+
+function isSuperAdminRole(role = "") {
+  const cleanRole = normalizeRole(role);
+  return cleanRole === "superadmin";
+}
+
+function isAdminRole(role = "") {
+  const cleanRole = normalizeRole(role);
+  return cleanRole === "admin";
+}
+
 function normalizePermissions(rawPermissions = {}) {
   const pages =
     rawPermissions.pages ||
@@ -129,17 +150,39 @@ export function AuthProvider({ children }) {
   const hasPageAccess = (pageKey, action = "view") => {
     if (!user) return false;
 
-    const role = String(user.role || "").toLowerCase();
-    if (role === "superadmin") return true;
+    const cleanRole = normalizeRole(user.role);
+    const cleanPageKey = normalizePageKey(pageKey);
 
-    return Boolean(user?.permissions?.pages?.[pageKey]?.[action]);
+    const superAdminOnlyPages = ["tableManagement"];
+    const adminAllowedPages = ["userManagement"];
+
+    if (superAdminOnlyPages.includes(cleanPageKey)) {
+      return isSuperAdminRole(cleanRole);
+    }
+
+    if (isSuperAdminRole(cleanRole)) return true;
+
+    if (adminAllowedPages.includes(cleanPageKey) && isAdminRole(cleanRole)) {
+      return true;
+    }
+
+    return Boolean(user?.permissions?.pages?.[cleanPageKey]?.[action]);
   };
 
   const hasSpecialAccess = (permissionKey) => {
     if (!user) return false;
 
-    const role = String(user.role || "").toLowerCase();
-    if (role === "superadmin") return true;
+    const cleanRole = normalizeRole(user.role);
+
+    if (isSuperAdminRole(cleanRole)) return true;
+
+    if (permissionKey === "manageUsers" && isAdminRole(cleanRole)) {
+      return true;
+    }
+
+    if (permissionKey === "manageDropdowns") {
+      return isSuperAdminRole(cleanRole);
+    }
 
     return Boolean(
       user?.permissions?.special?.[permissionKey] ||

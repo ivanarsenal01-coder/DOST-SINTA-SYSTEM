@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import { canAdd, canEdit, canDelete, canExport } from "../../usrmngment/utils/permissions";
 import API_BASE from "../../api";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -125,7 +127,119 @@ const PANGASINAN_DISTRICTS = [
 
 const API = API_BASE;
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function CEST() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "cest");
+  const allowEdit = canEdit(user, "cest");
+  const allowDelete = canDelete(user, "cest");
+  const allowExport = canExport(user, "cest");
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
 
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
@@ -297,6 +411,8 @@ export default function CEST() {
     projectProponent: "",
     sex: "",
     processSystem: "",
+    meansOfVerification: "",
+    movPhotos: [],
     staffName: "",
     communitiesAssisted: "",
     technologiesDeployed: "",
@@ -1295,6 +1411,8 @@ export default function CEST() {
       projectProponent: "",
       sex: "",
       processSystem: "",
+      meansOfVerification: "",
+      movPhotos: [],
       staffName: "",
       communitiesAssisted: "",
       technologiesDeployed: "",
@@ -1417,12 +1535,22 @@ export default function CEST() {
 
   // ===== PROJECT CRUD =====
   const openAddProject = () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add CEST projects.");
+      return;
+    }
+
     setEditProjectId(null);
     resetForm();
     setShowAdd(true);
   };
 
   const openEditProject = (id) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit CEST projects.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === id);
     if (!p) return;
 
@@ -1442,6 +1570,8 @@ export default function CEST() {
       projectProponent: p.projectProponent || "",
       sex: p.sex || "",
       processSystem: p.processSystem || "",
+      meansOfVerification: p.meansOfVerification || p.means_of_verification || "",
+      movPhotos: Array.isArray(p.movPhotos) ? p.movPhotos : Array.isArray(p.mov_photos) ? p.mov_photos : [],
       staffName: p.staffName || "",
       communitiesAssisted: p.communitiesAssisted ?? "",
       technologiesDeployed: p.technologiesDeployed ?? "",
@@ -1461,6 +1591,16 @@ export default function CEST() {
   };
 
   const saveProject = async () => {
+    if (editProjectId && !allowEdit) {
+      alert("You do not have permission to edit CEST projects.");
+      return;
+    }
+
+    if (!editProjectId && !allowAdd) {
+      alert("You do not have permission to add CEST projects.");
+      return;
+    }
+
     if (!form.projectTitle.trim()) return alert("Required: Project Title");
     if (!form.dateProjectApproval) return alert("Required: Date of Project Approval");
     if (form.approvedProjectCost === "" || Number.isNaN(Number(form.approvedProjectCost))) {
@@ -1484,6 +1624,10 @@ export default function CEST() {
       projectProponent: form.projectProponent.trim(),
       sex: (form.sex || "").trim(),
       processSystem: (form.processSystem || "").trim(),
+      meansOfVerification: (form.meansOfVerification || "").trim(),
+      means_of_verification: (form.meansOfVerification || "").trim(),
+      movPhotos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
+      mov_photos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
       staffName: (form.staffName || "").trim(),
       communitiesAssisted: toNumber(form.communitiesAssisted),
       technologiesDeployed: toNumber(form.technologiesDeployed),
@@ -1513,7 +1657,12 @@ export default function CEST() {
 
 
   const deleteProject = async (id) => {
-    if (!window.confirm("Delete this project?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete CEST projects.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this project?"))) return;
 
     try {
       await axios.delete(`${API}/cest/${id}`);
@@ -1525,15 +1674,32 @@ export default function CEST() {
   };
 
   // ===== INTERVENTION CRUD =====
-  const openInterventionPicker = (projectId) => setPickForId(projectId);
+  const openInterventionPicker = (projectId) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add CEST interventions.");
+      return;
+    }
+
+    setPickForId(projectId);
+  };
 
   const openInterventionDetails_Add = (projectId, type) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add CEST interventions.");
+      return;
+    }
+
     setPickForId(null);
     resetDetailForm(type);
     setDetailFor({ projectId, mode: "add" });
   };
 
   const openInterventionDetails_Edit = (projectId, entryId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit CEST interventions.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === projectId);
     const entry = p?.interventions?.find((x) => x.id === entryId);
     if (!p || !entry) return;
@@ -2059,7 +2225,12 @@ export default function CEST() {
   };
 
   const deleteIntervention = async (projectId, entryId) => {
-    if (!window.confirm("Delete this intervention entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete CEST interventions.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this intervention entry?"))) return;
 
     try {
       await axios.delete(`${API}/cest-interventions/${entryId}`);
@@ -2079,6 +2250,16 @@ export default function CEST() {
 
   const saveInterventionDetails = async () => {
     if (!detailFor) return;
+
+    if (detailFor.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit CEST interventions.");
+      return;
+    }
+
+    if (detailFor.mode === "add" && !allowAdd) {
+      alert("You do not have permission to add CEST interventions.");
+      return;
+    }
 
     const type = (detailForm.type || "").trim();
     const isTech = type === "Tech Roll Out";
@@ -4576,6 +4757,11 @@ export default function CEST() {
   }, [viewProjectId, viewProject]);
 
   const saveViewPressRelease = async () => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit CEST projects.");
+      return;
+    }
+
     if (!viewProject) return;
     try {
       await axios.put(`${API}/cest/${viewProject.id}`, {
@@ -4912,22 +5098,47 @@ export default function CEST() {
   };
 
   const openCESTPrintPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to print CEST records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "row", entryId, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCESTPrintPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to print CEST records.");
+      return;
+    }
+
     setPrintModal({ open: true, scope: "bulk", entryId: null, layout: "FORM", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCESTExportPopupRow = (entryId) => {
+    if (!allowExport) {
+      alert("You do not have permission to export CEST records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "row", entryId, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const openCESTExportPopupBulk = () => {
+    if (!allowExport) {
+      alert("You do not have permission to export CEST records.");
+      return;
+    }
+
     setExportModal({ open: true, scope: "bulk", entryId: null, format: "excel", template: "TABLE", preset: "a4", orientation: "landscape", customSize: { width: 8.5, height: 13 } });
   };
 
   const confirmCESTPrint = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to print CEST records.");
+      return;
+    }
+
     const sourceRows = await getCESTRowsForOutput(printModal.scope, printModal.entryId);
     const objectRows = buildCESTObjectRowsForOutput(sourceRows);
     const titleLabel = printModal.scope === "row"
@@ -4938,6 +5149,11 @@ export default function CEST() {
   };
 
   const confirmCESTExport = async () => {
+    if (!allowExport) {
+      alert("You do not have permission to export CEST records.");
+      return;
+    }
+
     const sourceRows = await getCESTRowsForOutput(exportModal.scope, exportModal.entryId);
     const objectRows = buildCESTObjectRowsForOutput(sourceRows);
     const baseName = exportModal.scope === "row"
@@ -5250,17 +5466,23 @@ export default function CEST() {
             Clear Filters
           </button>
 
-          <button type="button" style={styles.addBtn} onClick={openCESTExportPopupBulk}>
-            Export
-          </button>
+          {allowExport && (
+            <button type="button" style={styles.addBtn} onClick={openCESTExportPopupBulk}>
+              Export
+            </button>
+          )}
 
-          <button type="button" style={styles.printBtn} onClick={openCESTPrintPopupBulk}>
-            Print
-          </button>
+          {allowExport && (
+            <button type="button" style={styles.printBtn} onClick={openCESTPrintPopupBulk}>
+              Print
+            </button>
+          )}
 
-          <button type="button" style={styles.addBtn} onClick={openAddProject}>
-            + Add Project
-          </button>
+          {allowAdd && (
+            <button type="button" style={styles.addBtn} onClick={openAddProject}>
+              + Add Project
+            </button>
+          )}
         </div>
       </div>
 
@@ -5383,27 +5605,33 @@ export default function CEST() {
                         )}
 
                         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }} className="cest-actions">
-                          <button style={styles.pillBtn} onClick={() => openInterventionPicker(p.id)}>
-                            + Add
-                          </button>
+                          {allowAdd && (
+                            <button style={styles.pillBtn} onClick={() => openInterventionPicker(p.id)}>
+                              + Add
+                            </button>
+                          )}
 
-                          <button
-                            style={styles.tinyBtn}
-                            disabled={!selectedId}
-                            onClick={() => openInterventionDetails_Edit(p.id, selectedId)}
-                            title={!selectedId ? "Select an intervention first" : "Edit selected"}
-                          >
-                            Edit
-                          </button>
+                          {allowEdit && (
+                            <button
+                              style={styles.tinyBtn}
+                              disabled={!selectedId}
+                              onClick={() => openInterventionDetails_Edit(p.id, selectedId)}
+                              title={!selectedId ? "Select an intervention first" : "Edit selected"}
+                            >
+                              Edit
+                            </button>
+                          )}
 
-                          <button
-                            style={styles.dangerTiny}
-                            disabled={!selectedId}
-                            onClick={() => deleteIntervention(p.id, selectedId)}
-                            title={!selectedId ? "Select an intervention first" : "Delete selected"}
-                          >
-                            Delete
-                          </button>
+                          {allowDelete && (
+                            <button
+                              style={styles.dangerTiny}
+                              disabled={!selectedId}
+                              onClick={() => deleteIntervention(p.id, selectedId)}
+                              title={!selectedId ? "Select an intervention first" : "Delete selected"}
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -5419,18 +5647,26 @@ export default function CEST() {
                         >
                           View
                         </button>
-                        <button style={styles.tinyBtn} onClick={() => openEditProject(p.id)}>
-                          Edit
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openCESTPrintPopupRow(p.id)}>
-                          Print
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openCESTExportPopupRow(p.id)}>
-                          Export
-                        </button>
-                        <button style={styles.dangerBtn} onClick={() => deleteProject(p.id)}>
-                          Delete
-                        </button>
+                        {allowEdit && (
+                          <button style={styles.tinyBtn} onClick={() => openEditProject(p.id)}>
+                            Edit
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openCESTPrintPopupRow(p.id)}>
+                            Print
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openCESTExportPopupRow(p.id)}>
+                            Export
+                          </button>
+                        )}
+                        {allowDelete && (
+                          <button style={styles.dangerBtn} onClick={() => deleteProject(p.id)}>
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -6981,15 +7217,17 @@ export default function CEST() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveInterventionDetails}>
-                {detailForm.type === "Calibration"
-                  ? detailFor.mode === "edit"
-                    ? "Update Entry"
-                    : "Save Entry"
-                  : detailFor.mode === "edit"
-                    ? "Update"
-                    : "Save"}
-              </button>
+              {((detailFor.mode === "add" && allowAdd) || (detailFor.mode === "edit" && allowEdit)) && (
+                <button style={styles.btnDark} onClick={saveInterventionDetails}>
+                  {detailForm.type === "Calibration"
+                    ? detailFor.mode === "edit"
+                      ? "Update Entry"
+                      : "Save Entry"
+                    : detailFor.mode === "edit"
+                      ? "Update"
+                      : "Save"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -7486,14 +7724,18 @@ export default function CEST() {
                           <td style={styles.tdCenter}>{it.date || "—"}</td>
                           <td style={styles.td}>{it.venue || "—"}</td>
                           <td style={styles.tdCenter}>
-                            <button
-                              style={styles.tinyBtn}
-                              onClick={() =>
-                                openInterventionDetails_Edit(viewProject.id, it.id)
-                              }
-                            >
-                              View
-                            </button>
+                            {allowEdit ? (
+                              <button
+                                style={styles.tinyBtn}
+                                onClick={() =>
+                                  openInterventionDetails_Edit(viewProject.id, it.id)
+                                }
+                              >
+                                Edit
+                              </button>
+                            ) : (
+                              <span style={{ fontSize: 11, opacity: 0.65 }}>View only</span>
+                            )}
                           </td>
                         </tr>
                       ))
@@ -7649,9 +7891,11 @@ export default function CEST() {
               <button style={styles.btnGhost} onClick={() => setViewProjectId(null)}>
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveViewPressRelease}>
-                Save
-              </button>
+              {allowEdit && (
+                <button style={styles.btnDark} onClick={saveViewPressRelease}>
+                  Save
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -7811,6 +8055,13 @@ export default function CEST() {
                     onChange={(e) => setForm({ ...form, processSystem: e.target.value })}
                   />
                 </div>
+
+                <UnifiedMOVSection
+                  value={form.meansOfVerification || ""}
+                  photos={form.movPhotos || []}
+                  onValueChange={(value) => setForm((p) => ({ ...p, meansOfVerification: value }))}
+                  onPhotosChange={(photos) => setForm((p) => ({ ...p, movPhotos: photos }))}
+                />
               </div>
             </div>
 
@@ -7923,9 +8174,11 @@ export default function CEST() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveProject}>
-                {editProjectId ? "Update Project" : "Save Project"}
-              </button>
+              {((editProjectId && allowEdit) || (!editProjectId && allowAdd)) && (
+                <button style={styles.btnDark} onClick={saveProject}>
+                  {editProjectId ? "Update Project" : "Save Project"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -8026,6 +8279,112 @@ export default function CEST() {
           }
         />
       )}
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 

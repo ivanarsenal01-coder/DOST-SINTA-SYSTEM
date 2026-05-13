@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, PageOrientation } from "docx";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
 
 /* ✅ Leaflet + React-Leaflet */
 import "leaflet/dist/leaflet.css";
@@ -225,12 +226,138 @@ const normalizeEntryFromApi = (row) => {
   };
 };
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function TechnologyPromotion() {
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "This action cannot be undone.", title = "Confirm Delete", confirmText = "Delete") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, title, confirmText, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
   const MODE_ADD = "__ADD_MODE__";
   const PROJECT_ADD = "__ADD_PROJECT__";
 
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
+
+  const { hasPageAccess } = useAuth();
+  const canTechPromo = (action) =>
+    Boolean(
+      hasPageAccess?.("technologyPromotion", action) ||
+      hasPageAccess?.("technology_promotion", action) ||
+      hasPageAccess?.("techPromotion", action) ||
+      hasPageAccess?.("techPromo", action) ||
+      hasPageAccess?.("technologyPromotion", "manage") ||
+      hasPageAccess?.("techPromotion", "manage")
+    );
+
+  const canAdd = canTechPromo("add");
+  const canEdit = canTechPromo("edit");
+  const canDelete = canTechPromo("delete");
+  const canExport = canTechPromo("export");
+
+  const denyAccess = (action = "perform this action") => {
+    alert(`You don't have privilege to ${action}.`);
+    return false;
+  };
 
   // =========================
   // Pangasinan lists
@@ -972,11 +1099,24 @@ export default function TechnologyPromotion() {
       Source: sourceLabel(e) || "",
     }));
   };
-  const openPrintPopupRow = (entryId) => setPrintModal((p) => ({ ...p, open: true, scope: "row", entryId, layout: "FORM" }));
-  const openPrintPopupBulk = () => setPrintModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, layout: "FORM" }));
-  const openExportPopupRow = (entryId) => setExportModal((p) => ({ ...p, open: true, scope: "row", entryId, format: "excel" }));
-  const openExportPopupBulk = () => setExportModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, format: "excel" }));
+  const openPrintPopupRow = (entryId) => {
+    if (!canExport) return denyAccess("print");
+    setPrintModal((p) => ({ ...p, open: true, scope: "row", entryId, layout: "FORM" }));
+  };
+  const openPrintPopupBulk = () => {
+    if (!canExport) return denyAccess("print");
+    setPrintModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, layout: "FORM" }));
+  };
+  const openExportPopupRow = (entryId) => {
+    if (!canExport) return denyAccess("export");
+    setExportModal((p) => ({ ...p, open: true, scope: "row", entryId, format: "excel" }));
+  };
+  const openExportPopupBulk = () => {
+    if (!canExport) return denyAccess("export");
+    setExportModal((p) => ({ ...p, open: true, scope: "bulk", entryId: null, format: "excel" }));
+  };
   const confirmExport = async () => {
+    if (!canExport) return denyAccess("export");
     const rows = buildPromoRows(exportModal.scope, exportModal.entryId);
     const base = exportModal.scope === "row" ? `technology_promotion_${safeFilePart(exportModal.entryId)}` : `technology_promotion_filtered_${rows.length}_rows`;
     if (exportModal.format === "csv") {
@@ -997,6 +1137,7 @@ export default function TechnologyPromotion() {
     setExportModal((p) => ({ ...p, open: false }));
   };
   const confirmPrint = () => {
+    if (!canExport) return denyAccess("print");
     const rows = buildPromoRows(printModal.scope, printModal.entryId);
     const tableHtml = `<table><thead><tr>${promoColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${promoColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${promoColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>`;
     const cardsHtml = rows.length ? rows.map((r) => `<div class="card">${promoColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`;
@@ -1548,11 +1689,15 @@ export default function TechnologyPromotion() {
   // Mode/project add flows
   // =========================
   const handleModeChange = (val) => {
-    if (val === MODE_ADD) return setModeModalOpen(true);
+    if (val === MODE_ADD) {
+      if (!canAdd) return denyAccess("add mode of promotion");
+      return setModeModalOpen(true);
+    }
     setEntryForm((prev) => ({ ...prev, modeOfPromotion: val }));
   };
 
   const commitAddMode = async () => {
+    if (!canAdd) return denyAccess("add mode of promotion");
     try {
       const name = String(newModeName || "").trim();
       if (!name) return alert("Please type a mode of promotion.");
@@ -1572,11 +1717,15 @@ export default function TechnologyPromotion() {
   };
 
   const handleProjectChange = (val) => {
-    if (val === PROJECT_ADD) return setProjectModalOpen(true);
+    if (val === PROJECT_ADD) {
+      if (!canAdd) return denyAccess("add project option");
+      return setProjectModalOpen(true);
+    }
     setEntryForm((prev) => ({ ...prev, project: val }));
   };
 
   const commitAddProject = async () => {
+    if (!canAdd) return denyAccess("add project option");
     try {
       const name = String(newProjectName || "").trim();
       if (!name) return alert("Please type a project name.");
@@ -1753,11 +1902,13 @@ export default function TechnologyPromotion() {
   };
 
   const openAddEntry = () => {
+    if (!canAdd) return denyAccess("add entry");
     resetEntryForm();
     setEntryModal({ mode: "add" });
   };
 
   const openEditEntry = (entryId) => {
+    if (!canEdit) return denyAccess("edit entry");
     const e = entries.find((x) => String(x.id) === String(entryId));
     if (!e) return;
 
@@ -1784,8 +1935,9 @@ export default function TechnologyPromotion() {
   };
 
   const deleteEntry = async (entryId) => {
+    if (!canDelete) return denyAccess("delete entry");
     try {
-      if (!window.confirm("Delete this entry?")) return;
+      if (!(await requestDeleteConfirm("Delete this entry?", "Confirm Delete", "Delete"))) return;
 
       await apiFetch(`/entries/${entryId}`, {
         method: "DELETE",
@@ -1824,6 +1976,8 @@ export default function TechnologyPromotion() {
   };
 
   const saveEntry = async () => {
+    if (entryModal?.mode === "add" && !canAdd) return denyAccess("add entry");
+    if (entryModal?.mode === "edit" && !canEdit) return denyAccess("edit entry");
     try {
       const err = validateEntry();
       if (err) return alert(err);
@@ -3351,29 +3505,35 @@ export default function TechnologyPromotion() {
                 Clear Filters
               </button>
 
-              <button
-                type="button"
-                style={styles.toolbarBtn}
-                onClick={openExportPopupBulk}
-              >
-                Export
-              </button>
+              {canExport ? (
+                <button
+                  type="button"
+                  style={styles.toolbarBtn}
+                  onClick={openExportPopupBulk}
+                >
+                  Export
+                </button>
+              ) : null}
 
-              <button
-                type="button"
-                style={styles.btnDark}
-                onClick={openPrintPopupBulk}
-              >
-                Print
-              </button>
+              {canExport ? (
+                <button
+                  type="button"
+                  style={styles.btnDark}
+                  onClick={openPrintPopupBulk}
+                >
+                  Print
+                </button>
+              ) : null}
 
-              <button
-                type="button"
-                style={styles.toolbarAddBtn}
-                onClick={openAddEntry}
-              >
-                + Add Entry
-              </button>
+              {canAdd ? (
+                <button
+                  type="button"
+                  style={styles.toolbarAddBtn}
+                  onClick={openAddEntry}
+                >
+                  + Add Entry
+                </button>
+              ) : null}
             </div>
 
           </div>
@@ -3494,30 +3654,38 @@ export default function TechnologyPromotion() {
                         >
                           View
                         </button>
-                        <button
-                          style={styles.tinyBtn}
-                          onClick={() => openPrintPopupRow(e.id)}
-                        >
-                          Print
-                        </button>
-                        <button
-                          style={styles.tinyBtn}
-                          onClick={() => openExportPopupRow(e.id)}
-                        >
-                          Export
-                        </button>
-                        <button
-                          style={styles.tinyBtn}
-                          onClick={() => openEditEntry(e.id)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          style={styles.dangerTiny}
-                          onClick={() => deleteEntry(e.id)}
-                        >
-                          Delete
-                        </button>
+                        {canExport ? (
+                          <button
+                            style={styles.tinyBtn}
+                            onClick={() => openPrintPopupRow(e.id)}
+                          >
+                            Print
+                          </button>
+                        ) : null}
+                        {canExport ? (
+                          <button
+                            style={styles.tinyBtn}
+                            onClick={() => openExportPopupRow(e.id)}
+                          >
+                            Export
+                          </button>
+                        ) : null}
+                        {canEdit ? (
+                          <button
+                            style={styles.tinyBtn}
+                            onClick={() => openEditEntry(e.id)}
+                          >
+                            Edit
+                          </button>
+                        ) : null}
+                        {canDelete ? (
+                          <button
+                            style={styles.dangerTiny}
+                            onClick={() => deleteEntry(e.id)}
+                          >
+                            Delete
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
@@ -3789,7 +3957,7 @@ export default function TechnologyPromotion() {
                         {p}
                       </option>
                     ))}
-                    <option value={PROJECT_ADD}>+ Add project...</option>
+                    {canAdd ? <option value={PROJECT_ADD}>+ Add project...</option> : null}
                   </select>
                 </div>
 
@@ -3857,7 +4025,7 @@ export default function TechnologyPromotion() {
                         {m}
                       </option>
                     ))}
-                    <option value={MODE_ADD}>+ Add mode of promotion...</option>
+                    {canAdd ? <option value={MODE_ADD}>+ Add mode of promotion...</option> : null}
                   </select>
                 </div>
 
@@ -4127,9 +4295,11 @@ export default function TechnologyPromotion() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveEntry}>
-                {entryModal.mode === "edit" ? "Update" : "Save"}
-              </button>
+              {((entryModal.mode === "add" && canAdd) || (entryModal.mode === "edit" && canEdit)) ? (
+                <button style={styles.btnDark} onClick={saveEntry}>
+                  {entryModal.mode === "edit" ? "Update" : "Save"}
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -4190,9 +4360,11 @@ export default function TechnologyPromotion() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={commitAddMode}>
-                Add
-              </button>
+              {canAdd ? (
+                <button style={styles.btnDark} onClick={commitAddMode}>
+                  Add
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -4246,9 +4418,11 @@ export default function TechnologyPromotion() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={commitAddProject}>
-                Add
-              </button>
+              {canAdd ? (
+                <button style={styles.btnDark} onClick={commitAddProject}>
+                  Add
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -4524,15 +4698,17 @@ export default function TechnologyPromotion() {
               >
                 Close
               </button>
-              <button
-                style={styles.btnDark}
-                onClick={() => {
-                  setViewEntryId(null);
-                  openEditEntry(viewEntry.id);
-                }}
-              >
-                Edit
-              </button>
+              {canEdit ? (
+                <button
+                  style={styles.btnDark}
+                  onClick={() => {
+                    setViewEntryId(null);
+                    openEditEntry(viewEntry.id);
+                  }}
+                >
+                  Edit
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -4679,6 +4855,112 @@ export default function TechnologyPromotion() {
             <div style={styles.modalFooter}>
               <button style={styles.btnGhost} onClick={() => setExportModal((p) => ({ ...p, open: false }))}>Cancel</button>
               <button style={styles.btnDark} onClick={confirmExport}>Export Now</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>{deleteConfirmState.title || "Confirm Delete"}</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to continue?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                {deleteConfirmState.confirmText || "Delete"}
+              </button>
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import { canAdd, canEdit, canDelete, canExport } from "../../usrmngment/utils/permissions";
 
 /* =========================
    ✅ Leaflet + React-Leaflet (Map integration)
@@ -170,8 +172,10 @@ const readLocalProjects = () => {
         }))
         : [],
 
-      // ✅ Remarks (separate from old fields)
+      // ✅ Remarks + Means of Verification
       remarks: p?.remarks || "",
+      meansOfVerification: p?.meansOfVerification || p?.means_of_verification || "",
+      movPhotos: Array.isArray(p?.movPhotos) ? p.movPhotos : (Array.isArray(p?.mov_photos) ? p.mov_photos : []),
 
       // ✅ Keep for later (hidden in UI for now)
       interventions: Array.isArray(p?.interventions) ? p.interventions : [],
@@ -191,7 +195,119 @@ const writeLocalProjects = (arr) => {
 };
 
 
+
+
+function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
+  const [viewer, setViewer] = useState(null);
+  const cleanPhotos = Array.isArray(photos) ? photos : [];
+  const links = Array.from(new Set(String(value || "").match(/https?:\/\/[^\s]+/gi) || []));
+
+  const addPhotos = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = async () => {
+      const files = Array.from(input.files || []).filter((file) => String(file.type || "").startsWith("image/"));
+      const converted = await Promise.all(files.map((file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: String(reader.result || "") });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+      if (converted.length) onPhotosChange?.([...cleanPhotos, ...converted]);
+    };
+    input.click();
+  };
+
+  const openFirstLink = () => {
+    if (!links.length) return alert("No URL found in Means of Verification.");
+    window.open(links[0], "_blank", "noopener,noreferrer");
+  };
+
+  const removePhoto = (idx) => {
+    onPhotosChange?.(cleanPhotos.filter((_, i) => i !== idx));
+  };
+
+  const currentPhoto = viewer ? cleanPhotos[viewer.index] : null;
+
+  return (
+    <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 900, color: "#0f172a" }}>{label}</div>
+      <textarea
+        style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: 8, fontSize: 13, outline: "none", minHeight: 72, resize: "vertical", fontFamily: "inherit" }}
+        value={value || ""}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        placeholder="Attendance sheet / links to posts / activity reports / photos..."
+      />
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={openFirstLink}>View First Link</button>
+        <button type="button" style={{ border: "1px solid rgba(15,23,42,.18)", background: "#fff", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={addPhotos}>Add Photos</button>
+        <span style={{ display: "inline-block", padding: "3px 8px", borderRadius: 999, border: "1px solid #cbd5e1", background: "#f8fafc", fontSize: 11, fontWeight: 900 }}>Photos: {cleanPhotos.length}</span>
+      </div>
+      {links.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {links.map((url, idx) => (
+            <button key={`${url}_${idx}`} type="button" title={url} style={{ border: "1px solid #93c5fd", background: "#eff6ff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>Link {idx + 1}</button>
+          ))}
+        </div>
+      ) : null}
+      {cleanPhotos.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {cleanPhotos.map((photo, idx) => (
+            <div key={`${photo.name || 'photo'}_${idx}`} style={{ display: "flex", gap: 10, alignItems: "center", border: "1px solid #e2e8f0", borderRadius: 10, padding: 8 }}>
+              <img src={photo.dataUrl || photo.url} alt={photo.name || `Photo ${idx + 1}`} style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }} onClick={() => setViewer({ index: idx })} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 900, fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{photo.name || `Photo ${idx + 1}`}</div>
+                <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 800 }}>{photo.type || "image"}</div>
+              </div>
+              <button type="button" style={{ border: "1px solid #0b4ea2", background: "#fff", color: "#0b4ea2", padding: "5px 9px", borderRadius: 8, cursor: "pointer", fontWeight: 900, fontSize: 11, fontFamily: "inherit" }} onClick={() => removePhoto(idx)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {currentPhoto ? (
+        <div onClick={() => setViewer(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 999999 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(900px, 100%)", background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>
+            <div style={{ background: "#0b4ea2", color: "#fff", padding: "10px 14px", fontWeight: 900, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>{currentPhoto.name || "Photo"}</div>
+              <button type="button" onClick={() => setViewer(null)} style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "6px 10px", fontWeight: 900, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 16, display: "flex", justifyContent: "center" }}>
+              <img src={currentPhoto.dataUrl || currentPhoto.url} alt={currentPhoto.name || "Photo"} style={{ maxWidth: "100%", maxHeight: "70vh", borderRadius: 10 }} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function SSCP() {
+  const { user } = useAuth();
+
+  const allowAdd = canAdd(user, "sscp");
+  const allowEdit = canEdit(user, "sscp");
+  const allowDelete = canDelete(user, "sscp");
+  const allowExport = canExport(user, "sscp");
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState(null);
+
+  const requestDeleteConfirm = (message = "Delete this record?") =>
+    new Promise((resolve) => {
+      setDeleteConfirmState({ message, resolve });
+    });
+
+  const cancelDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(false);
+    setDeleteConfirmState(null);
+  };
+
+  const proceedDeleteConfirm = () => {
+    if (deleteConfirmState?.resolve) deleteConfirmState.resolve(true);
+    setDeleteConfirmState(null);
+  };
+
 
   const fontFamily =
     '"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
@@ -360,6 +476,8 @@ export default function SSCP() {
     smartCityDate: "",
 
     remarks: "",
+    meansOfVerification: "",
+    movPhotos: [],
     customFields: {},
   });
   // Address modal
@@ -386,6 +504,8 @@ export default function SSCP() {
     projectProponent: "",
     sex: "",
     processSystem: "",
+    meansOfVerification: "",
+    movPhotos: [],
   });
   const [sscProjectView, setSscProjectView] = useState(null); // { lguId, projectId }
 
@@ -1075,6 +1195,8 @@ export default function SSCP() {
       isSmartCity: false,
       smartCityDate: "",
       remarks: "",
+      meansOfVerification: "",
+      movPhotos: [],
       customFields: {},
     });
   };
@@ -1167,12 +1289,22 @@ export default function SSCP() {
 
   // ===== PROJECT CRUD =====
   const openAddProject = () => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SSCP LGU/Community records.");
+      return;
+    }
+
     setEditProjectId(null);
     resetForm();
     setShowAdd(true);
   };
 
   const openEditProject = (id) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SSCP LGU/Community records.");
+      return;
+    }
+
     const p = projects.find((x) => x.id === id);
     if (!p) return;
 
@@ -1188,6 +1320,8 @@ export default function SSCP() {
       isSmartCity: Boolean(p.isSmartCity),
       smartCityDate: p.smartCityDate || "",
       remarks: p.remarks || "",
+      meansOfVerification: p.meansOfVerification || p.means_of_verification || "",
+      movPhotos: Array.isArray(p.movPhotos) ? p.movPhotos : (Array.isArray(p.mov_photos) ? p.mov_photos : []),
       customFields:
         typeof (p.customFields || p.custom_fields || {}) === "string"
           ? (() => {
@@ -1204,6 +1338,16 @@ export default function SSCP() {
   };
 
   const saveProject = async () => {
+    if (editProjectId && !allowEdit) {
+      alert("You do not have permission to edit SSCP LGU/Community records.");
+      return;
+    }
+
+    if (!editProjectId && !allowAdd) {
+      alert("You do not have permission to add SSCP LGU/Community records.");
+      return;
+    }
+
     if (!form.lguCommunity.trim()) return alert("Required: LGU / Community");
     if (!form.address.trim()) return alert("Required: Venue/Address");
 
@@ -1226,6 +1370,10 @@ export default function SSCP() {
       isSmartCity: Boolean(form.isSmartCity),
       smartCityDate: form.isSmartCity ? (form.smartCityDate || "") : "",
       remarks: (form.remarks || "").trim(),
+      meansOfVerification: (form.meansOfVerification || "").trim(),
+      means_of_verification: (form.meansOfVerification || "").trim(),
+      movPhotos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
+      mov_photos: Array.isArray(form.movPhotos) ? form.movPhotos : [],
       custom_fields: form.customFields || {},
       customFields: form.customFields || {},
     };
@@ -1293,7 +1441,12 @@ export default function SSCP() {
 
 
   const deleteProject = async (id) => {
-    if (!window.confirm("Delete this project?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete SSCP LGU/Community records.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this project?"))) return;
 
     if (OFFLINE_MODE) {
       const next = readLocalProjects().filter((p) => String(p.id) !== String(id));
@@ -1333,10 +1486,17 @@ export default function SSCP() {
     projectProponent: "",
     sex: "",
     processSystem: "",
+    meansOfVerification: "",
+    movPhotos: [],
     ...seed,
   });
 
   const openAddSscProject = (lguId) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SSCP projects.");
+      return;
+    }
+
     const lgu = projects.find((x) => String(x.id) === String(lguId)) || null;
     setSscProjectForm(
       makeEmptySscProjectForm({
@@ -1349,6 +1509,11 @@ export default function SSCP() {
   };
 
   const openEditSscProject = (lguId, projectId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SSCP projects.");
+      return;
+    }
+
     const p = projects.find((x) => String(x.id) === String(lguId));
     const list = getSscProjects(p);
     const it = list.find((x) => String(x.id) === String(projectId));
@@ -1365,6 +1530,8 @@ export default function SSCP() {
         projectProponent: it?.projectProponent || "",
         sex: it?.sex || "",
         processSystem: it?.processSystem || "",
+        meansOfVerification: it?.meansOfVerification || it?.means_of_verification || "",
+        movPhotos: Array.isArray(it?.movPhotos) ? it.movPhotos : Array.isArray(it?.mov_photos) ? it.mov_photos : [],
       })
     );
 
@@ -1378,6 +1545,16 @@ export default function SSCP() {
 
   const saveSscProject = async () => {
     if (!sscProjectModal?.lguId) return;
+
+    if (sscProjectModal.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit SSCP projects.");
+      return;
+    }
+
+    if (sscProjectModal.mode === "add" && !allowAdd) {
+      alert("You do not have permission to add SSCP projects.");
+      return;
+    }
 
     // Required based on the current SSCP Add Project fields
     if (!(sscProjectForm.projectTitle || "").trim()) return alert("Required: Project Title");
@@ -1410,6 +1587,10 @@ export default function SSCP() {
       projectProponent: (sscProjectForm.projectProponent || "").trim(),
       sex: (sscProjectForm.sex || "").trim(),
       processSystem: (sscProjectForm.processSystem || "").trim(),
+      meansOfVerification: (sscProjectForm.meansOfVerification || "").trim(),
+      means_of_verification: (sscProjectForm.meansOfVerification || "").trim(),
+      movPhotos: Array.isArray(sscProjectForm.movPhotos) ? sscProjectForm.movPhotos : [],
+      mov_photos: Array.isArray(sscProjectForm.movPhotos) ? sscProjectForm.movPhotos : [],
     };
 
     if (OFFLINE_MODE) {
@@ -1474,7 +1655,12 @@ export default function SSCP() {
     }
   };
   const deleteSscProject = async (lguId, projectId) => {
-    if (!window.confirm("Delete this project entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete SSCP projects.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this project entry?"))) return;
 
     if (OFFLINE_MODE) {
       const current = readLocalProjects();
@@ -1520,15 +1706,32 @@ export default function SSCP() {
 
 
   // ===== INTERVENTION CRUD =====
-  const openInterventionPicker = (lguId, sscProjectId) => setPickForId({ lguId, sscProjectId });
+  const openInterventionPicker = (lguId, sscProjectId) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SSCP interventions.");
+      return;
+    }
+
+    setPickForId({ lguId, sscProjectId });
+  };
 
   const openInterventionDetails_Add = (lguId, sscProjectId, type) => {
+    if (!allowAdd) {
+      alert("You do not have permission to add SSCP interventions.");
+      return;
+    }
+
     setPickForId(null);
     resetDetailForm(type);
     setDetailFor({ lguId, sscProjectId, mode: "add" });
   };
 
   const openInterventionDetails_Edit = (lguId, sscProjectId, entryId) => {
+    if (!allowEdit) {
+      alert("You do not have permission to edit SSCP interventions.");
+      return;
+    }
+
     const p = projects.find((x) => String(x.id) === String(lguId));
     const sp = getSscProjects(p).find((x) => String(x.id) === String(sscProjectId));
     const entry = sp?.interventions?.find((x) => String(x.id) === String(entryId));
@@ -1939,7 +2142,12 @@ export default function SSCP() {
   };
 
   const deleteIntervention = async (lguId, sscProjectId, entryId) => {
-    if (!window.confirm("Delete this intervention entry?")) return;
+    if (!allowDelete) {
+      alert("You do not have permission to delete SSCP interventions.");
+      return;
+    }
+
+    if (!(await requestDeleteConfirm("Delete this intervention entry?"))) return;
 
     if (OFFLINE_MODE) {
       const current = readLocalProjects();
@@ -1993,6 +2201,16 @@ export default function SSCP() {
 
   const saveInterventionDetails = async () => {
     if (!detailFor) return;
+
+    if (detailFor.mode === "edit" && !allowEdit) {
+      alert("You do not have permission to edit SSCP interventions.");
+      return;
+    }
+
+    if (detailFor.mode === "add" && !allowAdd) {
+      alert("You do not have permission to add SSCP interventions.");
+      return;
+    }
 
     const type = (detailForm.type || "").trim();
     const isTech = type === "Tech Roll Out";
@@ -2747,6 +2965,7 @@ export default function SSCP() {
         "Recognized as Smart City": p?.isSmartCity ? "Yes" : "",
         "Smart City Recognition Date": p?.smartCityDate || "",
         "Total SSC Fund": getSscTotal(p),
+        "Means of Verification": p?.meansOfVerification || p?.means_of_verification || "",
         Remarks: p?.remarks || "",
       };
 
@@ -2827,6 +3046,11 @@ export default function SSCP() {
   };
 
   const openReportModal = (mode, items = filteredProjects, title = "SSCP Report", scope = "filtered") => {
+    if (!allowExport) {
+      alert("You do not have permission to export or print SSCP records.");
+      return;
+    }
+
     const arr = Array.isArray(items) ? items : [];
     setReportFormat("EXCEL");
     setPrintLayout("form");
@@ -2838,6 +3062,11 @@ export default function SSCP() {
   };
 
   const exportSscpRows = (items = filteredProjects, filename = "sscp_export.xlsx", format = "EXCEL") => {
+    if (!allowExport) {
+      alert("You do not have permission to export SSCP records.");
+      return;
+    }
+
     const rows = buildSscpExportRows(items);
     const baseName = safeFilePart(filename.replace(/\.[^.]+$/, ""));
     const upperFormat = String(format || "EXCEL").toUpperCase();
@@ -2865,6 +3094,11 @@ export default function SSCP() {
   };
 
   const printSscpRows = (items = filteredProjects, title = "SSCP Report", options = {}) => {
+    if (!allowExport) {
+      alert("You do not have permission to print SSCP records.");
+      return;
+    }
+
     const rows = buildSscpExportRows(items);
     const actualCount = Array.isArray(items) ? items.length : 0;
     const layout = options.layout || printLayout;
@@ -4921,17 +5155,23 @@ export default function SSCP() {
             Clear Filters
           </button>
 
-          <button style={styles.addBtn} onClick={() => openReportModal("export", filteredProjects, "SSCP Filtered Rows", "filtered")}>
-            Export
-          </button>
+          {allowExport && (
+            <button style={styles.addBtn} onClick={() => openReportModal("export", filteredProjects, "SSCP Filtered Rows", "filtered")}>
+              Export
+            </button>
+          )}
 
-          <button style={{ ...styles.addBtn, ...styles.printBtnBlue }} onClick={() => openReportModal("print", filteredProjects, "SSCP Filtered Rows", "filtered")}>
-            Print
-          </button>
+          {allowExport && (
+            <button style={{ ...styles.addBtn, ...styles.printBtnBlue }} onClick={() => openReportModal("print", filteredProjects, "SSCP Filtered Rows", "filtered")}>
+              Print
+            </button>
+          )}
 
-          <button style={styles.addBtn} onClick={openAddProject}>
-            + Add LGU / Community
-          </button>
+          {allowAdd && (
+            <button style={styles.addBtn} onClick={openAddProject}>
+              + Add LGU / Community
+            </button>
+          )}
         </div>
       </div>
 
@@ -5069,27 +5309,33 @@ export default function SSCP() {
                         )}
 
                         <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-                          <button style={styles.pillBtn} onClick={() => openAddSscProject(p.id)}>
-                            + Add Projects
-                          </button>
+                          {allowAdd && (
+                            <button style={styles.pillBtn} onClick={() => openAddSscProject(p.id)}>
+                              + Add Projects
+                            </button>
+                          )}
 
-                          <button
-                            style={styles.tinyBtn}
-                            disabled={!selectedPid}
-                            onClick={() => openEditSscProject(p.id, selectedPid)}
-                            title={!selectedPid ? "Select a project first" : "Edit selected"}
-                          >
-                            Edit
-                          </button>
+                          {allowEdit && (
+                            <button
+                              style={styles.tinyBtn}
+                              disabled={!selectedPid}
+                              onClick={() => openEditSscProject(p.id, selectedPid)}
+                              title={!selectedPid ? "Select a project first" : "Edit selected"}
+                            >
+                              Edit
+                            </button>
+                          )}
 
-                          <button
-                            style={styles.dangerTiny}
-                            disabled={!selectedPid}
-                            onClick={() => deleteSscProject(p.id, selectedPid)}
-                            title={!selectedPid ? "Select a project first" : "Delete selected"}
-                          >
-                            Delete
-                          </button>
+                          {allowDelete && (
+                            <button
+                              style={styles.dangerTiny}
+                              disabled={!selectedPid}
+                              onClick={() => deleteSscProject(p.id, selectedPid)}
+                              title={!selectedPid ? "Select a project first" : "Delete selected"}
+                            >
+                              Delete
+                            </button>
+                          )}
 
                           <button
                             style={styles.tinyBtn}
@@ -5120,18 +5366,26 @@ export default function SSCP() {
                         >
                           View
                         </button>
-                        <button style={styles.tinyBtn} onClick={() => openEditProject(p.id)}>
-                          Edit
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openReportModal("print", [p], `SSCP Report - ${p.lguCommunity || "LGU / Community"}`, "row")}>
-                          Print
-                        </button>
-                        <button style={styles.tinyBtn} onClick={() => openReportModal("export", [p], `SSCP Report - ${p.lguCommunity || "LGU / Community"}`, "row")}>
-                          Export
-                        </button>
-                        <button style={styles.dangerBtn} onClick={() => deleteProject(p.id)}>
-                          Delete
-                        </button>
+                        {allowEdit && (
+                          <button style={styles.tinyBtn} onClick={() => openEditProject(p.id)}>
+                            Edit
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openReportModal("print", [p], `SSCP Report - ${p.lguCommunity || "LGU / Community"}`, "row")}>
+                            Print
+                          </button>
+                        )}
+                        {allowExport && (
+                          <button style={styles.tinyBtn} onClick={() => openReportModal("export", [p], `SSCP Report - ${p.lguCommunity || "LGU / Community"}`, "row")}>
+                            Export
+                          </button>
+                        )}
+                        {allowDelete && (
+                          <button style={styles.dangerBtn} onClick={() => deleteProject(p.id)}>
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -5316,6 +5570,13 @@ export default function SSCP() {
                     placeholder="Optional"
                   />
                 </div>
+
+                <UnifiedMOVSection
+                  value={sscProjectForm.meansOfVerification || ""}
+                  photos={sscProjectForm.movPhotos || []}
+                  onValueChange={(value) => setSscProjectForm((p) => ({ ...p, meansOfVerification: value }))}
+                  onPhotosChange={(photos) => setSscProjectForm((p) => ({ ...p, movPhotos: photos }))}
+                />
               </div>
 
               <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
@@ -5327,9 +5588,11 @@ export default function SSCP() {
               <button style={styles.btnGhost} onClick={closeSscProjectModal}>
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveSscProject}>
-                {sscProjectModal.mode === "edit" ? "Update" : "Save"}
-              </button>
+              {((sscProjectModal.mode === "edit" && allowEdit) || (sscProjectModal.mode === "add" && allowAdd)) && (
+                <button style={styles.btnDark} onClick={saveSscProject}>
+                  {sscProjectModal.mode === "edit" ? "Update" : "Save"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -5498,9 +5761,11 @@ export default function SSCP() {
                       )}
 
                       <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-                        <button style={styles.pillBtn} onClick={() => openInterventionPicker(lgu.id, sp.id)}>
-                          + Add
-                        </button>
+                        {allowAdd && (
+                          <button style={styles.pillBtn} onClick={() => openInterventionPicker(lgu.id, sp.id)}>
+                            + Add
+                          </button>
+                        )}
 
                         <button
                           style={styles.tinyBtn}
@@ -5511,23 +5776,27 @@ export default function SSCP() {
                           View
                         </button>
 
-                        <button
-                          style={styles.tinyBtn}
-                          disabled={!selectedId}
-                          onClick={() => openInterventionDetails_Edit(lgu.id, sp.id, selectedId)}
-                          title={!selectedId ? "Select an intervention first" : "Edit selected"}
-                        >
-                          Edit
-                        </button>
+                        {allowEdit && (
+                          <button
+                            style={styles.tinyBtn}
+                            disabled={!selectedId}
+                            onClick={() => openInterventionDetails_Edit(lgu.id, sp.id, selectedId)}
+                            title={!selectedId ? "Select an intervention first" : "Edit selected"}
+                          >
+                            Edit
+                          </button>
+                        )}
 
-                        <button
-                          style={styles.dangerTiny}
-                          disabled={!selectedId}
-                          onClick={() => deleteIntervention(lgu.id, sp.id, selectedId)}
-                          title={!selectedId ? "Select an intervention first" : "Delete selected"}
-                        >
-                          Delete
-                        </button>
+                        {allowDelete && (
+                          <button
+                            style={styles.dangerTiny}
+                            disabled={!selectedId}
+                            onClick={() => deleteIntervention(lgu.id, sp.id, selectedId)}
+                            title={!selectedId ? "Select an intervention first" : "Delete selected"}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
 
                       <div style={{ fontSize: 12, opacity: 0.7 }}>
@@ -5571,7 +5840,7 @@ export default function SSCP() {
             </div>
 
             <div style={styles.pickBody}>
-              {INTERVENTION_OPTIONS.map((opt) => (
+              {allowAdd && INTERVENTION_OPTIONS.map((opt) => (
                 <button key={opt} style={styles.optionBtn} onClick={() => openInterventionDetails_Add(pickForId.lguId, pickForId.sscProjectId, opt)}>
                   {opt}
                 </button>
@@ -6611,9 +6880,11 @@ export default function SSCP() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveInterventionDetails}>
-                {detailFor.mode === "edit" ? "Update" : "Save"}
-              </button>
+              {((detailFor.mode === "edit" && allowEdit) || (detailFor.mode === "add" && allowAdd)) && (
+                <button style={styles.btnDark} onClick={saveInterventionDetails}>
+                  {detailFor.mode === "edit" ? "Update" : "Save"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -7027,6 +7298,26 @@ export default function SSCP() {
               </div>
 
               <div style={{ marginTop: 14 }}>
+                <div style={styles.label}>Means of Verification</div>
+                <div style={{ ...viewStyles.boxValue, whiteSpace: "pre-wrap" }}>
+                  {viewProject.meansOfVerification || viewProject.means_of_verification || "—"}
+                </div>
+              </div>
+
+              {Array.isArray(viewProject.movPhotos) && viewProject.movPhotos.length > 0 ? (
+                <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {viewProject.movPhotos.map((photo, idx) => (
+                    <img
+                      key={`lgu-mov-photo-${idx}`}
+                      src={photo.dataUrl || photo.url}
+                      alt={photo.name || `MOV Photo ${idx + 1}`}
+                      style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, border: "1px solid #cbd5e1" }}
+                    />
+                  ))}
+                </div>
+              ) : null}
+
+              <div style={{ marginTop: 14 }}>
                 <div style={styles.label}>Remarks</div>
                 <div style={viewStyles.boxValue}>{viewProject.remarks || "—"}</div>
               </div>
@@ -7043,9 +7334,11 @@ export default function SSCP() {
             </div>
 
             <div style={styles.modalFooter}>
-              <button style={styles.btnGhost} onClick={() => openEditProject(viewProject.id)}>
-                Edit
-              </button>
+              {allowEdit && (
+                <button style={styles.btnGhost} onClick={() => openEditProject(viewProject.id)}>
+                  Edit
+                </button>
+              )}
               <button style={styles.btnDark} onClick={() => setViewProjectId(null)}>
                 Close
               </button>
@@ -7181,6 +7474,13 @@ export default function SSCP() {
                   />
                 </div>
 
+                <UnifiedMOVSection
+                  value={form.meansOfVerification || ""}
+                  photos={form.movPhotos || []}
+                  onValueChange={(value) => setForm((p) => ({ ...p, meansOfVerification: value }))}
+                  onPhotosChange={(photos) => setForm((p) => ({ ...p, movPhotos: photos }))}
+                />
+
                 <div style={{ ...styles.field, gridColumn: "1 / -1" }}>
                   <div style={styles.label}>Remarks</div>
                   <textarea
@@ -7297,9 +7597,11 @@ export default function SSCP() {
               >
                 Cancel
               </button>
-              <button style={styles.btnDark} onClick={saveProject}>
-                {editProjectId ? "Update LGU / Community" : "Save LGU / Community"}
-              </button>
+              {((editProjectId && allowEdit) || (!editProjectId && allowAdd)) && (
+                <button style={styles.btnDark} onClick={saveProject}>
+                  {editProjectId ? "Update LGU / Community" : "Save LGU / Community"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -7443,6 +7745,112 @@ export default function SSCP() {
           }
         />
       )}
+      {deleteConfirmState && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.42)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            zIndex: 99999,
+            fontFamily: "inherit",
+          }}
+          onClick={cancelDeleteConfirm}
+        >
+          <div
+            style={{
+              width: "min(430px, 100%)",
+              background: "#fff",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 18px 45px rgba(15,23,42,0.28)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                background: "#0b4ea2",
+                color: "#fff",
+                padding: "14px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                fontWeight: 900,
+              }}
+            >
+              <span>Confirm Delete</span>
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.75)",
+                  background: "#fff",
+                  color: "#0f172a",
+                  borderRadius: 10,
+                  padding: "6px 10px",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 6, color: "#0f172a" }}>
+                Are you sure you want to delete this?
+              </div>
+              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.4 }}>
+                {deleteConfirmState.message || "This action cannot be undone."}
+              </div>
+            </div>
+            <div
+              style={{
+                padding: 14,
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
+                type="button"
+                onClick={cancelDeleteConfirm}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={proceedDeleteConfirm}
+                style={{
+                  background: "#0b4ea2",
+                  border: "1px solid #0b4ea2",
+                  color: "#fff",
+                  padding: "9px 12px",
+                  borderRadius: 10,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 
