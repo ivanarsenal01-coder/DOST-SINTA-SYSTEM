@@ -1381,6 +1381,8 @@ CREATE TABLE `technology_rollout` (
   `source_module` varchar(50) COLLATE utf8mb4_general_ci DEFAULT 'technology_rollout',
   `source_label` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `name_of_staff` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `means_of_verification` longtext COLLATE utf8mb4_general_ci,
+  `mov_photos` longtext COLLATE utf8mb4_general_ci,
   `custom_fields` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_technology_rollout_intervention_id` (`intervention_id`),
