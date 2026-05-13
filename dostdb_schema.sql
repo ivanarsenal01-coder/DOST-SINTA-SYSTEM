@@ -51,6 +51,8 @@ CREATE TABLE `calibration` (
   `sc` int NOT NULL DEFAULT '0',
   `fourPs` int NOT NULL DEFAULT '0',
   `nameOfStaff` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `means_of_verification` longtext COLLATE utf8mb4_general_ci,
+  `photos` longtext COLLATE utf8mb4_general_ci,
   `remarks` text COLLATE utf8mb4_general_ci,
   `custom_fields` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
