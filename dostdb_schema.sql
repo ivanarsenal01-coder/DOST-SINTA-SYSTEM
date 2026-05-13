@@ -1440,6 +1440,8 @@ CREATE TABLE `technology_training_entries` (
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `name_of_staff` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `means_of_verification` longtext COLLATE utf8mb4_general_ci,
+  `photos` longtext COLLATE utf8mb4_general_ci,
   `custom_fields` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_tt_cest_training` (`intervention_id`,`source_module`)
