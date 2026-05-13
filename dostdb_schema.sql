@@ -747,6 +747,7 @@ CREATE TABLE `special_projects` (
   `date_project_approved` date NOT NULL,
   `project_cost` decimal(15,2) NOT NULL DEFAULT '0.00',
   `means_of_verification` text,
+  `mov_photos` longtext,
   `staff_name` varchar(255) DEFAULT NULL,
   `snt_interventions` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
