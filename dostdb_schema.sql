@@ -1257,6 +1257,7 @@ DROP TABLE IF EXISTS `target_settings`;
 CREATE TABLE `target_settings` (
   `id` int NOT NULL AUTO_INCREMENT,
   `module_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `year` int NOT NULL DEFAULT '2026',
   `kpi_key` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
   `kpi_label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `annual_target` decimal(15,2) DEFAULT '0.00',
@@ -1266,8 +1267,7 @@ CREATE TABLE `target_settings` (
   `q4_target` decimal(15,2) DEFAULT '0.00',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_module_kpi` (`module_name`,`kpi_key`),
-  UNIQUE KEY `uniq_target_module_kpi` (`module_name`,`kpi_key`)
+  UNIQUE KEY `uniq_module_year_kpi` (`module_name`,`year`,`kpi_key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1171 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
