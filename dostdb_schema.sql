@@ -102,6 +102,8 @@ CREATE TABLE `cest` (
   `jobsGenerated` int NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `means_of_verification` TEXT NULL,
+  `means_of_verification_photos` LONGTEXT NULL,
   `custom_fields` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -720,6 +722,8 @@ CREATE TABLE `projects` (
   `jobs_generated` int DEFAULT '0',
   `spin_number` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `sector` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `means_of_verification` TEXT NULL,
+  `means_of_verification_photos` LONGTEXT NULL,
   `custom_fields` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -940,6 +944,8 @@ CREATE TABLE `sscp_lgus` (
   `partners` text COLLATE utf8mb4_general_ci,
   `is_smart_city` tinyint(1) DEFAULT '0',
   `smart_city_date` date DEFAULT NULL,
+  `means_of_verification` TEXT NULL,
+  `mov_photos` LONGTEXT NULL,
   `remarks` text COLLATE utf8mb4_general_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1009,6 +1015,8 @@ CREATE TABLE `sscp_projects` (
   `project_proponent` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `sex` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `process_system` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `means_of_verification` TEXT NULL,
+  `mov_photos` LONGTEXT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
