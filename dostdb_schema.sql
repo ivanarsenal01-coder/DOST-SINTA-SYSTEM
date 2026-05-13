@@ -1043,6 +1043,7 @@ CREATE TABLE `st_promo` (
   `share` int NOT NULL DEFAULT '0',
   `totalEngagements` int NOT NULL DEFAULT '0',
   `meansOfVerification` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mov_photos` longtext COLLATE utf8mb4_unicode_ci,
   `address` text COLLATE utf8mb4_unicode_ci,
   `addressMeta` longtext COLLATE utf8mb4_unicode_ci,
   `municipality` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
