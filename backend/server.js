@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require("express");
 const mysql = require("mysql2");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const { AsyncLocalStorage, AsyncResource } = require("async_hooks");
 const cors = require("cors");
 
@@ -17289,14 +17290,14 @@ const parseUserJsonSafe = (value, fallback = null) => {
   }
 };
 
+const isBcryptHash = (value = "") =>
+  /^\$2[aby]\$\d{2}\$/.test(String(value || ""));
+
 const hashPassword = (plainPassword = "") => {
   const password = String(plainPassword || "");
   if (!password) return "";
 
-  const salt = crypto.randomBytes(16).toString("hex");
-  const hash = crypto.scryptSync(password, salt, 64).toString("hex");
-
-  return `scrypt:${salt}:${hash}`;
+  return bcrypt.hashSync(password, 10);
 };
 
 const verifyPassword = (plainPassword = "", storedPassword = "") => {
@@ -17305,26 +17306,39 @@ const verifyPassword = (plainPassword = "", storedPassword = "") => {
 
   if (!password || !stored) return false;
 
-  // Backward compatibility: old plain-text passwords still work.
-  // Once the password is changed/reset, it will be saved as scrypt hash.
-  if (!stored.startsWith("scrypt:")) {
-    return password === stored;
+  // New format: bcrypt ($2a$, $2b$, $2y$)
+  if (isBcryptHash(stored)) {
+    const normalizedHash = stored.startsWith("$2y$")
+      ? stored.replace("$2y$", "$2a$")
+      : stored;
+
+    try {
+      return bcrypt.compareSync(password, normalizedHash);
+    } catch {
+      return false;
+    }
   }
 
-  const parts = stored.split(":");
-  if (parts.length !== 3) return false;
+  // Old format support: scrypt:salt:hash
+  if (stored.startsWith("scrypt:")) {
+    const parts = stored.split(":");
+    if (parts.length !== 3) return false;
 
-  const [, salt, originalHash] = parts;
-  const testHash = crypto.scryptSync(password, salt, 64).toString("hex");
+    const [, salt, originalHash] = parts;
+    const testHash = crypto.scryptSync(password, salt, 64).toString("hex");
 
-  try {
-    return crypto.timingSafeEqual(
-      Buffer.from(originalHash, "hex"),
-      Buffer.from(testHash, "hex")
-    );
-  } catch {
-    return false;
+    try {
+      return crypto.timingSafeEqual(
+        Buffer.from(originalHash, "hex"),
+        Buffer.from(testHash, "hex")
+      );
+    } catch {
+      return false;
+    }
   }
+
+  // Old plain text support
+  return password === stored;
 };
 
 const validatePasswordStrength = (password = "", { required = false } = {}) => {
@@ -17645,7 +17659,8 @@ app.post(["/api/login", "/login"], (req, res) => {
 
       // Upgrade old plain-text password to hashed format after successful login.
       const upgradePlainPassword = (next) => {
-        if (String(userRow.password || "").startsWith("scrypt:")) return next();
+        const currentPassword = String(userRow.password || "");
+        if (currentPassword.startsWith("scrypt:") || isBcryptHash(currentPassword)) return next();
         db.query(
           "UPDATE user_accounts SET password = ? WHERE id = ?",
           [hashPassword(password), userRow.id],

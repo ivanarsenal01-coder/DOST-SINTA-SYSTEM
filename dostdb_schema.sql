@@ -1701,7 +1701,7 @@ SELECT
   'Admin',
   'Super Admin',
   'superadmin',
-  'Admin123',
+  '$2y$10$R13DLRvNJKprbAXUQOpxYOoIL7guq//Ee6bXvG7/HHrVJuNra8/0e',
   'superadmin@dost.gov.ph',
   '09123456789',
   'superadmin',
