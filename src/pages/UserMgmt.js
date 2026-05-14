@@ -791,7 +791,7 @@ export default function UserMgmt() {
           style={styles.passwordViewBtn}
           onClick={() => setVisiblePasswordUserId(isVisible ? null : user.id)}
         >
-          {isVisible ? "Hide" : "View"}
+          {isVisible ? "Hide Hash" : "View Hash"}
         </button>
       </div>
     );
@@ -1623,7 +1623,7 @@ export default function UserMgmt() {
                   ["Full Name", viewUser.fullName],
                   ["Username", viewUser.username],
                   ...(canViewPasswordInfo(viewUser)
-                    ? [["Password", renderPasswordValue(viewUser)]]
+                    ? [["Password Hash", renderPasswordValue(viewUser)]]
                     : []),
                   ["Role", roleLabel(viewUser.role)],
                   ["Status", viewUser.status],
