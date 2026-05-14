@@ -186,6 +186,17 @@ function deriveDistrictFromEntry(entry) {
   return getDistrictFromMunicipality(derivedMunicipality) || "";
 }
 function sanitizeEntry(raw = {}) {
+  const rawCustomFields = raw?.customFields ?? raw?.custom_fields ?? {};
+  let parsedCustomFields = rawCustomFields;
+
+  if (typeof rawCustomFields === "string") {
+    try {
+      parsedCustomFields = JSON.parse(rawCustomFields || "{}");
+    } catch {
+      parsedCustomFields = {};
+    }
+  }
+
   return {
     ...EMPTY_FORM,
     ...raw,
@@ -193,8 +204,8 @@ function sanitizeEntry(raw = {}) {
     date: raw?.date || new Date().toISOString().slice(0, 10),
     address: raw?.address || raw?.addressMeta?.displayText || "",
     addressMeta: raw?.addressMeta || null,
-    customFields: raw?.customFields || raw?.custom_fields || {},
-    custom_fields: raw?.custom_fields || raw?.customFields || {},
+    customFields: parsedCustomFields || {},
+    custom_fields: parsedCustomFields || {},
     mcBreakdown: Array.isArray(raw?.mcBreakdown)
       ? raw.mcBreakdown.map((row) => ({
         id: row?.id || uid(),
@@ -1076,6 +1087,17 @@ export default function Calibration() {
           item?.fourPs,
           item?.nameOfStaff,
           item?.remarks,
+          ...Object.values((() => {
+            const raw = item?.customFields || item?.custom_fields || {};
+            if (typeof raw === "string") {
+              try {
+                return JSON.parse(raw || "{}");
+              } catch {
+                return {};
+              }
+            }
+            return raw || {};
+          })()),
         ]
           .filter((value) => value !== null && value !== undefined)
           .join(" ")
@@ -1401,6 +1423,36 @@ export default function Calibration() {
       .trim()
       .replace(/\b\w/g, (m) => m.toUpperCase());
 
+  const getCalibrationFieldKey = (field = {}) =>
+    field.fieldKey || field.field_key || field.key || "";
+
+  const getCalibrationFieldLabel = (field = {}) =>
+    cleanCalibrationCustomLabel(
+      field.fieldLabel ||
+        field.field_label ||
+        field.label ||
+        getCalibrationFieldKey(field)
+    );
+
+  const isCalibrationFieldVisible = (field = {}) =>
+    field.isVisible ?? field.is_visible ?? field.visible ?? true;
+
+  const canShowCalibrationFieldInForm = (field = {}) => {
+    const showAdd = field.showAdd ?? field.show_add ?? true;
+    const showEdit = field.showEdit ?? field.show_edit ?? true;
+
+    return editingId ? showEdit : showAdd;
+  };
+
+  const calibrationTableCustomFields = useMemo(
+    () =>
+      (calibrationCustomFields || []).filter((field) => {
+        const key = getCalibrationFieldKey(field);
+        return key && isCalibrationFieldVisible(field);
+      }),
+    [calibrationCustomFields]
+  );
+
   const parseCalibrationCustomValues = (record = {}) => {
     const raw = record?.customFields || record?.custom_fields || {};
     if (typeof raw === "string") {
@@ -1434,10 +1486,9 @@ export default function Calibration() {
 
     return (
       <>
-        {calibrationCustomFields.map((field) => {
-          const key = field.fieldKey || field.field_key || field.key;
-          const rawLabel = field.fieldLabel || field.field_label || field.label || key;
-          const label = cleanCalibrationCustomLabel(rawLabel);
+        {calibrationCustomFields.filter(canShowCalibrationFieldInForm).map((field) => {
+          const key = getCalibrationFieldKey(field);
+          const label = getCalibrationFieldLabel(field);
           const type = String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();
           const required = Boolean(field.isRequired ?? field.is_required ?? field.required ?? false);
 
@@ -1660,7 +1711,17 @@ export default function Calibration() {
 
 
   const buildCalibrationExportRows = (rows = []) =>
-    (Array.isArray(rows) ? rows : []).map((entry, index) => ({
+    (Array.isArray(rows) ? rows : []).map((entry, index) => {
+      const customFieldValues = {};
+
+      calibrationTableCustomFields.forEach((field) => {
+        const key = getCalibrationFieldKey(field);
+        const label = getCalibrationFieldLabel(field);
+        const values = parseCalibrationCustomValues(entry);
+        customFieldValues[label] = values?.[key] ?? "";
+      });
+
+      return {
       "No.": index + 1,
       "Category": entry?.category || "",
       "Date": entry?.date || "",
@@ -1682,8 +1743,10 @@ export default function Calibration() {
       "Senior Citizen": entry?.sc || "",
       "4Ps": entry?.fourPs || "",
       "Name of Staff": entry?.nameOfStaff || "",
+      ...customFieldValues,
       "Remarks": entry?.remarks || "",
-    }));
+    };
+    });
 
   function exportEntriesCSV(rows, filename = "Calibration.csv") {
     const headers = ["NO", "CATEGORY", "DATE", "TYPE OF SAMPLES", "TYPE OF TEST / ANALYSIS / CALIBRATION", "RANGE", "NO. OF SAMPLE", "COST", "FEES COLLECTED", "VENUE/ADDRESS", "MUNICIPALITY", "BARANGAY", "LAT", "LNG", "FEMALE", "MALE", "TOTAL CUSTOMERS", "NO. OF FIRMS", "NO. OF NEW FIRMS", "AGE RANGE", "PWD", "IP", "SENIOR CITIZEN", "4PS", "NAME OF STAFF", "REMARKS"];
@@ -2894,13 +2957,21 @@ export default function Calibration() {
                 <th style={{ ...styles.th, width: 55 }}>IP</th>
                 <th style={{ ...styles.th, width: 95 }}>SENIOR CITIZEN</th>
                 <th style={{ ...styles.th, width: 55 }}>4PS</th>
+                {calibrationTableCustomFields.map((field) => (
+                  <th
+                    key={`calibration-custom-head-${getCalibrationFieldKey(field)}`}
+                    style={{ ...styles.th, width: 140 }}
+                  >
+                    {getCalibrationFieldLabel(field)}
+                  </th>
+                ))}
                 <th style={{ ...styles.th, width: 190 }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               {!paginatedEntries.length ? (
                 <tr>
-                  <td colSpan={21} style={styles.tdCenter}>No entries found.</td>
+                  <td colSpan={21 + calibrationTableCustomFields.length} style={styles.tdCenter}>No entries found.</td>
                 </tr>
               ) : (
                 paginatedEntries.map((e, idx) => (
@@ -2946,6 +3017,17 @@ export default function Calibration() {
                     <td style={styles.tdCenter}>{toNumber(e.ip)}</td>
                     <td style={styles.tdCenter}>{toNumber(e.sc)}</td>
                     <td style={styles.tdCenter}>{toNumber(e.fourPs)}</td>
+                    {calibrationTableCustomFields.map((field) => {
+                      const key = getCalibrationFieldKey(field);
+                      const values = parseCalibrationCustomValues(e);
+                      const value = values?.[key];
+
+                      return (
+                        <td key={`calibration-custom-cell-${e.id}-${key}`} style={styles.td}>
+                          {value === null || value === undefined || value === "" ? "—" : String(value)}
+                        </td>
+                      );
+                    })}
                     <td style={styles.tdCenter}>
                       <button type="button" style={styles.tinyBtn} onClick={() => setShowViewId(e.id)}>View</button>
                       {allowEdit && (
@@ -2973,7 +3055,7 @@ export default function Calibration() {
                   <td style={{ ...styles.tdRight, fontWeight: 900, background: "#fff8dc" }}>
                     {money(filteredEntries.reduce((sum, e) => sum + toNumber(e.feesCollected), 0))}
                   </td>
-                  <td colSpan={12} style={styles.td}></td>
+                  <td colSpan={12 + calibrationTableCustomFields.length} style={styles.td}></td>
                 </tr>
               )}
             </tbody>

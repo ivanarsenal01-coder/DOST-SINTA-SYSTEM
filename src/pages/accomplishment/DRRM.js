@@ -223,6 +223,8 @@ function normalizeEntry(raw) {
             ? e.stakeholders.split(",").map((x) => x.trim()).filter(Boolean)
             : [],
     venueMeta: typeof e.venueMeta === "string" ? safeParse(e.venueMeta, null) : e.venueMeta || null,
+    customFields: parseCustomFields(e.customFields ?? e.custom_fields),
+    custom_fields: parseCustomFields(e.customFields ?? e.custom_fields),
   };
 }
 
@@ -774,6 +776,92 @@ function ListCell({ items }) {
   return <div style={{ display: "grid", gap: 4 }}>{arr.map((v, i) => <div key={i} style={{ fontWeight: 800, textAlign: "left" }}>{String(v)}</div>)}</div>;
 }
 
+function parseCustomFields(raw) {
+  if (!raw) return {};
+  if (typeof raw === "string") return safeParse(raw, {});
+  if (typeof raw === "object" && !Array.isArray(raw)) return raw;
+  return {};
+}
+
+function customFieldKey(field) {
+  return String(field?.fieldKey || field?.field_key || field?.key || "").trim();
+}
+
+function customFieldLabel(field) {
+  const key = customFieldKey(field);
+  return String(field?.fieldLabel || field?.field_label || field?.label || key || "Custom Field").trim();
+}
+
+function customFieldType(field) {
+  return String(field?.fieldType || field?.field_type || field?.type || "text").trim().toLowerCase();
+}
+
+function customFieldOptions(field) {
+  const raw = field?.options || field?.fieldOptions || field?.field_options || field?.optionValues || field?.option_values || [];
+  if (Array.isArray(raw)) {
+    return raw
+      .map((item) => {
+        if (typeof item === "string") return item;
+        return item?.label || item?.value || item?.optionName || item?.option_name || item?.name || "";
+      })
+      .map((item) => String(item || "").trim())
+      .filter(Boolean);
+  }
+  if (typeof raw === "string") {
+    const parsed = safeParse(raw, null);
+    if (Array.isArray(parsed)) return customFieldOptions({ options: parsed });
+    return raw.split(/[,\n]/).map((item) => item.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function customFieldVisible(field) {
+  return Boolean(field?.isVisible ?? field?.is_visible ?? field?.visible ?? true);
+}
+
+function customFieldShowAdd(field) {
+  return Boolean(field?.showAdd ?? field?.show_add ?? true);
+}
+
+function customFieldShowEdit(field) {
+  return Boolean(field?.showEdit ?? field?.show_edit ?? true);
+}
+
+function customFieldSort(a, b) {
+  return Number(a?.sortOrder ?? a?.sort_order ?? 999) - Number(b?.sortOrder ?? b?.sort_order ?? 999);
+}
+
+function getCustomFieldValue(entry, field) {
+  const key = customFieldKey(field);
+  const customFields = parseCustomFields(entry?.customFields ?? entry?.custom_fields);
+  return customFields?.[key] ?? "";
+}
+
+function formatCustomFieldValue(value) {
+  if (Array.isArray(value)) return value.join(", ");
+  if (value && typeof value === "object") return JSON.stringify(value);
+  return String(value ?? "");
+}
+
+function pickDrrmTableFields(drrmModule, tableNameKeywords = [], fixedKeys = new Set()) {
+  const tables = Array.isArray(drrmModule?.tables) ? drrmModule.tables : [];
+  const table = tables.find((t) => {
+    const name = String(t?.tableName || t?.table_name || t?.name || "").toLowerCase();
+    return tableNameKeywords.some((keyword) => name.includes(keyword));
+  }) || null;
+  const fields = Array.isArray(table?.fields)
+    ? table.fields
+    : Array.isArray(drrmModule?.fields)
+      ? drrmModule.fields
+      : Array.isArray(drrmModule?.formFields)
+        ? drrmModule.formFields
+        : [];
+  return fields.filter((field) => {
+    const key = customFieldKey(field);
+    const systemField = field?.isSystemField ?? field?.is_system_field ?? false;
+    return key && !systemField && !fixedKeys.has(key);
+  }).sort(customFieldSort);
+}
 
 
 function UnifiedMOVSection({ value = "", photos = [], onValueChange, onPhotosChange, label = "Means of Verification" }) {
@@ -894,6 +982,7 @@ export default function DRRM() {
   const [iecTitleOpts, setIecTitleOpts] = useState(DEFAULT_IEC_TITLES);
   const [iecSourceOpts, setIecSourceOpts] = useState(DEFAULT_IEC_SOURCES);
   const [stakeOpts, setStakeOpts] = useState(DEFAULT_STAKEHOLDERS);
+  const [drrmCustomFields, setDrrmCustomFields] = useState({ act: [], iec: [], col: [] });
   const [pscp, setPscp] = useState({ crafted: { q1: "", q2: "", q3: "", q4: "" }, implemented: { q1: "", q2: "", q3: "", q4: "" } });
 
   const [outline, setOutline] = useState(null);
@@ -909,9 +998,9 @@ export default function DRRM() {
   const [msOpen, setMsOpen] = useState(null);
   const [msTarget, setMsTarget] = useState(null);
 
-  const emptyAct = { title: "", sectors: [], dateMode: "single", dateStart: "", dateEnd: "", venueMeta: null, venueText: "", org: "", male: "", female: "", partners: [], mov: "", movPhotos: [], staffName: "", remarks: "" };
-  const emptyIec = { titles: [], sources: [], date: "", male: "", female: "", mov: "", movPhotos: [], staffName: "", remarks: "" };
-  const emptyCol = { title: "", stakeholders: [], date: "", mov: "", movPhotos: [], staffName: "", remarks: "" };
+  const emptyAct = { title: "", sectors: [], dateMode: "single", dateStart: "", dateEnd: "", venueMeta: null, venueText: "", org: "", male: "", female: "", partners: [], mov: "", movPhotos: [], staffName: "", remarks: "", customFields: {} };
+  const emptyIec = { titles: [], sources: [], date: "", male: "", female: "", mov: "", movPhotos: [], staffName: "", remarks: "", customFields: {} };
+  const emptyCol = { title: "", stakeholders: [], date: "", mov: "", movPhotos: [], staffName: "", remarks: "", customFields: {} };
 
   const [fAct, setFAct] = useState(emptyAct);
   const [fIec, setFIec] = useState(emptyIec);
@@ -952,6 +1041,33 @@ export default function DRRM() {
   }, []);
 
   useEffect(() => { loadDrrmData(); }, [loadDrrmData]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fixedKeysByKind = {
+      act: new Set(["no", "actions", "title", "sectors", "sector", "date", "dateMode", "dateStart", "dateEnd", "venue", "venueText", "venueMeta", "org", "coOrganizer", "male", "female", "total", "partners", "mov", "movPhotos", "month", "staffName", "remarks"]),
+      iec: new Set(["no", "actions", "titles", "title", "sources", "source", "date", "quarter", "month", "male", "female", "total", "mov", "movPhotos", "staffName", "remarks"]),
+      col: new Set(["no", "actions", "title", "stakeholders", "date", "quarter", "mov", "movPhotos", "staffName", "remarks"]),
+    };
+    async function loadDrrmCustomFields() {
+      try {
+        const res = await axios.get(`${API_BASE}/table-management/config`);
+        const modules = Array.isArray(res.data) ? res.data : [];
+        const drrmModule = modules.find((m) => String(m.moduleName || m.module_name || m.name || "").toUpperCase() === "DRRM");
+        const next = {
+          act: pickDrrmTableFields(drrmModule, ["activ", "activity", "activities", "main"], fixedKeysByKind.act),
+          iec: pickDrrmTableFields(drrmModule, ["iec", "material"], fixedKeysByKind.iec),
+          col: pickDrrmTableFields(drrmModule, ["collab", "partner", "stakeholder"], fixedKeysByKind.col),
+        };
+        if (!cancelled) setDrrmCustomFields(next);
+      } catch (err) {
+        console.error("Failed to load DRRM custom fields:", err);
+        if (!cancelled) setDrrmCustomFields({ act: [], iec: [], col: [] });
+      }
+    }
+    loadDrrmCustomFields();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancel = false;
@@ -1070,7 +1186,8 @@ export default function DRRM() {
       if (f.q && actQuarter(x) !== f.q) return false;
       if (f.m && actMonth(x) !== f.m) return false;
       if (q) {
-        const blob = [x.title, (x.sectors || []).join(" "), formatActDate(x), venueText(x), x.org, (x.partners || []).join(" "), x.staffName, x.mov, x.remarks].join(" ").toLowerCase();
+        const customSearch = Object.values(parseCustomFields(x.customFields ?? x.custom_fields)).map(formatCustomFieldValue).join(" ");
+        const blob = [x.title, (x.sectors || []).join(" "), formatActDate(x), venueText(x), x.org, (x.partners || []).join(" "), x.staffName, x.mov, x.remarks, customSearch].join(" ").toLowerCase();
         if (!blob.includes(q)) return false;
       }
       return true;
@@ -1090,7 +1207,8 @@ export default function DRRM() {
       if (f.q && qLabel(qFromDate(d)) !== f.q) return false;
       if (f.m && mName(d) !== f.m) return false;
       if (q) {
-        const blob = searchFields(x).join(" ").toLowerCase();
+        const customSearch = Object.values(parseCustomFields(x.customFields ?? x.custom_fields)).map(formatCustomFieldValue).join(" ");
+        const blob = [...searchFields(x), customSearch].join(" ").toLowerCase();
         if (!blob.includes(q)) return false;
       }
       return true;
@@ -1114,6 +1232,61 @@ export default function DRRM() {
   const actRows = useMemo(() => paged(actF, fa.page), [actF, fa.page]);
   const iecRows = useMemo(() => paged(iecF, fi.page), [iecF, fi.page]);
   const colRows = useMemo(() => paged(colF, fc.page), [colF, fc.page]);
+
+  const drrmTableFields = useMemo(() => ({
+    act: (drrmCustomFields.act || []).filter(customFieldVisible),
+    iec: (drrmCustomFields.iec || []).filter(customFieldVisible),
+    col: (drrmCustomFields.col || []).filter(customFieldVisible),
+  }), [drrmCustomFields]);
+
+  const getDrrmFormFields = (kind) => {
+    const fields = drrmCustomFields?.[kind] || [];
+    const isEdit = modal?.mode === "edit";
+    return fields.filter((field) => customFieldVisible(field) && (isEdit ? customFieldShowEdit(field) : customFieldShowAdd(field)));
+  };
+
+  const customExportValues = (kind, entry) => {
+    const out = {};
+    (drrmTableFields?.[kind] || []).forEach((field) => {
+      out[customFieldLabel(field)] = formatCustomFieldValue(getCustomFieldValue(entry, field));
+    });
+    return out;
+  };
+
+  const updateCustomFieldValue = (kind, key, value) => {
+    const updater = (prev) => ({ ...prev, customFields: { ...(prev.customFields || {}), [key]: value } });
+    if (kind === "act") setFAct(updater);
+    if (kind === "iec") setFIec(updater);
+    if (kind === "col") setFCol(updater);
+  };
+
+  const renderCustomFieldInputs = (kind, values = {}) => {
+    const fields = getDrrmFormFields(kind);
+    if (!fields.length) return null;
+    return fields.map((field) => {
+      const key = customFieldKey(field);
+      const label = customFieldLabel(field);
+      const type = customFieldType(field);
+      const options = customFieldOptions(field);
+      const value = values?.[key] ?? "";
+      const commonProps = { style: S.in, value, onChange: (e) => updateCustomFieldValue(kind, key, e.target.value) };
+      return (
+        <div key={`${kind}_${key}`} style={{ gridColumn: "1/-1" }}>
+          <div style={S.l}>{label}</div>
+          {options.length || type.includes("select") || type.includes("dropdown") ? (
+            <select {...commonProps}>
+              <option value="">—</option>
+              {options.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+          ) : type.includes("textarea") || type.includes("long") || type.includes("remarks") ? (
+            <textarea style={S.ta} value={value} onChange={(e) => updateCustomFieldValue(kind, key, e.target.value)} />
+          ) : (
+            <input {...commonProps} type={type.includes("number") ? "number" : type.includes("date") ? "date" : "text"} />
+          )}
+        </div>
+      );
+    });
+  };
 
   const exportXlsx = (filename, rows) => {
     if (!allowExport) {
@@ -1145,9 +1318,9 @@ export default function DRRM() {
     w.document.close();
   };
 
-  const actExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title of Activity": e.title, Sectors: (e.sectors || []).join(", "), "Date Conducted": formatActDate(e), "Venue/Address": venueText(e), "Name of Co-organizer": e.org, Male: e.male, Female: e.female, Total: e.total, Partners: (e.partners || []).join(", "), "Means of Verification": e.mov, Month: actMonth(e), "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
-  const iecExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title(s) of IEC Material": (e.titles || []).join(", "), "Source(s)": (e.sources || []).join(", "), Date: e.date ? fmtDateShort(e.date) : "—", Quarter: qLabel(qFromDate(e.date)), Month: mName(e.date), Male: e.male, Female: e.female, Total: e.total, "Means of Verification": e.mov, "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
-  const colExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title of Activity": e.title, "Stakeholder/s": (e.stakeholders || []).join(", "), Date: e.date ? fmtDateShort(e.date) : "—", Quarter: qLabel(qFromDate(e.date)), "Means of Verification": e.mov, "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
+  const actExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title of Activity": e.title, Sectors: (e.sectors || []).join(", "), "Date Conducted": formatActDate(e), "Venue/Address": venueText(e), "Name of Co-organizer": e.org, Male: e.male, Female: e.female, Total: e.total, Partners: (e.partners || []).join(", "), "Means of Verification": e.mov, Month: actMonth(e), ...customExportValues("act", e), "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
+  const iecExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title(s) of IEC Material": (e.titles || []).join(", "), "Source(s)": (e.sources || []).join(", "), Date: e.date ? fmtDateShort(e.date) : "—", Quarter: qLabel(qFromDate(e.date)), Month: mName(e.date), Male: e.male, Female: e.female, Total: e.total, "Means of Verification": e.mov, ...customExportValues("iec", e), "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
+  const colExportRows = (rows) => rows.map((e, i) => ({ "No.": i + 1, "Title of Activity": e.title, "Stakeholder/s": (e.stakeholders || []).join(", "), Date: e.date ? fmtDateShort(e.date) : "—", Quarter: qLabel(qFromDate(e.date)), "Means of Verification": e.mov, ...customExportValues("col", e), "Name of Staff": e.staffName || "", Remarks: e.remarks || "" }));
 
   const printRows = (title, rows) => {
     const cols = rows.length ? Object.keys(rows[0]) : ["No."];
@@ -1178,15 +1351,15 @@ export default function DRRM() {
 
     if (kind === "act") {
       const e = act.find((x) => x.id === id); if (!e) return;
-      setFAct({ title: e.title || "", sectors: Array.isArray(e.sectors) ? e.sectors : [], dateMode: e.dateEnd ? "range" : "single", dateStart: e.dateStart || e.date || "", dateEnd: e.dateEnd || "", venueMeta: e.venueMeta || null, venueText: e.venueText || e.venueMeta?.displayText || "", org: e.org || "", male: e.male ?? "", female: e.female ?? "", partners: Array.isArray(e.partners) ? e.partners : Array.isArray(e.stakeholders) ? e.stakeholders : [], mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFAct({ title: e.title || "", sectors: Array.isArray(e.sectors) ? e.sectors : [], dateMode: e.dateEnd ? "range" : "single", dateStart: e.dateStart || e.date || "", dateEnd: e.dateEnd || "", venueMeta: e.venueMeta || null, venueText: e.venueText || e.venueMeta?.displayText || "", org: e.org || "", male: e.male ?? "", female: e.female ?? "", partners: Array.isArray(e.partners) ? e.partners : Array.isArray(e.stakeholders) ? e.stakeholders : [], mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "", customFields: parseCustomFields(e.customFields ?? e.custom_fields) });
     }
     if (kind === "iec") {
       const e = iec.find((x) => x.id === id); if (!e) return;
-      setFIec({ titles: Array.isArray(e.titles) ? e.titles : [], sources: Array.isArray(e.sources) ? e.sources : [], date: e.date || "", male: e.male ?? "", female: e.female ?? "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFIec({ titles: Array.isArray(e.titles) ? e.titles : [], sources: Array.isArray(e.sources) ? e.sources : [], date: e.date || "", male: e.male ?? "", female: e.female ?? "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "", customFields: parseCustomFields(e.customFields ?? e.custom_fields) });
     }
     if (kind === "col") {
       const e = col.find((x) => x.id === id); if (!e) return;
-      setFCol({ title: e.title || "", stakeholders: Array.isArray(e.stakeholders) ? e.stakeholders : [], date: e.date || "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "" });
+      setFCol({ title: e.title || "", stakeholders: Array.isArray(e.stakeholders) ? e.stakeholders : [], date: e.date || "", mov: e.mov || "", movPhotos: Array.isArray(e.movPhotos) ? e.movPhotos : [], staffName: e.staffName || "", remarks: e.remarks || "", customFields: parseCustomFields(e.customFields ?? e.custom_fields) });
     }
     setModal({ kind, mode: "edit", id });
   };
@@ -1275,7 +1448,7 @@ export default function DRRM() {
         if (!fAct.dateStart) return window.alert("Required: Date Conducted (start)");
         if (fAct.dateMode === "range" && !fAct.dateEnd) return window.alert("Required: End date");
         if (!fAct.venueText.trim()) return window.alert("Required: Venue/Address");
-        const payload = { title: fAct.title.trim(), sectors: uniq(fAct.sectors), dateStart: fAct.dateStart, dateEnd: fAct.dateMode === "range" ? fAct.dateEnd : "", venueText: fAct.venueText.trim(), venueMeta: fAct.venueMeta || null, org: fAct.org.trim(), male: toNum(fAct.male), female: toNum(fAct.female), total: toNum(fAct.male) + toNum(fAct.female), partners: uniq(fAct.partners || []), mov: fAct.mov.trim(), movPhotos: Array.isArray(fAct.movPhotos) ? fAct.movPhotos : [], staffName: fAct.staffName.trim(), remarks: fAct.remarks.trim() };
+        const payload = { title: fAct.title.trim(), sectors: uniq(fAct.sectors), dateStart: fAct.dateStart, dateEnd: fAct.dateMode === "range" ? fAct.dateEnd : "", venueText: fAct.venueText.trim(), venueMeta: fAct.venueMeta || null, org: fAct.org.trim(), male: toNum(fAct.male), female: toNum(fAct.female), total: toNum(fAct.male) + toNum(fAct.female), partners: uniq(fAct.partners || []), mov: fAct.mov.trim(), movPhotos: Array.isArray(fAct.movPhotos) ? fAct.movPhotos : [], staffName: fAct.staffName.trim(), remarks: fAct.remarks.trim(), customFields: fAct.customFields || {}, custom_fields: fAct.customFields || {} };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/activities/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/activities`, payload);
         await loadDrrmData(); setModal(null); return;
@@ -1284,7 +1457,7 @@ export default function DRRM() {
         if (!Array.isArray(fIec.titles) || fIec.titles.length === 0) return window.alert("Required: Title of IEC Material");
         if (!Array.isArray(fIec.sources) || fIec.sources.length === 0) return window.alert("Required: Source");
         if (!fIec.date) return window.alert("Required: Date");
-        const payload = { titles: uniq(fIec.titles), sources: uniq(fIec.sources), date: fIec.date, male: toNum(fIec.male), female: toNum(fIec.female), total: toNum(fIec.male) + toNum(fIec.female), mov: fIec.mov.trim(), movPhotos: Array.isArray(fIec.movPhotos) ? fIec.movPhotos : [], staffName: fIec.staffName.trim(), remarks: fIec.remarks.trim() };
+        const payload = { titles: uniq(fIec.titles), sources: uniq(fIec.sources), date: fIec.date, male: toNum(fIec.male), female: toNum(fIec.female), total: toNum(fIec.male) + toNum(fIec.female), mov: fIec.mov.trim(), movPhotos: Array.isArray(fIec.movPhotos) ? fIec.movPhotos : [], staffName: fIec.staffName.trim(), remarks: fIec.remarks.trim(), customFields: fIec.customFields || {}, custom_fields: fIec.customFields || {} };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/iec-materials/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/iec-materials`, payload);
         await loadDrrmData(); setModal(null); return;
@@ -1293,7 +1466,7 @@ export default function DRRM() {
         if (!fCol.title.trim()) return window.alert("Required: Title of Activity");
         if (!Array.isArray(fCol.stakeholders) || fCol.stakeholders.length === 0) return window.alert("Required: Name of Stakeholder/s");
         if (!fCol.date) return window.alert("Required: Date");
-        const payload = { title: fCol.title.trim(), stakeholders: uniq(fCol.stakeholders), date: fCol.date, mov: fCol.mov.trim(), movPhotos: Array.isArray(fCol.movPhotos) ? fCol.movPhotos : [], staffName: fCol.staffName.trim(), remarks: fCol.remarks.trim() };
+        const payload = { title: fCol.title.trim(), stakeholders: uniq(fCol.stakeholders), date: fCol.date, mov: fCol.mov.trim(), movPhotos: Array.isArray(fCol.movPhotos) ? fCol.movPhotos : [], staffName: fCol.staffName.trim(), remarks: fCol.remarks.trim(), customFields: fCol.customFields || {}, custom_fields: fCol.customFields || {} };
         if (modal.mode === "edit") await axios.put(`${DRRM_API}/collaborations/${modal.id}`, payload);
         else await axios.post(`${DRRM_API}/collaborations`, payload);
         await loadDrrmData(); setModal(null);
@@ -1378,6 +1551,20 @@ export default function DRRM() {
       </BoxField>
     );
 
+    const renderCustomViewFields = (kind) => {
+      const fields = drrmTableFields?.[kind] || [];
+      if (!fields.length) return null;
+      return (
+        <div style={viewStyles.grid}>
+          {fields.map((field) => (
+            <ValueField key={customFieldKey(field)} label={customFieldLabel(field)}>
+              {formatCustomFieldValue(getCustomFieldValue(entry, field)) || "—"}
+            </ValueField>
+          ))}
+        </div>
+      );
+    };
+
     if (isActivity) {
       return (
         <div style={{ fontFamily }}>
@@ -1419,6 +1606,8 @@ export default function DRRM() {
             <ListCell items={entry?.partners || []} />
           </BoxField>
 
+          {renderCustomViewFields("act")}
+
           {renderMovBox()}
 
           <BoxField label="Remarks">{entry?.remarks || "—"}</BoxField>
@@ -1449,6 +1638,8 @@ export default function DRRM() {
             <ListCell items={entry?.sources || []} />
           </BoxField>
 
+          {renderCustomViewFields("iec")}
+
           {renderMovBox()}
 
           <BoxField label="Remarks">{entry?.remarks || "—"}</BoxField>
@@ -1468,6 +1659,7 @@ export default function DRRM() {
         <BoxField label="Name of Stakeholder/s">
           <ListCell items={entry?.stakeholders || []} />
         </BoxField>
+        {renderCustomViewFields("col")}
         {renderMovBox()}
         <BoxField label="Remarks">{entry?.remarks || "—"}</BoxField>
       </div>
@@ -1534,8 +1726,8 @@ export default function DRRM() {
         </div>
         <div style={S.tableWrap}>
           <table style={{ ...S.table, minWidth: 1900 }}>
-            <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF ACTIVITY ON DRR and CC Learning and Development</th><th style={S.th} rowSpan={2}>TYPE OF SECTOR-SPECIFIC LEARNING AND DEVELOPMENT INTERVENTION*</th><th style={S.th} rowSpan={2}>DATE CONDUCTED</th><th style={S.th} rowSpan={2}>VENUE/ADDRESS</th><th style={S.th} rowSpan={2}>NAME OF CO-ORGANIZER</th><th style={S.th} colSpan={3}>NO. OF PARTICIPANT**</th><th style={S.th} rowSpan={2}>PARTNERS</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th><th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
-            <tbody>{actRows.length === 0 ? <tr><td style={S.tdC} colSpan={14}>No entries yet. Click “+ Add Entry”.</td></tr> : actRows.map((e, idx) => { const no = (fa.page - 1) * PAGE_SIZE + idx + 1; const hasCoords = Number.isFinite(Number(e?.venueMeta?.lat)) && Number.isFinite(Number(e?.venueMeta?.lng)); return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}>{e.title}</td><td style={S.td}><ListCell items={e.sectors || []} /></td><td style={S.tdC}>{formatActDate(e)}</td><td style={S.td}><div style={{ display: "grid", gap: 6 }}><div>{venueText(e)}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{hasCoords ? <><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Map</button><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Directions</button></> : null}</div></div></td><td style={S.td}>{e.org || "—"}</td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><ListCell items={e.partners || []} /></td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{actMonth(e) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("act", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — Activity (1 entry)", actExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowAct(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("act", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
+            <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF ACTIVITY ON DRR and CC Learning and Development</th><th style={S.th} rowSpan={2}>TYPE OF SECTOR-SPECIFIC LEARNING AND DEVELOPMENT INTERVENTION*</th><th style={S.th} rowSpan={2}>DATE CONDUCTED</th><th style={S.th} rowSpan={2}>VENUE/ADDRESS</th><th style={S.th} rowSpan={2}>NAME OF CO-ORGANIZER</th><th style={S.th} colSpan={3}>NO. OF PARTICIPANT**</th><th style={S.th} rowSpan={2}>PARTNERS</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th>{drrmTableFields.act.map((field) => <th key={customFieldKey(field)} style={S.th} rowSpan={2}>{customFieldLabel(field)}</th>)}<th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
+            <tbody>{actRows.length === 0 ? <tr><td style={S.tdC} colSpan={14 + drrmTableFields.act.length}>No entries yet. Click “+ Add Entry”.</td></tr> : actRows.map((e, idx) => { const no = (fa.page - 1) * PAGE_SIZE + idx + 1; const hasCoords = Number.isFinite(Number(e?.venueMeta?.lat)) && Number.isFinite(Number(e?.venueMeta?.lng)); return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}>{e.title}</td><td style={S.td}><ListCell items={e.sectors || []} /></td><td style={S.tdC}>{formatActDate(e)}</td><td style={S.td}><div style={{ display: "grid", gap: 6 }}><div>{venueText(e)}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{hasCoords ? <><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Map</button><button style={S.tbtn} onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${e.venueMeta.lat},${e.venueMeta.lng}`, "_blank")}>Directions</button></> : null}</div></div></td><td style={S.td}>{e.org || "—"}</td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><ListCell items={e.partners || []} /></td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{actMonth(e) || "—"}</td>{drrmTableFields.act.map((field) => <td key={customFieldKey(field)} style={S.td}>{formatCustomFieldValue(getCustomFieldValue(e, field)) || "—"}</td>)}<td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("act", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("act", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — Activity (1 entry)", actExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowAct(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("act", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
           </table>
         </div>
         <Pagination total={actF.length} page={fa.page} onPage={(p) => setFa((x) => ({ ...x, page: p }))} />
@@ -1559,8 +1751,8 @@ export default function DRRM() {
         </div>
         <div style={S.tableWrap}>
           <table style={{ ...S.table, minWidth: 1420 }}>
-            <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF IEC MATERIAL</th><th style={S.th} rowSpan={2}>SOURCE</th><th style={S.th} colSpan={3}>NO. OF BENEFICIARY*</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th><th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
-            <tbody>{iecRows.length === 0 ? <tr><td style={S.tdC} colSpan={10}>No entries yet. Click “+ Add Entry”.</td></tr> : iecRows.map((e, idx) => { const no = (fi.page - 1) * PAGE_SIZE + idx + 1; return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}><ListCell items={e.titles || []} /></td><td style={S.td}><ListCell items={e.sources || []} /></td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{mName(e.date) || "—"}</td><td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("iec", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("iec", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — IEC (1 entry)", iecExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowIec(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("iec", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
+            <thead><tr><th style={S.th} rowSpan={2}>NO.</th><th style={S.th} rowSpan={2}>TITLE OF IEC MATERIAL</th><th style={S.th} rowSpan={2}>SOURCE</th><th style={S.th} colSpan={3}>NO. OF BENEFICIARY*</th><th style={S.th} rowSpan={2}>MEANS OF VERIFICATION</th><th style={S.th} rowSpan={2}>MONTH</th>{drrmTableFields.iec.map((field) => <th key={customFieldKey(field)} style={S.th} rowSpan={2}>{customFieldLabel(field)}</th>)}<th style={S.th} rowSpan={2}>REMARKS</th><th style={S.th} rowSpan={2}>ACTIONS</th></tr><tr><th style={S.th}>MALE</th><th style={S.th}>FEMALE</th><th style={S.th}>TOTAL</th></tr></thead>
+            <tbody>{iecRows.length === 0 ? <tr><td style={S.tdC} colSpan={10 + drrmTableFields.iec.length}>No entries yet. Click “+ Add Entry”.</td></tr> : iecRows.map((e, idx) => { const no = (fi.page - 1) * PAGE_SIZE + idx + 1; return <tr key={e.id}><td style={S.tdC}>{no}</td><td style={S.td}><ListCell items={e.titles || []} /></td><td style={S.td}><ListCell items={e.sources || []} /></td><td style={S.tdC}>{toNum(e.male)}</td><td style={S.tdC}>{toNum(e.female)}</td><td style={S.tdC}>{toNum(e.total)}</td><td style={S.td}><MovCell text={e.mov} /></td><td style={S.tdC}>{mName(e.date) || "—"}</td>{drrmTableFields.iec.map((field) => <td key={customFieldKey(field)} style={S.td}>{formatCustomFieldValue(getCustomFieldValue(e, field)) || "—"}</td>)}<td style={S.td}>{e.remarks || "—"}</td><td style={S.tdC}><div style={{ display: "grid", gap: 6, justifyItems: "center" }}><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}><button style={S.tbtn} onClick={() => openView("iec", e.id)}>View</button>{allowEdit && <button style={S.tbtn} onClick={() => openEdit("iec", e.id)}>Edit</button>}{allowExport && <button style={S.tbtn} onClick={() => printRows("DRRM — IEC (1 entry)", iecExportRows([e]))}>Print</button>}</div><div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>{allowExport && <button style={S.tbtn} onClick={() => exportRowIec(e)}>Export</button>}{allowDelete && <button style={S.danger} onClick={() => del("iec", e.id)}>Delete</button>}</div></div></td></tr>; })}</tbody>
           </table>
         </div>
         <Pagination total={iecF.length} page={fi.page} onPage={(p) => setFi((x) => ({ ...x, page: p }))} />
@@ -1591,6 +1783,7 @@ export default function DRRM() {
           <div><div style={S.l}>Participants (Male)</div><input style={S.in} type="number" value={fAct.male} onChange={(e) => setFAct((p) => ({ ...p, male: e.target.value }))} /></div>
           <div><div style={S.l}>Participants (Female)</div><input style={S.in} type="number" value={fAct.female} onChange={(e) => setFAct((p) => ({ ...p, female: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Total (auto): <b>{toNum(fAct.male) + toNum(fAct.female)}</b></div></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Partners</div><button type="button" style={{ ...S.in, background: "#f8fafc", cursor: "pointer", textAlign: "left" }} onClick={() => openMulti("actPartners")}>{fAct.partners?.length ? fAct.partners.join(", ") : "Click to select partners"}</button></div>
+          {renderCustomFieldInputs("act", fAct.customFields || {})}
           <UnifiedMOVSection
             value={fAct.mov || ""}
             photos={fAct.movPhotos || []}
@@ -1607,6 +1800,7 @@ export default function DRRM() {
           <div><div style={S.l}>Date (for Month/Quarter) *</div><input style={S.in} type="date" value={fIec.date} onChange={(e) => setFIec((p) => ({ ...p, date: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Quarter: <b>{qLabel(qFromDate(fIec.date))}</b> • Month: <b>{mName(fIec.date) || "—"}</b></div></div>
           <div><div style={S.l}>Beneficiary (Male)</div><input style={S.in} type="number" value={fIec.male} onChange={(e) => setFIec((p) => ({ ...p, male: e.target.value }))} /></div>
           <div><div style={S.l}>Beneficiary (Female)</div><input style={S.in} type="number" value={fIec.female} onChange={(e) => setFIec((p) => ({ ...p, female: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Total (auto): <b>{toNum(fIec.male) + toNum(fIec.female)}</b></div></div>
+          {renderCustomFieldInputs("iec", fIec.customFields || {})}
           <UnifiedMOVSection
             value={fIec.mov || ""}
             photos={fIec.movPhotos || []}
@@ -1621,6 +1815,7 @@ export default function DRRM() {
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Title of Activity *</div><textarea style={S.ta} value={fCol.title} onChange={(e) => setFCol((p) => ({ ...p, title: e.target.value }))} /></div>
           <div style={{ gridColumn: "1/-1" }}><div style={S.l}>Name of Stakeholder/s *</div><button type="button" style={{ ...S.in, background: "#f8fafc", cursor: "pointer", textAlign: "left" }} onClick={() => openMulti("stakeholders")}>{fCol.stakeholders?.length ? fCol.stakeholders.join(", ") : "Click to select (multi-select)"}</button></div>
           <div><div style={S.l}>Date (for Quarter) *</div><input style={S.in} type="date" value={fCol.date} onChange={(e) => setFCol((p) => ({ ...p, date: e.target.value }))} /><div style={{ fontSize: 12, opacity: 0.75 }}>Quarter: <b>{qLabel(qFromDate(fCol.date))}</b></div></div>
+          {renderCustomFieldInputs("col", fCol.customFields || {})}
           <UnifiedMOVSection
             value={fCol.mov || ""}
             photos={fCol.movPhotos || []}

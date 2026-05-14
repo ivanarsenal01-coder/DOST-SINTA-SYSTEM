@@ -515,6 +515,9 @@ export default function SpecialProject() {
       "PROJECT COST",
       "MEANS OF VERIFICATION",
       "MOV PHOTO COUNT",
+      ...specialProjectCustomFields.map((field) =>
+        cleanCustomLabel(field.fieldLabel || field.field_label || field.label || field.fieldKey || field.field_key || field.key)
+      ),
       "NAME OF STAFF",
       "QUARTER",
     ];
@@ -540,6 +543,11 @@ export default function SpecialProject() {
           toNumber(r?.projectCost),
           r?.meansOfVerification || "",
           getMovPhotos(r).length,
+          ...specialProjectCustomFields.map((field) => {
+            const key = field.fieldKey || field.field_key || field.key;
+            const values = parseSpecialProjectCustomValues(r);
+            return values?.[key] ?? "";
+          }),
           r?.staffName || "",
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ]
@@ -566,6 +574,14 @@ export default function SpecialProject() {
       "PROJECT COST": toNumber(r?.projectCost),
       "MEANS OF VERIFICATION": r?.meansOfVerification || "",
       "MOV PHOTO COUNT": getMovPhotos(r).length,
+      ...Object.fromEntries(
+        specialProjectCustomFields.map((field) => {
+          const key = field.fieldKey || field.field_key || field.key;
+          const label = cleanCustomLabel(field.fieldLabel || field.field_label || field.label || key);
+          const values = parseSpecialProjectCustomValues(r);
+          return [label, values?.[key] ?? ""];
+        })
+      ),
       "NAME OF STAFF": r?.staffName || "",
       QUARTER: r?.quarter ? `${String(r.quarter)}Q` : "",
     }));
@@ -625,6 +641,9 @@ export default function SpecialProject() {
         "DATE APPROVED",
         "PROJECT COST",
         "MEANS OF VERIFICATION",
+        ...specialProjectCustomFields.map((field) =>
+          cleanCustomLabel(field.fieldLabel || field.field_label || field.label || field.fieldKey || field.field_key || field.key)
+        ),
         "NAME OF STAFF",
         "QUARTER",
       ]];
@@ -637,6 +656,11 @@ export default function SpecialProject() {
         r?.dateProjectApproved || "",
         `PHP ${formatCurrency(r?.projectCost)}`,
         r?.meansOfVerification || "—",
+        ...specialProjectCustomFields.map((field) => {
+          const key = field.fieldKey || field.field_key || field.key;
+          const values = parseSpecialProjectCustomValues(r);
+          return values?.[key] ?? "—";
+        }),
         r?.staffName || "—",
         r?.quarter ? `${String(r.quarter)}Q` : "",
       ]);
@@ -671,6 +695,7 @@ export default function SpecialProject() {
         ["Project Cost", `PHP ${formatCurrency(r?.projectCost)}`],
         ["Means of Verification", r?.meansOfVerification || "—"],
         ["MOV Photo Count", getMovPhotos(r).length],
+        ...getSpecialProjectCustomPairs(r).map((item) => [item.label, item.value]),
         ["Name of Staff", r?.staffName || "—"],
       ];
 
@@ -761,6 +786,7 @@ export default function SpecialProject() {
           ["Date Project Approved", r?.dateProjectApproved || "—"],
           ["Project Cost", `PHP ${formatCurrency(r?.projectCost)}`],
           ["Means of Verification", r?.meansOfVerification || "—"],
+          ...getSpecialProjectCustomPairs(r).map((item) => [item.label, item.value]),
           ["Name of Staff", r?.staffName || "—"],
         ])
       );
@@ -823,6 +849,20 @@ export default function SpecialProject() {
         ? `${record.addressMeta.lat}, ${record.addressMeta.lng}`
         : "—";
 
+    const customPairs = getSpecialProjectCustomPairs(record);
+
+    const customFormFields = customPairs
+      .map((item) => `<div class="field"><div class="label">${escapeHtml(item.label)}</div><div class="value">${escapeHtml(item.value)}</div></div>`)
+      .join("");
+
+    const customTableRows = customPairs
+      .map((item) => `<tr><th>${escapeHtml(item.label)}</th><td colspan="3">${escapeHtml(item.value)}</td></tr>`)
+      .join("");
+
+    const customCompactRows = customPairs
+      .map((item) => `<div><b>${escapeHtml(item.label)}:</b> ${escapeHtml(item.value)}</div>`)
+      .join("");
+
     const header = `
       <div class="header">
         <div>
@@ -844,6 +884,7 @@ export default function SpecialProject() {
         <div class="field"><div class="label">Project Cost</div><div class="value">PHP ${escapeHtml(formatCurrency(record?.projectCost))}</div></div>
         <div class="field full"><div class="label">Means of Verification</div><div class="value">${escapeHtml(record?.meansOfVerification || "—")}</div></div>
         <div class="field"><div class="label">MOV Photo Count</div><div class="value">${getMovPhotos(record).length}</div></div>
+        ${customFormFields}
         <div class="field full"><div class="label">Name of Staff</div><div class="value">${escapeHtml(record?.staffName || "—")}</div></div>
       </div>
     `;
@@ -858,6 +899,7 @@ export default function SpecialProject() {
           <tr><th>Date Project Approved</th><td>${escapeHtml(record?.dateProjectApproved || "—")}</td><th>Project Cost</th><td>PHP ${escapeHtml(formatCurrency(record?.projectCost))}</td></tr>
           <tr><th>Means of Verification</th><td colspan="3">${escapeHtml(record?.meansOfVerification || "—")}</td></tr>
           <tr><th>MOV Photo Count</th><td colspan="3">${getMovPhotos(record).length}</td></tr>
+          ${customTableRows}
           <tr><th>Name of Staff</th><td colspan="3">${escapeHtml(record?.staffName || "—")}</td></tr>
         </tbody>
       </table>
@@ -873,6 +915,7 @@ export default function SpecialProject() {
         <div><b>Project Cost:</b> PHP ${escapeHtml(formatCurrency(record?.projectCost))}</div>
         <div><b>Means of Verification:</b> ${escapeHtml(record?.meansOfVerification || "—")}</div>
         <div><b>MOV Photo Count:</b> ${getMovPhotos(record).length}</div>
+        ${customCompactRows}
         <div><b>Name of Staff:</b> ${escapeHtml(record?.staffName || "—")}</div>
         <div><b>Quarter:</b> ${escapeHtml(record?.quarter ? `${record.quarter}Q` : "—")}</div>
       </div>
@@ -1317,6 +1360,7 @@ export default function SpecialProject() {
           r?.projectCost,
           r?.meansOfVerification,
           r?.staffName,
+          ...Object.values(parseSpecialProjectCustomValues(r) || {}),
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ].join(" ").toLowerCase();
         return blob.includes(q);
@@ -1677,7 +1721,13 @@ export default function SpecialProject() {
 
     return (
       <>
-        {specialProjectCustomFields.map((field) => {
+        {specialProjectCustomFields
+          .filter((field) => {
+            const showAddField = field.showAdd ?? field.show_add ?? true;
+            const showEditField = field.showEdit ?? field.show_edit ?? true;
+            return editRecordId ? showEditField : showAddField;
+          })
+          .map((field) => {
           const key = field.fieldKey || field.field_key || field.key;
           const label = field.fieldLabel || field.field_label || field.label || key;
           const type = String(field.fieldType || field.field_type || field.type || "Text");
@@ -3412,6 +3462,9 @@ export default function SpecialProject() {
             <col style={{ width: 420 }} />
             <col style={{ width: 310 }} />
             <col style={{ width: 250 }} />
+            {specialProjectCustomFields.map((field) => (
+              <col key={`custom-col-${field.fieldKey || field.field_key || field.key}`} style={{ width: 180 }} />
+            ))}
             <col style={{ width: 220 }} />
           </colgroup>
           <thead>
@@ -3426,6 +3479,11 @@ export default function SpecialProject() {
               <th style={styles.th}>VENUE/ADDRESS</th>
               <th style={styles.th}>S&T INTERVENTIONS</th>
               <th style={styles.th}>MEANS OF VERIFICATION</th>
+              {specialProjectCustomFields.map((field) => (
+                <th key={`custom-head-${field.fieldKey || field.field_key || field.key}`} style={styles.th}>
+                  {cleanCustomLabel(field.fieldLabel || field.field_label || field.label || field.fieldKey || field.field_key || field.key)}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -3433,7 +3491,7 @@ export default function SpecialProject() {
           <tbody>
             {paginatedRecords.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={11}>
+                <td style={styles.tdCenter} colSpan={11 + specialProjectCustomFields.length}>
                   Walang entries sa current filter. (Try “Clear Filters”)
                 </td>
               </tr>
@@ -3541,6 +3599,18 @@ export default function SpecialProject() {
                         ) : null}
                       </div>
                     </td>
+
+                    {specialProjectCustomFields.map((field) => {
+                      const key = field.fieldKey || field.field_key || field.key;
+                      const values = parseSpecialProjectCustomValues(r);
+                      const value = values?.[key];
+
+                      return (
+                        <td key={`custom-cell-${r.id}-${key}`} style={styles.td}>
+                          {value === null || value === undefined || value === "" ? "—" : String(value)}
+                        </td>
+                      );
+                    })}
 
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>

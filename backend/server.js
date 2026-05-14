@@ -17223,17 +17223,21 @@ app.get("/dashboard/projects", async (req, res) => {
 const USER_MODULE_KEYS = [
   "dashboard",
   "targetSetting",
+  "accomplishments",
   "userManagement",
   "tableManagement",
   "setup",
   "cest",
   "sscp",
-  "technologyTraining",
-  "tacs",
-  "pcl",
-  "specialReport",
-  "promo",
+  "drrm",
+  "specialProject",
   "calibration",
+  "packaging",
+  "stPromo",
+  "tacs",
+  "techPromo",
+  "techRollout",
+  "techTraining",
 ];
 
 const defaultUserPagePermission = () => ({
@@ -17579,6 +17583,7 @@ const getDefaultPermissionsForRole = (role = "staff") => {
 
   pages.dashboard = { view: true, add: false, edit: false, delete: false, export: false };
   pages.targetSetting = { view: true, add: false, edit: false, delete: false, export: false };
+  pages.accomplishments = { view: true, add: false, edit: false, delete: false, export: false };
   pages.userManagement = { view: true, add: false, edit: false, delete: false, export: false };
   pages.setup = { view: true, add: true, edit: true, delete: false, export: false };
   pages.tacs = { view: true, add: true, edit: true, delete: false, export: false };
@@ -17594,7 +17599,7 @@ const getDefaultPermissionsForRole = (role = "staff") => {
 };
 
 // LOGIN
-app.post("/login", (req, res) => {
+app.post(["/api/login", "/login"], (req, res) => {
   const username = String(req.body?.username || "").trim();
   const password = String(req.body?.password || "").trim();
 
@@ -17680,7 +17685,7 @@ app.post("/login", (req, res) => {
 });
 
 // GET ALL USERS
-app.get("/users", (req, res) => {
+app.get(["/api/users", "/users"], (req, res) => {
   db.query(
     `
       SELECT *
@@ -17722,7 +17727,7 @@ app.get("/users", (req, res) => {
 });
 
 // GET SINGLE USER
-app.get("/users/:id", (req, res) => {
+app.get(["/api/users/:id", "/users/:id"], (req, res) => {
   getFullUserById(req.params.id, (err, user) => {
     if (err) {
       console.error("GET /users/:id ERROR:", err);
@@ -17736,7 +17741,7 @@ app.get("/users/:id", (req, res) => {
 });
 
 // CREATE USER
-app.post("/users", (req, res) => {
+app.post(["/api/users", "/users"], (req, res) => {
   const b = req.body || {};
   const role = normalizeUserRole(b.role);
   const status = normalizeUserStatus(b.status);
@@ -17842,7 +17847,7 @@ app.post("/users", (req, res) => {
 
 
 // UPDATE USER
-app.put("/users/:id", (req, res) => {
+app.put(["/api/users/:id", "/users/:id"], (req, res) => {
   const userId = Number(req.params.id);
   const b = req.body || {};
 
@@ -17961,7 +17966,7 @@ app.put("/users/:id", (req, res) => {
 
 // UPDATE USER PERMISSIONS ONLY
 // UPDATE USER PERMISSIONS
-app.put("/users/:id/permissions", (req, res) => {
+app.put(["/api/users/:id/permissions", "/users/:id/permissions"], (req, res) => {
   const userId = Number(req.params.id);
   const b = req.body || {};
 
@@ -18000,7 +18005,7 @@ app.put("/users/:id/permissions", (req, res) => {
 
 // RESET PASSWORD
 // RESET USER PASSWORD
-app.put("/users/:id/reset-password", (req, res) => {
+app.put(["/api/users/:id/reset-password", "/users/:id/reset-password"], (req, res) => {
   const userId = Number(req.params.id);
   const password = String(req.body?.password || "").trim();
 
@@ -18036,7 +18041,7 @@ app.put("/users/:id/reset-password", (req, res) => {
 
 
 // ACTIVATE USER
-app.put("/users/:id/activate", (req, res) => {
+app.put(["/api/users/:id/activate", "/users/:id/activate"], (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {
@@ -18071,7 +18076,7 @@ app.put("/users/:id/activate", (req, res) => {
 
 
 // DEACTIVATE USER
-app.put("/users/:id/deactivate", (req, res) => {
+app.put(["/api/users/:id/deactivate", "/users/:id/deactivate"], (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {
@@ -18106,7 +18111,7 @@ app.put("/users/:id/deactivate", (req, res) => {
 
 
 // DELETE USER
-app.delete("/users/:id", (req, res) => {
+app.delete(["/api/users/:id", "/users/:id"], (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isFinite(userId) || userId <= 0) {

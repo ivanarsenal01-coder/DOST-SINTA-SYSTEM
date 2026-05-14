@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import { canAccess } from "../../usrmngment/utils/permissions";
 
 const API = API_BASE;
 const CEST_API = `${API_BASE}/cest`;
@@ -19,6 +21,33 @@ const CALIBRATION_API = `${API_BASE}/calibration`;
 const ST_PROMO_API = `${API_BASE}/st-promo`;
 
 export default function Setup() {
+  const { user } = useAuth();
+
+  const canViewSetup = canAccess(user, "setup", "view");
+  const canViewCest = canAccess(user, "cest", "view");
+  const canViewSscp = canAccess(user, "sscp", "view");
+  const canViewDrrm = canAccess(user, "drrm", "view");
+  const canViewTacs = canAccess(user, "tacs", "view");
+  const canViewTechPromo = canAccess(user, "techPromo", "view");
+  const canViewTechRollout = canAccess(user, "techRollout", "view");
+  const canViewTechTraining = canAccess(user, "techTraining", "view");
+  const canViewPackaging = canAccess(user, "packaging", "view");
+  const canViewCalibration = canAccess(user, "calibration", "view");
+  const canViewStPromo = canAccess(user, "stPromo", "view");
+
+  const hasAnyVisibleSummary =
+    canViewSetup ||
+    canViewCest ||
+    canViewSscp ||
+    canViewDrrm ||
+    canViewTacs ||
+    canViewTechPromo ||
+    canViewTechRollout ||
+    canViewTechTraining ||
+    canViewPackaging ||
+    canViewCalibration ||
+    canViewStPromo;
+
   // ✅ SETUP default fallback targets = 0
   const DEFAULT_TARGETS = {
     interventions: { annual: 0, q1: 0, q2: 0, q3: 0, q4: 0 },
@@ -1936,6 +1965,17 @@ export default function Setup() {
       fontFamily,
     },
     sectionGap: { marginTop: 28 },
+    hidden: { display: "none" },
+    accessNotice: {
+      background: "#fff7ed",
+      border: "1px solid #fed7aa",
+      color: "#9a3412",
+      borderRadius: 12,
+      padding: 14,
+      fontSize: 13,
+      fontWeight: 800,
+      fontFamily,
+    },
   };
 
   const TARGETS = targets;
@@ -2325,14 +2365,20 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.titleBar}>
+      {!hasAnyVisibleSummary ? (
+        <div style={styles.accessNotice}>
+          Access Denied: Your account has Accomplishment Summary access, but no module summary permission is assigned yet.
+        </div>
+      ) : null}
+
+      <div style={canViewSetup ? styles.titleBar : styles.hidden}>
         <div>SETUP</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
           KPI Summary (auto-computed from Projects + Reports)
         </div>
       </div>
 
-      <div style={styles.tableWrap}>
+      <div style={canViewSetup ? styles.tableWrap : styles.hidden}>
         <table style={styles.table}>
           <thead>
             <tr>
@@ -2365,7 +2411,7 @@ export default function Setup() {
         </table>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewCest ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>CEST</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2406,7 +2452,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewSscp ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>SSCP</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2446,7 +2492,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewDrrm ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>DRRM</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2485,7 +2531,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewTacs ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>TACS</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2522,7 +2568,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewTechPromo ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>TECHNOLOGY PROMOTION</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2559,7 +2605,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewTechRollout ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>TECHNOLOGY ROLL OUT</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2615,7 +2661,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewTechTraining ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>TECHNOLOGY TRAINING</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2652,7 +2698,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewPackaging ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>PACKAGING AND LABELING</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2697,7 +2743,7 @@ export default function Setup() {
         </div>
       </div>
 
-      <div style={styles.sectionGap}>
+      <div style={canViewCalibration ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>CALIBRATION</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -2758,7 +2804,7 @@ export default function Setup() {
           </table>
         </div>
       </div>
-      <div style={styles.sectionGap}>
+      <div style={canViewStPromo ? styles.sectionGap : styles.hidden}>
         <div style={styles.titleBar}>
           <div>S&amp;T PROMO</div>
           <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>

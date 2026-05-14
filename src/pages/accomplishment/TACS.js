@@ -598,30 +598,10 @@ export default function TACS() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-              {
-                fieldKey: "funding",
-                fieldLabel: "Funding",
-                fieldType: "Text",
-                sortOrder: 999,
-              },
-            ];
-
-        if (!cancelled) setTacsCustomFields(finalCustomFields);
+        if (!cancelled) setTacsCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load TACS custom fields:", err);
-        if (!cancelled) {
-          setTacsCustomFields([
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ]);
-        }
+        if (!cancelled) setTacsCustomFields([]);
       }
     }
 
@@ -847,7 +827,7 @@ export default function TACS() {
 
     return (
       <>
-        {tacsCustomFields.map((field) => {
+        {tacsCustomFields.filter(shouldShowTacsCustomFieldInForm).map((field) => {
           const key = field.fieldKey || field.field_key || field.key;
           const rawLabel = field.fieldLabel || field.field_label || field.label || key;
           const label = cleanTacsCustomLabel(rawLabel);
@@ -898,6 +878,40 @@ export default function TACS() {
       </div>
     ));
   };
+
+  const getTacsFieldKey = (field = {}) =>
+    String(field.fieldKey || field.field_key || field.key || "").trim();
+
+  const getTacsFieldLabel = (field = {}) =>
+    cleanTacsCustomLabel(field.fieldLabel || field.field_label || field.label || getTacsFieldKey(field));
+
+  const getTacsCustomValue = (entry = {}, field = {}) => {
+    const key = getTacsFieldKey(field);
+    const values = parseTacsCustomFields(entry.customFields || entry.custom_fields);
+    const value = values?.[key];
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  };
+
+  const shouldShowTacsCustomFieldInForm = (field = {}) => {
+    const showAdd = field.showAdd ?? field.show_add ?? true;
+    const showEdit = field.showEdit ?? field.show_edit ?? true;
+    return entryModal?.mode === "edit" ? Boolean(showEdit) : Boolean(showAdd);
+  };
+
+  const tacsTableCustomFields = useMemo(() => {
+    return (tacsCustomFields || [])
+      .filter((field) => {
+        const key = getTacsFieldKey(field);
+        const visible = field.isVisible ?? field.is_visible ?? true;
+        const systemField = field.isSystemField ?? field.is_system_field ?? false;
+        return key && visible && !systemField;
+      })
+      .sort(
+        (a, b) =>
+          Number(a.sortOrder ?? a.sort_order ?? 999) -
+          Number(b.sortOrder ?? b.sort_order ?? 999)
+      );
+  }, [tacsCustomFields]);
   const validate = () => {
     if (!String(form.typeOfConsultancy || "").trim() || form.typeOfConsultancy === TYPE_ADD) return "Required: Type of Consultancy";
     if (!String(form.dateOfEngagement || "").trim()) return "Required: Date of Engagement";
@@ -974,11 +988,15 @@ export default function TACS() {
     ["expertInstitution", "NAME OF EXPERT/INSTITUTION"],
     ["customerName", "NAME OF CUSTOMER"],
     ["sex", "SEX"],
-    ["customerAddressText", "VENUE/VENUE/ADDRESS OF CUSTOMER"],
+    ["customerAddressText", "VENUE/ADDRESS OF CUSTOMER"],
     ["coordinates", "COORDINATES"],
     ["adviceCount", "NO. OF ADVICE"],
     ["meansOfVerification", "MEANS OF VERIFICATION"],
     ["staffName", "NAME OF STAFF"],
+    ...tacsTableCustomFields.map((field) => [
+      `custom:${getTacsFieldKey(field)}`,
+      getTacsFieldLabel(field),
+    ]),
   ];
 
   const buildExportRows = (scope = "bulk", entryId = null) => {
@@ -986,22 +1004,31 @@ export default function TACS() {
       ? entries.filter((entry) => entry.id === entryId)
       : entries;
 
-    return source.map((entry, idx) => ({
-      no: scope === "row" ? 1 : (currentPage - 1) * rowsPerPage + idx + 1,
-      typeOfConsultancy: entry.typeOfConsultancy || "",
-      dateOfEngagement: entry.dateOfEngagement || "",
-      expertInstitution: entry.expertInstitution || "",
-      customerName: entry.customerName || "",
-      sex: entry.sex || "",
-      customerAddressText: entryAddressText(entry),
-      coordinates:
-        Number.isFinite(entry?.customerAddressMeta?.lat) && Number.isFinite(entry?.customerAddressMeta?.lng)
-          ? `${entry.customerAddressMeta.lat}, ${entry.customerAddressMeta.lng}`
-          : "",
-      adviceCount: toNumber(entry.adviceCount),
-      meansOfVerification: entry.meansOfVerification || "",
-      staffName: entry.staffName || entry.nameOfStaff || "",
-    }));
+    return source.map((entry, idx) => {
+      const customValues = tacsTableCustomFields.reduce((acc, field) => {
+        const key = getTacsFieldKey(field);
+        acc[`custom:${key}`] = getTacsCustomValue(entry, field);
+        return acc;
+      }, {});
+
+      return {
+        no: scope === "row" ? 1 : (currentPage - 1) * rowsPerPage + idx + 1,
+        typeOfConsultancy: entry.typeOfConsultancy || "",
+        dateOfEngagement: entry.dateOfEngagement || "",
+        expertInstitution: entry.expertInstitution || "",
+        customerName: entry.customerName || "",
+        sex: entry.sex || "",
+        customerAddressText: entryAddressText(entry),
+        coordinates:
+          Number.isFinite(entry?.customerAddressMeta?.lat) && Number.isFinite(entry?.customerAddressMeta?.lng)
+            ? `${entry.customerAddressMeta.lat}, ${entry.customerAddressMeta.lng}`
+            : "",
+        adviceCount: toNumber(entry.adviceCount),
+        meansOfVerification: entry.meansOfVerification || "",
+        staffName: entry.staffName || entry.nameOfStaff || "",
+        ...customValues,
+      };
+    });
   };
 
   const getExportTitle = (scope = "bulk") =>
@@ -2919,7 +2946,7 @@ const PAGINATION_SCALE = 0.75;
 
       {/* MAIN TABLE */}
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 1500 }}>
+        <table style={{ ...styles.table, minWidth: 1500 + tacsTableCustomFields.length * 160 }}>
           <colgroup>
             <col style={{ width: "4%" }} />
             <col style={{ width: "14%" }} />
@@ -2929,6 +2956,9 @@ const PAGINATION_SCALE = 0.75;
             <col style={{ width: "6%" }} />
             <col style={{ width: "20%" }} />
             <col style={{ width: "8%" }} />
+            {tacsTableCustomFields.map((field) => (
+              <col key={`tacs-custom-col-${getTacsFieldKey(field)}`} style={{ width: "12%" }} />
+            ))}
             <col style={{ width: "13%" }} />
           </colgroup>
 
@@ -2942,6 +2972,11 @@ const PAGINATION_SCALE = 0.75;
               <th style={styles.th}>SEX (M/F)</th>
               <th style={styles.th}>VENUE/ADDRESS OF CUSTOMER</th>
               <th style={styles.th}>NO. OF ADVICE</th>
+              {tacsTableCustomFields.map((field) => (
+                <th key={`tacs-custom-head-${getTacsFieldKey(field)}`} style={styles.th}>
+                  {getTacsFieldLabel(field)}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -2949,7 +2984,7 @@ const PAGINATION_SCALE = 0.75;
           <tbody>
             {filteredEntries.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={9}>
+                <td style={styles.tdCenter} colSpan={9 + tacsTableCustomFields.length}>
                   No matching entries found. Adjust the filters or click “+ Add Project”.
                 </td>
               </tr>
@@ -2990,6 +3025,12 @@ const PAGINATION_SCALE = 0.75;
                     </td>
 
                     <td style={styles.tdCenter}>{toNumber(e.adviceCount)}</td>
+
+                    {tacsTableCustomFields.map((field) => (
+                      <td key={`tacs-custom-cell-${e.id}-${getTacsFieldKey(field)}`} style={styles.td}>
+                        {getTacsCustomValue(e, field)}
+                      </td>
+                    ))}
 
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>

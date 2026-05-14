@@ -1743,18 +1743,27 @@ function AddEditProjectModal({
                   {setupCustomFields
                     .filter((field) => {
                       const key = String(field.fieldKey || field.field_key || field.key || "").trim();
-                      return ![
-                        "dateApproved",
-                        "date_approved",
-                        "dateProjectApproval",
-                        "date_project_approval",
-                        "approvedDate",
-                        "approved_date",
-                      ].includes(key);
+                      const showAdd = field.showAdd ?? field.show_add ?? true;
+                      const showEdit = field.showEdit ?? field.show_edit ?? true;
+                      const allowedByMode = editProjectId
+                        ? showEdit !== false && showEdit !== 0
+                        : showAdd !== false && showAdd !== 0;
+
+                      return (
+                        allowedByMode &&
+                        ![
+                          "dateApproved",
+                          "date_approved",
+                          "dateProjectApproval",
+                          "date_project_approval",
+                          "approvedDate",
+                          "approved_date",
+                        ].includes(key)
+                      );
                     })
                     .map((field) => {
-                      const key = field.fieldKey || field.field_key;
-                      const label = field.fieldLabel || field.field_label || key;
+                      const key = field.fieldKey || field.field_key || field.key;
+                      const label = field.fieldLabel || field.field_label || field.label || key;
                       const type = String(field.fieldType || field.field_type || "Text").toLowerCase();
                       const value = form.customFields?.[key] ?? "";
 
@@ -2754,8 +2763,8 @@ export default function Setup() {
           moaSigned: (p.moaSigned ?? p.moa_signed ?? "") || "",
 
           addressMeta: finalMeta,
-          customFields: p.customFields ?? p.custom_fields ?? {},
-          custom_fields: p.custom_fields ?? p.customFields ?? {},
+          customFields: parseSetupCustomFieldsObject(p.customFields ?? p.custom_fields ?? {}),
+          custom_fields: parseSetupCustomFieldsObject(p.custom_fields ?? p.customFields ?? {}),
 
           interventions: Array.isArray(p.interventions)
             ? p.interventions.map((it) => ({
@@ -2897,11 +2906,9 @@ export default function Setup() {
           .filter((f) => {
             const key = String(f.fieldKey || f.field_key || "").trim();
             const visible = f.isVisible ?? f.is_visible ?? true;
-            const showAdd = f.showAdd ?? f.show_add ?? true;
-            const showEdit = f.showEdit ?? f.show_edit ?? true;
             const systemField = f.isSystemField ?? f.is_system_field ?? false;
 
-            return key && visible && !systemField && (showAdd || showEdit) && !fixedKeys.has(key);
+            return key && visible && !systemField && !fixedKeys.has(key);
           })
           .sort(
             (a, b) =>
@@ -3050,7 +3057,7 @@ export default function Setup() {
       meansOfVerification: p.meansOfVerification || p.means_of_verification || p.meansVerification || "",
       meansOfVerificationPhotos: normalizeMovPhotos(p.meansOfVerificationPhotos || p.means_of_verification_photos || p.movPhotos || p.mov_photos),
       addressMeta: p.addressMeta || null,
-      customFields: p.customFields || p.custom_fields || {},
+      customFields: parseSetupCustomFieldsObject(p.customFields || p.custom_fields || {}),
     });
 
     setShowAdd(true);
@@ -3181,6 +3188,8 @@ export default function Setup() {
       date_approved: dateApproved || null,
       moa_signed: p.moaSigned || null,
       addressMeta: p.addressMeta || null,
+      custom_fields: parseSetupCustomFieldsObject(p.customFields || p.custom_fields || {}),
+      customFields: parseSetupCustomFieldsObject(p.customFields || p.custom_fields || {}),
     };
 
     try {
@@ -4852,9 +4861,21 @@ export default function Setup() {
 
   const pageWindowStart =
     Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW + 1;
+  const pageWindowEnd = pageWindowStart + PAGE_NUMBER_WINDOW - 1;
+
   const visiblePageNumbers = Array.from(
     { length: PAGE_NUMBER_WINDOW },
     (_, i) => pageWindowStart + i
+  );
+
+  const activeLogoIndex = Math.min(
+    PAGE_NUMBER_WINDOW - 1,
+    Math.max(0, currentPage - pageWindowStart)
+  );
+
+  const paginationLogoOSlots = Array.from(
+    { length: PAGE_NUMBER_WINDOW },
+    (_, i) => i
   );
 
   useEffect(() => {
@@ -5085,29 +5106,98 @@ export default function Setup() {
   };
 
 
+  const getSetupCustomFieldKey = (field = {}) =>
+    String(field.fieldKey || field.field_key || field.key || "").trim();
+
+  const getSetupCustomFieldLabel = (field = {}) => {
+    const key = getSetupCustomFieldKey(field);
+    return String(
+      field.fieldLabel ||
+        field.field_label ||
+        field.label ||
+        field.name ||
+        key
+    ).trim();
+  };
+
+  const parseSetupCustomFieldsObject = (rawValue) => {
+    if (!rawValue) return {};
+
+    if (typeof rawValue === "string") {
+      try {
+        const parsed = JSON.parse(rawValue || "{}");
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+          ? parsed
+          : {};
+      } catch {
+        return {};
+      }
+    }
+
+    return rawValue && typeof rawValue === "object" && !Array.isArray(rawValue)
+      ? rawValue
+      : {};
+  };
+
+  const getSetupCustomFieldValue = (project = {}, key = "") => {
+    const customValues = parseSetupCustomFieldsObject(
+      project.customFields ?? project.custom_fields ?? {}
+    );
+    return customValues?.[key] ?? "";
+  };
+
+  const setupTableCustomFields = useMemo(() => {
+    return (Array.isArray(setupCustomFields) ? setupCustomFields : [])
+      .filter((field) => {
+        const key = getSetupCustomFieldKey(field);
+        const visible = field.isVisible ?? field.is_visible ?? field.visible ?? true;
+        const systemField = field.isSystemField ?? field.is_system_field ?? false;
+        return key && visible !== false && visible !== 0 && !systemField;
+      })
+      .sort(
+        (a, b) =>
+          Number(a.sortOrder ?? a.sort_order ?? 999) -
+          Number(b.sortOrder ?? b.sort_order ?? 999)
+      );
+  }, [setupCustomFields]);
+
   const buildProjectExportRows = (rows = []) => {
-    return (Array.isArray(rows) ? rows : []).map((p, idx) => ({
-      No: idx + 1,
-      "Project Title": p.projectTitle || "",
-      "Name of Firm": p.firmName || "",
-      "Cooperator Name": p.cooperatorName || "",
-      Age: p.age ?? "",
-      Sex: p.sex || "",
-      "SPIN Number": p.spinNumber || "",
-      Sector: p.sector || "",
-      District: p.district || "",
-      "Venue/Address": p.address || "",
-      Funded: p.funded || "",
-      Amount: toNumber(p.amount),
-      Status: p.status || "",
-      Type: p.type || "",
-      "Date Approved": p.dateApproved || "",
-      "Name of Staff": p.nameOfStaff || "",
-      Remarks: p.remarks || "",
-      "S&T Interventions": Array.isArray(p.interventions)
-        ? p.interventions.map((it, i) => `${i + 1}. [${it.type || "—"}] ${getInterventionLabel(it)}`).join("\n")
-        : "",
-    }));
+    return (Array.isArray(rows) ? rows : []).map((p, idx) => {
+      const customFieldValues = {};
+
+      setupTableCustomFields.forEach((field) => {
+        const key = getSetupCustomFieldKey(field);
+        const label = getSetupCustomFieldLabel(field);
+        if (!key || !label) return;
+        customFieldValues[label] = getSetupCustomFieldValue(p, key);
+      });
+
+      return {
+        No: idx + 1,
+        "Project Title": p.projectTitle || "",
+        "Name of Firm": p.firmName || "",
+        "Cooperator Name": p.cooperatorName || "",
+        Age: p.age ?? "",
+        Sex: p.sex || "",
+        "SPIN Number": p.spinNumber || "",
+        Sector: p.sector || "",
+        District: p.district || "",
+        "Venue/Address": p.address || "",
+        Funded: p.funded || "",
+        Amount: toNumber(p.amount),
+        Status: p.status || "",
+        Type: p.type || "",
+        "Date Approved": p.dateApproved || "",
+        ...customFieldValues,
+        "Name of Staff": p.nameOfStaff || "",
+        Remarks: p.remarks || "",
+        "S&T Interventions": Array.isArray(p.interventions)
+          ? p.interventions
+              .map((it, i) => `${i + 1}. [${it.type || "—"}] ${getInterventionLabel(it)}`)
+              .join("\n")
+          : "",
+      };
+    });
   };
 
   const exportProjects = (rows = paginatedProjects, filename = "SETUP_Export.xlsx") => {
@@ -5130,24 +5220,40 @@ export default function Setup() {
     }
 
     const data = buildProjectExportRows(rows);
+    const fallbackHeaders = [
+      "No",
+      "Project Title",
+      "Name of Firm",
+      "Cooperator Name",
+      "Age",
+      "Sex",
+      "SPIN Number",
+      "Sector",
+      "District",
+      "Venue/Address",
+      "Funded",
+      "Amount",
+      "Status",
+      "Type",
+      "Date Approved",
+      ...setupTableCustomFields.map((field) => getSetupCustomFieldLabel(field)),
+      "Name of Staff",
+      "Remarks",
+      "S&T Interventions",
+    ].filter(Boolean);
+    const headers = data.length ? Object.keys(data[0]) : fallbackHeaders;
+
     const htmlRows = data
       .map(
         (r) => `
           <tr>
-            <td>${r.No}</td>
-            <td>${r["Project Title"]}</td>
-            <td>${r["Name of Firm"]}</td>
-            <td>${r["SPIN Number"]}</td>
-            <td>${r.Sector}</td>
-            <td>${r.District}</td>
-            <td>${r["Venue/Address"]}</td>
-            <td style="text-align:right">${money(r.Amount)}</td>
-            <td>${String(r["S&T Interventions"] || "").replace(/\n/g, "<br/>")}</td>
-            <td>${r.Status}</td>
-            <td>${r.Type}</td>
-            <td>${r["Date Approved"]}</td>
-            <td>${r["Name of Staff"]}</td>
-            <td>${r.Remarks}</td>
+            ${headers
+              .map((header) => {
+                const value = header === "Amount" ? money(r[header]) : r[header];
+                const align = header === "Amount" ? ' style="text-align:right"' : "";
+                return `<td${align}>${escapeHtml(String(value ?? "")).replace(/\n/g, "<br/>")}</td>`;
+              })
+              .join("")}
           </tr>`
       )
       .join("");
@@ -5157,7 +5263,7 @@ export default function Setup() {
     w.document.write(`
       <html>
         <head>
-          <title>${title}</title>
+          <title>${escapeHtml(title)}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 18px; }
             h2 { margin: 0 0 12px; color: #0b4ea2; }
@@ -5167,27 +5273,14 @@ export default function Setup() {
           </style>
         </head>
         <body>
-          <h2>${title}</h2>
+          <h2>${escapeHtml(title)}</h2>
           <table>
             <thead>
               <tr>
-                <th>No.</th>
-                <th>Project Title</th>
-                <th>Name of Firm</th>
-                <th>SPIN Number</th>
-                <th>Sector</th>
-                <th>District</th>
-                <th>Venue/Address</th>
-                <th>Amount</th>
-                <th>S&T Interventions</th>
-                <th>Status</th>
-                <th>Type</th>
-                <th>Date Approved</th>
-                <th>Name of Staff</th>
-                <th>Remarks</th>
+                ${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}
               </tr>
             </thead>
-            <tbody>${htmlRows || `<tr><td colspan="14">No records found.</td></tr>`}</tbody>
+            <tbody>${htmlRows || `<tr><td colspan="${headers.length}">No records found.</td></tr>`}</tbody>
           </table>
           <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); };</script>
         </body>
@@ -5429,8 +5522,6 @@ export default function Setup() {
     setExportModal((p) => ({ ...p, open: false }));
   };
 
-  const PAGINATION_SCALE = 0.75;
-
   const styles = {
     page: {
       padding: 14,
@@ -5593,7 +5684,6 @@ export default function Setup() {
       marginTop: 18,
       marginBottom: 8,
       width: "100%",
-      
     },
     googleWordmark: {
       display: "flex",
@@ -5782,46 +5872,6 @@ export default function Setup() {
       textAlign: "center",
       fontFamily,
     },
-
-    modernPaginationWrap: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 22,
-      marginBottom: 10,
-      width: "100%",
-      transform: `scale(${PAGINATION_SCALE})`,
-      transformOrigin: "top center",
-    },
-    modernPaginationRow: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-      flexWrap: "wrap",
-    },
-    modernPageBtn: (disabled = false, active = false) => ({
-      minWidth: 54,
-      height: 54,
-      padding: "0 16px",
-      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-      borderRadius: 16,
-      background: active ? "#3b82f6" : "#ffffff",
-      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
-      fontSize: active ? 24 : 22,
-      fontWeight: 900,
-      cursor: disabled ? "not-allowed" : "pointer",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: active
-        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
-        : "0 8px 18px rgba(15, 23, 42, 0.06)",
-      opacity: disabled ? 0.45 : 1,
-      fontFamily,
-      transition:
-        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
-    }),
 
     tablePrintBtn: {
       border: "1px solid #0b4ea2",
@@ -6255,42 +6305,6 @@ export default function Setup() {
 
   return (
     <div style={styles.page} className="setup-page">
-      <style>
-        {`
-          .setup-modern-page-btn:hover:not(:disabled):not(.setup-modern-page-active) {
-            transform: translateY(-3px);
-            border-color: #93c5fd !important;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
-          }
-
-          .setup-modern-page-btn:active:not(:disabled) {
-            transform: scale(0.94);
-          }
-
-          .setup-modern-page-active {
-            animation: setupActivePagePop 0.28s ease;
-          }
-
-          .setup-modern-page-arrow {
-            font-size: 36px !important;
-            line-height: 1;
-          }
-
-          @keyframes setupActivePagePop {
-            0% {
-              transform: scale(0.88);
-            }
-
-            70% {
-              transform: scale(1.07);
-            }
-
-            100% {
-              transform: scale(1);
-            }
-          }
-        `}
-      </style>
       <div style={styles.titleBar}>
         <div>SETUP</div>
         <div
@@ -6656,7 +6670,7 @@ export default function Setup() {
       </div>
 
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 1580 }}>
+        <table style={{ ...styles.table, minWidth: 1580 + setupTableCustomFields.length * 150 }}>
           <thead>
             <tr>
               <th style={styles.th}>NO.</th>
@@ -6671,6 +6685,16 @@ export default function Setup() {
               <th style={styles.th}>STATUS</th>
               <th style={styles.th}>TYPE</th>
               <th style={styles.th}>DATE APPROVED</th>
+              {setupTableCustomFields.map((field) => {
+                const key = getSetupCustomFieldKey(field);
+                const label = getSetupCustomFieldLabel(field);
+
+                return (
+                  <th key={key} style={styles.th}>
+                    {label}
+                  </th>
+                );
+              })}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -6678,7 +6702,7 @@ export default function Setup() {
           <tbody>
             {paginatedProjects.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={13}>
+                <td style={styles.tdCenter} colSpan={13 + setupTableCustomFields.length}>
                   {projects.length === 0
                     ? 'Wala pang entries. Click “Add Project”.'
                     : "No matching projects found."}
@@ -6973,6 +6997,19 @@ export default function Setup() {
                     <td style={styles.tdCenter}>{p.type || "—"}</td>
                     <td style={styles.tdCenter}>{p.dateApproved || "—"}</td>
 
+                    {setupTableCustomFields.map((field) => {
+                      const key = getSetupCustomFieldKey(field);
+                      const value = getSetupCustomFieldValue(p, key);
+
+                      return (
+                        <td key={key} style={styles.td}>
+                          {value === null || value === undefined || value === ""
+                            ? "—"
+                            : String(value)}
+                        </td>
+                      );
+                    })}
+
                     <td style={styles.tdCenter}>
                       <div
                         style={{
@@ -7050,12 +7087,28 @@ export default function Setup() {
         </table>
       </div>
 
-      <div style={styles.modernPaginationWrap}>
-        <div style={styles.modernPaginationRow}>
+      <div style={styles.googlePaginationWrap}>
+        <div style={styles.googleWordmark} aria-hidden="true">
+          <span style={styles.googleLetterBlue()}>D</span>
+
+          <div style={styles.googleWordmarkTrack}>
+            {paginationLogoOSlots.map((slot) => (
+              <span key={slot} style={styles.googleLetterO()}>
+                o
+              </span>
+            ))}
+
+            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
+          </div>
+
+          <span style={styles.googleLetterBlue()}>s</span>
+          <span style={styles.googleLetterBlue()}>t</span>
+        </div>
+
+        <div style={styles.googlePaginationRow}>
           <button
             type="button"
-            className="setup-modern-page-btn setup-modern-page-arrow"
-            style={styles.modernPageBtn(pageWindowStart === 1, false)}
+            style={styles.googleNavBtn(pageWindowStart === 1)}
             onClick={() =>
               setCurrentPage((prev) =>
                 Math.max(
@@ -7066,34 +7119,36 @@ export default function Setup() {
               )
             }
             disabled={pageWindowStart === 1}
-            title="Previous pages"
           >
-            ‹
+            Previous
           </button>
 
-          {visiblePageNumbers.map((page) => {
-            const isActive = page === currentPage;
+          <div style={styles.googlePageNumbers}>
+            {visiblePageNumbers.map((page) => {
+              const isActive = page === currentPage;
 
-            return (
-              <button
-                key={page}
-                type="button"
-                className={`setup-modern-page-btn ${isActive ? "setup-modern-page-active" : ""}`}
-                style={styles.modernPageBtn(false, isActive)}
-                onClick={() => {
-                  setCurrentPage(page);
-                }}
-                title={`Page ${page}`}
-              >
-                {page}
-              </button>
-            );
-          })}
+              return isActive ? (
+                <span key={page} style={styles.googlePageCurrent}>
+                  {page}
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  type="button"
+                  style={styles.googlePageBtn}
+                  onClick={() => {
+                    setCurrentPage(page);
+                  }}
+                >
+                  {page}
+                </button>
+              );
+            })}
+          </div>
 
           <button
             type="button"
-            className="setup-modern-page-btn setup-modern-page-arrow"
-            style={styles.modernPageBtn(false, false)}
+            style={styles.googleNavBtn(false)}
             onClick={() =>
               setCurrentPage(
                 Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
@@ -7102,9 +7157,8 @@ export default function Setup() {
               )
             }
             disabled={false}
-            title="Next pages"
           >
-            ›
+            Next
           </button>
         </div>
       </div>

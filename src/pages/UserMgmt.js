@@ -454,6 +454,44 @@ function makeNewAccountForm(currentRole = "superadmin") {
   };
 }
 
+function fileToCompressedDataUrl(file, maxSize = 420, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type?.startsWith("image/")) {
+      reject(new Error("Please upload a valid image file."));
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onerror = () => reject(new Error("Unable to read image file."));
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onerror = () => reject(new Error("Unable to load image file."));
+
+      img.onload = () => {
+        const ratio = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const width = Math.max(1, Math.round(img.width * ratio));
+        const height = Math.max(1, Math.round(img.height * ratio));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+
+      img.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 function renderAvatar(avatar, size = 72) {
   const boxStyle = {
     width: size,
@@ -596,6 +634,7 @@ export default function UserMgmt() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [viewUser, setViewUser] = useState(null);
+  const [visiblePasswordUserId, setVisiblePasswordUserId] = useState(null);
   const [showAllDetails, setShowAllDetails] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [privilegeUser, setPrivilegeUser] = useState(null);
@@ -614,29 +653,15 @@ export default function UserMgmt() {
     setPageError("");
     try {
       const data = await getAccounts();
-      const normalized = (Array.isArray(data) && data.length ? data : SAMPLE_USERS).map((u) => normalizeUserShape(u));
+      const normalized = Array.isArray(data)
+        ? data.map((u) => normalizeUserShape(u))
+        : [];
+
       setUsers(normalized);
-      localStorage.setItem(USERS_KEY, JSON.stringify(normalized));
     } catch (e) {
       console.error("Load user accounts error:", e);
       setPageError(e?.response?.data?.message || e?.message || "Hindi ma-load ang accounts mula sa database.");
-
-      const raw = localStorage.getItem(USERS_KEY);
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length) {
-            setUsers(parsed.map((u) => normalizeUserShape(u)));
-            return;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      const seeded = SAMPLE_USERS.map((u) => normalizeUserShape(u));
-      localStorage.setItem(USERS_KEY, JSON.stringify(seeded));
-      setUsers(seeded);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -677,21 +702,6 @@ export default function UserMgmt() {
       users[0];
     setSelectedUser(match || null);
   }, [currentUser, users]);
-
-  useEffect(() => {
-    const onStorage = () => {
-      const raw = localStorage.getItem(USERS_KEY);
-      if (!raw) return;
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setUsers(parsed.map((u) => normalizeUserShape(u)));
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   const visibleUsers = useMemo(() => {
     const role = currentUser?.role || "superadmin";
@@ -754,12 +764,37 @@ export default function UserMgmt() {
   function persistUsers(next) {
     const normalized = next.map((u) => normalizeUserShape(u));
     setUsers(normalized);
-    localStorage.setItem(USERS_KEY, JSON.stringify(normalized));
   }
 
   function openProfile(user) {
     setViewUser(user);
+    setVisiblePasswordUserId(null);
     setShowAllDetails(false);
+  }
+
+  function renderPasswordValue(user) {
+    const rawPassword = safeText(user?.password).trim();
+
+    if (!rawPassword) {
+      return <span style={styles.passwordEmptyText}>No password set</span>;
+    }
+
+    const isVisible = visiblePasswordUserId === user.id;
+
+    return (
+      <div style={styles.passwordRevealWrap}>
+        <span style={isVisible ? styles.passwordText : styles.passwordMasked}>
+          {isVisible ? rawPassword : "••••••••"}
+        </span>
+        <button
+          type="button"
+          style={styles.passwordViewBtn}
+          onClick={() => setVisiblePasswordUserId(isVisible ? null : user.id)}
+        >
+          {isVisible ? "Hide" : "View"}
+        </button>
+      </div>
+    );
   }
 
   function openEdit(user) {
@@ -805,7 +840,6 @@ export default function UserMgmt() {
       const normalizedSaved = normalizeUserShape(saved || updatedUser);
       setUsers((prev) => {
         const next = prev.map((u) => (u.id === normalizedSaved.id ? normalizedSaved : u));
-        localStorage.setItem(USERS_KEY, JSON.stringify(next));
         return next;
       });
       setEditingUser(null);
@@ -836,7 +870,6 @@ export default function UserMgmt() {
       const normalizedSaved = normalizeUserShape(saved || { ...privilegeUser, permissions: nextPermissions });
       setUsers((prev) => {
         const next = prev.map((u) => (u.id === privilegeUser.id ? normalizedSaved : u));
-        localStorage.setItem(USERS_KEY, JSON.stringify(next));
         return next;
       });
       closePrivileges();
@@ -868,36 +901,61 @@ export default function UserMgmt() {
     );
   }
 
-  function updateTopProfilePicture(updatedAvatar) {
+  async function updateTopProfilePicture(updatedAvatar) {
     if (!currentAccount) return;
-    const nextUsers = users.map((u) =>
-      u.id === currentAccount.id ? { ...u, avatar: clone(updatedAvatar) } : u
-    );
-    persistUsers(nextUsers);
-    setShowAvatarPickerFor(null);
+
+    const updatedAccount = normalizeUserShape({
+      ...currentAccount,
+      avatar: clone(updatedAvatar),
+    });
+
+    setSaving(true);
+    try {
+      const saved = await updateAccount(updatedAccount.id, updatedAccount);
+      const normalizedSaved = normalizeUserShape(saved || updatedAccount);
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === normalizedSaved.id ? normalizedSaved : u))
+      );
+      setSelectedUser((prev) =>
+        prev?.id === normalizedSaved.id ? normalizedSaved : prev
+      );
+      setShowAvatarPickerFor(null);
+    } catch (e) {
+      console.error("Update profile photo error:", e);
+      alert(e?.response?.data?.message || e?.message || "Hindi na-save ang profile photo sa database.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function onUploadForUser(event, userTarget, mode = "edit") {
+  async function onUploadForUser(event, userTarget, mode = "edit") {
     const file = event.target.files?.[0];
     if (!file || !userTarget) return;
-    const reader = new FileReader();
-    reader.onload = () => {
+
+    try {
+      const compressedDataUrl = await fileToCompressedDataUrl(file);
       const avatar = {
         id: `upload_${Date.now()}`,
         label: "Uploaded Photo",
         type: "upload",
-        value: reader.result,
+        value: compressedDataUrl,
         bg: "#111827",
       };
+
       if (mode === "top") {
         updateTopProfilePicture(avatar);
         return;
       }
+
       if (mode === "edit") {
         setEditingUser((prev) => (prev && prev.id === userTarget.id ? { ...prev, avatar } : prev));
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (e) {
+      alert(e?.message || "Hindi ma-process ang profile photo.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function canStaffViewSensitive(target) {
@@ -944,7 +1002,6 @@ export default function UserMgmt() {
       await deleteAccount(target.id);
       setUsers((prev) => {
         const next = prev.filter((u) => u.id !== target.id);
-        localStorage.setItem(USERS_KEY, JSON.stringify(next));
         return next;
       });
 
@@ -997,7 +1054,6 @@ export default function UserMgmt() {
 
       setUsers((prev) => {
         const next = prev.map((u) => (u.id === target.id ? normalizedSaved : u));
-        localStorage.setItem(USERS_KEY, JSON.stringify(next));
         return next;
       });
 
@@ -1112,7 +1168,6 @@ export default function UserMgmt() {
       const normalizedSaved = normalizeUserShape(saved || newUser);
       setUsers((prev) => {
         const next = [...prev, normalizedSaved];
-        localStorage.setItem(USERS_KEY, JSON.stringify(next));
         return next;
       });
       setShowAddAccount(false);
@@ -1484,20 +1539,24 @@ export default function UserMgmt() {
                     type="file"
                     accept="image/*"
                     style={{ display: "none" }}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = () => {
+
+                      try {
+                        const compressedDataUrl = await fileToCompressedDataUrl(file);
                         updateAddForm("avatar", {
                           id: `upload_${Date.now()}`,
                           label: "Uploaded Photo",
                           type: "upload",
-                          value: reader.result,
+                          value: compressedDataUrl,
                           bg: "#111827",
                         });
-                      };
-                      reader.readAsDataURL(file);
+                      } catch (err) {
+                        alert(err?.message || "Hindi ma-process ang profile photo.");
+                      } finally {
+                        e.target.value = "";
+                      }
                     }}
                   />
                 </div>
@@ -1514,7 +1573,7 @@ export default function UserMgmt() {
       )}
 
       {viewUser && (
-        <ModalShell title="Account Profile" onClose={() => setViewUser(null)} width={980} zIndex={1500}>
+        <ModalShell title="Account Profile" onClose={() => { setViewUser(null); setVisiblePasswordUserId(null); }} width={980} zIndex={1500}>
           <div style={styles.profileHero}>
             <div style={{ cursor: "pointer" }} onClick={() => setImagePreviewUser(viewUser)}>
               {renderAvatar(viewUser.avatar, 86)}
@@ -1564,7 +1623,7 @@ export default function UserMgmt() {
                   ["Full Name", viewUser.fullName],
                   ["Username", viewUser.username],
                   ...(canViewPasswordInfo(viewUser)
-                    ? [["Password", viewUser.password ? `Set: ${viewUser.password}` : "No password set"]]
+                    ? [["Password", renderPasswordValue(viewUser)]]
                     : []),
                   ["Role", roleLabel(viewUser.role)],
                   ["Status", viewUser.status],
@@ -2219,6 +2278,54 @@ const styles = {
     fontSize: 14,
   },
   snapshotLabel: { fontWeight: 800, color: "#475569" },
+  passwordRevealWrap: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+    width: "100%",
+  },
+  passwordText: {
+    minHeight: 32,
+    minWidth: 130,
+    borderRadius: 10,
+    border: "1px solid #c7d2fe",
+    background: "#eef2ff",
+    color: "#111827",
+    fontWeight: 900,
+    letterSpacing: "0.04em",
+    padding: "7px 10px",
+    display: "inline-flex",
+    alignItems: "center",
+    overflowWrap: "anywhere",
+  },
+  passwordMasked: {
+    minHeight: 32,
+    minWidth: 130,
+    borderRadius: 10,
+    border: "1px solid #d7dee9",
+    background: "#f8fafc",
+    color: "#334155",
+    fontWeight: 900,
+    letterSpacing: "0.18em",
+    padding: "7px 10px",
+    display: "inline-flex",
+    alignItems: "center",
+  },
+  passwordViewBtn: {
+    height: 32,
+    borderRadius: 10,
+    border: "1px solid #93c5fd",
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    fontWeight: 900,
+    padding: "0 12px",
+    cursor: "pointer",
+  },
+  passwordEmptyText: {
+    color: "#64748b",
+    fontWeight: 700,
+  },
   quickGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
   quickCard: {
     border: "1px solid #d7e2f3",

@@ -1317,11 +1317,9 @@ export default function STPromo() {
             const key = String(f.fieldKey || f.field_key || f.key || "").trim();
             const label = String(f.fieldLabel || f.field_label || f.label || "").trim();
             const visible = f.isVisible ?? f.is_visible ?? true;
-            const showAdd = f.showAdd ?? f.show_add ?? true;
-            const showEdit = f.showEdit ?? f.show_edit ?? true;
             const systemField = f.isSystemField ?? f.is_system_field ?? false;
 
-            return key && label && visible && !systemField && (showAdd || showEdit) && !fixedKeys.has(key);
+            return key && label && visible && !systemField && !fixedKeys.has(key);
           })
           .sort(
             (a, b) =>
@@ -1329,30 +1327,10 @@ export default function STPromo() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ];
-
-        if (!cancelled) setStPromoCustomFields(finalCustomFields);
+        if (!cancelled) setStPromoCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load S&T Promo custom fields:", err);
-        if (!cancelled) {
-          setStPromoCustomFields([
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ]);
-        }
+        if (!cancelled) setStPromoCustomFields([]);
       }
     }
 
@@ -1628,6 +1606,34 @@ export default function STPromo() {
   }
 
 
+  function getStPromoFieldKey(field = {}) {
+    return field.fieldKey || field.field_key || field.key || "";
+  }
+
+  function getStPromoFieldLabel(field = {}) {
+    const key = getStPromoFieldKey(field);
+    return cleanStPromoCustomLabel(field.fieldLabel || field.field_label || field.label || key);
+  }
+
+  function getStPromoFieldValue(entry = {}, field = {}) {
+    const key = getStPromoFieldKey(field);
+    const values = parseStPromoCustomFields(entry.customFields || entry.custom_fields);
+    const value = values?.[key];
+
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  }
+
+  function shouldShowStPromoCustomFieldInForm(field = {}) {
+    if (editingId) return field.showEdit ?? field.show_edit ?? true;
+    return field.showAdd ?? field.show_add ?? true;
+  }
+
+  const stPromoCustomExportHeaders = useMemo(() => {
+    return (stPromoCustomFields || []).map((field) => getStPromoFieldLabel(field).toUpperCase());
+  }, [stPromoCustomFields]);
+
+
+
   function getStPromoCustomPairs(entry = {}) {
     const values = parseStPromoCustomFields(entry.customFields || entry.custom_fields);
 
@@ -1649,7 +1655,7 @@ export default function STPromo() {
 
     return (
       <>
-        {stPromoCustomFields.map((field) => {
+        {stPromoCustomFields.filter(shouldShowStPromoCustomFieldInForm).map((field) => {
           const key = field.fieldKey || field.field_key || field.key;
           const rawLabel = field.fieldLabel || field.field_label || field.label || key;
           const label = cleanStPromoCustomLabel(rawLabel);
@@ -1706,7 +1712,6 @@ export default function STPromo() {
     if (!form.projectTitle.trim()) return alert("Required: Project Title"), false;
     if (!form.activityType.trim()) return alert("Required: Type of Promotional Activity"), false;
     if (form.entryMode === "ONSITE" && !form.address.trim()) return alert("Required: Venue/Address"), false;
-    if (!form.meansOfVerification.trim()) return alert("Required: Means of Verification"), false;
     return true;
   }
 
@@ -1887,7 +1892,7 @@ export default function STPromo() {
     return entry?.projectTitle || entry?.activityType || entry?.date || "Record";
   }
 
-  const EXPORT_HEADERS = [
+  const EXPORT_HEADERS = useMemo(() => [
     "NO",
     "ENTRY TYPE",
     "DATE",
@@ -1915,8 +1920,9 @@ export default function STPromo() {
     "MEANS OF VERIFICATION",
     "MOV PHOTO COUNT",
     "NAME OF STAFF",
+    ...stPromoCustomExportHeaders,
     "REMARKS",
-  ];
+  ], [stPromoCustomExportHeaders]);
 
   function entryToExportRow(entry, index) {
     return [
@@ -1947,6 +1953,10 @@ export default function STPromo() {
       entry?.meansOfVerification || "",
       getStPromoPhotos(entry).length,
       getStaffName(entry),
+      ...(stPromoCustomFields || []).map((field) => {
+        const value = getStPromoFieldValue(entry, field);
+        return value === "—" ? "" : value;
+      }),
       entry?.remarks || "",
     ];
   }
@@ -2040,6 +2050,7 @@ export default function STPromo() {
           ["Coordinates", Number.isFinite(entry?.addressMeta?.lat) && Number.isFinite(entry?.addressMeta?.lng) ? `${entry.addressMeta.lat}, ${entry.addressMeta.lng}` : "—"],
           ["Means of Verification", entry.meansOfVerification || "—"],
           ["Name of Staff", getStaffName(entry) || "—"],
+          ...getStPromoCustomPairs(entry).map((item) => [item.label, item.value]),
           ["Remarks", entry.remarks || "—"],
         ];
         doc.setFontSize(14);
@@ -2094,6 +2105,7 @@ export default function STPromo() {
           ["Venue/Address", entry.address || "—"],
           ["Means of Verification", entry.meansOfVerification || "—"],
           ["Name of Staff", getStaffName(entry) || "—"],
+          ...getStPromoCustomPairs(entry).map((item) => [item.label, item.value]),
           ["Remarks", entry.remarks || "—"],
         ]));
       });
@@ -2154,6 +2166,7 @@ export default function STPromo() {
       ["Coordinates", coords],
       ["Means of Verification", entry?.meansOfVerification || "—"],
       ["Name of Staff", getStaffName(entry) || "—"],
+      ...getStPromoCustomPairs(entry).map((item) => [item.label, item.value]),
       ["Remarks", entry?.remarks || "—"],
     ];
 
@@ -2213,7 +2226,18 @@ export default function STPromo() {
       });
       const payload = res.data || {};
       const rows = Array.isArray(payload?.data) ? payload.data : extractArrayResponse(payload);
-      return Array.isArray(rows) ? rows : [];
+      return Array.isArray(rows)
+        ? rows.map((row) => ({
+          ...row,
+          meansOfVerification: row.meansOfVerification || row.means_of_verification || "",
+          staffName: row.staffName || row.nameOfStaff || row.staff_name || row.name_of_staff || "",
+          nameOfStaff: row.nameOfStaff || row.staffName || row.name_of_staff || row.staff_name || "",
+          customFields: parseStPromoCustomFields(row.customFields || row.custom_fields),
+          custom_fields: parseStPromoCustomFields(row.custom_fields || row.customFields),
+          photos: getStPromoPhotos(row),
+          movPhotos: getStPromoPhotos(row),
+        }))
+        : [];
     } catch (e) {
       console.error("Failed to load rows for export/print", e);
       return filteredEntries;
@@ -3253,7 +3277,7 @@ export default function STPromo() {
 
         <div style={styles.tableWrap}>
           {tableMode === "ONSITE" ? (
-            <table style={{ ...styles.table, minWidth: 1500 }}>
+            <table style={{ ...styles.table, minWidth: 1500 + stPromoCustomFields.length * 150 }}>
               <thead>
                 <tr>
                   <th style={styles.th} rowSpan={2}>NO.</th>
@@ -3262,7 +3286,11 @@ export default function STPromo() {
                   <th style={styles.th} rowSpan={2}>TYPE OF PROMOTIONAL ACTIVITY</th>
                   <th style={styles.th} colSpan={4}>NO. OF PROMOTIONAL ACTIVITIES</th>
                   <th style={styles.th} colSpan={3}>NO. OF PARTICIPANTS</th>
-                  <th style={styles.th} rowSpan={2}>MEANS OF VERIFICATION</th>
+                  {stPromoCustomFields.map((field) => (
+                    <th key={`onsite-custom-head-${getStPromoFieldKey(field)}`} style={styles.th} rowSpan={2}>
+                      {getStPromoFieldLabel(field).toUpperCase()}
+                    </th>
+                  ))}
                   <th style={styles.th} rowSpan={2}>ACTIONS</th>
                 </tr>
                 <tr>
@@ -3278,11 +3306,11 @@ export default function STPromo() {
               <tbody>
                 {loadingEntries ? (
                   <tr>
-                    <td colSpan={13} style={styles.tdCenter}>Loading S&amp;T Promo entries...</td>
+                    <td colSpan={12 + stPromoCustomFields.length} style={styles.tdCenter}>Loading S&amp;T Promo entries...</td>
                   </tr>
                 ) : !paginatedEntries.length ? (
                   <tr>
-                    <td colSpan={13} style={styles.tdCenter}>No entries found.</td>
+                    <td colSpan={12 + stPromoCustomFields.length} style={styles.tdCenter}>No entries found.</td>
                   </tr>
                 ) : (
                   paginatedEntries.map((e, idx) => (
@@ -3298,7 +3326,11 @@ export default function STPromo() {
                       <td style={styles.tdCenter}>{toNumber(e.male)}</td>
                       <td style={styles.tdCenter}>{toNumber(e.female)}</td>
                       <td style={styles.tdCenter}>{totalParticipants(e)}</td>
-                      <td style={{ ...styles.td, whiteSpace: "pre-wrap" }}>{e.meansOfVerification || "—"}</td>
+                      {stPromoCustomFields.map((field) => (
+                        <td key={`onsite-custom-${e.id}-${getStPromoFieldKey(field)}`} style={styles.td}>
+                          {getStPromoFieldValue(e, field)}
+                        </td>
+                      ))}
                       <td style={styles.actionCell}>
                         <div style={styles.actionWrap}>
                           <div style={styles.actionRow}>
@@ -3339,14 +3371,16 @@ export default function STPromo() {
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onsiteTotals.male}</td>
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onsiteTotals.female}</td>
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onsiteTotals.totalParticipants}</td>
-                    <td style={styles.td}></td>
+                    {stPromoCustomFields.map((field) => (
+                      <td key={`onsite-total-custom-${getStPromoFieldKey(field)}`} style={styles.td}></td>
+                    ))}
                     <td style={styles.td}></td>
                   </tr>
                 )}
               </tbody>
             </table>
           ) : (
-            <table style={{ ...styles.table, minWidth: 2050 }}>
+            <table style={{ ...styles.table, minWidth: 2050 + stPromoCustomFields.length * 150 }}>
               <thead>
                 <tr>
                   <th style={styles.th} rowSpan={2}>NO.</th>
@@ -3358,7 +3392,11 @@ export default function STPromo() {
                   <th style={styles.th} rowSpan={2}>NO. OF PEOPLE REACHED</th>
                   <th style={styles.th} rowSpan={2}>NO. OF VIEWS</th>
                   <th style={styles.th} colSpan={4}>NO. OF ENGAGEMENTS</th>
-                  <th style={styles.th} rowSpan={2}>MEANS OF VERIFICATION</th>
+                  {stPromoCustomFields.map((field) => (
+                    <th key={`online-custom-head-${getStPromoFieldKey(field)}`} style={styles.th} rowSpan={2}>
+                      {getStPromoFieldLabel(field).toUpperCase()}
+                    </th>
+                  ))}
                   <th style={styles.th} rowSpan={2}>ACTIONS</th>
                 </tr>
                 <tr>
@@ -3378,11 +3416,11 @@ export default function STPromo() {
               <tbody>
                 {loadingEntries ? (
                   <tr>
-                    <td colSpan={19} style={styles.tdCenter}>Loading S&amp;T Promo entries...</td>
+                    <td colSpan={18 + stPromoCustomFields.length} style={styles.tdCenter}>Loading S&amp;T Promo entries...</td>
                   </tr>
                 ) : !paginatedEntries.length ? (
                   <tr>
-                    <td colSpan={19} style={styles.tdCenter}>No entries found.</td>
+                    <td colSpan={18 + stPromoCustomFields.length} style={styles.tdCenter}>No entries found.</td>
                   </tr>
                 ) : (
                   paginatedEntries.map((e, idx) => (
@@ -3404,7 +3442,11 @@ export default function STPromo() {
                       <td style={styles.tdCenter}>{toNumber(e.comment) || ""}</td>
                       <td style={styles.tdCenter}>{toNumber(e.share) || ""}</td>
                       <td style={styles.tdCenter}>{totalEngagements(e) || ""}</td>
-                      <td style={{ ...styles.td, whiteSpace: "pre-wrap" }}>{e.meansOfVerification || "—"}</td>
+                      {stPromoCustomFields.map((field) => (
+                        <td key={`online-custom-${e.id}-${getStPromoFieldKey(field)}`} style={styles.td}>
+                          {getStPromoFieldValue(e, field)}
+                        </td>
+                      ))}
                       <td style={styles.actionCell}>
                         <div style={styles.actionWrap}>
                           <div style={styles.actionRow}>
@@ -3451,7 +3493,9 @@ export default function STPromo() {
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onlineLikeTotals.comment || ""}</td>
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onlineLikeTotals.share || ""}</td>
                     <td style={{ ...styles.tdCenter, fontWeight: 900 }}>{onlineLikeTotals.totalEngagements || ""}</td>
-                    <td style={styles.td}></td>
+                    {stPromoCustomFields.map((field) => (
+                      <td key={`online-total-custom-${getStPromoFieldKey(field)}`} style={styles.td}></td>
+                    ))}
                     <td style={styles.td}></td>
                   </tr>
                 )}
@@ -3730,7 +3774,7 @@ export default function STPromo() {
                       photos: Array.isArray(photos) ? photos : [],
                     }))
                   }
-                  label={<>Means of Verification<span style={styles.req}>*</span></>}
+                  label="Means of Verification"
                 />
 
                 {form.entryMode === "ONSITE" ? (

@@ -1671,3 +1671,60 @@ CREATE TABLE `user_special_permissions` (
 -- Dump completed on 2026-05-08  8:45:30
 -- Ensure user account password column can store hashed passwords
 ALTER TABLE `user_accounts` MODIFY `password` VARCHAR(255) NOT NULL;
+ALTER TABLE `user_accounts`
+ADD COLUMN IF NOT EXISTS `avatar_json` LONGTEXT NULL AFTER `can_manage_dropdowns`;
+
+-- Seed default Super Admin account if missing
+INSERT INTO `user_accounts` (
+  `first_name`,
+  `last_name`,
+  `full_name`,
+  `username`,
+  `password`,
+  `email`,
+  `contact_number`,
+  `role`,
+  `status`,
+  `position`,
+  `office`,
+  `created_by`,
+  `can_manage_dropdowns`,
+  `avatar_json`,
+  `assigned`,
+  `completed`,
+  `pending`,
+  `edited_records`,
+  `last_login`
+)
+SELECT
+  'Super',
+  'Admin',
+  'Super Admin',
+  'superadmin',
+  'Admin123',
+  'superadmin@dost.gov.ph',
+  '09123456789',
+  'superadmin',
+  'active',
+  'System Owner',
+  'DOST Pangasinan',
+  'System Seed',
+  1,
+  '{"id":"shield","label":"Shield","type":"emoji","value":"🛡️","bg":"#1f2937"}',
+  0,
+  0,
+  0,
+  0,
+  NULL
+WHERE NOT EXISTS (
+  SELECT 1 FROM `user_accounts` WHERE `username` = 'superadmin'
+);
+-- ============================================================
+-- TABLE MANAGEMENT CUSTOM FIELDS PATCH
+-- ============================================================
+
+ALTER TABLE `drrm_collaborations`
+ADD COLUMN IF NOT EXISTS `custom_fields` JSON NULL;
+
+ALTER TABLE `sscp_projects`
+ADD COLUMN IF NOT EXISTS `custom_fields` JSON NULL;

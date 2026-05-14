@@ -1305,11 +1305,9 @@ export default function CEST() {
           .filter((f) => {
             const key = String(f.fieldKey || f.field_key || f.key || "").trim();
             const visible = f.isVisible ?? f.is_visible ?? f.visible ?? true;
-            const showAdd = f.showAdd ?? f.show_add ?? true;
-            const showEdit = f.showEdit ?? f.show_edit ?? true;
             const systemField = f.isSystemField ?? f.is_system_field ?? false;
 
-            return key && visible && !systemField && (showAdd || showEdit) && !fixedKeys.has(key);
+            return key && visible && !systemField && !fixedKeys.has(key);
           })
           .sort(
             (a, b) =>
@@ -1330,6 +1328,78 @@ export default function CEST() {
       cancelled = true;
     };
   }, []);
+
+  const getCestFieldKey = (field = {}) =>
+    String(field.fieldKey || field.field_key || field.key || "").trim();
+
+  const getCestFieldLabel = (field = {}) => {
+    const key = getCestFieldKey(field);
+    return String(field.fieldLabel || field.field_label || field.label || key || "Custom Field").trim();
+  };
+
+  const isCestFieldVisible = (field = {}) =>
+    Boolean(field.isVisible ?? field.is_visible ?? field.visible ?? true);
+
+  const isCestFieldShownInAdd = (field = {}) =>
+    Boolean(field.showAdd ?? field.show_add ?? true);
+
+  const isCestFieldShownInEdit = (field = {}) =>
+    Boolean(field.showEdit ?? field.show_edit ?? true);
+
+  const parseCestCustomFields = (value = {}) => {
+    if (!value) return {};
+    if (typeof value === "string") {
+      try {
+        return JSON.parse(value || "{}");
+      } catch {
+        return {};
+      }
+    }
+    return value && typeof value === "object" ? value : {};
+  };
+
+  const getCestProjectCustomFields = (project = {}) =>
+    parseCestCustomFields(project.customFields ?? project.custom_fields ?? {});
+
+  const cestTableCustomFields = useMemo(
+    () =>
+      (Array.isArray(cestCustomFields) ? cestCustomFields : [])
+        .filter((field) => getCestFieldKey(field) && isCestFieldVisible(field))
+        .sort(
+          (a, b) =>
+            Number(a.sortOrder ?? a.sort_order ?? 999) -
+            Number(b.sortOrder ?? b.sort_order ?? 999)
+        ),
+    [cestCustomFields]
+  );
+
+  const cestProjectFormCustomFields = useMemo(
+    () =>
+      cestTableCustomFields.filter((field) =>
+        editProjectId ? isCestFieldShownInEdit(field) : isCestFieldShownInAdd(field)
+      ),
+    [cestTableCustomFields, editProjectId]
+  );
+
+  const getCestCustomFieldValue = (project = {}, field = {}) => {
+    const key = getCestFieldKey(field);
+    if (!key) return "";
+    const values = getCestProjectCustomFields(project);
+    return values?.[key] ?? "";
+  };
+
+  const buildCestCustomFieldExportValues = (project = {}) => {
+    const values = getCestProjectCustomFields(project);
+    const result = {};
+
+    cestTableCustomFields.forEach((field) => {
+      const key = getCestFieldKey(field);
+      if (!key) return;
+      result[getCestFieldLabel(field)] = values?.[key] ?? "";
+    });
+
+    return result;
+  };
 
   // Load GeoJSON files
   useEffect(() => {
@@ -3900,7 +3970,7 @@ export default function CEST() {
       </div>
     );
   }
-  const PAGINATION_SCALE = 0.75;
+
   // ===== Styles =====
   const styles = {
     page: { padding: 16, position: "relative", fontFamily },
@@ -4143,49 +4213,6 @@ export default function CEST() {
       fontFamily,
       whiteSpace: "nowrap",
     },
-
-
-    modernPaginationWrap: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 22,
-      marginBottom: 10,
-      width: "100%",
-      transform: `scale(${PAGINATION_SCALE})`,
-      transformOrigin: "top center",
-    },
-
-    modernPaginationRow: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-      flexWrap: "wrap",
-    },
-
-    modernPageBtn: (disabled = false, active = false) => ({
-      minWidth: 54,
-      height: 54,
-      padding: "0 16px",
-      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-      borderRadius: 16,
-      background: active ? "#3b82f6" : "#ffffff",
-      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
-      fontSize: active ? 24 : 22,
-      fontWeight: 900,
-      cursor: disabled ? "not-allowed" : "pointer",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: active
-        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
-        : "0 8px 18px rgba(15, 23, 42, 0.06)",
-      opacity: disabled ? 0.45 : 1,
-      fontFamily,
-      transition:
-        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
-    }),
 
 
     googlePaginationWrap: {
@@ -4891,6 +4918,26 @@ export default function CEST() {
             ? ""
             : String(p.startupsAssisted),
         jobsGenerated: Number(p.jobsGenerated ?? 0),
+        customFields:
+          typeof (p.customFields ?? p.custom_fields ?? {}) === "string"
+            ? (() => {
+              try {
+                return JSON.parse(p.customFields ?? p.custom_fields ?? "{}");
+              } catch {
+                return {};
+              }
+            })()
+            : p.customFields ?? p.custom_fields ?? {},
+        custom_fields:
+          typeof (p.custom_fields ?? p.customFields ?? {}) === "string"
+            ? (() => {
+              try {
+                return JSON.parse(p.custom_fields ?? p.customFields ?? "{}");
+              } catch {
+                return {};
+              }
+            })()
+            : p.custom_fields ?? p.customFields ?? {},
         district,
         interventions: Array.isArray(p.interventions) ? p.interventions : [],
       };
@@ -4927,27 +4974,32 @@ export default function CEST() {
   };
 
   const buildCestExportRows = (items = []) =>
-    (Array.isArray(items) ? items : []).map((p, idx) => ({
-      "No.": idx + 1,
-      "Type": p?.type || "",
-      "Project Title": p?.projectTitle || "",
-      "Date of Project Approval": p?.dateProjectApproval || "",
-      "Approved Project Cost (in Peso)": toNumber(p?.approvedProjectCost),
-      "Name of Association / Cooperative": p?.associationName || "",
-      "Venue/Address": p?.address || "",
-      "Name of LGU-Communities": p?.lguNumbersOfCommunities || "",
-      "Number of MOA": toNumber(p?.numberOfMoa),
-      "Name of Project Proponent": p?.projectProponent || "",
-      "Sex": p?.sex || "",
-      "Name of Staff": p?.staffName || "",
-      "Process/System Developed/Improved": p?.processSystem || "",
-      "Communities Assisted": toNumber(p?.communitiesAssisted),
-      "Technologies Deployed": toNumber(p?.technologiesDeployed),
-      "Beneficiaries": toNumber(p?.beneficiaries),
-      "Startups Assisted": p?.startupsAssisted || "",
-      "Jobs Generated": toNumber(p?.jobsGenerated),
-      "S&T Interventions Count": Array.isArray(p?.interventions) ? p.interventions.length : 0,
-    }));
+    (Array.isArray(items) ? items : []).map((p, idx) => {
+      const customFieldValues = buildCestCustomFieldExportValues(p);
+
+      return {
+        "No.": idx + 1,
+        "Type": p?.type || "",
+        "Project Title": p?.projectTitle || "",
+        "Date of Project Approval": p?.dateProjectApproval || "",
+        "Approved Project Cost (in Peso)": toNumber(p?.approvedProjectCost),
+        "Name of Association / Cooperative": p?.associationName || "",
+        "Venue/Address": p?.address || "",
+        "Name of LGU-Communities": p?.lguNumbersOfCommunities || "",
+        "Number of MOA": toNumber(p?.numberOfMoa),
+        ...customFieldValues,
+        "Name of Project Proponent": p?.projectProponent || "",
+        "Sex": p?.sex || "",
+        "Name of Staff": p?.staffName || "",
+        "Process/System Developed/Improved": p?.processSystem || "",
+        "Communities Assisted": toNumber(p?.communitiesAssisted),
+        "Technologies Deployed": toNumber(p?.technologiesDeployed),
+        "Beneficiaries": toNumber(p?.beneficiaries),
+        "Startups Assisted": p?.startupsAssisted || "",
+        "Jobs Generated": toNumber(p?.jobsGenerated),
+        "S&T Interventions Count": Array.isArray(p?.interventions) ? p.interventions.length : 0,
+      };
+    });
 
   const makeCestExportFilename = (label = "cest_export") =>
     `${String(label || "cest_export").replace(/[^a-z0-9]+/gi, "_")}.xlsx`;
@@ -5230,41 +5282,6 @@ export default function CEST() {
 
   return (
     <div style={styles.page} className="cest-page">
-
-      <style>{`
-        .modern-page-btn:hover:not(:disabled):not(.modern-page-active) {
-          transform: translateY(-3px);
-          border-color: #93c5fd !important;
-          box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
-        }
-
-        .modern-page-btn:active:not(:disabled) {
-          transform: scale(0.94);
-        }
-
-        .modern-page-active {
-          animation: activePagePop 0.28s ease;
-        }
-
-        .modern-page-arrow {
-          font-size: 36px !important;
-          line-height: 1;
-        }
-
-        @keyframes activePagePop {
-          0% {
-            transform: scale(0.88);
-          }
-
-          70% {
-            transform: scale(1.07);
-          }
-
-          100% {
-            transform: scale(1);
-          }
-        }
-      `}</style>
       <div style={styles.titleBar}>
         <div>CEST</div>
         <div style={{ fontSize: 12, opacity: 0.95, fontWeight: 800, fontFamily }}>
@@ -5566,7 +5583,13 @@ export default function CEST() {
 
       {/* PROJECTS TABLE */}
       <div style={styles.tableWrap} className="cest-table-wrap">
-        <table style={{ ...styles.table, minWidth: 1560 }} className="cest-table">
+        <table
+          style={{
+            ...styles.table,
+            minWidth: 1560 + cestTableCustomFields.length * 160,
+          }}
+          className="cest-table"
+        >
           <colgroup>
             <col style={{ width: "4%" }} />
             <col style={{ width: "9%" }} />
@@ -5577,6 +5600,9 @@ export default function CEST() {
             <col style={{ width: "17%" }} />
             <col style={{ width: "8%" }} />
             <col style={{ width: "8%" }} />
+            {cestTableCustomFields.map((field) => (
+              <col key={`col_${getCestFieldKey(field)}`} style={{ width: "10%" }} />
+            ))}
             <col style={{ width: "14%" }} />
             <col style={{ width: "10%" }} />
           </colgroup>
@@ -5592,6 +5618,11 @@ export default function CEST() {
               <th style={styles.th}>VENUE/ADDRESS</th>
               <th style={styles.th}>NAME OF LGU-COMMUNITIES</th>
               <th style={styles.th}>NUMBER OF MOA</th>
+              {cestTableCustomFields.map((field) => (
+                <th key={getCestFieldKey(field)} style={styles.th}>
+                  {getCestFieldLabel(field)}
+                </th>
+              ))}
               <th style={styles.th}>S&amp;T INTERVENTION PROVIDED</th>
               <th style={styles.th}>ACTIONS</th>
             </tr>
@@ -5600,7 +5631,7 @@ export default function CEST() {
           <tbody>
             {paginatedProjects.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={11}>
+                <td style={styles.tdCenter} colSpan={11 + cestTableCustomFields.length}>
                   {projects.length === 0 ? 'Wala pang entries. Click “Add Project”.' : "No matching projects found."}
                 </td>
               </tr>
@@ -5650,6 +5681,17 @@ export default function CEST() {
                         ? "—"
                         : toNumber(p.numberOfMoa)}
                     </td>
+
+                    {cestTableCustomFields.map((field) => {
+                      const key = getCestFieldKey(field);
+                      const value = getCestCustomFieldValue(p, field);
+
+                      return (
+                        <td key={`${p.id}_${key}`} style={styles.td}>
+                          {String(value || "").trim() || "—"}
+                        </td>
+                      );
+                    })}
 
                     <td style={styles.td}>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -5755,12 +5797,28 @@ export default function CEST() {
         </table>
       </div>
 
-      <div style={styles.modernPaginationWrap}>
-        <div style={styles.modernPaginationRow}>
+      <div style={styles.googlePaginationWrap}>
+        <div style={styles.googleWordmark} aria-hidden="true">
+          <span style={styles.googleLetterBlue()}>D</span>
+
+          <div style={styles.googleWordmarkTrack}>
+            {paginationLogoOSlots.map((slot) => (
+              <span key={slot} style={styles.googleLetterO()}>
+                o
+              </span>
+            ))}
+
+            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
+          </div>
+
+          <span style={styles.googleLetterBlue()}>s</span>
+          <span style={styles.googleLetterBlue()}>t</span>
+        </div>
+
+        <div style={styles.googlePaginationRow}>
           <button
             type="button"
-            className="modern-page-btn modern-page-arrow"
-            style={styles.modernPageBtn(pageWindowStart === 1, false)}
+            style={styles.googleNavBtn(pageWindowStart === 1)}
             onClick={() =>
               setCurrentPage((prev) =>
                 Math.max(
@@ -5771,34 +5829,36 @@ export default function CEST() {
               )
             }
             disabled={pageWindowStart === 1}
-            title="Previous pages"
           >
-            ‹
+            Previous
           </button>
 
-          {visiblePageNumbers.map((page) => {
-            const isActive = page === currentPage;
+          <div style={styles.googlePageNumbers}>
+            {visiblePageNumbers.map((page) => {
+              const isActive = page === currentPage;
 
-            return (
-              <button
-                key={page}
-                type="button"
-                className={`modern-page-btn ${isActive ? "modern-page-active" : ""}`}
-                style={styles.modernPageBtn(false, isActive)}
-                onClick={() => {
-                  setCurrentPage(page);
-                }}
-                title={`Page ${page}`}
-              >
-                {page}
-              </button>
-            );
-          })}
+              return isActive ? (
+                <span key={page} style={styles.googlePageCurrent}>
+                  {page}
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  type="button"
+                  style={styles.googlePageBtn}
+                  onClick={() => {
+                    setCurrentPage(page);
+                  }}
+                >
+                  {page}
+                </button>
+              );
+            })}
+          </div>
 
           <button
             type="button"
-            className="modern-page-btn modern-page-arrow"
-            style={styles.modernPageBtn(false, false)}
+            style={styles.googleNavBtn(false)}
             onClick={() =>
               setCurrentPage(
                 Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
@@ -5807,9 +5867,8 @@ export default function CEST() {
               )
             }
             disabled={false}
-            title="Next pages"
           >
-            ›
+            Next
           </button>
         </div>
       </div>
@@ -8127,7 +8186,7 @@ export default function CEST() {
             </div>
 
 
-            {cestCustomFields.length > 0 ? (
+            {cestProjectFormCustomFields.length > 0 ? (
               <div
                 style={{
                   padding: "0 16px 16px",
@@ -8136,7 +8195,7 @@ export default function CEST() {
               >
 
                 <div style={styles.grid}>
-                  {cestCustomFields.map((field) => {
+                  {cestProjectFormCustomFields.map((field) => {
                     const key = field.fieldKey || field.field_key || field.key;
                     const label = field.fieldLabel || field.field_label || field.label || key;
                     const type = String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();

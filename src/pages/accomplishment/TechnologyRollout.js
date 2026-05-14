@@ -830,6 +830,7 @@ export default function TechnologyRollout() {
       "REPRESENTATIVE DESIGNATION",
       "SEX",
       "NAME OF STAFF",
+      ...getVisibleTechRolloutCustomFields().map((field) => getTechRolloutCustomFieldLabel(field)),
       "QUARTER",
     ];
 
@@ -867,6 +868,7 @@ export default function TechnologyRollout() {
           r?.representativeDesignation || "",
           r?.sex || "",
           r?.nameOfStaff || r?.staffName || "",
+          ...getVisibleTechRolloutCustomFields().map((field) => getTechRolloutCustomFieldValue(r, field)),
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ]
           .map(csvEscape)
@@ -906,6 +908,10 @@ export default function TechnologyRollout() {
       "REPRESENTATIVE DESIGNATION": r?.representativeDesignation || "",
       SEX: r?.sex || "",
       "NAME OF STAFF": r?.nameOfStaff || r?.staffName || "",
+      ...getVisibleTechRolloutCustomFields().reduce((acc, field) => {
+        acc[getTechRolloutCustomFieldLabel(field)] = getTechRolloutCustomFieldValue(r, field);
+        return acc;
+      }, {}),
       QUARTER: r?.quarter ? `${String(r.quarter)}Q` : "",
     }));
 
@@ -973,6 +979,8 @@ export default function TechnologyRollout() {
         "CLASSIFICATION",
         "REPRESENTATIVE",
         "SEX",
+        ...getVisibleTechRolloutCustomFields().map((field) => getTechRolloutCustomFieldLabel(field)),
+        "NAME OF STAFF",
         "QUARTER",
       ]];
 
@@ -996,6 +1004,7 @@ export default function TechnologyRollout() {
           rep || "—",
           r?.sex || "",
           r?.nameOfStaff || r?.staffName || "",
+          ...getVisibleTechRolloutCustomFields().map((field) => getTechRolloutCustomFieldValue(r, field)),
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ];
       });
@@ -1039,6 +1048,10 @@ export default function TechnologyRollout() {
         ["Representative Name", r?.representativeName || "—"],
         ["Representative Designation", r?.representativeDesignation || "—"],
         ["Sex", r?.sex || "—"],
+        ...getVisibleTechRolloutCustomFields().map((field) => [
+          getTechRolloutCustomFieldLabel(field),
+          getTechRolloutCustomFieldValue(r, field),
+        ]),
         ["Name of Staff", r?.nameOfStaff || r?.staffName || "—"],
       ];
 
@@ -1135,6 +1148,10 @@ export default function TechnologyRollout() {
           ["Representative Name", r?.representativeName || "—"],
           ["Representative Designation", r?.representativeDesignation || "—"],
           ["Sex", r?.sex || "—"],
+          ...getVisibleTechRolloutCustomFields().map((field) => [
+            getTechRolloutCustomFieldLabel(field),
+            getTechRolloutCustomFieldValue(r, field),
+          ]),
           ["Name of Staff", r?.nameOfStaff || r?.staffName || "—"],
         ])
       );
@@ -1199,6 +1216,27 @@ export default function TechnologyRollout() {
         ? `${record.institutionAddressMeta.lat}, ${record.institutionAddressMeta.lng}`
         : "—";
 
+    const customPrintFields = getVisibleTechRolloutCustomFields()
+      .map(
+        (field) =>
+          `<div class="field"><div class="label">${escapeHtml(getTechRolloutCustomFieldLabel(field))}</div><div class="value">${escapeHtml(getTechRolloutCustomFieldValue(record, field))}</div></div>`
+      )
+      .join("");
+
+    const customPrintRows = getVisibleTechRolloutCustomFields()
+      .map(
+        (field) =>
+          `<tr><th>${escapeHtml(getTechRolloutCustomFieldLabel(field))}</th><td colspan="3">${escapeHtml(getTechRolloutCustomFieldValue(record, field))}</td></tr>`
+      )
+      .join("");
+
+    const customCompactFields = getVisibleTechRolloutCustomFields()
+      .map(
+        (field) =>
+          `<div><b>${escapeHtml(getTechRolloutCustomFieldLabel(field))}:</b> ${escapeHtml(getTechRolloutCustomFieldValue(record, field))}</div>`
+      )
+      .join("");
+
     const header = `
       <div class="header">
         <div>
@@ -1236,6 +1274,8 @@ export default function TechnologyRollout() {
         <div class="field"><div class="label">Sex</div><div class="value">${escapeHtml(record?.sex || "—")}</div></div>
         <div class="field"><div class="label">Name of Staff</div><div class="value">${escapeHtml(record?.nameOfStaff || record?.staffName || "—")}</div></div>
 
+        ${customPrintFields}
+
         <div class="field"><div class="label">Representative Name</div><div class="value">${escapeHtml(record?.representativeName || "—")}</div></div>
         <div class="field"><div class="label">Representative Designation</div><div class="value">${escapeHtml(record?.representativeDesignation || "—")}</div></div>
       </div>
@@ -1254,6 +1294,7 @@ export default function TechnologyRollout() {
           <tr><th>Institution Address</th><td colspan="3">${escapeHtml(record?.institutionAddress || "—")}</td></tr>
           <tr><th>Coordinates</th><td>${escapeHtml(coords)}</td><th>Sex</th><td>${escapeHtml(record?.sex || "—")}</td></tr>
           <tr><th>Representative</th><td>${escapeHtml(record?.representativeName || "—")}</td><th>Designation</th><td>${escapeHtml(record?.representativeDesignation || "—")}</td></tr>
+          ${customPrintRows}
         </tbody>
       </table>
     `;
@@ -1271,6 +1312,7 @@ export default function TechnologyRollout() {
         <div><b>Coords:</b> ${escapeHtml(coords)}</div>
         <div><b>Representative:</b> ${escapeHtml(record?.representativeName || "—")} (${escapeHtml(record?.sex || "—")})</div>
         <div><b>Name of Staff:</b> ${escapeHtml(record?.nameOfStaff || record?.staffName || "—")}</div>
+        ${customCompactFields}
         <div><b>Designation:</b> ${escapeHtml(record?.representativeDesignation || "—")}</div>
       </div>
     `;
@@ -1550,29 +1592,11 @@ export default function TechnologyRollout() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ];
-
-        if (!cancelled) setTechRolloutCustomFields(finalCustomFields);
+        if (!cancelled) setTechRolloutCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load Technology Rollout custom fields:", err);
         if (!cancelled) {
-          setTechRolloutCustomFields([
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ]);
+          setTechRolloutCustomFields([]);
         }
       }
     }
@@ -1693,7 +1717,7 @@ export default function TechnologyRollout() {
   }, []);
 
   const resetForm = () => {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, customFields: {}, movPhotos: [] });
   };
 
   useEffect(() => {
@@ -1896,31 +1920,63 @@ export default function TechnologyRollout() {
   };
 
 
+  const getTechRolloutCustomFieldKey = (field) =>
+    field.fieldKey || field.field_key || field.key || "";
+
+  const getTechRolloutCustomFieldLabel = (field) =>
+    cleanTechRolloutCustomLabel(
+      field.fieldLabel ||
+        field.field_label ||
+        field.label ||
+        getTechRolloutCustomFieldKey(field)
+    );
+
+  const getVisibleTechRolloutCustomFields = () =>
+    (techRolloutCustomFields || []).filter((field) => {
+      const key = String(getTechRolloutCustomFieldKey(field) || "").trim();
+      const label = String(getTechRolloutCustomFieldLabel(field) || "").trim();
+      const visible = field.isVisible ?? field.is_visible ?? true;
+      return key && label && visible;
+    });
+
+  const getFormTechRolloutCustomFields = () =>
+    getVisibleTechRolloutCustomFields().filter((field) => {
+      const showAdd = field.showAdd ?? field.show_add ?? true;
+      const showEdit = field.showEdit ?? field.show_edit ?? true;
+      if (editRecordId) return showEdit;
+      return showAdd;
+    });
+
+  const getTechRolloutCustomFieldValue = (entry, field) => {
+    const key = getTechRolloutCustomFieldKey(field);
+    const values = parseTechRolloutCustomFields(entry.customFields || entry.custom_fields);
+    const value = values?.[key];
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  };
+
   const getTechRolloutCustomPairs = (entry = {}) => {
     const values = parseTechRolloutCustomFields(entry.customFields || entry.custom_fields);
 
-    return (techRolloutCustomFields || []).map((field) => {
-      const key = field.fieldKey || field.field_key || field.key;
-      const rawLabel = field.fieldLabel || field.field_label || field.label || key;
-      const value = values?.[key];
+    return getVisibleTechRolloutCustomFields().map((field) => {
+      const key = getTechRolloutCustomFieldKey(field);
 
       return {
         key,
-        label: cleanTechRolloutCustomLabel(rawLabel),
-        value: value === null || value === undefined || value === "" ? "—" : String(value),
+        label: getTechRolloutCustomFieldLabel(field),
+        value: getTechRolloutCustomFieldValue(entry, field),
       };
     });
   };
 
   const renderTechRolloutCustomInputs = () => {
-    if (!techRolloutCustomFields.length) return null;
+    const fields = getFormTechRolloutCustomFields();
+    if (!fields.length) return null;
 
     return (
       <>
-        {techRolloutCustomFields.map((field) => {
-          const key = field.fieldKey || field.field_key || field.key;
-          const rawLabel = field.fieldLabel || field.field_label || field.label || key;
-          const label = cleanTechRolloutCustomLabel(rawLabel);
+        {fields.map((field) => {
+          const key = getTechRolloutCustomFieldKey(field);
+          const label = getTechRolloutCustomFieldLabel(field);
           const type = String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();
           const required = Boolean(field.isRequired ?? field.is_required ?? field.required ?? false);
 
@@ -2783,8 +2839,6 @@ export default function TechnologyRollout() {
     return records.find((r) => r.id === institutionAddressViewForId) || null;
   }, [institutionAddressViewForId, records]);
 
-  const PAGINATION_SCALE = 0.75;
-
   // ===== Styles (reused from Packaging) =====
   const styles = {
     page: { padding: 16, position: "relative", fontFamily },
@@ -2982,51 +3036,6 @@ export default function TechnologyRollout() {
       fontFamily,
       whiteSpace: "nowrap",
     },
-
-    modernPaginationWrap: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 22,
-      marginBottom: 10,
-      width: "100%",
-      transform: `scale(${PAGINATION_SCALE})`,
-      transformOrigin: "top center",
-    },
-
-    modernPaginationControls: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-      flexWrap: "wrap",
-      padding: "6px 0",
-    },
-
-    modernPageBtn: (disabled = false, active = false, arrow = false) => ({
-      minWidth: arrow ? 48 : 54,
-      height: 54,
-      padding: arrow ? "0 14px" : "0 16px",
-      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-      borderRadius: 14,
-      background: active ? "#3b82f6" : "#ffffff",
-      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
-      fontSize: arrow ? 26 : active ? 21 : 18,
-      fontWeight: 900,
-      cursor: disabled ? "not-allowed" : "pointer",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: active
-        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
-        : "0 8px 18px rgba(15, 23, 42, 0.06)",
-      opacity: disabled ? 0.45 : 1,
-      fontFamily,
-      lineHeight: 1,
-      userSelect: "none",
-      transition:
-        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
-    }),
 
     googlePaginationWrap: {
       display: "flex",
@@ -3605,7 +3614,12 @@ export default function TechnologyRollout() {
 
       {/* TABLE */}
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 2200 }}>
+        <table
+          style={{
+            ...styles.table,
+            minWidth: 2200 + getVisibleTechRolloutCustomFields().length * 160,
+          }}
+        >
           <thead>
             <tr>
               <th style={{ ...styles.th, width: 56 }}>NO.</th>
@@ -3620,6 +3634,11 @@ export default function TechnologyRollout() {
               <th style={styles.th}>CLASSIFICATION</th>
               <th style={styles.th}>NAME AND DESIGNATION OF REPRESENTATIVE</th>
               <th style={styles.th}>SEX</th>
+              {getVisibleTechRolloutCustomFields().map((field) => (
+                <th key={`custom-head-${getTechRolloutCustomFieldKey(field)}`} style={styles.th}>
+                  {getTechRolloutCustomFieldLabel(field)}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -3627,7 +3646,7 @@ export default function TechnologyRollout() {
           <tbody>
             {filteredRecords.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={13}>
+                <td style={styles.tdCenter} colSpan={13 + getVisibleTechRolloutCustomFields().length}>
                   {Number(serverTotalRows || 0) === 0
                     ? "Wala pang entries. Click “Add Project”."
                     : "Walang entries sa current filter. (Try “Clear Filters”)"}
@@ -3703,6 +3722,12 @@ export default function TechnologyRollout() {
 
                     <td style={styles.tdCenter}>{r.sex || "—"}</td>
 
+                    {getVisibleTechRolloutCustomFields().map((field) => (
+                      <td key={`custom-cell-${r.id}-${getTechRolloutCustomFieldKey(field)}`} style={styles.td}>
+                        {getTechRolloutCustomFieldValue(r, field)}
+                      </td>
+                    ))}
+
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
                         <button type="button" style={styles.tinyBtn} onClick={() => { setViewMode("list"); setViewRecordId(r.id); }}>View</button>
@@ -3763,70 +3788,84 @@ export default function TechnologyRollout() {
         </table>
       </div>
 
-      <div style={styles.modernPaginationWrap}>
-        <style>{`
-          .tech-rollout-page-btn:hover:not(:disabled):not(.tech-rollout-page-active) {
-            transform: translateY(-3px);
-            border-color: #93c5fd !important;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
-          }
+      <div style={styles.googlePaginationWrap}>
+        <div style={styles.googleWordmark} aria-hidden="true">
+          <span style={styles.googleLetterBlue()}>D</span>
 
-          .tech-rollout-page-btn:active:not(:disabled) {
-            transform: scale(0.94);
-          }
+          <div style={styles.googleWordmarkTrack}>
+            {paginationLogoOSlots.map((slot) => (
+              <span key={slot} style={styles.googleLetterO()}>
+                o
+              </span>
+            ))}
 
-          .tech-rollout-page-active {
-            animation: techrolloutActivePagePop 0.28s ease;
-          }
+            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
+          </div>
 
-          @keyframes techrolloutActivePagePop {
-            0% { transform: scale(0.88); }
-            70% { transform: scale(1.07); }
-            100% { transform: scale(1); }
-          }
-        `}</style>
+          <span style={styles.googleLetterBlue()}>s</span>
+          <span style={styles.googleLetterBlue()}>t</span>
+        </div>
 
-        <div style={styles.modernPaginationControls}>
+        <div style={styles.googlePaginationRow}>
           <button
             type="button"
-            className="tech-rollout-page-btn"
-            style={styles.modernPageBtn(pageWindowStart === 1, false, true)}
-            onClick={() => setCurrentPage((prev) => Math.max(1, pageWindowStart - PAGE_NUMBER_WINDOW))}
+            style={styles.googleNavBtn(pageWindowStart === 1)}
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.max(
+                  1,
+                  Math.floor((prev - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW -
+                  (PAGE_NUMBER_WINDOW - 1)
+                )
+              )
+            }
             disabled={pageWindowStart === 1}
-            title="Previous page group"
           >
-            ‹
+            Previous
           </button>
 
-          {visiblePageNumbers.map((pageNum) => {
-            const active = pageNum === currentPage;
+          <div style={styles.googlePageNumbers}>
+            {visiblePageNumbers.map((page) => {
+              const isActive = page === currentPage;
 
-            return (
-              <button
-                key={pageNum}
-                type="button"
-                className={`tech-rollout-page-btn ${active ? "tech-rollout-page-active" : ""}`}
-                style={styles.modernPageBtn(false, active, false)}
-                onClick={() => setCurrentPage(pageNum)}
-                title={`Page ${pageNum}`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+              if (isActive) {
+                return (
+                  <span key={page} style={styles.googlePageCurrent}>
+                    {page}
+                  </span>
+                );
+              }
+
+              return (
+                <button
+                  key={page}
+                  type="button"
+                  style={styles.googlePageBtn}
+                  onClick={() => setCurrentPage(page)}
+                  disabled={false}
+                >
+                  {page}
+                </button>
+              );
+            })}
+          </div>
 
           <button
             type="button"
-            className="tech-rollout-page-btn"
-            style={styles.modernPageBtn(false, false, true)}
-            onClick={() => setCurrentPage((prev) => pageWindowStart + PAGE_NUMBER_WINDOW)}
-            title="Next page group"
+            style={styles.googleNavBtn(false)}
+            onClick={() =>
+              setCurrentPage(
+                Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
+                PAGE_NUMBER_WINDOW +
+                1
+              )
+            }
+            disabled={false}
           >
-            ›
+            Next
           </button>
         </div>
       </div>
-
 
       {institutionAddressViewForId && (
         <AddressViewModal record={institutionAddressViewRecord} onClose={() => setInstitutionAddressViewForId(null)} />

@@ -480,6 +480,8 @@ export default function TechnologyTraining() {
       "",
     movPhotos: parseTrainingPhotos(row.movPhotos || row.photos || row.mov_photos),
     photos: parseTrainingPhotos(row.photos || row.movPhotos || row.mov_photos),
+    customFields: parseTechTrainingCustomFields(row.customFields || row.custom_fields),
+    custom_fields: parseTechTrainingCustomFields(row.custom_fields || row.customFields),
   });
 
   // =========================
@@ -688,29 +690,11 @@ export default function TechnologyTraining() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ];
-
-        if (!cancelled) setTechTrainingCustomFields(finalCustomFields);
+        if (!cancelled) setTechTrainingCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load Technology Training custom fields:", err);
         if (!cancelled) {
-          setTechTrainingCustomFields([
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ]);
+          setTechTrainingCustomFields([]);
         }
       }
     }
@@ -991,6 +975,12 @@ export default function TechnologyTraining() {
       FirmsAssociations: e.firmsAssociationsList || "",
       TrainorAffiliation: e.trainorAffiliation || "",
       ProgramProjectUnit: e.programProjectUnit || "",
+      ...Object.fromEntries(
+        getVisibleTechTrainingCustomFields().map((field) => [
+          getTechTrainingCustomFieldLabel(field),
+          getTechTrainingCustomFieldValue(e, field),
+        ])
+      ),
     }));
 
     const headers = [
@@ -1003,6 +993,9 @@ export default function TechnologyTraining() {
       "FirmsAssociations",
       "TrainorAffiliation",
       "ProgramProjectUnit",
+      ...getVisibleTechTrainingCustomFields().map((field) =>
+        getTechTrainingCustomFieldLabel(field)
+      ),
     ];
 
     const escapeCSV = (value) => {
@@ -1057,11 +1050,40 @@ export default function TechnologyTraining() {
   // =========================
   const escapeHtml = (value = "") => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   const downloadBlob = (blob, filename) => { const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); };
-  const trainingColumns = ["No.", "Program", "Province", "Date", "Venue/Address", "Coordinates", "Title", "No. of Firms", "Female", "Male", "Total Participants", "Name of Staff", "Trainor/Affiliation", "Program/Project/Unit", "Means of Verification", "MOV Photos", "DOST Cost", "Partner Cost", "Total Cost"];
+  const getTrainingColumns = () => [
+    "No.",
+    "Program",
+    "Province",
+    "Date",
+    "Venue/Address",
+    "Coordinates",
+    "Title",
+    "No. of Firms",
+    "Female",
+    "Male",
+    "Total Participants",
+    "Name of Staff",
+    "Trainor/Affiliation",
+    "Program/Project/Unit",
+    ...getVisibleTechTrainingCustomFields().map((field) =>
+      getTechTrainingCustomFieldLabel(field)
+    ),
+    "Means of Verification",
+    "MOV Photos",
+    "DOST Cost",
+    "Partner Cost",
+    "Total Cost",
+  ];
   const buildTrainingRows = (scope = "bulk", entryId = null) => {
     const source = scope === "row" && entryId ? filteredEntries.filter((e) => e.id === entryId) : filteredEntries;
     return source.map((e, i) => {
       const enriched = enrichEntry(e);
+      const customValues = {};
+      getVisibleTechTrainingCustomFields().forEach((field) => {
+        customValues[getTechTrainingCustomFieldLabel(field)] =
+          getTechTrainingCustomFieldValue(enriched, field);
+      });
+
       return {
         "No.": i + 1,
         Program: enriched?.program || "",
@@ -1077,6 +1099,7 @@ export default function TechnologyTraining() {
         "Name of Staff": enriched?.staffName || enriched?.nameOfStaff || "",
         "Trainor/Affiliation": enriched?.trainorAffiliation || "",
         "Program/Project/Unit": enriched?.programProjectUnit || "",
+        ...customValues,
         "Means of Verification": enriched?.meansOfVerification || enriched?.means_of_verification || "",
         "MOV Photos": Array.isArray(enriched?.movPhotos || enriched?.photos) ? (enriched?.movPhotos || enriched?.photos).length : 0,
         "DOST Cost": enriched?.costDost || "",
@@ -1104,6 +1127,7 @@ export default function TechnologyTraining() {
   const confirmExport = async () => {
     if (!canExport) return denyPrivilege("export Technology Training records");
     const rows = buildTrainingRows(exportModal.scope, exportModal.entryId);
+    const trainingColumns = getTrainingColumns();
     const base = exportModal.scope === "row" ? `technology_training_${exportModal.entryId || "row"}` : "technology_training_filtered";
     if (exportModal.format === "csv") {
       const csv = [trainingColumns.join(","), ...rows.map((r) => trainingColumns.map((c) => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(","))].join("\n");
@@ -1125,13 +1149,12 @@ export default function TechnologyTraining() {
   const confirmPrint = () => {
     if (!canExport) return denyPrivilege("print Technology Training records");
     const rows = buildTrainingRows(printModal.scope, printModal.entryId);
+    const trainingColumns = getTrainingColumns();
     const body = printModal.layout === "TABLE" ? `<table><thead><tr>${trainingColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${trainingColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${trainingColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>` : `${rows.length ? rows.map((r) => `<div class="card">${trainingColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`}`;
     const win = window.open("", "_blank", "width=1200,height=900"); if (!win) return alert("Popup blocked. Please allow popups for printing.");
     win.document.write(`<!doctype html><html><head><title>Technology Training Print</title><style>@page{size:${printModal.preset || "a4"} ${printModal.orientation || "landscape"};margin:10mm;}body{font-family:Arial;padding:12px;color:#0f172a}h1{font-size:18px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #94a3b8;padding:6px;font-size:11px;vertical-align:top}th{background:#e2e8f0}.card{border:1px solid #94a3b8;border-radius:8px;padding:10px;margin-bottom:10px;display:grid;gap:4px;font-size:12px}</style></head><body><h1>Technology Training Print</h1>${body}<script>setTimeout(()=>window.print(),250)</script></body></html>`); win.document.close(); win.focus();
     setPrintModal((p) => ({ ...p, open: false }));
   };
-
-  const PAGINATION_SCALE = 0.75;
 
   // =========================
   // Styles
@@ -1558,51 +1581,6 @@ export default function TechnologyTraining() {
       fontSize: 11,
       fontWeight: 900,
     },
-    modernPaginationWrap: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 22,
-      marginBottom: 10,
-      width: "100%",
-      transform: `scale(${PAGINATION_SCALE})`,
-            transformOrigin: "top center",
-    },
-
-    modernPaginationControls: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-      flexWrap: "wrap",
-      padding: "6px 0",
-    },
-
-    modernPageBtn: (disabled = false, active = false, arrow = false) => ({
-      minWidth: arrow ? 48 : 54,
-      height: 54,
-      padding: arrow ? "0 14px" : "0 16px",
-      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-      borderRadius: 14,
-      background: active ? "#3b82f6" : "#ffffff",
-      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
-      fontSize: arrow ? 26 : active ? 21 : 18,
-      fontWeight: 900,
-      cursor: disabled ? "not-allowed" : "pointer",
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: active
-        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
-        : "0 8px 18px rgba(15, 23, 42, 0.06)",
-      opacity: disabled ? 0.45 : 1,
-      fontFamily,
-      lineHeight: 1,
-      userSelect: "none",
-      transition:
-        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
-    }),
-
     googlePaginationWrap: {
       display: "flex",
       flexDirection: "column",
@@ -1753,31 +1731,64 @@ export default function TechnologyTraining() {
   };
 
 
+  const getTechTrainingCustomFieldKey = (field) =>
+    field.fieldKey || field.field_key || field.key || "";
+
+  const getTechTrainingCustomFieldLabel = (field) =>
+    cleanTechTrainingCustomLabel(
+      field.fieldLabel ||
+        field.field_label ||
+        field.label ||
+        getTechTrainingCustomFieldKey(field)
+    );
+
+  const getVisibleTechTrainingCustomFields = () =>
+    (techTrainingCustomFields || []).filter((field) => {
+      const key = String(getTechTrainingCustomFieldKey(field) || "").trim();
+      const label = String(getTechTrainingCustomFieldLabel(field) || "").trim();
+      const visible = field.isVisible ?? field.is_visible ?? true;
+      return key && label && visible;
+    });
+
+  const getFormTechTrainingCustomFields = () =>
+    getVisibleTechTrainingCustomFields().filter((field) => {
+      const showAdd = field.showAdd ?? field.show_add ?? true;
+      const showEdit = field.showEdit ?? field.show_edit ?? true;
+      if (entryModal?.mode === "edit") return showEdit;
+      return showAdd;
+    });
+
+  const getTechTrainingCustomFieldValue = (entry, field) => {
+    const key = getTechTrainingCustomFieldKey(field);
+    const values = parseTechTrainingCustomFields(entry?.customFields || entry?.custom_fields);
+    const value = values?.[key];
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  };
+
   const getTechTrainingCustomPairs = (entry = {}) => {
     const values = parseTechTrainingCustomFields(entry.customFields || entry.custom_fields);
 
-    return (techTrainingCustomFields || []).map((field) => {
-      const key = field.fieldKey || field.field_key || field.key;
-      const rawLabel = field.fieldLabel || field.field_label || field.label || key;
+    return getVisibleTechTrainingCustomFields().map((field) => {
+      const key = getTechTrainingCustomFieldKey(field);
       const value = values?.[key];
 
       return {
         key,
-        label: cleanTechTrainingCustomLabel(rawLabel),
+        label: getTechTrainingCustomFieldLabel(field),
         value: value === null || value === undefined || value === "" ? "—" : String(value),
       };
     });
   };
 
   const renderTechTrainingCustomInputs = () => {
-    if (!techTrainingCustomFields.length) return null;
+    const fields = getFormTechTrainingCustomFields();
+    if (!fields.length) return null;
 
     return (
       <>
-        {techTrainingCustomFields.map((field) => {
-          const key = field.fieldKey || field.field_key || field.key;
-          const rawLabel = field.fieldLabel || field.field_label || field.label || key;
-          const label = cleanTechTrainingCustomLabel(rawLabel);
+        {fields.map((field) => {
+          const key = getTechTrainingCustomFieldKey(field);
+          const label = getTechTrainingCustomFieldLabel(field);
           const type = String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();
           const required = Boolean(field.isRequired ?? field.is_required ?? field.required ?? false);
 
@@ -3259,7 +3270,7 @@ export default function TechnologyTraining() {
 
       {/* MAIN TABLE REDUCED */}
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 1650 }}>
+        <table style={{ ...styles.table, minWidth: 1650 + getVisibleTechTrainingCustomFields().length * 160 }}>
           <colgroup>
             <col style={{ width: "3%" }} />
             <col style={{ width: "6%" }} />
@@ -3270,6 +3281,9 @@ export default function TechnologyTraining() {
             <col style={{ width: "10%" }} />
             <col style={{ width: "10%" }} />
             <col style={{ width: "10%" }} />
+            {getVisibleTechTrainingCustomFields().map((field) => (
+              <col key={`custom-col-${getTechTrainingCustomFieldKey(field)}`} style={{ width: "10%" }} />
+            ))}
             <col style={{ width: "11%" }} />
           </colgroup>
 
@@ -3284,6 +3298,11 @@ export default function TechnologyTraining() {
               <th style={styles.th}>LIST OF FIRMS / ASSOCIATIONS</th>
               <th style={styles.th}>NAME OF TRAINOR / AFFILIATION</th>
               <th style={styles.th}>NAME OF PROGRAM / PROJECT / UNIT</th>
+              {getVisibleTechTrainingCustomFields().map((field) => (
+                <th key={`custom-head-${getTechTrainingCustomFieldKey(field)}`} style={styles.th}>
+                  {getTechTrainingCustomFieldLabel(field)}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -3291,7 +3310,7 @@ export default function TechnologyTraining() {
           <tbody>
             {filteredEntries.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={10}>
+                <td style={styles.tdCenter} colSpan={10 + getVisibleTechTrainingCustomFields().length}>
                   Wala pang entries. Click “Add Entry”.
                 </td>
               </tr>
@@ -3341,6 +3360,12 @@ export default function TechnologyTraining() {
                     <td style={styles.td}>{e.firmsAssociationsList || "—"}</td>
                     <td style={styles.td}>{e.trainorAffiliation || "—"}</td>
                     <td style={styles.td}>{e.programProjectUnit || "—"}</td>
+
+                    {getVisibleTechTrainingCustomFields().map((field) => (
+                      <td key={`custom-cell-${e.id}-${getTechTrainingCustomFieldKey(field)}`} style={styles.td}>
+                        {getTechTrainingCustomFieldValue(e, field)}
+                      </td>
+                    ))}
 
                     <td style={styles.tdCenter}>
                       <div
@@ -3413,70 +3438,66 @@ export default function TechnologyTraining() {
         </table>
       </div>
 
-      <div style={styles.modernPaginationWrap}>
-        <style>{`
-          .tech-training-page-btn:hover:not(:disabled):not(.tech-training-page-active) {
-            transform: translateY(-3px);
-            border-color: #93c5fd !important;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
-          }
+      <div style={styles.googlePaginationWrap}>
+        <div style={styles.googleWordmark} aria-hidden="true">
+          <span style={styles.googleLetterBlue({ marginRight: 2 })}>D</span>
 
-          .tech-training-page-btn:active:not(:disabled) {
-            transform: scale(0.94);
-          }
+          <div
+            style={{
+              ...styles.googleWordmarkTrack,
+              width: paginationLogoOSlots.length * 20,
+            }}
+          >
+            {paginationLogoOSlots.map((slot) => (
+              <span key={`slot-${slot}`} style={styles.googleLetterO()}>
+                o
+              </span>
+            ))}
 
-          .tech-training-page-active {
-            animation: techtrainingActivePagePop 0.28s ease;
-          }
+            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
+          </div>
 
-          @keyframes techtrainingActivePagePop {
-            0% { transform: scale(0.88); }
-            70% { transform: scale(1.07); }
-            100% { transform: scale(1); }
-          }
-        `}</style>
+          <span style={styles.googleLetterBlue({ marginLeft: 2 })}>st</span>
+        </div>
 
-        <div style={styles.modernPaginationControls}>
+        <div style={styles.googlePaginationRow}>
           <button
             type="button"
-            className="tech-training-page-btn"
-            style={styles.modernPageBtn(pageWindowStart === 1, false, true)}
+            style={styles.googleNavBtn(currentPage <= 1)}
+            disabled={currentPage <= 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, pageWindowStart - PAGE_NUMBER_WINDOW))}
-            disabled={pageWindowStart === 1}
-            title="Previous page group"
           >
-            ‹
+            Previous
           </button>
 
-          {visiblePageNumbers.map((pageNum) => {
-            const active = pageNum === currentPage;
-
-            return (
-              <button
-                key={pageNum}
-                type="button"
-                className={`tech-training-page-btn ${active ? "tech-training-page-active" : ""}`}
-                style={styles.modernPageBtn(false, active, false)}
-                onClick={() => setCurrentPage(pageNum)}
-                title={`Page ${pageNum}`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+          <div style={styles.googlePageNumbers}>
+            {visiblePageNumbers.map((pageNum) =>
+              pageNum === currentPage ? (
+                <span key={pageNum} style={styles.googlePageCurrent}>
+                  {pageNum}
+                </span>
+              ) : (
+                <button
+                  key={pageNum}
+                  type="button"
+                  style={styles.googlePageBtn}
+                  onClick={() => setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </button>
+              )
+            )}
+          </div>
 
           <button
             type="button"
-            className="tech-training-page-btn"
-            style={styles.modernPageBtn(false, false, true)}
+            style={styles.googleNavBtn(false)}
             onClick={() => setCurrentPage((prev) => pageWindowStart + PAGE_NUMBER_WINDOW)}
-            title="Next page group"
           >
-            ›
+            Next
           </button>
         </div>
       </div>
-
 
       {/* Venue quick view modal */}
       {venueViewEntryId && (
@@ -4266,6 +4287,11 @@ export default function TechnologyTraining() {
                         <th style={styles.th}>LIST OF FIRMS / ASSOCIATIONS</th>
                         <th style={styles.th}>NAME OF TRAINOR / AFFILIATION</th>
                         <th style={styles.th}>NAME OF PROGRAM / PROJECT / UNIT</th>
+                        {getVisibleTechTrainingCustomFields().map((field) => (
+                          <th key={`view-table-custom-head-${getTechTrainingCustomFieldKey(field)}`} style={styles.th}>
+                            {getTechTrainingCustomFieldLabel(field)}
+                          </th>
+                        ))}
                         <th style={styles.th}>DOST COST</th>
                         <th style={styles.th}>PARTNER AGENCY COST</th>
                         <th style={styles.th}>TOTAL COST</th>
@@ -4331,6 +4357,11 @@ export default function TechnologyTraining() {
                         <td style={styles.td}>{viewEntry.firmsAssociationsList || "—"}</td>
                         <td style={styles.td}>{viewEntry.trainorAffiliation || "—"}</td>
                         <td style={styles.td}>{viewEntry.programProjectUnit || "—"}</td>
+                        {getVisibleTechTrainingCustomFields().map((field) => (
+                          <td key={`view-table-custom-cell-${getTechTrainingCustomFieldKey(field)}`} style={styles.td}>
+                            {getTechTrainingCustomFieldValue(viewEntry, field)}
+                          </td>
+                        ))}
                         <td style={styles.tdCenter}>{peso(viewEntry.costDost)}</td>
                         <td style={styles.tdCenter}>{peso(viewEntry.costPartnerAgency)}</td>
                         <td style={styles.tdCenter}>{peso(viewEntry.costTotal)}</td>

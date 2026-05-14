@@ -599,6 +599,9 @@ export default function PackagingAndLabeling() {
       "MEANS OF VERIFICATION",
       "NAME OF STAFF",
       "REMARKS",
+      ...packagingCustomFields.map((field) =>
+        cleanPackagingCustomLabel(field.fieldLabel || field.field_label || field.label || field.fieldKey || field.field_key || field.key)
+      ),
       "PHOTO COUNT",
       "QUARTER",
     ];
@@ -634,6 +637,7 @@ export default function PackagingAndLabeling() {
           r?.meansOfVerification || "",
           r?.nameOfStaff || "",
           r?.remarks || "",
+          ...getPackagingCustomPairs(r).map((item) => item.value === "—" ? "" : item.value),
           Array.isArray(r?.photos) ? r.photos.length : 0,
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ]
@@ -670,6 +674,9 @@ export default function PackagingAndLabeling() {
       "MEANS OF VERIFICATION": r?.meansOfVerification || "",
       "NAME OF STAFF": r?.nameOfStaff || "",
       REMARKS: r?.remarks || "",
+      ...Object.fromEntries(
+        getPackagingCustomPairs(r).map((item) => [item.label, item.value === "—" ? "" : item.value])
+      ),
       "PHOTO COUNT": Array.isArray(r?.photos) ? r.photos.length : 0,
       QUARTER: r?.quarter ? `${String(r.quarter)}Q` : "",
     }));
@@ -731,6 +738,10 @@ export default function PackagingAndLabeling() {
 
     // Helper: dataset table (like Excel export)
     const buildDatasetTable = (rowsToUse) => {
+      const customHeaders = packagingCustomFields.map((field) =>
+        cleanPackagingCustomLabel(field.fieldLabel || field.field_label || field.label || field.fieldKey || field.field_key || field.key)
+      );
+
       const head = [[
         "NO",
         "PROVINCE",
@@ -750,6 +761,7 @@ export default function PackagingAndLabeling() {
         "MEANS OF VERIFICATION",
         "NAME OF STAFF",
         "REMARKS",
+        ...customHeaders,
         "PHOTO COUNT",
         "QUARTER",
       ]];
@@ -779,6 +791,7 @@ export default function PackagingAndLabeling() {
           r?.meansOfVerification || "",
           r?.nameOfStaff || "",
           r?.remarks || "",
+          ...getPackagingCustomPairs(r).map((item) => item.value === "—" ? "" : item.value),
           Array.isArray(r?.photos) ? r.photos.length : 0,
           r?.quarter ? `${String(r.quarter)}Q` : "",
         ];
@@ -846,6 +859,7 @@ export default function PackagingAndLabeling() {
         ["Products", flattenProducts(r) || "—"],
         ["Means of Verification", r?.meansOfVerification || "—"],
         ["Name of Staff", r?.nameOfStaff || "—"],
+        ...getPackagingCustomPairs(r).map((item) => [item.label, item.value]),
         ["Remarks", r?.remarks || "—"],
         ["Photo Count", Array.isArray(r?.photos) ? r.photos.length : 0],
       ];
@@ -986,6 +1000,7 @@ export default function PackagingAndLabeling() {
           ["Products", products],
           ["Means of Verification", r?.meansOfVerification || "—"],
           ["Name of Staff", r?.nameOfStaff || "—"],
+          ...getPackagingCustomPairs(r).map((item) => [item.label, item.value]),
           ["Remarks", r?.remarks || "—"],
           ["Photo Count", Array.isArray(r?.photos) ? r.photos.length : 0],
         ])
@@ -1236,18 +1251,7 @@ export default function PackagingAndLabeling() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ];
-
-        if (!cancelled) setPackagingCustomFields(finalCustomFields);
+        if (!cancelled) setPackagingCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load Packaging custom fields:", err);
         if (!cancelled) setPackagingCustomFields([]);
@@ -1668,6 +1672,25 @@ export default function PackagingAndLabeling() {
         ? `${record.addressMeta.lat}, ${record.addressMeta.lng}`
         : "—";
 
+    const customFieldsHtml = getPackagingCustomPairs(record)
+      .map((item) => `
+        <div class="field full">
+          <div class="label">${escapeHtml(item.label)}</div>
+          <div class="value">${escapeHtml(item.value || "—")}</div>
+        </div>
+      `)
+      .join("");
+
+    const customTableRowsHtml = getPackagingCustomPairs(record)
+      .map((item) => `
+          <tr><th>${escapeHtml(item.label)}</th><td colspan="3">${escapeHtml(item.value || "—")}</td></tr>
+      `)
+      .join("");
+
+    const customCompactHtml = getPackagingCustomPairs(record)
+      .map((item) => `<div><b>${escapeHtml(item.label)}:</b> ${escapeHtml(item.value || "—")}</div>`)
+      .join("");
+
     const header = `
       <div class="header">
         <div>
@@ -1739,6 +1762,7 @@ export default function PackagingAndLabeling() {
           <div class="label">Name of Staff</div>
           <div class="value">${escapeHtml(record.nameOfStaff || "—")}</div>
         </div>
+        ${customFieldsHtml}
         <div class="field full">
           <div class="label">Remarks</div>
           <div class="value">${escapeHtml(record.remarks || "—")}</div>
@@ -1768,6 +1792,7 @@ export default function PackagingAndLabeling() {
           <tr><th>Address / Venue</th><td colspan="3">${escapeHtml(record.address || "—")}</td></tr>
           <tr><th>Means of Verification</th><td colspan="3">${escapeHtml(record.meansOfVerification || "—")}</td></tr>
           <tr><th>Name of Staff</th><td colspan="3">${escapeHtml(record.nameOfStaff || "—")}</td></tr>
+          ${customTableRowsHtml}
           <tr><th>Remarks</th><td colspan="3">${escapeHtml(record.remarks || "—")}</td></tr>
         </tbody>
       </table>
@@ -1794,6 +1819,7 @@ export default function PackagingAndLabeling() {
         <div><b>Products:</b> ${productInline}</div>
         <div><b>MOV:</b> ${escapeHtml(record.meansOfVerification || "—")}</div>
         <div><b>Name of Staff:</b> ${escapeHtml(record.nameOfStaff || "—")}</div>
+        ${customCompactHtml}
         <div><b>Photos:</b> ${photos.length}</div>
         ${record.remarks
         ? `<div><b>Remarks:</b> ${escapeHtml(record.remarks)}</div>`
@@ -2170,9 +2196,17 @@ export default function PackagingAndLabeling() {
   const renderPackagingCustomInputs = () => {
     if (!packagingCustomFields.length) return null;
 
+    const fieldsForMode = packagingCustomFields.filter((field) => {
+      const allowInAdd = field.showAdd ?? field.show_add ?? true;
+      const allowInEdit = field.showEdit ?? field.show_edit ?? true;
+      return editRecordId ? allowInEdit : allowInAdd;
+    });
+
+    if (!fieldsForMode.length) return null;
+
     return (
       <>
-        {packagingCustomFields.map((field) => {
+        {fieldsForMode.map((field) => {
           const key = field.fieldKey || field.field_key || field.key;
           const rawLabel = field.fieldLabel || field.field_label || field.label || key;
           const label = cleanPackagingCustomLabel(rawLabel);
@@ -4590,6 +4624,9 @@ export default function PackagingAndLabeling() {
             <col style={{ width: "5%" }} />
             <col style={{ width: "13%" }} />
             <col style={{ width: "16%" }} />
+            {packagingCustomFields.map((field) => (
+              <col key={`pcl-custom-col-${field.fieldKey || field.field_key || field.key}`} style={{ width: "10%" }} />
+            ))}
             <col style={{ width: "12%" }} />
           </colgroup>
 
@@ -4606,6 +4643,13 @@ export default function PackagingAndLabeling() {
               <th style={styles.th}>SEX (M/F)</th>
               <th style={styles.th}>Name of Firm/Institution / Address / Venue</th>
               <th style={styles.th}>Means of Verification</th>
+              {packagingCustomFields.map((field) => {
+                const key = field.fieldKey || field.field_key || field.key;
+                const label = cleanPackagingCustomLabel(field.fieldLabel || field.field_label || field.label || key);
+                return (
+                  <th key={`pcl-custom-th-${key}`} style={styles.th}>{label}</th>
+                );
+              })}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -4613,7 +4657,7 @@ export default function PackagingAndLabeling() {
           <tbody>
             {filteredRecords.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={12}>
+                <td style={styles.tdCenter} colSpan={12 + packagingCustomFields.length}>
                   Walang entries sa current filter. (Try “Clear Filters”)
                 </td>
               </tr>
@@ -4710,6 +4754,12 @@ export default function PackagingAndLabeling() {
                         </div>
                       </div>
                     </td>
+
+                    {getPackagingCustomPairs(r).map((item) => (
+                      <td key={`pcl-custom-td-${r.id}-${item.key}`} style={styles.td}>
+                        {item.value}
+                      </td>
+                    ))}
 
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>

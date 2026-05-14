@@ -852,30 +852,10 @@ export default function TechnologyPromotion() {
               Number(b.sortOrder ?? b.sort_order ?? 999)
           );
 
-        const finalCustomFields = customFields.length
-          ? customFields
-          : [
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ];
-
-        if (!cancelled) setTechPromoCustomFields(finalCustomFields);
+        if (!cancelled) setTechPromoCustomFields(customFields);
       } catch (err) {
         console.error("Failed to load Technology Promotion custom fields:", err);
-        if (!cancelled) {
-          setTechPromoCustomFields([
-            {
-              fieldKey: "funding",
-              fieldLabel: "Funding",
-              fieldType: "Text",
-              sortOrder: 999,
-            },
-          ]);
-        }
+        if (!cancelled) setTechPromoCustomFields([]);
       }
     }
 
@@ -991,6 +971,7 @@ export default function TechnologyPromotion() {
         entry.staffName,
         entry.sourceModule,
         entry.sourceType,
+        ...Object.values(parseTechPromoCustomFields(entry.customFields || entry.custom_fields)),
       ]
         .filter(Boolean)
         .join(" ")
@@ -1072,32 +1053,88 @@ export default function TechnologyPromotion() {
   };
 
 
+  const getTechPromoCustomFieldKey = (field) =>
+    field.fieldKey || field.field_key || field.key || "";
+
+  const getTechPromoCustomFieldLabel = (field) =>
+    cleanTechPromoCustomLabel(
+      field.fieldLabel || field.field_label || field.label || getTechPromoCustomFieldKey(field)
+    );
+
+  const getTechPromoCustomFieldValue = (entry, field) => {
+    const key = getTechPromoCustomFieldKey(field);
+    const values = parseTechPromoCustomFields(entry.customFields || entry.custom_fields);
+    const value = values?.[key];
+    return value === null || value === undefined || value === "" ? "—" : String(value);
+  };
+
+  const getVisibleTechPromoCustomFields = () =>
+    (techPromoCustomFields || []).filter((field) => {
+      const key = String(getTechPromoCustomFieldKey(field) || "").trim();
+      const label = String(getTechPromoCustomFieldLabel(field) || "").trim();
+      const visible = field.isVisible ?? field.is_visible ?? true;
+      return key && label && visible;
+    });
+
+  const getFormTechPromoCustomFields = () =>
+    getVisibleTechPromoCustomFields().filter((field) => {
+      const showAdd = field.showAdd ?? field.show_add ?? true;
+      const showEdit = field.showEdit ?? field.show_edit ?? true;
+      if (entryModal?.mode === "edit") return showEdit;
+      return showAdd;
+    });
+
   // =========================
   // Export / Print popup actions
   // =========================
   const escapeHtml = (value = "") => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   const downloadBlob = (blob, filename) => { const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); };
   const safeFilePart = (value = "") => String(value || "").trim().replace(/[^\w-]+/g, "_").slice(0, 60) || "export";
-  const promoColumns = ["No.", "Project", "Activity Date", "Technology Promoted", "Technology Generator", "Mode of Promotion", "Activity Title", "Activity Venue/Address", "Coordinates", "Customer/Participant", "Customer Address", "Sex", "Name of Staff", "Means of Verification", "Source"];
+  const getPromoColumns = () => [
+    "No.",
+    "Project",
+    "Activity Date",
+    "Technology Promoted",
+    "Technology Generator",
+    "Mode of Promotion",
+    "Activity Title",
+    "Activity Venue/Address",
+    "Coordinates",
+    "Customer/Participant",
+    "Customer Address",
+    "Sex",
+    ...getVisibleTechPromoCustomFields().map((field) => getTechPromoCustomFieldLabel(field)),
+    "Name of Staff",
+    "Means of Verification",
+    "Source",
+  ];
   const buildPromoRows = (scope = "bulk", entryId = null) => {
     const source = scope === "row" && entryId ? searchedEntries.filter((e) => String(e.id) === String(entryId)) : searchedEntries;
-    return source.map((e, i) => ({
-      "No.": i + 1,
-      Project: e.project || e.projectName || "",
-      "Activity Date": formatDateDisplay(e.activityDate),
-      "Technology Promoted": e.technologyPromoted || "",
-      "Technology Generator": e.technologyGenerator || "",
-      "Mode of Promotion": e.modeOfPromotion || "",
-      "Activity Title": e.activityTitle || "",
-      "Activity Venue/Address": venueAddressText(e),
-      Coordinates: venueCoordText(e),
-      "Customer/Participant": e.customerName || "",
-      "Customer Address": e.customerAddress || "",
-      Sex: e.sex || "",
-      "Name of Staff": e.staffName || "",
-      "Means of Verification": e.meansOfVerification || "",
-      Source: sourceLabel(e) || "",
-    }));
+    return source.map((e, i) => {
+      const customValues = {};
+      getVisibleTechPromoCustomFields().forEach((field) => {
+        customValues[getTechPromoCustomFieldLabel(field)] = getTechPromoCustomFieldValue(e, field);
+      });
+
+      return {
+        "No.": i + 1,
+        Project: e.project || e.projectName || "",
+        "Activity Date": formatDateDisplay(e.activityDate),
+        "Technology Promoted": e.technologyPromoted || "",
+        "Technology Generator": e.technologyGenerator || "",
+        "Mode of Promotion": e.modeOfPromotion || "",
+        "Activity Title": e.activityTitle || "",
+        "Activity Venue/Address": venueAddressText(e),
+        Coordinates: venueCoordText(e),
+        "Customer/Participant": e.customerName || "",
+        "Customer Address": e.customerAddress || "",
+        Sex: e.sex || "",
+        ...customValues,
+        "Name of Staff": e.staffName || "",
+        "Means of Verification": e.meansOfVerification || "",
+        Source: sourceLabel(e) || "",
+      };
+    });
   };
   const openPrintPopupRow = (entryId) => {
     if (!canExport) return denyAccess("print");
@@ -1118,6 +1155,7 @@ export default function TechnologyPromotion() {
   const confirmExport = async () => {
     if (!canExport) return denyAccess("export");
     const rows = buildPromoRows(exportModal.scope, exportModal.entryId);
+    const promoColumns = getPromoColumns();
     const base = exportModal.scope === "row" ? `technology_promotion_${safeFilePart(exportModal.entryId)}` : `technology_promotion_filtered_${rows.length}_rows`;
     if (exportModal.format === "csv") {
       const csv = [promoColumns.join(","), ...rows.map((r) => promoColumns.map((c) => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(","))].join("\n");
@@ -1139,6 +1177,7 @@ export default function TechnologyPromotion() {
   const confirmPrint = () => {
     if (!canExport) return denyAccess("print");
     const rows = buildPromoRows(printModal.scope, printModal.entryId);
+    const promoColumns = getPromoColumns();
     const tableHtml = `<table><thead><tr>${promoColumns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${promoColumns.map((c) => `<td>${escapeHtml(r[c])}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${promoColumns.length}">No data available. Template/header only.</td></tr>`}</tbody></table>`;
     const cardsHtml = rows.length ? rows.map((r) => `<div class="card">${promoColumns.map((c) => `<div><b>${escapeHtml(c)}:</b> ${escapeHtml(r[c])}</div>`).join("")}</div>`).join("") : `<div class="card">No data available. Template/header only.</div>`;
     const body = printModal.layout === "TABLE" ? tableHtml : cardsHtml;
@@ -1822,11 +1861,12 @@ export default function TechnologyPromotion() {
   };
 
   const renderTechPromoCustomInputs = () => {
-    if (!techPromoCustomFields.length) return null;
+    const fields = getFormTechPromoCustomFields();
+    if (!fields.length) return null;
 
     return (
       <>
-        {techPromoCustomFields.map((field) => {
+        {fields.map((field) => {
           const key = field.fieldKey || field.field_key || field.key;
           const rawLabel = field.fieldLabel || field.field_label || field.label || key;
           const label = cleanTechPromoCustomLabel(rawLabel);
@@ -1895,6 +1935,7 @@ export default function TechnologyPromotion() {
       sex: "N/A",
       meansOfVerification: "",
       staffName: "",
+      customFields: {},
       photos: [],
     });
     setNewModeName("");
@@ -3542,7 +3583,7 @@ export default function TechnologyPromotion() {
 
       {/* MAIN TABLE */}
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 1650 }}>
+        <table style={{ ...styles.table, minWidth: 1650 + getVisibleTechPromoCustomFields().length * 160 }}>
           <colgroup>
             <col style={{ width: "9%" }} />
             <col style={{ width: "4%" }} />
@@ -3567,6 +3608,11 @@ export default function TechnologyPromotion() {
               <th style={styles.th}>ACTIVITY VENUE/ADDRESS</th>
               <th style={styles.th}>NAME OF CUSTOMER/PARTICIPANT</th>
               <th style={styles.th}>CUSTOMER/PARTICIPANT ADDRESS</th>
+              {getVisibleTechPromoCustomFields().map((field) => (
+                <th key={`custom-head-${getTechPromoCustomFieldKey(field)}`} style={styles.th}>
+                  {getTechPromoCustomFieldLabel(field)}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -3574,7 +3620,7 @@ export default function TechnologyPromotion() {
           <tbody>
             {searchedEntries.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={10}>
+                <td style={styles.tdCenter} colSpan={10 + getVisibleTechPromoCustomFields().length}>
                   Wala pang entries
                   {projectFilter !== "ALL"
                     ? ` for project "${projectFilter || "(No Project)"}"`
@@ -3638,6 +3684,12 @@ export default function TechnologyPromotion() {
 
                     <td style={styles.td}>{e.customerName || "—"}</td>
                     <td style={styles.td}>{e.customerAddress || "—"}</td>
+
+                    {getVisibleTechPromoCustomFields().map((field) => (
+                      <td key={`custom-cell-${e.id}-${getTechPromoCustomFieldKey(field)}`} style={styles.td}>
+                        {getTechPromoCustomFieldValue(e, field)}
+                      </td>
+                    ))}
 
                     <td style={styles.tdCenter}>
                       <div

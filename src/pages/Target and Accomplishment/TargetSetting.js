@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import API_BASE from "../../api";
+import { useAuth } from "../../usrmngment/auth/AuthContext";
+import { canAccess } from "../../usrmngment/utils/permissions";
 
 const API = API_BASE;
+const TARGET_SETTING_PAGE_KEY = "targetSetting";
 
 const cloneRows = (rows) => rows.map((r) => ({ ...r }));
 
@@ -16,6 +19,15 @@ const extractErrorMessage = (err, fallback) => {
 };
 
 export default function Setup() {
+  const { user } = useAuth();
+  const canEditTargets = canAccess(user, TARGET_SETTING_PAGE_KEY, "edit");
+
+  const showTargetEditDenied = () => {
+    window.alert(
+      "Access Denied\n\nYour account does not have permission to edit Target Settings."
+    );
+  };
+
   const defaultRows = [
     {
       kpiKey: "interventions",
@@ -450,8 +462,6 @@ export default function Setup() {
   const [targetYear, setTargetYear] = useState(currentYear);
   const [globalStatus, setGlobalStatus] = useState("");
 
-  // Year-only picker shown as a modal popup.
-  // Uses a generated scrollable year list, plus manual typing for any year.
   const [yearPickerOpen, setYearPickerOpen] = useState(false);
   const [yearDraft, setYearDraft] = useState(String(currentYear));
 
@@ -575,6 +585,15 @@ export default function Setup() {
     setStatus,
     year = targetYear
   ) => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      if (setStatus) {
+        setStatus("❌ Edit permission required.");
+        setTimeout(() => setStatus(""), 3000);
+      }
+      return;
+    }
+
     try {
       const payloadRows = buildRowsPayload(moduleName, rowsData, year);
 
@@ -612,6 +631,15 @@ export default function Setup() {
     setStatus,
     year = targetYear
   ) => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      if (setStatus) {
+        setStatus("❌ Edit permission required.");
+        setTimeout(() => setStatus(""), 3000);
+      }
+      return;
+    }
+
     try {
       await axios.put(
         `${API}/target-settings/${encodeURIComponent(moduleName)}?year=${encodeURIComponent(year)}`,
@@ -690,6 +718,11 @@ export default function Setup() {
   }, [targetYear]);
 
   const updateCellFactory = (setter) => (idx, key, value) => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      return;
+    }
+
     setter((prev) => {
       const next = [...prev];
       const updated = { ...next[idx], [key]: value };
@@ -912,6 +945,13 @@ export default function Setup() {
   };
 
   const saveAllTargets = async () => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      setGlobalStatus("❌ Edit permission required.");
+      setTimeout(() => setGlobalStatus(""), 3000);
+      return;
+    }
+
     setGlobalStatus(`Saving all target settings for ${targetYear}...`);
     for (const m of targetModules) {
       await saveTargetSettings(m.key, m.rowsData, m.defaults, m.setter, m.statusSetter, targetYear);
@@ -921,6 +961,13 @@ export default function Setup() {
   };
 
   const clearCurrentYearTargets = async () => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      setGlobalStatus("❌ Edit permission required.");
+      setTimeout(() => setGlobalStatus(""), 3000);
+      return;
+    }
+
     const ok = window.confirm(`Clear all target settings for ${targetYear}?`);
     if (!ok) return;
 
@@ -933,6 +980,13 @@ export default function Setup() {
   };
 
   const copyPreviousYearTargets = async () => {
+    if (!canEditTargets) {
+      showTargetEditDenied();
+      setGlobalStatus("❌ Edit permission required.");
+      setTimeout(() => setGlobalStatus(""), 3000);
+      return;
+    }
+
     const previousYear = Number(targetYear) - 1;
     const ok = window.confirm(`Copy ${previousYear} targets into ${targetYear}? This will only fill the page. Click Save All after reviewing.`);
     if (!ok) return;
@@ -1435,15 +1489,22 @@ export default function Setup() {
         </div>
 
         <div style={styles.btnRow}>
-          <button style={styles.btn} onClick={onSave}>
-            Save {targetYear}
-          </button>
+          {canEditTargets ? (
+            <button style={styles.btn} onClick={onSave}>
+              Save {targetYear}
+            </button>
+          ) : null}
+
           <button style={styles.btn} onClick={onLoad}>
             Load {targetYear}
           </button>
-          <button style={styles.btn} onClick={onClear}>
-            Clear {targetYear}
-          </button>
+
+          {canEditTargets ? (
+            <button style={styles.btn} onClick={onClear}>
+              Clear {targetYear}
+            </button>
+          ) : null}
+
           {status ? <span style={styles.status}>{status}</span> : null}
         </div>
       </div>
@@ -1492,10 +1553,13 @@ export default function Setup() {
                   {["t1", "t2", "t3", "t4"].map((k) => (
                     <td key={k} style={{ ...styles.tdCenter, ...styles.green }}>
                       <input
-                        style={styles.input}
+                        style={canEditTargets ? styles.input : styles.inputReadonly}
                         type="number"
                         step={step}
                         value={r[k]}
+                        disabled={!canEditTargets}
+                        readOnly={!canEditTargets}
+                        title={!canEditTargets ? "Edit permission required" : ""}
                         onChange={(e) => onChange(idx, k, e.target.value)}
                       />
                     </td>
@@ -1515,7 +1579,9 @@ export default function Setup() {
         <div style={styles.globalHeader}>
           <div>
             <div style={styles.globalTitle}>Target Settings</div>
-            <div style={styles.globalSub}>Set, view, copy, and save annual targets by year. The selected year applies to every target table below.</div>
+            <div style={styles.globalSub}>
+              Set, view, copy, and save annual targets by year. The selected year applies to every target table below.
+            </div>
           </div>
 
           <div style={styles.fieldGroup}>
@@ -1528,15 +1594,25 @@ export default function Setup() {
           <button style={styles.globalBtnLight} onClick={loadAllTargets}>
             Load All {targetYear}
           </button>
-          <button style={styles.globalBtn} onClick={saveAllTargets}>
-            Save All {targetYear}
-          </button>
-          <button style={styles.globalBtnLight} onClick={copyPreviousYearTargets}>
-            Copy from {Number(targetYear) - 1}
-          </button>
-          <button style={styles.globalBtnDanger} onClick={clearCurrentYearTargets}>
-            Clear Current Year
-          </button>
+
+          {canEditTargets ? (
+            <button style={styles.globalBtn} onClick={saveAllTargets}>
+              Save All {targetYear}
+            </button>
+          ) : null}
+
+          {canEditTargets ? (
+            <button style={styles.globalBtnLight} onClick={copyPreviousYearTargets}>
+              Copy from {Number(targetYear) - 1}
+            </button>
+          ) : null}
+
+          {canEditTargets ? (
+            <button style={styles.globalBtnDanger} onClick={clearCurrentYearTargets}>
+              Clear Current Year
+            </button>
+          ) : null}
+
           {globalStatus ? <span style={{ ...styles.status, color: "#0f172a" }}>{globalStatus}</span> : null}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../usrmngment/auth/AuthContext";
+import { canAccess } from "../usrmngment/utils/permissions";
 import "./Sidebar.css";
 import logoMark from "../assets/logo/dost_sinta_logo_mark.png";
 
@@ -91,6 +92,40 @@ export default function Sidebar({ open, onClose }) {
   const isAdmin = cleanRole === "admin";
   const isSuperAdmin = cleanRole === "superadmin";
   const isStaff = cleanRole === "staff";
+
+  const canSeeDashboard = canAccess(user, "dashboard", "view");
+
+  const canSeeTargetSetting = canAccess(user, "targetSetting", "view");
+  const canSeeAccomplishmentSummary = canAccess(user, "accomplishments", "view");
+  const canSeeTargetAndAccomplishmentDropdown =
+    canSeeTargetSetting || canSeeAccomplishmentSummary;
+
+  const canSeeSetup = canAccess(user, "setup", "view");
+  const canSeeCest = canAccess(user, "cest", "view");
+  const canSeeSscp = canAccess(user, "sscp", "view");
+  const canSeeDrrm = canAccess(user, "drrm", "view");
+  const canSeeSpecialProject = canAccess(user, "specialProject", "view");
+  const canSeeCalibration = canAccess(user, "calibration", "view");
+  const canSeePackaging = canAccess(user, "packaging", "view");
+  const canSeeStPromo = canAccess(user, "stPromo", "view");
+  const canSeeTacs = canAccess(user, "tacs", "view");
+  const canSeeTechPromo = canAccess(user, "techPromo", "view");
+  const canSeeTechRollout = canAccess(user, "techRollout", "view");
+  const canSeeTechTraining = canAccess(user, "techTraining", "view");
+
+  const canSeeAccomplishmentReportingDropdown =
+    canSeeSetup ||
+    canSeeCest ||
+    canSeeSscp ||
+    canSeeDrrm ||
+    canSeeSpecialProject ||
+    canSeeCalibration ||
+    canSeePackaging ||
+    canSeeStPromo ||
+    canSeeTacs ||
+    canSeeTechPromo ||
+    canSeeTechRollout ||
+    canSeeTechTraining;
 
   const canSeeManagementDropdown = isSuperAdmin || isAdmin;
   const canSeeUserManagement = isSuperAdmin || isAdmin;
@@ -205,328 +240,390 @@ export default function Sidebar({ open, onClose }) {
 
         <div className="sidebar-scroll">
           <nav className="nav">
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
-              onClick={closeAll}
-            >
-              <Icon>{icons.dashboard}</Icon>
-              {!collapsed && <span className="nav-label">Dashboard</span>}
-            </NavLink>
-
-            <div
-              className="dropdown-wrap"
-              onMouseEnter={() => collapsed && setTaFlyout(true)}
-              onMouseLeave={() => collapsed && setTaFlyout(false)}
-            >
-              <button
-                type="button"
-                className={`nav-collapsible ${taOpen ? "open" : ""} ${
-                  collapsed ? "collapsed-btn" : ""
-                } ${isTargetSectionActive ? "section-active" : ""}`}
-                onClick={() => {
-                  if (collapsed) setTaFlyout((v) => !v);
-                  else setTaOpen((v) => !v);
-                }}
+            {canSeeDashboard ? (
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+                onClick={closeAll}
               >
-                <span className="nav-collapsible-left">
-                  <Icon>{icons.target}</Icon>
-                  {!collapsed && (
-                    <span className="nav-label">Target and Accomplishment</span>
-                  )}
-                </span>
-                {!collapsed && <span className="chev">{icons.chevron}</span>}
-              </button>
+                <Icon>{icons.dashboard}</Icon>
+                {!collapsed && <span className="nav-label">Dashboard</span>}
+              </NavLink>
+            ) : null}
 
-              {taOpen && !collapsed && (
-                <div className="nav-sub">
-                  <NavLink
-                    to="/target-setting"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Target Setting</span>
-                  </NavLink>
-
-                  <NavLink
-                    to="/accomplishment"
-                    end
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Accomplishment</span>
-                  </NavLink>
-                </div>
-              )}
-
-              {collapsed && taFlyout && (
-                <div className="flyout">
-                  <div className="flyout-title">Target &amp; Accomplishment</div>
-
-                  <NavLink
-                    to="/target-setting"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Target Setting
-                  </NavLink>
-
-                  <NavLink
-                    to="/accomplishment"
-                    end
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Accomplishment
-                  </NavLink>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="dropdown-wrap"
-              onMouseEnter={() => collapsed && setAccFlyout(true)}
-              onMouseLeave={() => collapsed && setAccFlyout(false)}
-            >
-              <button
-                type="button"
-                className={`nav-collapsible ${accOpen ? "open" : ""} ${
-                  collapsed ? "collapsed-btn" : ""
-                } ${isAccomplishmentSectionActive ? "section-active" : ""}`}
-                onClick={() => {
-                  if (collapsed) setAccFlyout((v) => !v);
-                  else setAccOpen((v) => !v);
-                }}
+            {canSeeTargetAndAccomplishmentDropdown ? (
+              <div
+                className="dropdown-wrap"
+                onMouseEnter={() => collapsed && setTaFlyout(true)}
+                onMouseLeave={() => collapsed && setTaFlyout(false)}
               >
-                <span className="nav-collapsible-left">
-                  <Icon>{icons.report}</Icon>
-                  {!collapsed && (
-                    <span className="nav-label">Accomplishment Reporting</span>
-                  )}
-                </span>
-                {!collapsed && <span className="chev">{icons.chevron}</span>}
-              </button>
+                <button
+                  type="button"
+                  className={`nav-collapsible ${taOpen ? "open" : ""} ${
+                    collapsed ? "collapsed-btn" : ""
+                  } ${isTargetSectionActive ? "section-active" : ""}`}
+                  onClick={() => {
+                    if (collapsed) setTaFlyout((v) => !v);
+                    else setTaOpen((v) => !v);
+                  }}
+                >
+                  <span className="nav-collapsible-left">
+                    <Icon>{icons.target}</Icon>
+                    {!collapsed && (
+                      <span className="nav-label">Target and Accomplishment</span>
+                    )}
+                  </span>
+                  {!collapsed && <span className="chev">{icons.chevron}</span>}
+                </button>
 
-              {accOpen && !collapsed && (
-                <div className="nav-sub">
-                  <NavLink
-                    to="/accomplishment/setup"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>SETUP</span>
-                  </NavLink>
+                {taOpen && !collapsed && (
+                  <div className="nav-sub">
+                    {canSeeTargetSetting ? (
+                      <NavLink
+                        to="/target-setting"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Target Setting</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/cest"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>CEST</span>
-                  </NavLink>
+                    {canSeeAccomplishmentSummary ? (
+                      <NavLink
+                        to="/accomplishment"
+                        end
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Accomplishment</span>
+                      </NavLink>
+                    ) : null}
+                  </div>
+                )}
 
-                  <NavLink
-                    to="/accomplishment/sscp"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>SSCP</span>
-                  </NavLink>
+                {collapsed && taFlyout && (
+                  <div className="flyout">
+                    <div className="flyout-title">Target &amp; Accomplishment</div>
 
-                  <NavLink
-                    to="/accomplishment/drrm"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>DRRM</span>
-                  </NavLink>
+                    {canSeeTargetSetting ? (
+                      <NavLink
+                        to="/target-setting"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Target Setting
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/special_report"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Special Project</span>
-                  </NavLink>
+                    {canSeeAccomplishmentSummary ? (
+                      <NavLink
+                        to="/accomplishment"
+                        end
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Accomplishment
+                      </NavLink>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            ) : null}
 
-                  <NavLink
-                    to="/accomplishment/calibration"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Calibration</span>
-                  </NavLink>
+            {canSeeAccomplishmentReportingDropdown ? (
+              <div
+                className="dropdown-wrap"
+                onMouseEnter={() => collapsed && setAccFlyout(true)}
+                onMouseLeave={() => collapsed && setAccFlyout(false)}
+              >
+                <button
+                  type="button"
+                  className={`nav-collapsible ${accOpen ? "open" : ""} ${
+                    collapsed ? "collapsed-btn" : ""
+                  } ${isAccomplishmentSectionActive ? "section-active" : ""}`}
+                  onClick={() => {
+                    if (collapsed) setAccFlyout((v) => !v);
+                    else setAccOpen((v) => !v);
+                  }}
+                >
+                  <span className="nav-collapsible-left">
+                    <Icon>{icons.report}</Icon>
+                    {!collapsed && (
+                      <span className="nav-label">Accomplishment Reporting</span>
+                    )}
+                  </span>
+                  {!collapsed && <span className="chev">{icons.chevron}</span>}
+                </button>
 
-                  <NavLink
-                    to="/accomplishment/packaging_and_labeling"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Packaging &amp; Labeling</span>
-                  </NavLink>
+                {accOpen && !collapsed && (
+                  <div className="nav-sub">
+                    {canSeeSetup ? (
+                      <NavLink
+                        to="/accomplishment/setup"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>SETUP</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/promo"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>S&amp;T PROMO</span>
-                  </NavLink>
+                    {canSeeCest ? (
+                      <NavLink
+                        to="/accomplishment/cest"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>CEST</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/tacs"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>TACS</span>
-                  </NavLink>
+                    {canSeeSscp ? (
+                      <NavLink
+                        to="/accomplishment/sscp"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>SSCP</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_promotion"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Technology Promotion</span>
-                  </NavLink>
+                    {canSeeDrrm ? (
+                      <NavLink
+                        to="/accomplishment/drrm"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>DRRM</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_rollout"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Technology Roll Out</span>
-                  </NavLink>
+                    {canSeeSpecialProject ? (
+                      <NavLink
+                        to="/accomplishment/special_report"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Special Project</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_training"
-                    className={({ isActive }) =>
-                      `nav-sub-item ${isActive ? "active" : ""}`
-                    }
-                    onClick={closeAll}
-                  >
-                    <span className="dot" />
-                    <span>Technology Training</span>
-                  </NavLink>
-                </div>
-              )}
+                    {canSeeCalibration ? (
+                      <NavLink
+                        to="/accomplishment/calibration"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Calibration</span>
+                      </NavLink>
+                    ) : null}
 
-              {collapsed && accFlyout && (
-                <div className="flyout">
-                  <div className="flyout-title">Accomplishment</div>
+                    {canSeePackaging ? (
+                      <NavLink
+                        to="/accomplishment/packaging_and_labeling"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Packaging &amp; Labeling</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/setup" className="flyout-item" onClick={closeAll}>
-                    SETUP
-                  </NavLink>
+                    {canSeeStPromo ? (
+                      <NavLink
+                        to="/accomplishment/promo"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>S&amp;T PROMO</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/cest" className="flyout-item" onClick={closeAll}>
-                    CEST
-                  </NavLink>
+                    {canSeeTacs ? (
+                      <NavLink
+                        to="/accomplishment/tacs"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>TACS</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/sscp" className="flyout-item" onClick={closeAll}>
-                    SSCP
-                  </NavLink>
+                    {canSeeTechPromo ? (
+                      <NavLink
+                        to="/accomplishment/technology_promotion"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Technology Promotion</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/drrm" className="flyout-item" onClick={closeAll}>
-                    DRRM
-                  </NavLink>
+                    {canSeeTechRollout ? (
+                      <NavLink
+                        to="/accomplishment/technology_rollout"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Technology Roll Out</span>
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/special_report"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Special Project
-                  </NavLink>
+                    {canSeeTechTraining ? (
+                      <NavLink
+                        to="/accomplishment/technology_training"
+                        className={({ isActive }) =>
+                          `nav-sub-item ${isActive ? "active" : ""}`
+                        }
+                        onClick={closeAll}
+                      >
+                        <span className="dot" />
+                        <span>Technology Training</span>
+                      </NavLink>
+                    ) : null}
+                  </div>
+                )}
 
-                  <NavLink
-                    to="/accomplishment/calibration"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Calibration
-                  </NavLink>
+                {collapsed && accFlyout && (
+                  <div className="flyout">
+                    <div className="flyout-title">Accomplishment</div>
 
-                  <NavLink
-                    to="/accomplishment/packaging_and_labeling"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Packaging &amp; Labeling
-                  </NavLink>
+                    {canSeeSetup ? (
+                      <NavLink to="/accomplishment/setup" className="flyout-item" onClick={closeAll}>
+                        SETUP
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/promo" className="flyout-item" onClick={closeAll}>
-                    S&amp;T PROMO
-                  </NavLink>
+                    {canSeeCest ? (
+                      <NavLink to="/accomplishment/cest" className="flyout-item" onClick={closeAll}>
+                        CEST
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink to="/accomplishment/tacs" className="flyout-item" onClick={closeAll}>
-                    TACS
-                  </NavLink>
+                    {canSeeSscp ? (
+                      <NavLink to="/accomplishment/sscp" className="flyout-item" onClick={closeAll}>
+                        SSCP
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_promotion"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Technology Promotion
-                  </NavLink>
+                    {canSeeDrrm ? (
+                      <NavLink to="/accomplishment/drrm" className="flyout-item" onClick={closeAll}>
+                        DRRM
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_rollout"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Technology Roll Out
-                  </NavLink>
+                    {canSeeSpecialProject ? (
+                      <NavLink
+                        to="/accomplishment/special_report"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Special Project
+                      </NavLink>
+                    ) : null}
 
-                  <NavLink
-                    to="/accomplishment/technology_training"
-                    className="flyout-item"
-                    onClick={closeAll}
-                  >
-                    Technology Training
-                  </NavLink>
-                </div>
-              )}
-            </div>
+                    {canSeeCalibration ? (
+                      <NavLink
+                        to="/accomplishment/calibration"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Calibration
+                      </NavLink>
+                    ) : null}
+
+                    {canSeePackaging ? (
+                      <NavLink
+                        to="/accomplishment/packaging_and_labeling"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Packaging &amp; Labeling
+                      </NavLink>
+                    ) : null}
+
+                    {canSeeStPromo ? (
+                      <NavLink to="/accomplishment/promo" className="flyout-item" onClick={closeAll}>
+                        S&amp;T PROMO
+                      </NavLink>
+                    ) : null}
+
+                    {canSeeTacs ? (
+                      <NavLink to="/accomplishment/tacs" className="flyout-item" onClick={closeAll}>
+                        TACS
+                      </NavLink>
+                    ) : null}
+
+                    {canSeeTechPromo ? (
+                      <NavLink
+                        to="/accomplishment/technology_promotion"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Technology Promotion
+                      </NavLink>
+                    ) : null}
+
+                    {canSeeTechRollout ? (
+                      <NavLink
+                        to="/accomplishment/technology_rollout"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Technology Roll Out
+                      </NavLink>
+                    ) : null}
+
+                    {canSeeTechTraining ? (
+                      <NavLink
+                        to="/accomplishment/technology_training"
+                        className="flyout-item"
+                        onClick={closeAll}
+                      >
+                        Technology Training
+                      </NavLink>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            ) : null}
 
             {canSeeManagementDropdown ? (
               <div

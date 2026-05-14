@@ -991,6 +991,38 @@ export default function SSCP() {
           }))
           : [],
         remarks: p.remarks || "",
+        meansOfVerification: p.meansOfVerification || p.means_of_verification || "",
+        means_of_verification: p.meansOfVerification || p.means_of_verification || "",
+        movPhotos: Array.isArray(p.movPhotos)
+          ? p.movPhotos
+          : Array.isArray(p.mov_photos)
+            ? p.mov_photos
+            : [],
+        mov_photos: Array.isArray(p.movPhotos)
+          ? p.movPhotos
+          : Array.isArray(p.mov_photos)
+            ? p.mov_photos
+            : [],
+        customFields:
+          typeof (p.customFields || p.custom_fields || {}) === "string"
+            ? (() => {
+              try {
+                return JSON.parse(p.customFields || p.custom_fields || "{}");
+              } catch {
+                return {};
+              }
+            })()
+            : p.customFields || p.custom_fields || {},
+        custom_fields:
+          typeof (p.customFields || p.custom_fields || {}) === "string"
+            ? (() => {
+              try {
+                return JSON.parse(p.customFields || p.custom_fields || "{}");
+              } catch {
+                return {};
+              }
+            })()
+            : p.customFields || p.custom_fields || {},
 
         // keep for later
         interventions: Array.isArray(p.interventions) ? p.interventions : [],
@@ -1108,6 +1140,72 @@ export default function SSCP() {
       cancelled = true;
     };
   }, []);
+
+  const getCustomFieldKey = (field = {}) =>
+    String(field.fieldKey || field.field_key || field.key || "").trim();
+
+  const getCustomFieldLabel = (field = {}) =>
+    String(field.fieldLabel || field.field_label || field.label || getCustomFieldKey(field) || "Custom Field").trim();
+
+  const getCustomFieldType = (field = {}) =>
+    String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();
+
+  const isCustomFieldVisible = (field = {}) =>
+    Boolean(field.isVisible ?? field.is_visible ?? field.visible ?? true);
+
+  const isCustomFieldShownOnAdd = (field = {}) =>
+    Boolean(field.showAdd ?? field.show_add ?? true);
+
+  const isCustomFieldShownOnEdit = (field = {}) =>
+    Boolean(field.showEdit ?? field.show_edit ?? true);
+
+  const parseCustomFieldsObject = (value = {}) => {
+    if (!value) return {};
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value || "{}");
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  };
+
+  const getProjectCustomFields = (project = {}) =>
+    parseCustomFieldsObject(project.customFields || project.custom_fields || {});
+
+  const sscpTableCustomFields = useMemo(
+    () =>
+      (Array.isArray(sscpCustomFields) ? sscpCustomFields : [])
+        .filter((field) => getCustomFieldKey(field) && isCustomFieldVisible(field))
+        .sort(
+          (a, b) =>
+            Number(a.sortOrder ?? a.sort_order ?? 999) -
+            Number(b.sortOrder ?? b.sort_order ?? 999)
+        ),
+    [sscpCustomFields]
+  );
+
+  const sscpFormCustomFields = useMemo(
+    () =>
+      sscpTableCustomFields.filter((field) =>
+        editProjectId ? isCustomFieldShownOnEdit(field) : isCustomFieldShownOnAdd(field)
+      ),
+    [sscpTableCustomFields, editProjectId]
+  );
+
+  const getProjectCustomFieldExportValues = (project = {}) => {
+    const projectCustomFields = getProjectCustomFields(project);
+
+    return sscpTableCustomFields.reduce((acc, field) => {
+      const key = getCustomFieldKey(field);
+      const label = getCustomFieldLabel(field);
+      acc[label] = projectCustomFields?.[key] ?? "";
+      return acc;
+    }, {});
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -2854,6 +2952,7 @@ export default function SSCP() {
           p?.partners,
           p?.staffName,
           p?.remarks,
+          ...Object.values(getProjectCustomFields(p) || {}),
           sscProjectText,
         ]
           .filter(Boolean)
@@ -2936,6 +3035,11 @@ export default function SSCP() {
     "Recognized as Smart City": "",
     "Smart City Recognition Date": "",
     "Total SSC Fund": "",
+    "Means of Verification": "",
+    ...sscpTableCustomFields.reduce((acc, field) => {
+      acc[getCustomFieldLabel(field)] = "";
+      return acc;
+    }, {}),
     Remarks: "",
     "Project Title": "",
     "Date of Project Approval": "",
@@ -2966,6 +3070,7 @@ export default function SSCP() {
         "Smart City Recognition Date": p?.smartCityDate || "",
         "Total SSC Fund": getSscTotal(p),
         "Means of Verification": p?.meansOfVerification || p?.means_of_verification || "",
+        ...getProjectCustomFieldExportValues(p),
         Remarks: p?.remarks || "",
       };
 
@@ -5247,7 +5352,7 @@ export default function SSCP() {
 
       {/* LGU/COMMUNITY TABLE */}
       <div style={styles.tableWrap}>
-        <table style={{ ...styles.table, minWidth: 1550 }}>
+        <table style={{ ...styles.table, minWidth: 1550 + sscpTableCustomFields.length * 140 }}>
           <colgroup>
             <col style={{ width: "4%" }} />
             <col style={{ width: "12%" }} />
@@ -5258,6 +5363,9 @@ export default function SSCP() {
             <col style={{ width: "18%" }} />
             <col style={{ width: "10%" }} />
             <col style={{ width: "8%" }} />
+            {sscpTableCustomFields.map((field) => (
+              <col key={`sscp-custom-col-${getCustomFieldKey(field)}`} style={{ width: "10%" }} />
+            ))}
             <col style={{ width: "10%" }} />
           </colgroup>
 
@@ -5272,6 +5380,11 @@ export default function SSCP() {
               <th style={styles.th}>PROJECTS</th>
               <th style={styles.th}>TOTAL SSC FUND</th>
               <th style={styles.th}>REMARKS</th>
+              {sscpTableCustomFields.map((field) => (
+                <th key={`sscp-custom-head-${getCustomFieldKey(field)}`} style={styles.th}>
+                  {getCustomFieldLabel(field).toUpperCase()}
+                </th>
+              ))}
               <th style={styles.th}>ACTIONS</th>
             </tr>
           </thead>
@@ -5279,7 +5392,7 @@ export default function SSCP() {
           <tbody>
             {paginatedProjects.length === 0 ? (
               <tr>
-                <td style={styles.tdCenter} colSpan={10}>
+                <td style={styles.tdCenter} colSpan={10 + sscpTableCustomFields.length}>
                   Walang entries sa current filter. Try “Clear Filters” or click “Add LGU / Community”.
                 </td>
               </tr>
@@ -5424,6 +5537,21 @@ export default function SSCP() {
                     <td style={styles.td}>
                       {p.remarks ? p.remarks : <span style={{ opacity: 0.65 }}>—</span>}
                     </td>
+
+                    {sscpTableCustomFields.map((field) => {
+                      const key = getCustomFieldKey(field);
+                      const value = getProjectCustomFields(p)?.[key];
+
+                      return (
+                        <td key={`sscp-custom-cell-${p.id}-${key}`} style={styles.td}>
+                          {value === null || value === undefined || value === "" ? (
+                            <span style={{ opacity: 0.65 }}>—</span>
+                          ) : (
+                            String(value)
+                          )}
+                        </td>
+                      );
+                    })}
 
                     <td style={styles.tdCenter}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
@@ -7304,20 +7432,11 @@ export default function SSCP() {
               </div>
 
               {(() => {
-                const projectCustomFields =
-                  typeof (viewProject?.customFields || viewProject?.custom_fields || {}) === "string"
-                    ? (() => {
-                      try {
-                        return JSON.parse(viewProject?.customFields || viewProject?.custom_fields || "{}");
-                      } catch {
-                        return {};
-                      }
-                    })()
-                    : viewProject?.customFields || viewProject?.custom_fields || {};
+                const projectCustomFields = getProjectCustomFields(viewProject);
 
                 const displayCustomFields =
-                  sscpCustomFields.length > 0
-                    ? sscpCustomFields
+                  sscpTableCustomFields.length > 0
+                    ? sscpTableCustomFields
                     : Object.keys(projectCustomFields || {}).map((key) => ({
                       key,
                       fieldKey: key,
@@ -7328,8 +7447,8 @@ export default function SSCP() {
                 return displayCustomFields.length > 0 ? (
                   <div style={{ ...styles.grid, marginTop: 14 }}>
                     {displayCustomFields.map((field) => {
-                      const key = field.fieldKey || field.field_key || field.key;
-                      const label = field.fieldLabel || field.field_label || field.label || key;
+                      const key = getCustomFieldKey(field);
+                      const label = getCustomFieldLabel(field);
                       const value = projectCustomFields?.[key];
 
                       return (
@@ -7544,12 +7663,12 @@ export default function SSCP() {
                   />
                 </div>
 
-                {sscpCustomFields.length > 0 ? (
+                {sscpFormCustomFields.length > 0 ? (
                   <>
-                    {sscpCustomFields.map((field) => {
-                      const key = field.fieldKey || field.field_key || field.key;
-                      const label = field.fieldLabel || field.field_label || field.label || key;
-                      const type = String(field.fieldType || field.field_type || field.type || "Text").toLowerCase();
+                    {sscpFormCustomFields.map((field) => {
+                      const key = getCustomFieldKey(field);
+                      const label = getCustomFieldLabel(field);
+                      const type = getCustomFieldType(field);
                       const value = form.customFields?.[key] ?? "";
 
                       const updateCustomField = (newValue) => {

@@ -467,6 +467,56 @@ const DEFAULT_CONFIGS = {
           },
         ],
       },
+
+      "Collaborations": {
+        columns: [
+          { label: "No.", key: "no", type: "Auto Number", visible: true, required: false },
+          { label: "Title of Collaboration", key: "title", type: "Text", visible: true, required: true },
+          { label: "Activity Date", key: "activityDate", type: "Date", visible: true, required: true },
+          { label: "Stakeholders", key: "stakeholders", type: "Multi-Select Dropdown", visible: true, required: false },
+          { label: "Means of Verification", key: "meansOfVerification", type: "Link / File", visible: true, required: false },
+          { label: "Remarks", key: "remarks", type: "Textarea", visible: true, required: false },
+          { label: "Actions", key: "actions", type: "Action Buttons", visible: true, required: false },
+        ],
+        formFields: [
+          { id: "title", label: "Title of Collaboration", key: "title", type: "Text", showAdd: true, showEdit: true, required: true },
+          { id: "activityDate", label: "Activity Date", key: "activityDate", type: "Date", showAdd: true, showEdit: true, required: true },
+          { id: "stakeholders", label: "Stakeholders", key: "stakeholders", type: "Multi-Select Dropdown", showAdd: true, showEdit: true, required: false },
+          { id: "meansOfVerification", label: "Means of Verification", key: "meansOfVerification", type: "Link / File", showAdd: true, showEdit: true, required: false },
+          { id: "remarks", label: "Remarks", key: "remarks", type: "Textarea", showAdd: true, showEdit: true, required: false },
+        ],
+        dropdowns: {
+          Stakeholders: [
+            "RDRRMC1",
+            "OCD 1",
+            "PDRRMO Pangasinan",
+            "DOST-PHIVOLCS",
+            "DOST-PAGASA",
+            "PHIVOLCS",
+            "PAGASA",
+            "DOST-STII",
+            "DENR-MGB",
+            "LGU",
+            "Academe",
+            "Private Sector",
+            "Civil Society Organization",
+            "Other"
+          ],
+          Month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+          Quarter: ["1st", "2nd", "3rd", "4th"],
+        },
+        sampleRows: [
+          {
+            "No.": "1",
+            "Title of Collaboration": "DRRM Coordination Meeting",
+            "Activity Date": "2026-03-15",
+            Stakeholders: "PDRRMO Pangasinan, OCD",
+            "Means of Verification": "MOV Link",
+            Remarks: "Sample only",
+            Actions: "View / Edit / Delete",
+          },
+        ],
+      },
     },
   },
 
@@ -840,6 +890,7 @@ const DEFAULT_CONFIGS = {
 const TABLE_NAME_MAP = {
   "Activities Table": "activities",
   "IEC Materials": "iec_materials",
+  "Collaborations": "collaborations",
 };
 
 function normalizeFieldFromApi(field) {
@@ -2057,8 +2108,11 @@ function TableManagement() {
               }}
               style={styles.subTableSelect}
             >
-              <option value="Activities Table">Table 1: Activities Table</option>
-              <option value="IEC Materials">Table 2: IEC Materials</option>
+              {Object.keys(configs.DRRM?.tables || {}).map((tableName, index) => (
+                <option key={tableName} value={tableName}>
+                  Table {index + 1}: {tableName}
+                </option>
+              ))}
             </select>
           </label>
         </div>
