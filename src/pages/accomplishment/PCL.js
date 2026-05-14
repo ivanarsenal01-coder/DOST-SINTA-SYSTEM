@@ -4736,63 +4736,153 @@ export default function PackagingAndLabeling() {
         </table>
       </div>
 
-      <div style={styles.googlePaginationWrap}>
-        <div style={styles.googleWordmark} aria-hidden="true">
-          <span style={styles.googleLetterBlue({ marginRight: 2 })}>D</span>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          marginTop: 18,
+          marginBottom: 8,
+          width: "100%",
+          background: "transparent",
+          fontFamily,
+          userSelect: "none",
+          boxSizing: "border-box",
+          padding: "10px 0",
+          transform: "scale(0.75)",
+    transformOrigin: "top center",
+        }}
+      >
+        <style>{`
+          @keyframes pclActivePagePop {
+            0% { transform: scale(0.88); }
+            70% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+          }
 
-          <div
-            style={{
-              ...styles.googleWordmarkTrack,
-              width: paginationLogoOSlots.length * 20,
-            }}
-          >
-            {paginationLogoOSlots.map((slot) => (
-              <span key={`slot-${slot}`} style={styles.googleLetterO()}>
-                o
-              </span>
-            ))}
+          .pcl-modern-page-btn:hover:not(:disabled):not(.pcl-modern-page-active) {
+            transform: translateY(-3px);
+            border-color: #93c5fd !important;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+          }
 
-            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
-          </div>
+          .pcl-modern-page-btn:active:not(:disabled) {
+            transform: scale(0.94);
+          }
 
-          <span style={styles.googleLetterBlue({ marginLeft: 2 })}>st</span>
-        </div>
+          .pcl-modern-page-active {
+            animation: pclActivePagePop 0.28s ease;
+          }
+        `}</style>
 
-        <div style={styles.googlePaginationRow}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            flexWrap: "wrap",
+            width: "100%",
+          }}
+        >
           <button
             type="button"
-            style={styles.googleNavBtn(currentPage <= 1)}
+            className="pcl-modern-page-btn"
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            title="Previous page"
+            style={{
+              minWidth: 54,
+              height: 54,
+              padding: "0 16px",
+              border: "2px solid #e5e7eb",
+              borderRadius: 16,
+              background: "#ffffff",
+              color: currentPage <= 1 ? "#a1a1aa" : "#2f3037",
+              fontSize: 34,
+              fontWeight: 900,
+              cursor: currentPage <= 1 ? "not-allowed" : "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: currentPage <= 1 ? "none" : "0 8px 18px rgba(15, 23, 42, 0.06)",
+              opacity: currentPage <= 1 ? 0.45 : 1,
+              fontFamily,
+              lineHeight: 1,
+              transition:
+                "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+            }}
           >
-            Previous
+            ‹
           </button>
 
-          <div style={styles.googlePageNumbers}>
-            {visiblePageNumbers.map((pageNum) =>
-              pageNum === currentPage ? (
-                <span key={pageNum} style={styles.googlePageCurrent}>
-                  {pageNum}
-                </span>
-              ) : (
-                <button
-                  key={pageNum}
-                  type="button"
-                  style={styles.googlePageBtn}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              )
-            )}
-          </div>
+          {visiblePageNumbers.map((pageNum) => {
+            const isActive = pageNum === currentPage;
+
+            return (
+              <button
+                key={pageNum}
+                type="button"
+                className={`pcl-modern-page-btn ${isActive ? "pcl-modern-page-active" : ""}`}
+                onClick={() => setCurrentPage(pageNum)}
+                title={`Page ${pageNum}`}
+                style={{
+                  minWidth: 54,
+                  height: 54,
+                  padding: "0 16px",
+                  border: isActive ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+                  borderRadius: 16,
+                  background: isActive ? "#3b82f6" : "#ffffff",
+                  color: isActive ? "#ffffff" : "#2f3037",
+                  fontSize: isActive ? 24 : 22,
+                  fontWeight: 900,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: isActive
+                    ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+                    : "0 8px 18px rgba(15, 23, 42, 0.06)",
+                  fontFamily,
+                  lineHeight: 1,
+                  transition:
+                    "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
 
           <button
             type="button"
-            style={styles.googleNavBtn(false)}
+            className="pcl-modern-page-btn"
             onClick={() => setCurrentPage((prev) => prev + 1)}
+            title="Next page"
+            style={{
+              minWidth: 54,
+              height: 54,
+              padding: "0 16px",
+              border: "2px solid #e5e7eb",
+              borderRadius: 16,
+              background: "#ffffff",
+              color: "#2f3037",
+              fontSize: 34,
+              fontWeight: 900,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 18px rgba(15, 23, 42, 0.06)",
+              fontFamily,
+              lineHeight: 1,
+              transition:
+                "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+            }}
           >
-            Next
+            ›
           </button>
         </div>
       </div>

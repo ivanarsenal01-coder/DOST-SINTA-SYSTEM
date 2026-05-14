@@ -613,15 +613,132 @@ function Pagination({ total, page, onPage }) {
   const safePage = Math.max(1, Number(page) || 1);
   const groupStart = Math.floor((safePage - 1) / 10) * 10 + 1;
   const nums = Array.from({ length: 10 }, (_, i) => groupStart + i);
+  const PAGINATION_SCALE = 0.75;
+
+  const wrap = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "18px 0 16px",
+    width: "100%",
+    fontFamily,
+    transform: `scale(${PAGINATION_SCALE})`,
+  transformOrigin: "top center",
+  };
+
+  const row = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    flexWrap: "wrap",
+  };
+
+  const pageBtn = (active = false, disabled = false) => ({
+    minWidth: 48,
+    height: 48,
+    padding: "0 14px",
+    border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+    borderRadius: 16,
+    background: active ? "#3b82f6" : "#ffffff",
+    color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
+    fontSize: active ? 22 : 18,
+    fontWeight: 900,
+    cursor: disabled ? "not-allowed" : "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: active
+      ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+      : "0 8px 18px rgba(15, 23, 42, 0.06)",
+    opacity: disabled ? 0.45 : 1,
+    fontFamily,
+    transition:
+      "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+  });
+
+  const arrowBtn = (disabled = false) => ({
+    ...pageBtn(false, disabled),
+    fontSize: 34,
+    lineHeight: 1,
+    paddingBottom: 3,
+  });
+
+  const prevDisabled = groupStart === 1;
+
   return (
-    <div style={S.dostPagerWrap}>
-      <div style={S.dostPagerLogo} aria-label="DOST pagination logo">
-        <span style={S.dostBlue}>D</span><span style={S.dostDark}>o</span><span style={S.dostBlue}>oooooooooo</span><span style={S.dostBlue}>st</span>
-      </div>
-      <div style={S.dostPagerControls}>
-        <button style={S.link} onClick={() => onPage(Math.max(1, groupStart - 10))}>Previous</button>
-        {nums.map((n) => <button key={n} style={S.link2(n === safePage)} onClick={() => onPage(n)}>{n}</button>)}
-        <button style={S.link} onClick={() => onPage(groupStart + 10)}>Next</button>
+    <div style={wrap}>
+      <style>
+        {`
+          .drrm-modern-page-btn:hover:not(:disabled):not(.drrm-modern-page-active) {
+            transform: translateY(-3px);
+            border-color: #93c5fd !important;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+          }
+
+          .drrm-modern-page-btn:active:not(:disabled) {
+            transform: scale(0.94);
+          }
+
+          .drrm-modern-page-active {
+            animation: drrmActivePagePop 0.28s ease;
+          }
+
+          @keyframes drrmActivePagePop {
+            0% {
+              transform: scale(0.88);
+            }
+
+            70% {
+              transform: scale(1.07);
+            }
+
+            100% {
+              transform: scale(1);
+            }
+          }
+        `}
+      </style>
+
+      <div style={row}>
+        <button
+          type="button"
+          className="drrm-modern-page-btn"
+          style={arrowBtn(prevDisabled)}
+          onClick={() => onPage(Math.max(1, groupStart - 10))}
+          disabled={prevDisabled}
+          title="Previous pages"
+        >
+          ‹
+        </button>
+
+        {nums.map((n) => {
+          const active = n === safePage;
+
+          return (
+            <button
+              key={n}
+              type="button"
+              className={`drrm-modern-page-btn ${active ? "drrm-modern-page-active" : ""}`}
+              style={pageBtn(active, false)}
+              onClick={() => onPage(n)}
+              title={`Page ${n}`}
+            >
+              {n}
+            </button>
+          );
+        })}
+
+        <button
+          type="button"
+          className="drrm-modern-page-btn"
+          style={arrowBtn(false)}
+          onClick={() => onPage(groupStart + 10)}
+          disabled={false}
+          title="Next pages"
+        >
+          ›
+        </button>
       </div>
     </div>
   );

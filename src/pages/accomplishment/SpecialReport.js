@@ -2603,36 +2603,81 @@ export default function SpecialProject() {
     return records.find((r) => r.id === addressViewForId) || null;
   }, [addressViewForId, records]);
 
+  
+  const PAGINATION_SCALE = 0.85;
   function Pagination({ page, onPage }) {
     const safePage = Math.max(1, Number(page) || 1);
     const groupStart = Math.floor((safePage - 1) / 10) * 10 + 1;
     const nums = Array.from({ length: 10 }, (_, i) => groupStart + i);
+    
 
     return (
-      <div style={styles.dostPagerWrap}>
-        <div style={styles.dostPagerLogo} aria-label="DOST pagination logo">
-          <span style={styles.dostBlue}>D</span>
-          <span style={styles.dostDark}>o</span>
-          <span style={styles.dostBlue}>oooooooooo</span>
-          <span style={styles.dostBlue}>st</span>
-        </div>
-        <div style={styles.dostPagerControls}>
-          <button type="button" style={styles.pageLink} onClick={() => onPage(Math.max(1, safePage - 1))}>Previous</button>
-          {nums.map((n) => (
-            <button
-              key={n}
-              type="button"
-              style={n === safePage ? styles.pageLinkActive : styles.pageLink}
-              onClick={() => onPage(n)}
-            >
-              {n}
-            </button>
-          ))}
-          <button type="button" style={styles.pageLink} onClick={() => onPage(safePage + 1)}>Next</button>
+      <div style={styles.modernPagerWrap}>
+        <style>{`
+          .special-project-page-btn:hover:not(:disabled):not(.special-project-page-active) {
+            transform: translateY(-3px);
+            border-color: #93c5fd !important;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+          }
+
+          .special-project-page-btn:active:not(:disabled) {
+            transform: scale(0.94);
+          }
+
+          .special-project-page-active {
+            animation: specialProjectActivePagePop 0.28s ease;
+          }
+
+          @keyframes specialProjectActivePagePop {
+            0% { transform: scale(0.88); }
+            70% { transform: scale(1.07); }
+            100% { transform: scale(1); }
+          }
+        `}</style>
+
+        <div style={styles.modernPagerControls}>
+          <button
+            type="button"
+            className="special-project-page-btn"
+            style={styles.modernPageBtn(safePage === 1, false, true)}
+            onClick={() => onPage(Math.max(1, safePage - 1))}
+            disabled={safePage === 1}
+            title="Previous page"
+          >
+            ‹
+          </button>
+
+          {nums.map((n) => {
+            const active = n === safePage;
+
+            return (
+              <button
+                key={n}
+                type="button"
+                className={`special-project-page-btn ${active ? "special-project-page-active" : ""}`}
+                style={styles.modernPageBtn(false, active, false)}
+                onClick={() => onPage(n)}
+                title={`Page ${n}`}
+              >
+                {n}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            className="special-project-page-btn"
+            style={styles.modernPageBtn(false, false, true)}
+            onClick={() => onPage(safePage + 1)}
+            title="Next page"
+          >
+            ›
+          </button>
         </div>
       </div>
     );
   }
+  
 
   const styles = {
     page: { padding: 16, position: "relative", fontFamily },
@@ -2714,37 +2759,47 @@ export default function SpecialProject() {
       fontFamily,
       outline: "none",
     },
-    dostPagerWrap: {
+    modernPagerWrap: {
       display: "flex",
-      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      gap: 2,
-      padding: "14px 0",
+      width: "100%",
+      padding: "18px 0 14px",
+      fontFamily,
+      transform: `scale(${PAGINATION_SCALE})`,
+      transformOrigin: "top center",
+    },
+    modernPagerControls: {
+      display: "flex",
+      justifyContent: "center",
+      gap: 10,
+      flexWrap: "wrap",
+      alignItems: "center",
       fontFamily,
     },
-    dostPagerLogo: { lineHeight: 1, fontSize: 30, fontWeight: 1000, letterSpacing: -1, fontFamily },
-    dostBlue: { color: "#23a8e0" },
-    dostDark: { color: "#0f172a" },
-    dostPagerControls: { display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap", alignItems: "center", fontFamily },
-    pageLink: {
-      border: "none",
-      background: "transparent",
-      cursor: "pointer",
-      fontWeight: 800,
-      color: "#0f172a",
-      textDecoration: "none",
-      fontFamily,
-    },
-    pageLinkActive: {
-      border: "none",
-      background: "transparent",
-      cursor: "pointer",
+    modernPageBtn: (disabled = false, active = false, arrow = false) => ({
+      minWidth: 48,
+      height: 48,
+      padding: arrow ? "0 15px" : "0 14px",
+      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+      borderRadius: 15,
+      background: active ? "#3b82f6" : "#ffffff",
+      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
+      fontSize: arrow ? 34 : 17,
+      lineHeight: 1,
       fontWeight: 900,
-      color: "#2563eb",
-      textDecoration: "underline",
+      cursor: disabled ? "not-allowed" : "pointer",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: active
+        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+        : "0 8px 18px rgba(15, 23, 42, 0.06)",
+      opacity: disabled ? 0.45 : 1,
       fontFamily,
-    },
+      transition:
+        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+    }),
 
     addBtn: {
       border: "1px solid rgba(15, 23, 42, 0.18)",

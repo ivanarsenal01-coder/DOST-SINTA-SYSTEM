@@ -2783,6 +2783,8 @@ export default function TechnologyRollout() {
     return records.find((r) => r.id === institutionAddressViewForId) || null;
   }, [institutionAddressViewForId, records]);
 
+  const PAGINATION_SCALE = 0.75;
+
   // ===== Styles (reused from Packaging) =====
   const styles = {
     page: { padding: 16, position: "relative", fontFamily },
@@ -2980,6 +2982,51 @@ export default function TechnologyRollout() {
       fontFamily,
       whiteSpace: "nowrap",
     },
+
+    modernPaginationWrap: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 22,
+      marginBottom: 10,
+      width: "100%",
+      transform: `scale(${PAGINATION_SCALE})`,
+      transformOrigin: "top center",
+    },
+
+    modernPaginationControls: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      flexWrap: "wrap",
+      padding: "6px 0",
+    },
+
+    modernPageBtn: (disabled = false, active = false, arrow = false) => ({
+      minWidth: arrow ? 48 : 54,
+      height: 54,
+      padding: arrow ? "0 14px" : "0 16px",
+      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+      borderRadius: 14,
+      background: active ? "#3b82f6" : "#ffffff",
+      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
+      fontSize: arrow ? 26 : active ? 21 : 18,
+      fontWeight: 900,
+      cursor: disabled ? "not-allowed" : "pointer",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: active
+        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+        : "0 8px 18px rgba(15, 23, 42, 0.06)",
+      opacity: disabled ? 0.45 : 1,
+      fontFamily,
+      lineHeight: 1,
+      userSelect: "none",
+      transition:
+        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+    }),
 
     googlePaginationWrap: {
       display: "flex",
@@ -3716,84 +3763,70 @@ export default function TechnologyRollout() {
         </table>
       </div>
 
-      <div style={styles.googlePaginationWrap}>
-        <div style={styles.googleWordmark} aria-hidden="true">
-          <span style={styles.googleLetterBlue()}>D</span>
+      <div style={styles.modernPaginationWrap}>
+        <style>{`
+          .tech-rollout-page-btn:hover:not(:disabled):not(.tech-rollout-page-active) {
+            transform: translateY(-3px);
+            border-color: #93c5fd !important;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+          }
 
-          <div style={styles.googleWordmarkTrack}>
-            {paginationLogoOSlots.map((slot) => (
-              <span key={slot} style={styles.googleLetterO()}>
-                o
-              </span>
-            ))}
+          .tech-rollout-page-btn:active:not(:disabled) {
+            transform: scale(0.94);
+          }
 
-            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
-          </div>
+          .tech-rollout-page-active {
+            animation: techrolloutActivePagePop 0.28s ease;
+          }
 
-          <span style={styles.googleLetterBlue()}>s</span>
-          <span style={styles.googleLetterBlue()}>t</span>
-        </div>
+          @keyframes techrolloutActivePagePop {
+            0% { transform: scale(0.88); }
+            70% { transform: scale(1.07); }
+            100% { transform: scale(1); }
+          }
+        `}</style>
 
-        <div style={styles.googlePaginationRow}>
+        <div style={styles.modernPaginationControls}>
           <button
             type="button"
-            style={styles.googleNavBtn(pageWindowStart === 1)}
-            onClick={() =>
-              setCurrentPage((prev) =>
-                Math.max(
-                  1,
-                  Math.floor((prev - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW -
-                  (PAGE_NUMBER_WINDOW - 1)
-                )
-              )
-            }
+            className="tech-rollout-page-btn"
+            style={styles.modernPageBtn(pageWindowStart === 1, false, true)}
+            onClick={() => setCurrentPage((prev) => Math.max(1, pageWindowStart - PAGE_NUMBER_WINDOW))}
             disabled={pageWindowStart === 1}
+            title="Previous page group"
           >
-            Previous
+            ‹
           </button>
 
-          <div style={styles.googlePageNumbers}>
-            {visiblePageNumbers.map((page) => {
-              const isActive = page === currentPage;
+          {visiblePageNumbers.map((pageNum) => {
+            const active = pageNum === currentPage;
 
-              if (isActive) {
-                return (
-                  <span key={page} style={styles.googlePageCurrent}>
-                    {page}
-                  </span>
-                );
-              }
-
-              return (
-                <button
-                  key={page}
-                  type="button"
-                  style={styles.googlePageBtn}
-                  onClick={() => setCurrentPage(page)}
-                  disabled={false}
-                >
-                  {page}
-                </button>
-              );
-            })}
-          </div>
+            return (
+              <button
+                key={pageNum}
+                type="button"
+                className={`tech-rollout-page-btn ${active ? "tech-rollout-page-active" : ""}`}
+                style={styles.modernPageBtn(false, active, false)}
+                onClick={() => setCurrentPage(pageNum)}
+                title={`Page ${pageNum}`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
 
           <button
             type="button"
-            style={styles.googleNavBtn(false)}
-            onClick={() =>
-              setCurrentPage(
-                Math.floor((currentPage - 1) / PAGE_NUMBER_WINDOW) * PAGE_NUMBER_WINDOW +
-                PAGE_NUMBER_WINDOW +
-                1
-              )
-            }
-            disabled={false}
+            className="tech-rollout-page-btn"
+            style={styles.modernPageBtn(false, false, true)}
+            onClick={() => setCurrentPage((prev) => pageWindowStart + PAGE_NUMBER_WINDOW)}
+            title="Next page group"
           >
-            Next
+            ›
           </button>
         </div>
       </div>
+
 
       {institutionAddressViewForId && (
         <AddressViewModal record={institutionAddressViewRecord} onClose={() => setInstitutionAddressViewForId(null)} />

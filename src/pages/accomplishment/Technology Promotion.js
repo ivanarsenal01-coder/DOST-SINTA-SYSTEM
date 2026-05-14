@@ -3695,20 +3695,51 @@ export default function TechnologyPromotion() {
           </tbody>
         </table>
 
+        <style>{`
+          .modern-page-btn:hover:not(:disabled):not(.modern-page-active) {
+            transform: translateY(-3px);
+            border-color: #93c5fd !important;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+          }
+
+          .modern-page-btn:active:not(:disabled) {
+            transform: scale(0.94);
+          }
+
+          .modern-page-active {
+            animation: activePagePop 0.28s ease;
+          }
+
+          .modern-page-arrow {
+            font-size: 36px !important;
+            line-height: 1;
+          }
+
+          @keyframes activePagePop {
+            0% {
+              transform: scale(0.88);
+            }
+
+            70% {
+              transform: scale(1.07);
+            }
+
+            100% {
+              transform: scale(1);
+            }
+          }
+        `}</style>
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: 4,
-            marginTop: 18,
-            marginBottom: 8,
+            marginTop: 22,
+            marginBottom: 10,
             width: "100%",
-            background: "transparent",
-            fontFamily,
-            userSelect: "none",
-            boxSizing: "border-box",
+            transform: "scale(0.75)",
+    transformOrigin: "top center",
           }}
         >
           <div
@@ -3716,181 +3747,105 @@ export default function TechnologyPromotion() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 0,
-              lineHeight: 1,
-              background: "transparent",
-              border: "none",
-              boxShadow: "none",
-              padding: 0,
-              borderRadius: 0,
-            }}
-            aria-hidden="true"
-          >
-            <span
-              style={{
-                display: "inline-block",
-                color: "#1ba4df",
-                fontWeight: 900,
-                fontSize: 34,
-                lineHeight: 1,
-                letterSpacing: 0,
-                fontFamily,
-              }}
-            >
-              D
-            </span>
-
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                width: paginationLogoOSlots.length * 20,
-              }}
-            >
-              {paginationLogoOSlots.map((slot) => (
-                <span
-                  key={`dost-blue-o-${slot}`}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 20,
-                    color: "#1ba4df",
-                    fontWeight: 900,
-                    fontSize: 34,
-                    lineHeight: 1,
-                    fontFamily,
-                  }}
-                >
-                  o
-                </span>
-              ))}
-
-              <span
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 20,
-                  color: "#111827",
-                  fontWeight: 900,
-                  fontSize: 34,
-                  lineHeight: 1,
-                  fontFamily,
-                  pointerEvents: "none",
-                  transform: `translateX(${activeLogoIndex * 20}px)`,
-                  transition: "transform 220ms ease-in-out",
-                }}
-              >
-                o
-              </span>
-            </div>
-
-            <span
-              style={{
-                display: "inline-block",
-                color: "#1ba4df",
-                fontWeight: 900,
-                fontSize: 34,
-                lineHeight: 1,
-                letterSpacing: 0,
-                fontFamily,
-              }}
-            >
-              st
-            </span>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
+              gap: 10,
               flexWrap: "wrap",
-              width: "100%",
-              lineHeight: 1,
-              marginTop: 0,
             }}
           >
             <button
               type="button"
+              className="modern-page-btn modern-page-arrow"
               disabled={safeCurrentPage <= 1}
-              onClick={() => setCurrentPage((prev) => Math.max(1, pageWindowStart - PAGE_WINDOW_SIZE))}
+              onClick={() =>
+                setCurrentPage(() => Math.max(1, pageWindowStart - PAGE_WINDOW_SIZE))
+              }
+              title="Previous pages"
               style={{
-                border: "none",
-                background: "transparent",
-                color: safeCurrentPage <= 1 ? "#94a3b8" : "#2563eb",
-                padding: 0,
+                minWidth: 54,
+                height: 54,
+                padding: "0 16px",
+                border: "2px solid #e5e7eb",
+                borderRadius: 16,
+                background: "#ffffff",
+                color: safeCurrentPage <= 1 ? "#a1a1aa" : "#2f3037",
+                fontSize: 22,
+                fontWeight: 900,
                 cursor: safeCurrentPage <= 1 ? "not-allowed" : "pointer",
-                fontWeight: 700,
-                fontSize: 14,
-                fontFamily,
-                lineHeight: 1,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Previous
-            </button>
-
-            <div
-              style={{
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 14,
-                flexWrap: "wrap",
-                width: "auto",
-                lineHeight: 1,
+                boxShadow: "0 8px 18px rgba(15, 23, 42, 0.06)",
+                opacity: safeCurrentPage <= 1 ? 0.45 : 1,
+                fontFamily,
+                transition:
+                  "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
               }}
             >
-              {visiblePageNumbers.map((page) => (
+              ‹
+            </button>
+
+            {visiblePageNumbers.map((page) => {
+              const isActive = safeCurrentPage === page;
+
+              return (
                 <button
                   key={page}
                   type="button"
+                  className={`modern-page-btn ${isActive ? "modern-page-active" : ""}`}
                   onClick={() => setCurrentPage(page)}
+                  title={`Page ${page}`}
                   style={{
-                    border: "none",
-                    background: "transparent",
-                    color: safeCurrentPage === page ? "#2563eb" : "#111827",
-                    padding: 0,
-                    minWidth: 18,
+                    minWidth: 54,
+                    height: 54,
+                    padding: "0 16px",
+                    border: isActive ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+                    borderRadius: 16,
+                    background: isActive ? "#3b82f6" : "#ffffff",
+                    color: isActive ? "#ffffff" : "#2f3037",
+                    fontSize: isActive ? 24 : 22,
+                    fontWeight: 900,
                     cursor: "pointer",
-                    fontWeight: safeCurrentPage === page ? 800 : 500,
-                    fontSize: 14,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: isActive
+                      ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+                      : "0 8px 18px rgba(15, 23, 42, 0.06)",
                     fontFamily,
-                    lineHeight: 1,
-                    textAlign: "center",
+                    transition:
+                      "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
                   }}
                 >
                   {page}
                 </button>
-              ))}
-            </div>
+              );
+            })}
 
             <button
               type="button"
-              disabled={false}
-              onClick={() => setCurrentPage((prev) => pageWindowStart + PAGE_WINDOW_SIZE)}
+              className="modern-page-btn modern-page-arrow"
+              onClick={() => setCurrentPage(() => pageWindowStart + PAGE_WINDOW_SIZE)}
+              title="Next pages"
               style={{
-                border: "none",
-                background: "transparent",
-                color: "#2563eb",
-                padding: 0,
+                minWidth: 54,
+                height: 54,
+                padding: "0 16px",
+                border: "2px solid #e5e7eb",
+                borderRadius: 16,
+                background: "#ffffff",
+                color: "#2f3037",
+                fontSize: 22,
+                fontWeight: 900,
                 cursor: "pointer",
-                fontWeight: 700,
-                fontSize: 14,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 8px 18px rgba(15, 23, 42, 0.06)",
                 fontFamily,
-                lineHeight: 1,
-                whiteSpace: "nowrap",
+                transition:
+                  "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
               }}
             >
-              Next
+              ›
             </button>
           </div>
         </div>

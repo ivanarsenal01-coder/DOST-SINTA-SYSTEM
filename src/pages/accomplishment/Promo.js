@@ -3183,7 +3183,7 @@ export default function STPromo() {
             <div style={styles.sectionTitle}>
               S&amp;T PROMO TABLE
               <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.75 }}>
-                Showing <b>{pageStartItem}-{pageEndItem}</b> / {totalEntries}
+                Showing <b>{pageStartItem}  of  {pageEndItem}</b> / {totalEntries}
               </span>
             </div>
 
@@ -3460,55 +3460,153 @@ export default function STPromo() {
           )}
         </div>
 
-        <div style={styles.dostPaginationWrap}>
-          <div style={styles.dostWordmark} aria-hidden="true">
-            <span style={styles.dostBlueLetter}>D</span>
-            <div
-              style={{
-                ...styles.dostOTrack,
-                width: paginationLogoOSlots.length * 20,
-              }}
-            >
-              {paginationLogoOSlots.map((slot) => (
-                <span key={`slot-${slot}`} style={styles.dostO}>
-                  o
-                </span>
-              ))}
-              <span style={styles.dostMovingO(activeLogoIndex)}>o</span>
-            </div>
-            <span style={styles.dostBlueLetter}>st</span>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            marginTop: 18,
+            marginBottom: 8,
+            width: "100%",
+            background: "transparent",
+            fontFamily,
+            userSelect: "none",
+            boxSizing: "border-box",
+            padding: "10px 0",
+            transform: "scale(0.75)",
+    transformOrigin: "top center",
+          }}
+        >
+          <style>{`
+            @keyframes stPromoActivePagePop {
+              0% { transform: scale(0.88); }
+              70% { transform: scale(1.08); }
+              100% { transform: scale(1); }
+            }
 
-          <div style={styles.dostPaginationRow}>
+            .stpromo-modern-page-btn:hover:not(:disabled):not(.stpromo-modern-page-active) {
+              transform: translateY(-3px);
+              border-color: #93c5fd !important;
+              box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+            }
+
+            .stpromo-modern-page-btn:active:not(:disabled) {
+              transform: scale(0.94);
+            }
+
+            .stpromo-modern-page-active {
+              animation: stPromoActivePagePop 0.28s ease;
+            }
+          `}</style>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              flexWrap: "wrap",
+              width: "100%",
+            }}
+          >
             <button
               type="button"
-              style={styles.dostNavBtn(currentPage <= 1)}
+              className="stpromo-modern-page-btn"
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              title="Previous page"
+              style={{
+                minWidth: 54,
+                height: 54,
+                padding: "0 16px",
+                border: "2px solid #e5e7eb",
+                borderRadius: 16,
+                background: "#ffffff",
+                color: currentPage <= 1 ? "#a1a1aa" : "#2f3037",
+                fontSize: 34,
+                fontWeight: 900,
+                cursor: currentPage <= 1 ? "not-allowed" : "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: currentPage <= 1 ? "none" : "0 8px 18px rgba(15, 23, 42, 0.06)",
+                opacity: currentPage <= 1 ? 0.45 : 1,
+                fontFamily,
+                lineHeight: 1,
+                transition:
+                  "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+              }}
             >
-              Previous
+              ‹
             </button>
 
-            <div style={styles.dostPageNumbers}>
-              {visiblePageNumbers.map((page) => (
+            {visiblePageNumbers.map((page) => {
+              const isActive = currentPage === page;
+
+              return (
                 <button
                   key={page}
                   type="button"
-                  style={styles.dostPageBtn(page === currentPage)}
+                  className={`stpromo-modern-page-btn ${isActive ? "stpromo-modern-page-active" : ""}`}
                   onClick={() => setCurrentPage(page)}
+                  title={`Page ${page}`}
+                  style={{
+                    minWidth: 54,
+                    height: 54,
+                    padding: "0 16px",
+                    border: isActive ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+                    borderRadius: 16,
+                    background: isActive ? "#3b82f6" : "#ffffff",
+                    color: isActive ? "#ffffff" : "#2f3037",
+                    fontSize: isActive ? 24 : 22,
+                    fontWeight: 900,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: isActive
+                      ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+                      : "0 8px 18px rgba(15, 23, 42, 0.06)",
+                    fontFamily,
+                    lineHeight: 1,
+                    transition:
+                      "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+                  }}
                 >
                   {page}
                 </button>
-              ))}
-            </div>
+              );
+            })}
 
             <button
               type="button"
-              style={styles.dostNavBtn(false)}
-              disabled={false}
+              className="stpromo-modern-page-btn"
               onClick={() => setCurrentPage((prev) => prev + 1)}
+              title="Next page"
+              style={{
+                minWidth: 54,
+                height: 54,
+                padding: "0 16px",
+                border: "2px solid #e5e7eb",
+                borderRadius: 16,
+                background: "#ffffff",
+                color: "#2f3037",
+                fontSize: 34,
+                fontWeight: 900,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 8px 18px rgba(15, 23, 42, 0.06)",
+                fontFamily,
+                lineHeight: 1,
+                transition:
+                  "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+              }}
             >
-              Next
+              ›
             </button>
           </div>
         </div>

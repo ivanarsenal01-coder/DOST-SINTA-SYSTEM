@@ -515,17 +515,13 @@ aside.sidebar.collapsed {
 }
 
 .sidebar .logo-name {
-  font-size: 18px !important;
+  font-size: 26px !important;
   font-weight: 900 !important;
   color: #000000 !important;
   letter-spacing: 8px !important;
   white-space: nowrap !important;
   line-height: 1 !important;
-  font-family: Inter, "Segoe UI", Arial, sans-serif !important;
-}
-
-.sidebar .logo-sub {
-  display: none !important;
+  font-family: Algerian, "Copperplate Gothic Bold", "Copperplate Gothic Light", Georgia, serif !important;
 }
 
 /* =========================================================

@@ -1990,7 +1990,7 @@ export default function TACS() {
       </div>
     );
   }
-
+const PAGINATION_SCALE = 0.75;
   // =========================
   // Styles
   // =========================
@@ -2475,6 +2475,48 @@ export default function TACS() {
       textAlign: "center",
       fontFamily,
     },
+
+    modernPaginationWrap: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 22,
+      marginBottom: 10,
+      width: "100%",
+      transform: `scale(${PAGINATION_SCALE})`,
+      transformOrigin: "top center",
+    },
+
+    modernPaginationRow: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      flexWrap: "wrap",
+    },
+
+    modernPageBtn: (disabled = false, active = false) => ({
+      minWidth: 54,
+      height: 54,
+      padding: "0 16px",
+      border: active ? "2px solid #3b82f6" : "2px solid #e5e7eb",
+      borderRadius: 16,
+      background: active ? "#3b82f6" : "#ffffff",
+      color: disabled ? "#a1a1aa" : active ? "#ffffff" : "#2f3037",
+      fontSize: active ? 24 : 22,
+      fontWeight: 900,
+      cursor: disabled ? "not-allowed" : "pointer",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: active
+        ? "0 14px 30px rgba(59, 130, 246, 0.28)"
+        : "0 8px 18px rgba(15, 23, 42, 0.06)",
+      opacity: disabled ? 0.45 : 1,
+      fontFamily,
+      transition:
+        "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease",
+    }),
     toolbarBtn: {
       height: 30,
       minWidth: 84,
@@ -2984,74 +3026,86 @@ export default function TACS() {
         </table>
       </div>
 
-      <div style={styles.googlePaginationWrap}>
-        <div style={styles.googleWordmark} aria-hidden="true">
-          <span style={styles.googleLetterBlue({ marginRight: 2 })}>D</span>
+      <style>{`
+        .modern-page-btn:hover:not(:disabled):not(.modern-page-active) {
+          transform: translateY(-3px);
+          border-color: #93c5fd !important;
+          box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+        }
 
-          <div
-            style={{
-              ...styles.googleWordmarkTrack,
-              width: paginationLogoOSlots.length * 20,
-            }}
-          >
-            {paginationLogoOSlots.map((slot) => (
-              <span key={`slot-${slot}`} style={styles.googleLetterO()}>
-                o
-              </span>
-            ))}
+        .modern-page-btn:active:not(:disabled) {
+          transform: scale(0.94);
+        }
 
-            <span style={styles.googleMovingBlackO(activeLogoIndex)}>o</span>
-          </div>
+        .modern-page-active {
+          animation: activePagePop 0.28s ease;
+        }
 
-          <span style={styles.googleLetterBlue({ marginLeft: 2 })}>st</span>
-        </div>
+        .modern-page-arrow {
+          font-size: 36px !important;
+          line-height: 1;
+        }
 
-        <div style={styles.googlePaginationRow}>
+        @keyframes activePagePop {
+          0% {
+            transform: scale(0.88);
+          }
+
+          70% {
+            transform: scale(1.07);
+          }
+
+          100% {
+            transform: scale(1);
+          }
+        }
+      `}</style>
+
+      <div style={styles.modernPaginationWrap}>
+        <div style={styles.modernPaginationRow}>
           <button
             type="button"
-            style={styles.googleNavBtn(currentPage <= 1)}
+            className="modern-page-btn modern-page-arrow"
+            style={styles.modernPageBtn(currentPage <= 1, false)}
             disabled={currentPage <= 1}
             onClick={() =>
               setCurrentPage(() => Math.max(1, pageWindowStart - PAGE_NUMBER_WINDOW))
             }
+            title="Previous pages"
           >
-            Previous
+            ‹
           </button>
 
-          <div style={styles.googlePageNumbers}>
-            {visiblePageNumbers.map((pageNum) =>
-              pageNum === currentPage ? (
-                <span key={pageNum} style={styles.googlePageCurrent}>
-                  {pageNum}
-                </span>
-              ) : (
-                <button
-                  key={pageNum}
-                  type="button"
-                  style={styles.googlePageBtn}
-                  onClick={() => setCurrentPage(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              )
-            )}
-          </div>
+          {visiblePageNumbers.map((pageNum) => {
+            const isActive = pageNum === currentPage;
+
+            return (
+              <button
+                key={pageNum}
+                type="button"
+                className={`modern-page-btn ${isActive ? "modern-page-active" : ""}`}
+                style={styles.modernPageBtn(false, isActive)}
+                onClick={() => setCurrentPage(pageNum)}
+                title={`Page ${pageNum}`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
 
           <button
             type="button"
-            style={styles.googleNavBtn(false)}
+            className="modern-page-btn modern-page-arrow"
+            style={styles.modernPageBtn(false, false)}
             onClick={() => setCurrentPage(() => pageWindowStart + PAGE_NUMBER_WINDOW)}
+            title="Next pages"
           >
-            Next
+            ›
           </button>
         </div>
       </div>
 
-      <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75, fontFamily }}>
-        * Scientific/technical/expert advice or recommendation rendered in any manner, either directly or indirectly to customers
-        <br />
-        ** Should be supported with a documented recommendation and acceptance report
-      </div>
+      
 
       {/* ADDRESS QUICK VIEW MODAL */}
       {addressViewEntryId && <AddressViewModal entry={addressViewEntry} onClose={() => setAddressViewEntryId(null)} />}
