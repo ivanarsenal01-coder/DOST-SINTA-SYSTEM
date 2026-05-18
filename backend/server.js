@@ -33,6 +33,88 @@ db.getConnection((err, conn) => {
     conn.release();
   }
 });
+// ===========================
+// FIRST SUPER ADMIN SEED
+// Creates first login account only when users table is empty
+// ===========================
+const seedFirstSuperAdmin = async () => {
+  const defaultPassword = process.env.FIRST_ADMIN_PASSWORD || "Admin123";
+
+  db.query(
+    `
+    CREATE TABLE IF NOT EXISTS users (
+      id INT NOT NULL AUTO_INCREMENT,
+      full_name VARCHAR(150) NOT NULL,
+      username VARCHAR(80) NOT NULL,
+      email VARCHAR(150) DEFAULT NULL,
+      password VARCHAR(255) NOT NULL,
+      role VARCHAR(50) NOT NULL DEFAULT 'staff',
+      status VARCHAR(30) NOT NULL DEFAULT 'active',
+      permissions LONGTEXT DEFAULT NULL,
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_users_username (username),
+      UNIQUE KEY uq_users_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `,
+    async (tableErr) => {
+      if (tableErr) {
+        console.error("❌ Failed creating/checking users table:", tableErr.message);
+        return;
+      }
+
+      db.query("SELECT COUNT(*) AS total FROM users", async (countErr, rows) => {
+        if (countErr) {
+          console.error("❌ Failed checking users table:", countErr.message);
+          return;
+        }
+
+        const total = Number(rows?.[0]?.total || 0);
+
+        if (total > 0) {
+          console.log("✅ Users already exist. Skipping first admin seed.");
+          return;
+        }
+
+        try {
+          const passwordHash = await bcrypt.hash(defaultPassword, 10);
+
+          db.query(
+            `
+            INSERT INTO users
+            (full_name, username, email, password, role, status, permissions)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            `,
+            [
+              "Super Admin",
+              "superadmin",
+              "superadmin@dost.gov.ph",
+              passwordHash,
+              "superadmin",
+              "active",
+              JSON.stringify({}),
+            ],
+            (insertErr) => {
+              if (insertErr) {
+                console.error("❌ Failed creating first Super Admin:", insertErr.message);
+                return;
+              }
+
+              console.log("✅ First Super Admin created.");
+              console.log("Username: superadmin");
+              console.log(`Password: ${defaultPassword}`);
+            }
+          );
+        } catch (hashErr) {
+          console.error("❌ Failed hashing first admin password:", hashErr.message);
+        }
+      });
+    }
+  );
+};
+
+seedFirstSuperAdmin();
 
 // ===========================
 // MySQL Pool Transaction Patch
