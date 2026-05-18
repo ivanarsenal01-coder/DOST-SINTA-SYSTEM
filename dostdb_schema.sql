@@ -1728,3 +1728,22 @@ ADD COLUMN IF NOT EXISTS `custom_fields` JSON NULL;
 
 ALTER TABLE `sscp_projects`
 ADD COLUMN IF NOT EXISTS `custom_fields` JSON NULL;
+
+-- =========================================================
+-- USERS / AUTHENTICATION TABLE
+-- =========================================================
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `full_name` VARCHAR(150) NOT NULL,
+  `username` VARCHAR(80) NOT NULL,
+  `email` VARCHAR(150) DEFAULT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(50) NOT NULL DEFAULT 'staff',
+  `status` VARCHAR(30) NOT NULL DEFAULT 'active',
+  `permissions` LONGTEXT DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_username` (`username`),
+  UNIQUE KEY `uq_users_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
