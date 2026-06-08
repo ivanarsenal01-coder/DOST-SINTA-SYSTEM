@@ -4093,7 +4093,7 @@ export default function Setup() {
           row.modeOfTransfer &&
           row.dateTransferred &&
           row.activityTitle &&
-          row.activityDate &&
+          row.activityDateVenue &&
           row.institutionName &&
           row.institutionAddress &&
           row.classification &&
